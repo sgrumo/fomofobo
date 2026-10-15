@@ -1,14 +1,6 @@
 import { execSync } from "node:child_process"
 import path from "node:path"
 
-import { getTableName, is } from "drizzle-orm"
-import { PgTable } from "drizzle-orm/pg-core"
-import { Client } from "pg"
-// oxlint-disable-next-line import/no-namespace -- Drizzle requires a namespace import for schema
-import * as schema from "storage/schema"
-
-import { publishedDatabaseUrl } from "./env"
-
 /**
  * @description Returns the `stderr` and `stdout` carried by a thrown `execSync` error
  * @param error Value thrown by `execSync`
@@ -59,42 +51,5 @@ export const exec = (
         throw new Error(`${label} failed:\n${getCommandOutput(error)}`, {
             cause: error,
         })
-    }
-}
-
-/**
- * @description Pushes the Drizzle schema to the test database
- * @param log Sink for progress messages
- */
-export const pushSchema = (log: (msg: string) => void) => {
-    log("pushing schema to test DB...")
-    exec("pnpm db:force-push", "schema push", ROOT_DIR)
-}
-
-/**
- * @description Returns the table names declared in the Drizzle schema
- */
-const getSchemaTableNames = (): string[] =>
-    Object.values(schema)
-        .filter(value => is(value, PgTable))
-        .map(table => getTableName(table))
-
-/**
- * @description Truncates every application table in the database that the lifecycle started
- * @param log Sink for progress messages, silent by default
- */
-export const truncateAllTables = async (log: (msg: string) => void = () => undefined) => {
-    const tableNames = getSchemaTableNames()
-    if (tableNames.length === 0) {
-        return
-    }
-    log("truncating all tables...")
-    const client = new Client({ connectionString: publishedDatabaseUrl() })
-    await client.connect()
-    try {
-        const tables = tableNames.map(name => `"${name}"`).join(", ")
-        await client.query(`TRUNCATE ${tables} CASCADE`)
-    } finally {
-        await client.end()
     }
 }

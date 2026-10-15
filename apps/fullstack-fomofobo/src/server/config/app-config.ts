@@ -40,6 +40,8 @@ export interface AppConfig {
      * instance refuses it, so a token never crosses the network in the clear.
      */
     allowInsecureOidc: boolean
+    /** Serve `POST /api/test/reset-database`, which deletes every row of D1. */
+    databaseResetEnabled: boolean
 }
 
 /**
@@ -50,6 +52,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
     match(appEnv)
         .returnType<AppConfig>()
         .with("test", () => ({
+            databaseResetEnabled: true,
             secureCookies: false,
             allowInsecureOidc: true,
             devPagesEnabled: true,
@@ -57,6 +60,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
             apiDocsEnabled: true,
         }))
         .with("local", () => ({
+            databaseResetEnabled: false,
             secureCookies: false,
             allowInsecureOidc: true,
             devPagesEnabled: true,
@@ -64,6 +68,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
             apiDocsEnabled: true,
         }))
         .with("cloudflare", () => ({
+            databaseResetEnabled: false,
             secureCookies: true,
             allowInsecureOidc: false,
             devPagesEnabled: false,

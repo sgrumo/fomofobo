@@ -1,55 +1,8 @@
-import type { StartedPostgreSqlContainer } from "@testcontainers/postgresql"
-import { PostgreSqlContainer } from "@testcontainers/postgresql"
 import type { StartedTestContainer } from "testcontainers"
 import { GenericContainer, Wait } from "testcontainers"
 import { z } from "zod"
 
-import { DATABASE_URL_ENV } from "./env"
-
-export type { StartedPostgreSqlContainer, StartedTestContainer }
-
-/**
- * @description Starts a PostgreSQL testcontainer and waits for readiness
- * @param log Sink for progress messages
- */
-export const startPostgresContainer = async (
-    log: (msg: string) => void,
-): Promise<StartedPostgreSqlContainer> => {
-    log("starting PostgreSQL container...")
-    const container = await new PostgreSqlContainer("postgres:18.6-trixie")
-        .withDatabase("postgres")
-        .withUsername("postgres")
-        .withPassword("postgres")
-        // Durability buys nothing on a database that lives for one run
-        .withCommand([
-            "postgres",
-            "-c",
-            "fsync=off",
-            "-c",
-            "synchronous_commit=off",
-            "-c",
-            "full_page_writes=off",
-        ])
-        .withStartupTimeout(60_000)
-        .start()
-    log(`PostgreSQL ready on port ${String(container.getMappedPort(5432))}`)
-    return container
-}
-
-/**
- * @description Sets the database connection env vars from the started container
- * @param pg Started PostgreSQL container
- * @remarks Mutates `process.env`
- */
-export const setContainerEnv = (pg: StartedPostgreSqlContainer) => {
-    process.env.PGHOST = pg.getHost()
-    process.env.PGPORT = String(pg.getMappedPort(5432))
-    process.env.PGUSER = "postgres"
-    process.env.PGPASSWORD = "postgres"
-    process.env.PGDATABASE = "postgres"
-    process.env[DATABASE_URL_ENV] = pg.getConnectionUri()
-    process.env.DISABLE_DRIZZLE_LOGS = "true"
-}
+export type { StartedTestContainer }
 
 const OBJECT_STORE_ACCESS_KEY = "yggtestaccess"
 const OBJECT_STORE_SECRET_KEY = "yggtestsecret123"

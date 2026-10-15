@@ -6,7 +6,7 @@ Each app has one E2E suite, in a workspace package named after the directory of 
 
 Run a suite with `pnpm e2e:<app>` from the repo root. `<app>` is the app name without its role prefix. `pnpm e2e` runs every suite, one after the other.
 
-The lifecycle pushes the current Drizzle schema to the test database. A suite needs no generated or applied migration.
+Each suite applies the generated migrations to a fresh local D1 database before it starts the app. A schema change needs its migration before the suite can see it.
 
 ## Which test
 

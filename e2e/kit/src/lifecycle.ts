@@ -9,14 +9,11 @@ import {
     objectStoreEnv,
     oidcEnv,
     oidcIssuer,
-    setContainerEnv,
     startObjectStoreContainer,
     startOidcProviderContainer,
-    startPostgresContainer,
 } from "./containers"
 import type { Log } from "./env"
 import { APP_URL_ENV } from "./env"
-import { pushSchema, truncateAllTables } from "./infra"
 import type { ServerSpec } from "./server"
 import { freePort, spawnServer, stopProcessGroup, waitForServer } from "./server"
 
@@ -45,11 +42,11 @@ export interface Stack {
 }
 
 /**
- * @description Builds the global setup of a suite: Postgres and the schema, then what `start` asks the stack for
+ * @description Builds the global setup of a suite: what `start` asks the stack for
  * @param options Logger and deadline
- * @param start Starts the containers and servers of the suite once the database is up
- * @remarks Writes the database, object store and provider variables into
- * `process.env`, so every server and test worker started later inherits them
+ * @param start Starts the containers and servers of the suite
+ * @remarks Writes the object store and provider variables into `process.env`, so every
+ * server and test worker started later inherits them
  */
 export const defineLifecycle =
     (options: LifecycleOptions, start: (stack: Stack) => Promise<void>) =>
@@ -107,22 +104,13 @@ export const defineLifecycle =
             },
         }
 
-        const run = async () => {
-            const pg = await startPostgresContainer(log)
-            containers.push(pg)
-            setContainerEnv(pg)
-
-            pushSchema(log)
-            await truncateAllTables(log)
-
-            await start(stack)
-        }
-
         const controller = new AbortController()
         try {
-            await withTimeout(run, options.timeoutMs ?? DEFAULT_TIMEOUT_MS, {
-                signal: controller.signal,
-            })
+            await withTimeout(
+                () => start(stack),
+                options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+                { signal: controller.signal },
+            )
         } catch (error) {
             await teardown()
             throw error

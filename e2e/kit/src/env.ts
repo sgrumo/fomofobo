@@ -25,9 +25,6 @@ export type Log = ReturnType<typeof createLog>
 /** Variable the lifecycle hands the origin of the app under test to the runner and the test workers through. */
 export const APP_URL_ENV = "E2E_APP_URL"
 
-/** Variable the lifecycle hands the connection string of the test database through. */
-export const DATABASE_URL_ENV = "E2E_DATABASE_URL"
-
 /**
  * @description Returns the value that the lifecycle published under the variable
  * @param variable Variable read
@@ -46,9 +43,3 @@ const published = (variable: string): string => {
  * @throws When no lifecycle published one
  */
 export const publishedAppUrl = (): string => published(APP_URL_ENV)
-
-/**
- * @description Returns the connection string of the database that the lifecycle started
- * @throws When no lifecycle published one
- */
-export const publishedDatabaseUrl = (): string => published(DATABASE_URL_ENV)

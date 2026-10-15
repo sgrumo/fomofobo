@@ -4,12 +4,12 @@ The harness that every suite imports. It holds no test. Each module is one entry
 
 ## Lifecycle
 
-The global setup of each suite calls `defineLifecycle`. It starts Postgres, pushes the Drizzle schema, and truncates every table. Then the suite asks the stack for the rest: free ports, the object store, the OpenID provider, and its servers.
+The global setup of each suite calls `defineLifecycle`. The suite asks the stack for what it needs: free ports, the object store, the OpenID provider, and its servers. The database belongs to the app: the suite prepares its local D1 state and serves the app on it.
 
 - The lifecycle writes the connection variables into `process.env`, so every server and test worker inherits them.
-- An API suite lists `e2e-kit/vitest-reset` in `setupFiles`. It truncates every table before each test.
-- If a suite keeps state outside Postgres, such as objects in a bucket or an in-memory fake, add a setup file with a `beforeEach` that clears it. List it in `setupFiles` after `e2e-kit/vitest-reset`.
-- The truncate connects only through the connection string that the lifecycle publishes for its container, never through the `PG*` variables of the shell. Without a lifecycle it throws, so it cannot wipe a developer database.
+- An API suite lists `e2e-kit/vitest-reset` in `setupFiles`. Before each test it calls `POST /api/test/reset-database` on the published app URL, and the app deletes every row. Never write the SQLite file of a running workerd from the test process: it corrupts the state that workerd holds open.
+- If a suite keeps state outside the database, such as objects in a bucket or an in-memory fake, add a setup file with a `beforeEach` that clears it. List it in `setupFiles` after `e2e-kit/vitest-reset`.
+- Without a lifecycle, the reset throws. Only an app under `APP_ENV=test` serves the route. The reset therefore cannot wipe a developer database.
 - The teardown stops each server with `SIGTERM`, then `SIGKILL` after five seconds.
 - Every port is dynamic. The containers use mapped ports, and each server listens on a port from `stack.freePort()`. The ports of two suites therefore never collide.
 

@@ -1,11 +1,13 @@
 import "server-only"
 import { swaggerUI } from "@hono/swagger-ui"
 import { OpenAPIHono } from "@hono/zod-openapi"
+import { getCloudflareContext } from "@opennextjs/cloudflare"
 import { createAuthMiddleware } from "backend-shared/auth"
 import type { ApplicationError } from "backend-shared/http"
 import { handleErrors, loggerMiddleware } from "backend-shared/http"
 import { memoize } from "es-toolkit"
 import { HttpStatus } from "models"
+import { buildDbInstance, deleteAllRows } from "storage"
 import { match } from "ts-pattern"
 
 import { getSessionCookieConfig } from "./auth/cookie-names"
@@ -62,6 +64,7 @@ const buildApi = (): OpenAPIHono => {
                 `${apiBasePath}/health`,
                 `${apiBasePath}/doc`,
                 `${apiBasePath}/swagger`,
+                `${apiBasePath}/test/reset-database`,
             ],
         }),
     )
@@ -73,6 +76,13 @@ const buildApi = (): OpenAPIHono => {
     )
 
     app.get(`${apiBasePath}/health`, c => c.json({ status: "ok" }))
+
+    if (appConfig.databaseResetEnabled) {
+        app.post(`${apiBasePath}/test/reset-database`, async c => {
+            await deleteAllRows(buildDbInstance(getCloudflareContext().env.DB))
+            return c.body(null, HttpStatus.NoContent)
+        })
+    }
 
     if (appConfig.apiDocsEnabled) {
         app.doc(`${apiBasePath}/doc`, {
