@@ -115,6 +115,22 @@ export const eventUpsertSchema = withTimeRange(
     )
 export type EventUpsert = z.infer<typeof eventUpsertSchema>
 
+export const eventListItemSchema = eventSchema
+    .pick({
+        id: true,
+        title: true,
+        startsAt: true,
+        endsAt: true,
+        organizer: true,
+        isBlocked: true,
+        blockReason: true,
+    })
+    .extend({
+        isRecurring: z.boolean(),
+        venue: venueSchema.pick({ id: true, name: true }),
+    })
+export type EventListItem = z.infer<typeof eventListItemSchema>
+
 export const eventListQuerySchema = paginationQuerySchema.extend({
     q: z.string().trim().min(1).optional(),
     organizerId: z.uuid().optional(),

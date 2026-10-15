@@ -1,7 +1,7 @@
 import { and, count, desc, eq, isNull, sql } from "drizzle-orm"
 import type { BatchItem } from "drizzle-orm/batch"
 import { chunk } from "es-toolkit"
-import type { Event, EventListQuery, Recurrence } from "models"
+import type { Event, EventListItem, EventListQuery, Recurrence } from "models"
 import type { StrictOmit } from "shared/types"
 
 import type { DbInstanceFromSchema } from "../db-config"
@@ -29,18 +29,6 @@ export interface StoredEventPhoto {
 }
 
 export type StoredEvent = StrictOmit<Event, "photos"> & { photos: StoredEventPhoto[] }
-
-export interface StoredEventListItem {
-    id: string
-    title: string
-    startsAt: string
-    endsAt: string
-    isRecurring: boolean
-    venue: { id: string; name: string }
-    organizer: { id: string; name: string }
-    isBlocked: boolean
-    blockReason: string | null
-}
 
 export interface StoredOccurrence {
     localDate: string
@@ -152,7 +140,7 @@ export class EventsStorage {
      */
     public async list(
         query: EventListQuery,
-    ): Promise<{ items: StoredEventListItem[]; total: number }> {
+    ): Promise<{ items: EventListItem[]; total: number }> {
         const whereClause = and(
             isNull(events.deletedAt),
             query.q === undefined ? undefined : likeContains(events.title, query.q),
