@@ -28,7 +28,6 @@
         "models": "workspace:*",
         "shared": "workspace:*",
         "ts-pattern": "catalog:",
-        "winston": "^3.15.0",
         "zod": "catalog:"
     },
     "devDependencies": {
