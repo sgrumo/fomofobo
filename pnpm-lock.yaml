@@ -616,6 +616,9 @@ importers:
       api-routes:
         specifier: workspace:*
         version: link:../api-routes
+      es-toolkit:
+        specifier: 'catalog:'
+        version: 1.52.0
       models:
         specifier: workspace:*
         version: link:../models
