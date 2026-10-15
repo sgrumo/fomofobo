@@ -27,8 +27,8 @@ export interface ObjectStoreProvisionConfig {
  * @description Creates the bucket, keeps it private, and writes its CORS rule
  * @param config Bucket, endpoint, credentials and the allowed browser origins
  * @throws When the store rejects a call, so a deployment stops on a broken store
- * @remarks Needs credentials that can create a bucket, so only a self-hosted store
- * runs it, and the CDK stack declares the same state on AWS
+ * @remarks Needs credentials that can create a bucket, so only the local and E2E stores
+ * run it, and `infra/cloudflare/README.md` describes the same state on R2
  */
 export const provisionObjectStore = async (
     config: ObjectStoreProvisionConfig,

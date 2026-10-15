@@ -1,9 +1,0 @@
-# Public S3 endpoint. The API bakes this host into presigned URLs, so the
-# browser must reach it. An S3 signature covers the full request path, so it
-# needs an address of its own and not a path prefix.
-#
-# OPERATOR: set S3_PUBLIC_DOMAIN to a host that resolves to this server, and
-# S3_PUBLIC_ENDPOINT to https://$S3_PUBLIC_DOMAIN.
-{$S3_PUBLIC_DOMAIN:s3.localhost} {
-	reverse_proxy objectstore:9000
-}

@@ -3,8 +3,7 @@ description: Install pnpm, Node.js, and install workspace dependencies.
 
 inputs:
     install:
-        # The Vercel deploy skips it: `vercel build` runs the project's own install
-        # command against the workspace, so a second install only costs time.
+        # A job that runs no workspace script skips it.
         description: Run `pnpm install --frozen-lockfile`.
         required: false
         default: "true"

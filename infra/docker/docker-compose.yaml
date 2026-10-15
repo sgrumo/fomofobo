@@ -1,9 +1,0 @@
-# Each app owns a fragment, and this list names the ones the project holds.
-# Run from this directory: `docker compose up -d --build`.
-
-name: fomofobo-stack
-
-include:
-    - path: compose.core.yaml
-    - path: compose.data.yaml
-    - path: compose.fullstack-fomofobo.yaml

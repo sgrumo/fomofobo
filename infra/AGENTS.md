@@ -25,7 +25,7 @@ Configuration is not a secret, because GitHub masks a secret in every log. A mas
 | Configuration of CI          | a workflow     | A GitHub variable                                                      |
 | Credential of CI             | a workflow     | A GitHub secret                                                        |
 
-Two stores stay outside the repository: the Vercel dashboard and the `.env` file on the Docker host. They hold only what the table above gives them. The `.env.template` of the app or the target lists their keys.
+One store stays outside the repository: the secrets of each Worker environment, set with `wrangler secret put`. It holds only the runtime credentials. `infra/cloudflare/README.md` lists their keys.
 
 ### Add a value
 
@@ -40,8 +40,7 @@ Two stores stay outside the repository: the Vercel dashboard and the `.env` file
 
 ## Runtime env
 
-The variables of the API that no deploy target computes itself are committed, one file per target, in the format the target reads: `cdk/env/prod.ts`, `cdk/env/dev.ts` and `docker/api.env`.
+The runtime configuration of the app is committed in `apps/fullstack-fomofobo/wrangler.jsonc`: the `vars` of each block under `env`, one block per deploy environment.
 
-- The target sets `NODE_ENV`, `APP_ENV`, `PG*` and `S3_*` itself. A file must not name them.
-- A file holds no secret. A secret is a GitHub secret that the deploy step sets under its own name. The CDK app takes it on top of the file.
-- A value left out in TypeScript, or empty in dotenv, means unset.
+- `vars` hold no credential.
+- A variable left out of the block is unset in that environment. `infra/cloudflare/AGENTS.md` holds the rules for a new one.

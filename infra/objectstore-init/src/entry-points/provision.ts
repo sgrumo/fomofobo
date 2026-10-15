@@ -44,7 +44,7 @@ const run = async (): Promise<void> => {
             [
                 "Cannot provision the object store. Set these variables:",
                 ...problems,
-                "See infra/docker/README.md.",
+                "See infra/local/README.md.",
             ].join("\n"),
         )
         process.exitCode = 1

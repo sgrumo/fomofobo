@@ -162,4 +162,4 @@ OpenID Connect Authorization Code with PKCE, owned by `openid-client`. No hand-w
 
 ## Deployment
 
-`infra/auth-oidc.md` documents the provider setup, `infra/vercel/README.md` the Vercel deploy, and `infra/docker/README.md` the Docker stack. Read them **before** you change env vars, secrets, the database, object storage or networking. **NEVER** assume a topology.
+`infra/auth-oidc.md` documents the provider setup, and `infra/cloudflare/README.md` the Worker deploy. Read them **before** you change env vars, secrets, the database, object storage or networking. **NEVER** assume a topology.
