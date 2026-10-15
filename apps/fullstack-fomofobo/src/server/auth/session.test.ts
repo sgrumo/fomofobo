@@ -26,7 +26,8 @@ const headerOf = (response: NextResponse, name: string): string =>
 describe("session cookies", () => {
     describe("on a deployed shape, where the names carry the __Host- prefix", () => {
         beforeEach(() => {
-            vi.stubEnv("APP_ENV", "docker")
+            vi.stubEnv("APP_ENV", "cloudflare")
+            vi.stubEnv("S3_BUCKET", "fomofobo")
             vi.stubEnv("S3_ENDPOINT", "https://s3.example.com")
             vi.stubEnv("S3_ACCESS_KEY", "access")
             vi.stubEnv("S3_SECRET_KEY", "secret")

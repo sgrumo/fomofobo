@@ -5,7 +5,7 @@ Fullstack app: one Next.js process serves the API and the pages. The API mounts 
 ## Next.js
 
 - The installed version differs from training data. Read `node_modules/next/dist/docs/` before you write App Router code
-- **NEVER** add `proxy.ts` (ex `middleware.ts`) - Vercel bills every invocation. Redirects go in `next.config.ts`
+- **NEVER** add `proxy.ts` (ex `middleware.ts`) - OpenNext runs the Node `proxy.ts` as an experimental feature. Redirects go in `next.config.ts`
 - **NEVER** enable `cacheComponents` / `"use cache"` - it forbids the `dynamic` segment config app-wide
 - Use the generated route types: `PageProps<'/route'>`, `LayoutProps`. `pnpm typecheck` runs `next typegen` first
 - Dev-only pages gate on `APP_ENV` through `devPagesEnabled()` + `notFound()`, **NEVER** on `NODE_ENV` - the E2E suite runs a production build with `APP_ENV=test`
@@ -49,7 +49,7 @@ Fullstack app: one Next.js process serves the API and the pages. The API mounts 
 - No data -> static, no segment config. Per-user or fresh data -> `force-dynamic`, no cache
 - Shared data a write marks stale -> `force-dynamic` + `unstable_cache(fn, keyParts, { tags })` **inside the service**. The writer calls `revalidateTag(tag, "max")`, plus `updateTag(tag)` when it reads its own write
 - Every value that changes the result goes in `keyParts`. **NEVER** cache a per-user read under a shared key
-- Docker keeps the Data Cache per replica. More than one replica needs a shared `cacheHandler`
+- The Worker configures no OpenNext incremental cache, so `unstable_cache` stores nothing. Add the R2 incremental cache, the D1 tag cache and the queue of OpenNext before a read relies on it
 
 ## Client boundary
 
@@ -122,11 +122,11 @@ OpenID Connect Authorization Code with PKCE, owned by `openid-client`. No hand-w
 - `getSession()` reads claims **without** a signature check. Display and expiry only. **NEVER** decide access with it
 - A route handler sets cookies on the response it returns (`NextResponse.cookies.set`). `redirect()` of `next/navigation` drops the `cookies()` store
 - Cookies are `HttpOnly`, the browser never holds a token. The middleware reads the access cookie on a same-origin `GET`, the `Authorization` header in process
-- Cookie names and `Secure` follow `APP_ENV`: `__Host-` + `Secure` in `docker` and `vercel`, plain in `local` and `test`. A deletion repeats path and flag
+- Cookie names and `Secure` follow `APP_ENV`: `__Host-` + `Secure` in `cloudflare`, plain in `local` and `test`. A deletion repeats path and flag
 - Provider unreachable -> `503` (`AuthProviderUnavailable`), **NEVER** `401` - a `401` signs everybody out
 - `/auth/refresh` keeps the cookies on a refused grant - two tabs share one token
 - `/auth/logout` answers a same-origin `POST` alone and redirects with `303` - a `307` replays the `POST` at the provider
-- `docker` and `vercel` refuse a plain-HTTP issuer. `local` and `test` opt in through `allowInsecureOidc`
+- `cloudflare` refuses a plain-HTTP issuer. `local` and `test` opt in through `allowInsecureOidc`
 - Provider extras (password policies, admin SDKs, post-login hooks) stay out of this app
 
 ## API
@@ -137,7 +137,7 @@ OpenID Connect Authorization Code with PKCE, owned by `openid-client`. No hand-w
 
 ## Environment
 
-- `APP_ENV` drives error verbosity, API docs, the dev pages and the cookie flags. No default on Vercel, which refuses `local` and `test`. Off Vercel a production build defaults to `local`
+- `APP_ENV` drives error verbosity, API docs, the dev pages and the cookie flags. No default on Workers: each deploy environment sets it, and `pnpm preview` passes `local`. Under Node an unset value reads as `local`
 - `src/server/config/env.ts`: one block per shape, every field in every block. Read the remarks there before you add a variable
 
 ## i18n

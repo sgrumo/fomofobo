@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest"
 
-import type { AppEnv } from "./app-config"
 import { appEnvValues, resolveAppConfig } from "./app-config"
 
 describe("resolveAppConfig", () => {
@@ -9,18 +8,11 @@ describe("resolveAppConfig", () => {
     })
 
     it("should hide the error detail and the API documentation in a deployed shape", () => {
-        const deployed: AppEnv[] = ["docker", "vercel"]
+        const config = resolveAppConfig("cloudflare")
 
-        expect(
-            deployed
-                .map(appEnv => resolveAppConfig(appEnv))
-                .map(config => ({
-                    verboseErrors: config.verboseErrors,
-                    apiDocsEnabled: config.apiDocsEnabled,
-                })),
-        ).toStrictEqual([
-            { verboseErrors: false, apiDocsEnabled: false },
-            { verboseErrors: false, apiDocsEnabled: false },
-        ])
+        expect({
+            verboseErrors: config.verboseErrors,
+            apiDocsEnabled: config.apiDocsEnabled,
+        }).toStrictEqual({ verboseErrors: false, apiDocsEnabled: false })
     })
 })

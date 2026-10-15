@@ -23,7 +23,7 @@ export const dynamic = "force-dynamic"
  * @remarks Answers `503` when the provider itself is unreachable, so the browser reads
  * an outage and not a dead session
  * @remarks Runs on a `401` from the API, never on a timer. There is no middleware to
- * hold one, and a Vercel deploy bills every middleware invocation apart
+ * hold one
  */
 export const POST = async (request: Request): Promise<Response> => {
     if (!isSameOrigin(request)) {
