@@ -25,3 +25,5 @@ export const notFoundResponse = (entity: string): JsonErrorResponse =>
     jsonError(`${entity} not found`)
 export const conflictResponse = (description: string): JsonErrorResponse =>
     jsonError(description)
+export const serviceUnavailableResponse = (description: string): JsonErrorResponse =>
+    jsonError(description)

@@ -87,7 +87,7 @@ export const ItemRoutes = {
 ```
 
 - Prefix each path with `/api/<domain>`.
-- Declare every status the handler can answer. Build the error responses with `badRequestResponse`, `notFoundResponse(entity)` and `conflictResponse(description)` from `./lib/common-responses`.
+- Declare every status the handler can answer. Build the error responses with `badRequestResponse`, `notFoundResponse(entity)`, `conflictResponse(description)` and `serviceUnavailableResponse(description)` from `./lib/common-responses`.
 - Put query parameters in `request.query` as a Zod object.
 - A read that needs a body uses `method: "query"`. It must not change state, its body schema uses no `z.coerce`, and the frontend calls it with `bodyfulQueryEndpoint`. If the criteria fit in a URL, use `get`.
 
