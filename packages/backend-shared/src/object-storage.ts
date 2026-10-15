@@ -2,10 +2,10 @@ import {
     DeleteObjectCommand,
     GetObjectCommand,
     HeadObjectCommand,
+    PutObjectCommand,
     S3Client,
     S3ServiceException,
 } from "@aws-sdk/client-s3"
-import { createPresignedPost } from "@aws-sdk/s3-presigned-post"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
 /**
@@ -20,7 +20,7 @@ const DOWNLOAD_URL_EXPIRE_SECONDS = 300
 export interface ObjectStorageConfig {
     bucket: string
     region: string
-    // Custom endpoint + static credentials for the on-prem S3 store. Omit both on
+    // Custom endpoint + static credentials for R2 or a local S3 store. Omit both on
     // AWS to fall back to the default credential chain (IAM role) and
     // virtual-hosted-style addressing.
     endpoint?: string
@@ -30,7 +30,7 @@ export interface ObjectStorageConfig {
 
 export interface PresignedUploadResult {
     url: string
-    fields: Record<string, string>
+    headers: Record<string, string>
 }
 
 export interface ObjectHead {
@@ -45,7 +45,7 @@ export class S3ObjectStorage {
     /**
      * @description Builds the S3 client addressing the configured bucket
      * @param config Bucket, region, endpoint and optional static credentials
-     * @remarks Uses path-style addressing when an endpoint is set, as the on-prem store requires
+     * @remarks Uses path-style addressing when an endpoint is set: a local store requires it, and R2 accepts it
      */
     public constructor(config: ObjectStorageConfig) {
         this.bucket = config.bucket
@@ -69,28 +69,31 @@ export class S3ObjectStorage {
     }
 
     /**
-     * @description Returns a presigned POST policy for one upload
+     * @description Returns a presigned PUT URL and the headers the upload must send
      * @param key Destination object key
      * @param contentType Content type the upload must match exactly
-     * @param maxSizeBytes Upper body length, in bytes
-     * @remarks Enforces the length and the content type in the store, before bytes land
+     * @param sizeBytes Exact body length, in bytes
+     * @remarks Leaves the signed length check to the store, which can skip it: head the object before trusting its size
      */
-    public async createUploadPost(
+    public async createUploadUrl(
         key: string,
         contentType: string,
-        maxSizeBytes: number,
+        sizeBytes: number,
     ): Promise<PresignedUploadResult> {
-        const { url, fields } = await createPresignedPost(this.client, {
-            Bucket: this.bucket,
-            Key: key,
-            Conditions: [
-                ["content-length-range", 1, maxSizeBytes],
-                ["eq", "$Content-Type", contentType],
-            ],
-            Fields: { "Content-Type": contentType },
-            Expires: UPLOAD_URL_EXPIRE_SECONDS,
-        })
-        return { url, fields }
+        const url = await getSignedUrl(
+            this.client,
+            new PutObjectCommand({
+                Bucket: this.bucket,
+                Key: key,
+                ContentType: contentType,
+                ContentLength: sizeBytes,
+            }),
+            {
+                expiresIn: UPLOAD_URL_EXPIRE_SECONDS,
+                signableHeaders: new Set(["content-type", "content-length"]),
+            },
+        )
+        return { url, headers: { "Content-Type": contentType } }
     }
 
     /**

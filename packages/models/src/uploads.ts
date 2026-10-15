@@ -1,8 +1,5 @@
 import { z } from "@hono/zod-openapi"
 
-/**
- * @remarks Constrains the client and the presigned POST policy
- */
 export const MAX_UPLOAD_SIZE_BYTES = 10 * 1024 * 1024
 
 export const allowedUploadContentTypes = [
@@ -26,11 +23,11 @@ export const uploadRequestSchema = z.object({
 export type UploadRequest = z.infer<typeof uploadRequestSchema>
 
 /**
- * @remarks Requires a multipart POST of `fields` plus the file to `url`
+ * @remarks Requires a PUT of the raw file to `url` with `headers`, never a multipart body
  */
 export const presignedUploadSchema = z.object({
     url: z.string(),
-    fields: z.record(z.string(), z.string()),
+    headers: z.record(z.string(), z.string()),
     key: z.string(),
 })
 export type PresignedUpload = z.infer<typeof presignedUploadSchema>

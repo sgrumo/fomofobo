@@ -83,3 +83,20 @@ describe("S3ObjectStorage.headObject", () => {
         })
     })
 })
+
+describe("S3ObjectStorage.createUploadUrl", () => {
+    it("signs the content type and the length into the URL", async () => {
+        const { url, headers } = await store.storage.createUploadUrl(
+            "photos/a.png",
+            "image/png",
+            1024,
+        )
+        const signedHeaders = new URL(url).searchParams.get("X-Amz-SignedHeaders")
+
+        expect(headers).toStrictEqual({ "Content-Type": "image/png" })
+        expect(signedHeaders?.split(";").filter(name => name !== "host")).toStrictEqual([
+            "content-length",
+            "content-type",
+        ])
+    })
+})
