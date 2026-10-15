@@ -1,7 +1,9 @@
 import { z } from "@hono/zod-openapi"
 
 import { eventExternalLinksSchema, eventPhotoSchema, eventSchema } from "./events"
+import { MAX_LOOKUP_REFS } from "./lib/limits"
 import { instantSchema, localDateSchema } from "./lib/local-time"
+import { queryArraySchema } from "./lib/query-array"
 import { venueSchema } from "./venues"
 
 export const occurrenceStatusSchema = z.enum(["upcoming", "live", "ended"])
@@ -36,3 +38,13 @@ export const occurrenceDetailSchema = occurrenceSummarySchema.extend({
     externalLinks: eventExternalLinksSchema,
 })
 export type OccurrenceDetail = z.infer<typeof occurrenceDetailSchema>
+
+export const occurrenceRefKeySchema = z
+    .string()
+    .regex(/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}:\d{4}-\d{2}-\d{2}$/u)
+export type OccurrenceRefKey = z.infer<typeof occurrenceRefKeySchema>
+
+export const occurrenceLookupQuerySchema = z.object({
+    ref: queryArraySchema(occurrenceRefKeySchema, MAX_LOOKUP_REFS),
+})
+export type OccurrenceLookupQuery = z.infer<typeof occurrenceLookupQuerySchema>

@@ -9,6 +9,13 @@ export const placeSuggestionSchema = z.object({
 })
 export type PlaceSuggestion = z.infer<typeof placeSuggestionSchema>
 
+export const placeSearchQuerySchema = z.object({
+    q: z.string().trim().min(2).max(100),
+    lat: z.coerce.number().min(-90).max(90),
+    lng: z.coerce.number().min(-180).max(180),
+})
+export type PlaceSearchQuery = z.infer<typeof placeSearchQuerySchema>
+
 // PLACEHOLDER(OP-05)
 export const searchSuggestionsSchema = z.object({
     places: z.array(placeSuggestionSchema),

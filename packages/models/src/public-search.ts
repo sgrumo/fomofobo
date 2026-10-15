@@ -1,7 +1,9 @@
 import { z } from "@hono/zod-openapi"
 
 import { customErrorParamsSchema } from "./lib/custom-errors"
+import { MAX_SEARCH_CATEGORIES } from "./lib/limits"
 import { instantSchema, localDateSchema } from "./lib/local-time"
+import { queryArraySchema } from "./lib/query-array"
 import { occurrenceSummarySchema } from "./occurrences"
 
 export const dateFilterKindSchema = z.enum([
@@ -23,7 +25,7 @@ export const publicSearchQuerySchema = z
         lng: z.coerce.number().min(-180).max(180),
         q: z.string().trim().min(1).optional(),
         // PLACEHOLDER(OP-10)
-        categoryIds: z.array(z.uuid()).optional(),
+        categoryIds: queryArraySchema(z.uuid(), MAX_SEARCH_CATEGORIES).optional(),
         date: dateFilterKindSchema.default("default"),
         // PLACEHOLDER(OP-09): past dates
         from: localDateSchema.optional(),

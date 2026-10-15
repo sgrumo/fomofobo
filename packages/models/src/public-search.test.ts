@@ -9,6 +9,18 @@ describe("publicSearchQuerySchema", () => {
         ).toStrictEqual({ lat: 44.3533, lng: 11.7147, q: "jazz", date: "default" })
     })
 
+    it("reads one category of a URL query as a list", () => {
+        const categoryId = crypto.randomUUID()
+
+        expect(
+            publicSearchQuerySchema.parse({
+                lat: "44.35",
+                lng: "11.71",
+                categoryIds: categoryId,
+            }).categoryIds,
+        ).toStrictEqual([categoryId])
+    })
+
     it("accepts a complete range", () => {
         expect(
             publicSearchQuerySchema.safeParse({
