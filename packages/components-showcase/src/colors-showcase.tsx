@@ -58,6 +58,7 @@ const colorGroups = [
         vars: [
             ["map-ground", "--color-map-ground"],
             ["map-block", "--color-map-block"],
+            ["map-dot", "--color-map-dot"],
             ["map-water", "--color-map-water"],
             ["map-road", "--color-map-road"],
         ],

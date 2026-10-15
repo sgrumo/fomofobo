@@ -25,6 +25,7 @@
     --palette-amber-strong: #8a5a00;
     --palette-map-ground: #247860;
     --palette-map-block: #18664e;
+    --palette-map-dot: #368a6c;
     --palette-map-water: #90e4c0;
     --palette-map-road: #defcf0;
 }
@@ -76,6 +77,7 @@
 
     --color-map-ground: var(--palette-map-ground);
     --color-map-block: var(--palette-map-block);
+    --color-map-dot: var(--palette-map-dot);
     --color-map-water: var(--palette-map-water);
     --color-map-road: var(--palette-map-road);
 
