@@ -60,22 +60,13 @@ jobs:
                       dev) echo "environment=dev" >> "$GITHUB_OUTPUT" ;;
                   esac
 
-    deploy-vercel:
-        name: Deploy (Vercel fullstack-fomofobo)
-        needs: [quality, resolve-env]
-        if: needs.resolve-env.outputs.environment != ''
-        uses: ./.github/workflows/deploy-vercel.yaml
-        with:
-            app: fullstack-fomofobo
-            environment: ${{ needs.resolve-env.outputs.environment }}
-        secrets: inherit
-
-    # Drop-in: Docker Compose deploy. One stack serves every app, so there is nothing to pick.
-    # deploy-docker:
-    #     name: Deploy Docker stack
+    # Drop-in: Cloudflare Workers deploy. Set up each environment with
+    # infra/cloudflare/README.md first.
+    # deploy-cloudflare:
+    #     name: Deploy Cloudflare
     #     needs: [quality, resolve-env]
     #     if: needs.resolve-env.outputs.environment != ''
-    #     uses: ./.github/workflows/deploy-docker.yaml
+    #     uses: ./.github/workflows/deploy-cloudflare.yaml
     #     with:
     #         environment: ${{ needs.resolve-env.outputs.environment }}
     #     secrets: inherit
@@ -85,7 +76,7 @@ jobs:
         runs-on: ["self-hosted", "Linux", "X64"]
         needs:
             - quality
-            # - deploy-docker
+            # - deploy-cloudflare
         if: always()
         steps:
             - uses: quinck-io/actions-notify-discord@v6

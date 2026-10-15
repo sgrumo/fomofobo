@@ -25,4 +25,59 @@
     "observability": {
         "enabled": true,
     },
+    // Bindings and vars are not inherited: each environment repeats every one.
+    "env": {
+        "dev": {
+            "name": "fomofobo-dev",
+            "vars": {
+                "APP_ENV": "cloudflare",
+                "APP_BASE_URL": "PLACEHOLDER(app origin of dev)",
+                "OIDC_ISSUER": "PLACEHOLDER(issuer of dev)",
+                "OIDC_CLIENT_ID": "PLACEHOLDER(client id of dev)",
+                "OIDC_AUDIENCE": "PLACEHOLDER(audience of dev)",
+                "S3_ENDPOINT": "PLACEHOLDER(https://<account id>.r2.cloudflarestorage.com)",
+                "S3_BUCKET": "fomofobo-dev",
+            },
+            "d1_databases": [
+                {
+                    "binding": "DB",
+                    "database_name": "fomofobo-dev",
+                    "database_id": "PLACEHOLDER(id of the fomofobo-dev D1 database)",
+                    "migrations_dir": "../../packages/storage/migrations",
+                },
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "fomofobo-dev",
+                },
+            ],
+        },
+        "prod": {
+            "name": "fomofobo-prod",
+            "vars": {
+                "APP_ENV": "cloudflare",
+                "APP_BASE_URL": "PLACEHOLDER(app origin of prod)",
+                "OIDC_ISSUER": "PLACEHOLDER(issuer of prod)",
+                "OIDC_CLIENT_ID": "PLACEHOLDER(client id of prod)",
+                "OIDC_AUDIENCE": "PLACEHOLDER(audience of prod)",
+                "S3_ENDPOINT": "PLACEHOLDER(https://<account id>.r2.cloudflarestorage.com)",
+                "S3_BUCKET": "fomofobo-prod",
+            },
+            "d1_databases": [
+                {
+                    "binding": "DB",
+                    "database_name": "fomofobo-prod",
+                    "database_id": "PLACEHOLDER(id of the fomofobo-prod D1 database)",
+                    "migrations_dir": "../../packages/storage/migrations",
+                },
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "fomofobo-prod",
+                },
+            ],
+        },
+    },
 }
