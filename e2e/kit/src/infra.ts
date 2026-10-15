@@ -84,13 +84,15 @@ const getSchemaTableNames = (): string[] =>
  * @param log Sink for progress messages, silent by default
  */
 export const truncateAllTables = async (log: (msg: string) => void = () => undefined) => {
+    const tableNames = getSchemaTableNames()
+    if (tableNames.length === 0) {
+        return
+    }
     log("truncating all tables...")
     const client = new Client({ connectionString: publishedDatabaseUrl() })
     await client.connect()
     try {
-        const tables = getSchemaTableNames()
-            .map(name => `"${name}"`)
-            .join(", ")
+        const tables = tableNames.map(name => `"${name}"`).join(", ")
         await client.query(`TRUNCATE ${tables} CASCADE`)
     } finally {
         await client.end()
