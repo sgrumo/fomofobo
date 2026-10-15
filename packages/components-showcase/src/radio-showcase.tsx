@@ -16,7 +16,7 @@ export const RadioShowcase = () => {
 
     return (
         <div className="flex flex-col gap-4">
-            <p className="tp-h4-medium">Radio Group</p>
+            <p className="tp-pixel-lg">Radio Group</p>
             <div className="flex flex-wrap gap-8">
                 <Field label="Fruits (sm)" required={false}>
                     <RadioGroup

@@ -1,9 +1,37 @@
 import type { ClassValue } from "clsx"
 import { clsx } from "clsx"
 import type { Properties } from "csstype"
-import { twMerge } from "tailwind-merge"
+import { extendTailwindMerge } from "tailwind-merge"
 
 type CSSProperties = Properties<string | number>
+
+/**
+ * @description Merges class lists, aware of the hard shadows and the typography utilities of `packages/styles`
+ * @remarks Mirrors the `--shadow-*` tokens and the `tp-*` utilities of `packages/styles`, so a new one there needs an entry here
+ */
+const twMerge = extendTailwindMerge<"typography">({
+    extend: {
+        theme: {
+            shadow: ["hard-sm", "hard-md", "hard-lg"],
+        },
+        classGroups: {
+            typography: [
+                {
+                    tp: [
+                        "pixel-2xl",
+                        "pixel-xl",
+                        "pixel-lg",
+                        "pixel-md",
+                        "pixel-sm",
+                        "body-lg",
+                        "body-md",
+                        "body-sm",
+                    ],
+                },
+            ],
+        },
+    },
+})
 
 /**
  * @description Returns the class list with conflicting Tailwind classes resolved

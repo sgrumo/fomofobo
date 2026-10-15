@@ -199,8 +199,8 @@ export const DateInput = ({
             )}
         >
             <span
-                className={cn("tp-b2-regular", {
-                    "text-neutral-400 dark:text-neutral-500": !propValue,
+                className={cn("tp-body-md", {
+                    "text-fg-subtle": !propValue,
                 })}
             >
                 {formatted}
@@ -211,7 +211,7 @@ export const DateInput = ({
                     aria-label={i18n.t("DateInput.Reset", undefined)}
                     tabIndex={-1}
                     data-input-reset={true}
-                    className="[&>svg]:size-4 [&>svg]:text-neutral-600 dark:[&>svg]:text-neutral-300"
+                    className="[&>svg]:text-fg-muted [&>svg]:size-4"
                     onPointerDown={onResetPointerDown}
                 >
                     <IconXMark />

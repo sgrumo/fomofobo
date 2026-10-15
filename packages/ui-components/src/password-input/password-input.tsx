@@ -131,7 +131,7 @@ export const PasswordInput = ({
                     <InputIcon
                         icon={show ? <IconEyeClosed /> : <IconEye />}
                         size={size}
-                        className="[&>svg]:transition-colors [&>svg]:hover:text-neutral-800 dark:[&>svg]:hover:text-neutral-100"
+                        className="[&>svg]:hover:text-fg [&>svg]:transition-colors"
                     />
                 </button>
             )}

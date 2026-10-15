@@ -37,12 +37,14 @@ export const ErrorView = (props: ErrorViewProps) => {
     return (
         <div
             className={cn(
-                "bg-danger-600 dark:bg-danger-800 flex flex-col items-center justify-center gap-4 overflow-auto p-8",
+                "bg-danger flex flex-col items-center justify-center gap-4 overflow-auto p-8",
                 props.className,
             )}
         >
-            <p className="tp-h1 text-center text-white">{t("ErrorBoundary.Title")}</p>
-            <p className="tp-b1-regular text-center text-white">
+            <p className="tp-pixel-2xl text-fg-inverse text-center">
+                {t("ErrorBoundary.Title")}
+            </p>
+            <p className="tp-body-lg text-fg-inverse text-center">
                 {t(
                     props.kind === "inside-layout"
                         ? "ErrorBoundary.DescriptionInsideLayout"
@@ -50,13 +52,13 @@ export const ErrorView = (props: ErrorViewProps) => {
                 )}
             </p>
             <div className="flex flex-col items-center gap-4">
-                <pre className="tp-mono-c1 text-danger-600 max-h-80 max-w-[100rem] overflow-auto rounded bg-neutral-100 p-2 text-wrap">
+                <pre className="tp-pixel-sm text-danger bg-surface-muted max-h-80 max-w-[100rem] overflow-auto rounded p-2 text-wrap">
                     {stack}
                 </pre>
                 <button
                     type="button"
                     onClick={onCopy}
-                    className="tp-b1-medium flex items-center gap-2 text-white transition-transform active:scale-85"
+                    className="tp-pixel-md text-fg-inverse flex items-center gap-2 transition-transform active:scale-85"
                 >
                     <IconCopy className="h-6 w-6" />
                     {t("ErrorBoundary.CopyError")}

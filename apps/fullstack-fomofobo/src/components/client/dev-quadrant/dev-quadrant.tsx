@@ -1,14 +1,11 @@
 "use client"
 
 import { useQueryClient } from "@tanstack/react-query"
-import { identity } from "es-toolkit"
 import { cn } from "frontend-shared/styles"
-import { useTranslation } from "react-i18next"
 import { Button } from "ui-components/button"
 import { Field } from "ui-components/field"
 import { IconChevronRight, IconHorizontalLine } from "ui-components/icons"
 import { NumberInput } from "ui-components/number-input"
-import { Select } from "ui-components/select"
 
 import { LanguageSwitcher } from "@/components/client/language-switcher/language-switcher"
 import { useLocalStorage } from "@/lib/hooks/use-local-storage"
@@ -38,9 +35,6 @@ const positionLabels: Record<DevQuadrantPosition, string> = {
     "bottom-right": "Move to bottom right",
 }
 
-type Theme = LocalStorageItem<"theme">
-const themeItems: Theme[] = ["light", "dark", "system"]
-
 export const DevQuadrant = () => {
     const [devQuadrant, setDevQuadrant] = useLocalStorage("dev-quadrant")
     const { position, minimized } = devQuadrant
@@ -59,16 +53,14 @@ export const DevQuadrant = () => {
                     onClick={() => {
                         setDevQuadrant({ ...devQuadrant, minimized: false })
                     }}
-                    className="tp-c1-semibold rounded-md border border-neutral-200 bg-white px-3 py-1 text-neutral-700 shadow-md hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                    className="tp-pixel-sm border-line-muted bg-surface text-fg shadow-hard-md hover:bg-surface-muted rounded-md border px-3 py-1"
                 >
                     DEV
                 </button>
             ) : (
-                <div className="flex w-80 flex-col gap-4 rounded-lg border border-neutral-200 bg-white p-4 shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
+                <div className="border-line-muted bg-surface shadow-hard-lg flex w-80 flex-col gap-4 rounded-lg border p-4">
                     <div className="flex items-center justify-between">
-                        <span className="tp-b2-semibold text-neutral-900 dark:text-neutral-100">
-                            DEV
-                        </span>
+                        <span className="tp-pixel-md text-fg">DEV</span>
                         <div className="flex items-center gap-1">
                             {localStorageSchema[
                                 "dev-quadrant"
@@ -82,10 +74,9 @@ export const DevQuadrant = () => {
                                         setDevQuadrant({ ...devQuadrant, position: pos })
                                     }}
                                     className={cn(
-                                        "rounded p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 dark:hover:bg-neutral-800 dark:hover:text-neutral-200",
+                                        "text-fg-subtle hover:bg-surface-muted hover:text-fg rounded p-1",
                                         {
-                                            "text-neutral-900 dark:text-neutral-100":
-                                                pos === position,
+                                            "text-fg": pos === position,
                                         },
                                     )}
                                 >
@@ -103,13 +94,12 @@ export const DevQuadrant = () => {
                                 onClick={() => {
                                     setDevQuadrant({ ...devQuadrant, minimized: true })
                                 }}
-                                className="rounded p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
+                                className="text-fg-subtle hover:bg-surface-muted hover:text-fg rounded p-1"
                             >
                                 <IconHorizontalLine className="size-4" />
                             </button>
                         </div>
                     </div>
-                    <DevThemeSelect />
                     <Field label="Language" required={false}>
                         <LanguageSwitcher />
                     </Field>
@@ -121,37 +111,12 @@ export const DevQuadrant = () => {
     )
 }
 
-const DevThemeSelect = () => {
-    const { t } = useTranslation("shared")
-    const [theme, setTheme] = useLocalStorage("theme")
-
-    return (
-        <Field label="Theme" required={false}>
-            <Select
-                multiple={false}
-                resettable={false}
-                items={themeItems}
-                value={theme}
-                onValueChange={next => {
-                    if (next !== undefined) {
-                        setTheme(next)
-                    }
-                }}
-                getItemId={identity}
-                renderItem={({ item }) => t(`Theme.${item}`)}
-            />
-        </Field>
-    )
-}
-
 const DevApiDelay = () => {
     const [stored, setStored] = useLocalStorage("api-delay")
 
     return (
         <div className="flex flex-col gap-2">
-            <span className="tp-b2-semibold text-neutral-500 dark:text-neutral-400">
-                Client API delay
-            </span>
+            <span className="tp-pixel-md text-fg-muted">Client API delay</span>
             <Field label="Base (ms)" required={false}>
                 <NumberInput
                     size="md"

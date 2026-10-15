@@ -4,11 +4,11 @@ interface AvatarRootStylesOpts {
     size: "sm" | "md" | "lg"
 }
 export const avatarRootStyles = styles((opts: AvatarRootStylesOpts) => [
-    "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-neutral-200 text-neutral-600 select-none dark:bg-neutral-700 dark:text-neutral-300",
+    "bg-line-muted text-fg-muted relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full select-none",
     {
-        "tp-b2-medium size-8": opts.size === "sm",
-        "tp-b1-medium size-10": opts.size === "md",
-        "tp-h4-semibold size-14": opts.size === "lg",
+        "tp-pixel-md size-8": opts.size === "sm",
+        "tp-pixel-md size-10": opts.size === "md",
+        "tp-pixel-lg size-14": opts.size === "lg",
     },
 ])
 

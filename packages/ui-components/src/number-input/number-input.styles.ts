@@ -10,9 +10,9 @@ export const numberInputStepTriggerIconStyles = styles(
         {
             "size-4": opts.size === "md",
             "size-[0.83rem]": opts.size === "sm",
-            "text-neutral-400 group-disabled:opacity-50 group-enabled:hover:text-neutral-500 dark:text-neutral-500 dark:group-enabled:hover:text-neutral-400":
+            "text-fg-subtle group-enabled:hover:text-fg-muted group-disabled:opacity-50":
                 !opts.disabled,
-            "text-neutral-400/75": opts.disabled,
+            "text-fg-subtle/75": opts.disabled,
         },
     ],
 )

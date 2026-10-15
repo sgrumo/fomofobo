@@ -10,7 +10,7 @@ interface ButtonShowcaseProps {
 export const ButtonShowcase = (props: ButtonShowcaseProps) => (
     <div className={cn("flex flex-col gap-6", props.className)}>
         <div className="flex flex-col gap-2">
-            <p className="tp-h4-semibold">Primary</p>
+            <p className="tp-pixel-lg">Primary</p>
             <div className="flex flex-wrap items-center gap-4">
                 <Button variant="primary" size="md" type="button">
                     Medium
@@ -152,7 +152,7 @@ export const ButtonShowcase = (props: ButtonShowcaseProps) => (
             </div>
         </div>
         <div className="flex flex-col gap-2">
-            <p className="tp-h4-semibold">Primary Destructive</p>
+            <p className="tp-pixel-lg">Primary Destructive</p>
             <div className="flex flex-wrap items-center gap-4">
                 <Button variant="primary" size="md" type="button" destructive={true}>
                     Medium
@@ -348,7 +348,7 @@ export const ButtonShowcase = (props: ButtonShowcaseProps) => (
             </div>
         </div>
         <div className="flex flex-col gap-2">
-            <p className="tp-h4-semibold">Secondary</p>
+            <p className="tp-pixel-lg">Secondary</p>
             <div className="flex flex-wrap items-center gap-4">
                 <Button variant="secondary" size="md" type="button">
                     Medium
@@ -490,7 +490,7 @@ export const ButtonShowcase = (props: ButtonShowcaseProps) => (
             </div>
         </div>
         <div className="flex flex-col gap-2">
-            <p className="tp-h4-semibold">Tertiary</p>
+            <p className="tp-pixel-lg">Tertiary</p>
             <div className="flex flex-wrap items-center gap-4">
                 <Button variant="tertiary" size="md" type="button">
                     Medium
@@ -632,7 +632,7 @@ export const ButtonShowcase = (props: ButtonShowcaseProps) => (
             </div>
         </div>
         <div className="flex flex-col gap-2">
-            <p className="tp-h4-semibold">Stretched (grid)</p>
+            <p className="tp-pixel-lg">Stretched (grid)</p>
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <Button variant="primary" size="md" type="button">
                     No icon

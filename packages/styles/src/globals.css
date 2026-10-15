@@ -1,102 +1,94 @@
 @import "tailwindcss";
 
-@custom-variant dark {
-    &:where(.dark, .dark *) {
-        @slot;
-    }
-    @media (prefers-color-scheme: dark) {
-        &:where(.system, .system *) {
-            @slot;
-        }
-    }
+/* Palette: values sampled from the mockup, PLACEHOLDER(TQ-08). Components read the semantic tokens of the theme, never these */
+
+:root {
+    --palette-frame: #0c1e18;
+    --palette-ink: #0c1e18;
+    --palette-ink-muted: #5c5a4f;
+    --palette-ink-subtle: #8e887a;
+    --palette-paper: #f0eade;
+    --palette-paper-muted: #e4ddcc;
+    --palette-line-muted: #c6c0ae;
+    --palette-red: #f6481e;
+    --palette-red-strong: #b8300f;
+    --palette-red-pale: #f9d5c8;
+    --palette-yellow: #f6d242;
+    --palette-yellow-pale: #f8e7a8;
+    --palette-green-faded: #6c9654;
+    --palette-green-strong: #276b33;
+    --palette-green-pale: #d6ead0;
+    --palette-lilac: #f0b4fc;
+    --palette-violet: #6a3fd1;
+    --palette-blue-strong: #1f5f9e;
+    --palette-blue-pale: #d4e4f2;
+    --palette-amber-strong: #8a5a00;
+    --palette-map-ground: #247860;
+    --palette-map-block: #18664e;
+    --palette-map-water: #90e4c0;
+    --palette-map-road: #defcf0;
 }
 
 /* Theme */
 
 @theme {
-    /* Fonts */
-    --font-funnel-display: "Funnel Display Variable", sans-serif;
-    --font-funnel-sans: "Funnel Sans Variable", sans-serif;
-    --font-mono: "Roboto Mono", monospace;
+    /* Fonts: PLACEHOLDER(TQ-08) */
+    --font-display: "Space Mono", ui-monospace, monospace;
+    --font-sans: "Funnel Sans Variable", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "Space Mono", ui-monospace, monospace;
 
-    /* Color palette */
-
-    /* Remove base styles */
+    /* Semantic colors */
     --color-*: initial;
 
     --color-white: #ffffff;
-    --color-absolute-black: #000000;
-    --color-black: #111114;
 
-    --color-neutral-50: #f7f7f8;
-    --color-neutral-100: #ededed;
-    --color-neutral-200: #d8d8dd;
-    --color-neutral-300: #b9bbc6;
-    --color-neutral-400: #8f92a3;
-    --color-neutral-500: #71717a;
-    --color-neutral-600: #3a3d4f;
-    --color-neutral-700: #2a2c3a;
-    --color-neutral-800: #1e1e1e;
-    --color-neutral-900: #16161e;
-    --color-neutral-950: #0a0a0e;
+    --color-surface: var(--palette-paper);
+    --color-surface-muted: var(--palette-paper-muted);
+    --color-surface-inverse: var(--palette-ink);
+    --color-backdrop: var(--palette-frame);
+    --color-overlay: rgb(12 30 24 / 0.6);
 
-    --color-primary-100: #ddd2ff;
-    --color-primary-200: #c2b0ff;
-    --color-primary-300: #a98eff;
-    --color-primary-400: #8f6cff;
-    --color-primary-500: #713eff;
-    --color-primary-600: #5e30e6;
-    --color-primary-700: #4b24bf;
-    --color-primary-800: #391a99;
+    --color-fg: var(--palette-ink);
+    --color-fg-muted: var(--palette-ink-muted);
+    --color-fg-subtle: var(--palette-ink-subtle);
+    --color-fg-inverse: var(--palette-paper);
 
-    --color-info-100: #e6f8ff;
-    --color-info-200: #beeaff;
-    --color-info-300: #85d7ff;
-    --color-info-400: #4cc3ff;
-    --color-info-500: #2db4f4;
-    --color-info-600: #0ea5e9;
-    --color-info-700: #0a7fb7;
-    --color-info-800: #075985;
-    --color-info-900: #043654;
+    --color-line: var(--palette-ink);
+    --color-line-muted: var(--palette-line-muted);
 
-    --color-success-100: #e8fff7;
-    --color-success-200: #bdfce7;
-    --color-success-300: #78e7c0;
-    --color-success-400: #34d399;
-    --color-success-500: #1cb481;
-    --color-success-600: #059669;
-    --color-success-700: #057a57;
-    --color-success-800: #065f46;
-    --color-success-900: #04412f;
+    --color-focus: var(--palette-violet);
 
-    --color-warning-100: #f9ffcc;
-    --color-warning-200: #f4ffb3;
-    --color-warning-300: #e8f590;
-    --color-warning-400: #ddeb6e;
-    --color-warning-500: #c5d550;
-    --color-warning-600: #aebf32;
-    --color-warning-700: #8e9d26;
-    --color-warning-800: #6e7c1a;
-    --color-warning-900: #4a5310;
+    --color-live: var(--palette-red);
+    --color-live-strong: var(--palette-red-strong);
+    --color-upcoming: var(--palette-yellow);
+    --color-ended: var(--palette-green-faded);
+    --color-social: var(--palette-lilac);
+    --color-position: var(--palette-lilac);
 
-    --color-danger-100: #fee2e2;
-    --color-danger-200: #fecaca;
-    --color-danger-300: #fb9e9e;
-    --color-danger-400: #f87171;
-    --color-danger-500: #ea4b4b;
-    --color-danger-600: #dc2626;
-    --color-danger-700: #ba2020;
-    --color-danger-800: #991b1b;
-    --color-danger-900: #661010;
+    --color-danger: var(--palette-red-strong);
+    --color-danger-surface: var(--palette-red-pale);
+    --color-success: var(--palette-green-strong);
+    --color-success-surface: var(--palette-green-pale);
+    --color-warning: var(--palette-amber-strong);
+    --color-warning-surface: var(--palette-yellow-pale);
+    --color-info: var(--palette-blue-strong);
+    --color-info-surface: var(--palette-blue-pale);
 
-    /* Shadows */
-    --shadow-100: 0 1px 2px 0 rgba(30, 41, 59, 0.12);
-    --shadow-200:
-        0 0 2px 1px rgba(30, 41, 59, 0.04), 0 1px 8px -1px rgba(30, 41, 59, 0.12);
-    --shadow-300:
-        0 2px 2px -1px rgba(30, 41, 59, 0.04), 0 8px 16px -2px rgba(30, 41, 59, 0.12);
-    --shadow-400:
-        0 2px 2px -1px rgba(30, 41, 59, 0.04), 0 16px 24px -4px rgba(30, 41, 59, 0.16);
+    --color-map-ground: var(--palette-map-ground);
+    --color-map-block: var(--palette-map-block);
+    --color-map-water: var(--palette-map-water);
+    --color-map-road: var(--palette-map-road);
+
+    /* Shape: PLACEHOLDER(TQ-08) */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 0.875rem;
+
+    --shadow-*: initial;
+    --shadow-hard-sm: 2px 2px 0 0 var(--palette-ink);
+    --shadow-hard-md: 3px 3px 0 0 var(--palette-ink);
+    --shadow-hard-lg: 4px 4px 0 0 var(--palette-ink);
 
     /* Utilities */
     --max-radius: calc(infinity * 1px);
@@ -108,6 +100,11 @@
     #root {
         /* https://base-ui.com/react/overview/quick-start#portals */
         isolation: isolate;
+    }
+
+    html {
+        background-color: var(--color-surface);
+        color: var(--color-fg);
     }
 
     body {
@@ -124,132 +121,54 @@
     }
 
     ::selection {
-        background-color: var(--color-primary-200);
+        background-color: var(--color-upcoming);
+        color: var(--color-fg);
     }
 
-    .dark ::selection {
-        background-color: var(--color-primary-400);
-    }
-
-    .dark input[type="date"]::-webkit-calendar-picker-indicator {
-        filter: invert(1);
-    }
-
-    @media (prefers-color-scheme: dark) {
-        .system ::selection {
-            background-color: var(--color-primary-400);
-        }
-
-        .system input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        ::before,
+        ::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
         }
     }
 }
 
-/* Typography */
+/* Typography: PLACEHOLDER(TQ-08) */
 
-@utility tp-d1 {
-    @apply font-funnel-display text-[6rem] leading-[6.625rem] font-semibold tracking-[-0.06rem] text-neutral-800 dark:text-neutral-100;
+@utility tp-pixel-2xl {
+    @apply font-display text-[2rem] leading-[2.25rem] font-bold tracking-[0.01em] uppercase;
 }
 
-@utility tp-d2 {
-    @apply font-funnel-display text-[4.5rem] leading-[5.875rem] font-semibold tracking-[-0.045rem] text-neutral-800 dark:text-neutral-100;
+@utility tp-pixel-xl {
+    @apply font-display text-[1.5rem] leading-[1.75rem] font-bold tracking-[0.01em] uppercase;
 }
 
-@utility tp-d3 {
-    @apply font-funnel-display text-[3.25rem] leading-[4.25rem] font-semibold tracking-[-0.0325rem] text-neutral-800 dark:text-neutral-100;
+@utility tp-pixel-lg {
+    @apply font-display text-[1.125rem] leading-[1.5rem] font-normal tracking-[0.02em] uppercase;
 }
 
-@utility tp-d4 {
-    @apply font-funnel-display text-[2.5rem] leading-[3.25rem] font-semibold tracking-[-0.025rem] text-neutral-800 dark:text-neutral-100;
+@utility tp-pixel-md {
+    @apply font-display text-[0.8125rem] leading-[1.125rem] font-normal tracking-[0.06em] uppercase;
 }
 
-@utility tp-h1 {
-    @apply font-funnel-display text-[2rem] leading-[2.5rem] font-semibold text-neutral-800 dark:text-neutral-100;
+@utility tp-pixel-sm {
+    @apply font-display text-[0.6875rem] leading-[1rem] font-normal tracking-[0.08em] uppercase;
 }
 
-@utility tp-h2-semibold {
-    @apply font-funnel-display text-[1.75rem] leading-[2.25rem] font-semibold text-neutral-800 dark:text-neutral-100;
+@utility tp-body-lg {
+    @apply font-sans text-[1rem] leading-[1.5rem] font-normal;
 }
 
-@utility tp-h2-medium {
-    @apply font-funnel-display text-[1.75rem] leading-[2.25rem] font-medium text-neutral-800 dark:text-neutral-100;
+@utility tp-body-md {
+    @apply font-sans text-[0.875rem] leading-[1.25rem] font-normal;
 }
 
-@utility tp-h2-regular {
-    @apply font-funnel-display text-[1.75rem] leading-[2.25rem] font-normal text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-h3-semibold {
-    @apply font-funnel-display text-[1.5rem] leading-[2.25rem] font-semibold text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-h3-medium {
-    @apply font-funnel-display text-[1.5rem] leading-[2.25rem] font-medium text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-h3-regular {
-    @apply font-funnel-display text-[1.5rem] leading-[2.25rem] font-normal text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-h4-semibold {
-    @apply font-funnel-display text-[1.25rem] leading-[1.875rem] font-semibold text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-h4-medium {
-    @apply font-funnel-display text-[1.25rem] leading-[1.875rem] font-medium text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-h4-regular {
-    @apply font-funnel-display text-[1.25rem] leading-[1.875rem] font-normal text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-b1-semibold {
-    @apply font-funnel-sans text-[1rem] leading-[1.5rem] font-semibold tracking-[0.01rem] text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-b1-medium {
-    @apply font-funnel-sans text-[1rem] leading-[1.5rem] font-medium tracking-[0.01rem] text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-b1-regular {
-    @apply font-funnel-sans text-[1rem] leading-[1.5rem] font-normal tracking-[0.01rem] text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-b2-semibold {
-    @apply font-funnel-sans text-[0.875rem] leading-[1.25rem] font-semibold tracking-[0.00875rem] text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-b2-medium {
-    @apply font-funnel-sans text-[0.875rem] leading-[1.25rem] font-medium tracking-[0.00875rem] text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-b2-regular {
-    @apply font-funnel-sans text-[0.875rem] leading-[1.25rem] font-normal tracking-[0.00875rem] text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-c1-semibold {
-    @apply font-funnel-sans text-[0.75rem] leading-[1.125rem] font-semibold tracking-[0.015rem] text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-c1-medium {
-    @apply font-funnel-sans text-[0.75rem] leading-[1.125rem] font-medium tracking-[0.015rem] text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-c1-regular {
-    @apply font-funnel-sans text-[0.75rem] leading-[1.125rem] font-normal tracking-[0.015rem] text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-mono-b1 {
-    @apply font-mono text-[1rem] leading-[1.5rem] font-normal tracking-[0.01rem] text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-mono-b2 {
-    @apply font-mono text-[0.875rem] leading-[1.25rem] font-normal tracking-[0.00875rem] text-neutral-800 dark:text-neutral-100;
-}
-
-@utility tp-mono-c1 {
-    @apply font-mono text-[0.75rem] leading-[1.125rem] font-normal tracking-[0.015rem] text-neutral-800 dark:text-neutral-100;
+@utility tp-body-sm {
+    @apply font-sans text-[0.75rem] leading-[1.125rem] font-normal;
 }
 
 /* Utilities */

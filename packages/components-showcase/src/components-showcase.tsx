@@ -57,7 +57,7 @@ interface ComponentsShowcaseProps {
 }
 
 export const ComponentsShowcase = (props: ComponentsShowcaseProps) => (
-    <div className="grid grid-cols-1 items-center border-t-2 border-neutral-800 lg:grid-cols-2">
+    <div className="border-line grid grid-cols-1 items-center border-t-2 lg:grid-cols-2">
         <ShowcaseSection cols={2} title="Typography" component={<TypographyShowcase />} />
         <ShowcaseSection cols={2} title="Colors" component={<ColorsShowcase />} />
         <ShowcaseSection cols={1} title="Button" component={<ButtonShowcase />} />
@@ -182,11 +182,11 @@ interface ShowcaseSectionProps {
 const ShowcaseSection = (props: ShowcaseSectionProps) => (
     <div
         className={cn(
-            "flex h-full min-h-[50dvh] flex-col gap-4 border-x border-b-2 border-neutral-600 p-4",
+            "border-line flex h-full min-h-[50dvh] flex-col gap-4 border-x border-b-2 p-4",
             { "lg:col-span-2": props.cols === 2 },
         )}
     >
-        <span className="tp-d4 w-full p-1 text-center">{props.title}</span>
+        <span className="tp-pixel-2xl w-full p-1 text-center">{props.title}</span>
         <div className="flex w-full grow flex-col items-center justify-center">
             {props.component}
         </div>

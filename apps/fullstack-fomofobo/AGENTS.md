@@ -152,14 +152,6 @@ OpenID Connect Authorization Code with PKCE, owned by `openid-client`. No hand-w
 - Translations: `public/locales/${locale}/${namespace}.json`. `instance.ts` lists the namespaces by hand, the locale test checks the list
 - `[lang]/[...rest]/page.tsx` catches every unmatched path -> `notFound()` -> `[lang]/not-found.tsx` in the URL language, status `404`
 
-## Theme
-
-- Stored in `localStorage` under `theme`, written through `useLocalStorage("theme")`
-- The root layout renders `DocumentTheme` first in `<body>`: inline `themeScript` on the server, `useApplyTheme` on the client. It sets the `<html>` class (`dark`, `system`, none) before first paint
-- `themeScript` inlines `applyStoredTheme` through `toString()`. That function **MUST** stay self-contained - any outer binding is `undefined` in the page
-- `system` is a class. `packages/styles` matches `.system` under `prefers-color-scheme: dark`
-- No Content Security Policy today. The day one lands, the inline script needs a nonce or a hash
-
 ## Deployment
 
 `infra/auth-oidc.md` documents the provider setup, and `infra/cloudflare/README.md` the Worker deploy. Read them **before** you change env vars, secrets, the database, object storage or networking. **NEVER** assume a topology.

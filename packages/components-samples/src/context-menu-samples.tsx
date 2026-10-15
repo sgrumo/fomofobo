@@ -12,7 +12,7 @@ export const ContextMenuSamples = () => {
     return (
         <div className="flex flex-col items-start gap-4">
             <ContextMenu>
-                <ContextMenuTrigger className="flex h-24 w-64 items-center justify-center rounded-lg border-2 border-dashed border-neutral-300 text-neutral-500 dark:border-neutral-600 dark:text-neutral-400">
+                <ContextMenuTrigger className="border-line-muted text-fg-muted flex h-24 w-64 items-center justify-center rounded-lg border-2 border-dashed">
                     Context Menu Target
                 </ContextMenuTrigger>
                 <ContextMenuContent>

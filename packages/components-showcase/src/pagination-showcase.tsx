@@ -15,7 +15,7 @@ const PaginationExampleShowcase = (props: PaginationExampleShowcaseProps) => {
 
     return (
         <div className="flex flex-col gap-1">
-            <p className="tp-c1-medium text-neutral-500 uppercase">{props.size}</p>
+            <p className="tp-pixel-sm text-fg-muted">{props.size}</p>
             <Pagination
                 page={page}
                 totalPages={props.totalPages}
@@ -37,7 +37,7 @@ interface PaginationSectionShowcaseProps {
 
 const PaginationSectionShowcase = (props: PaginationSectionShowcaseProps) => (
     <div className="flex flex-col gap-3">
-        <p className="tp-h4-semibold">{props.title}</p>
+        <p className="tp-pixel-lg">{props.title}</p>
         <PaginationExampleShowcase
             size="md"
             totalPages={props.totalPages}

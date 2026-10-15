@@ -18,15 +18,15 @@ export const CollapsibleShowcase = (props: CollapsibleShowcaseProps) => (
         )}
     >
         <div className="flex flex-col gap-4">
-            <p className="tp-h4-semibold">Uncontrolled</p>
+            <p className="tp-pixel-lg">Uncontrolled</p>
             <CollapsibleUncontrolledShowcase />
         </div>
         <div className="flex flex-col gap-4">
-            <p className="tp-h4-semibold">Default open</p>
+            <p className="tp-pixel-lg">Default open</p>
             <CollapsibleDefaultOpenShowcase />
         </div>
         <div className="flex flex-col gap-4">
-            <p className="tp-h4-semibold">Controlled</p>
+            <p className="tp-pixel-lg">Controlled</p>
             <CollapsibleControlledShowcase />
         </div>
     </div>

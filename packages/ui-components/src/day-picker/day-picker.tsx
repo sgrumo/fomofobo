@@ -117,10 +117,10 @@ const DayPickerDayCell = (props: DayPickerDayCellProps) => {
             onKeyDown={event => {
                 props.onKeyDown(event, props.day)
             }}
-            className={cn("tp-b2-regular m-auto size-6 rounded-full transition-colors", {
-                "bg-primary-400 dark:bg-primary-300 text-white": props.selected,
-                "ring-primary-400 dark:ring-primary-300 ring-1": today && !props.selected,
-                "hover:bg-primary-100/50": !props.selected && !props.disabled,
+            className={cn("tp-body-md m-auto size-6 rounded-full transition-colors", {
+                "bg-surface-inverse text-fg-inverse": props.selected,
+                "ring-focus ring-1": today && !props.selected,
+                "hover:bg-surface-muted/50": !props.selected && !props.disabled,
                 "cursor-not-allowed opacity-50": props.disabled,
             })}
         >
@@ -142,7 +142,7 @@ const DayPickerWeekDayHeaderRow = () => {
                     key={weekDay}
                     role="columnheader"
                     aria-label={i18n.t(`Days.Full.${weekDay}`, undefined)}
-                    className="tp-b2-regular flex size-6 items-center justify-center text-neutral-500 dark:text-neutral-400"
+                    className="tp-body-md text-fg-muted flex size-6 items-center justify-center"
                 >
                     {i18n.t(`Days.Short.${weekDay}`, undefined)}
                 </span>
@@ -203,9 +203,9 @@ const DayPickerMonthCell = (props: DayPickerMonthCellProps) => {
             onKeyDown={event => {
                 props.onKeyDown(event, props.month)
             }}
-            className={cn("tp-b2-regular m-auto size-8 rounded-full transition-colors", {
-                "bg-primary-400 text-white": props.selected,
-                "hover:bg-primary-100/50": !props.selected && !props.disabled,
+            className={cn("tp-body-md m-auto size-8 rounded-full transition-colors", {
+                "bg-surface-inverse text-fg-inverse": props.selected,
+                "hover:bg-surface-muted/50": !props.selected && !props.disabled,
                 "cursor-not-allowed opacity-50": props.disabled,
             })}
         >
@@ -264,9 +264,9 @@ const DayPickerYearCell = (props: DayPickerYearCellProps) => (
         onKeyDown={event => {
             props.onKeyDown(event, props.year)
         }}
-        className={cn("tp-b2-regular m-auto size-10 rounded-full transition-colors", {
-            "bg-primary-400 text-white": props.selected,
-            "hover:bg-primary-100/50": !props.selected && !props.disabled,
+        className={cn("tp-body-md m-auto size-10 rounded-full transition-colors", {
+            "bg-surface-inverse text-fg-inverse": props.selected,
+            "hover:bg-surface-muted/50": !props.selected && !props.disabled,
             "cursor-not-allowed opacity-50": props.disabled,
         })}
     >
@@ -671,7 +671,7 @@ export const DayPicker = (props: DayPickerProps) => {
             aria-disabled={disabled || undefined}
             onBlur={handleBlur}
             className={cn(
-                "flex w-[12.5rem] flex-col rounded-lg border border-neutral-200 p-2 dark:border-neutral-700",
+                "border-line-muted flex w-[12.5rem] flex-col rounded-lg border p-2",
                 { "opacity-50": disabled },
                 props.className,
             )}
@@ -682,14 +682,14 @@ export const DayPicker = (props: DayPickerProps) => {
                     onClick={onPrevious}
                     disabled={previousDisabled || disabled}
                     aria-label={previousLabel}
-                    className="flex w-fit justify-start text-neutral-800 disabled:opacity-50 dark:text-neutral-100"
+                    className="text-fg flex w-fit justify-start disabled:opacity-50"
                 >
                     <IconChevronRight className="size-4 rotate-180" />
                 </button>
                 {(view === "day" || view === "month") && (
                     <button
                         type="button"
-                        className="tp-b2-regular flex items-center justify-center"
+                        className="tp-body-md flex items-center justify-center"
                         onClick={onCycleView}
                         disabled={disabled}
                         aria-live="polite"
@@ -699,7 +699,7 @@ export const DayPicker = (props: DayPickerProps) => {
                 )}
                 {view === "year" && (
                     <span
-                        className="tp-b2-regular flex items-center justify-center"
+                        className="tp-body-md flex items-center justify-center"
                         aria-live="polite"
                     >
                         {viewText}
@@ -710,7 +710,7 @@ export const DayPicker = (props: DayPickerProps) => {
                     onClick={onNext}
                     disabled={nextDisabled || disabled}
                     aria-label={nextLabel}
-                    className="flex w-fit justify-end text-neutral-800 disabled:opacity-50 dark:text-neutral-100"
+                    className="text-fg flex w-fit justify-end disabled:opacity-50"
                 >
                     <IconChevronRight className="size-4" />
                 </button>

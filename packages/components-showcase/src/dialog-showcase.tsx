@@ -19,11 +19,11 @@ interface DialogShowcaseProps {
 }
 export const DialogShowcase = (props: DialogShowcaseProps) => (
     <div className={cn("flex flex-col gap-6", props.className)}>
-        <p className="tp-h4-semibold">Basic</p>
+        <p className="tp-pixel-lg">Basic</p>
         <DialogBasicShowcase />
-        <p className="tp-h4-semibold">Nested</p>
+        <p className="tp-pixel-lg">Nested</p>
         <DialogNestedShowcase />
-        <p className="tp-h4-semibold">Focus on Close</p>
+        <p className="tp-pixel-lg">Focus on Close</p>
         <DialogFocusOnCloseShowcase />
     </div>
 )
@@ -176,7 +176,7 @@ const dialogContentClassName = "max-w-[calc(min(40rem_,90dvw))]"
 const nestedDialogContentClassName = "max-w-[calc(min(28rem_,90dvw))]"
 const dialogDescription = "A short description of what this dialog is about."
 const dialogBody = (
-    <p className="tp-b2-regular text-neutral-800 dark:text-neutral-100">
+    <p className="tp-body-md text-fg">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel sapien augue.
         Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium
         doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore

@@ -2,91 +2,64 @@ import { isEqual } from "es-toolkit"
 import { useState } from "react"
 
 const colorGroups = [
-    { name: "white", vars: [["white", "--color-white"]] },
     {
-        name: "neutral",
+        name: "surface",
         vars: [
-            ["neutral-50", "--color-neutral-50"],
-            ["neutral-100", "--color-neutral-100"],
-            ["neutral-200", "--color-neutral-200"],
-            ["neutral-300", "--color-neutral-300"],
-            ["neutral-400", "--color-neutral-400"],
-            ["neutral-500", "--color-neutral-500"],
-            ["neutral-600", "--color-neutral-600"],
-            ["neutral-700", "--color-neutral-700"],
-            ["neutral-800", "--color-neutral-800"],
-            ["neutral-900", "--color-neutral-900"],
-            ["neutral-950", "--color-neutral-950"],
-        ],
-    },
-    { name: "black", vars: [["black", "--color-black"]] },
-    {
-        name: "primary",
-        vars: [
-            ["primary-100", "--color-primary-100"],
-            ["primary-200", "--color-primary-200"],
-            ["primary-300", "--color-primary-300"],
-            ["primary-400", "--color-primary-400"],
-            ["primary-500", "--color-primary-500"],
-            ["primary-600", "--color-primary-600"],
-            ["primary-700", "--color-primary-700"],
-            ["primary-800", "--color-primary-800"],
+            ["surface", "--color-surface"],
+            ["surface-muted", "--color-surface-muted"],
+            ["surface-inverse", "--color-surface-inverse"],
+            ["backdrop", "--color-backdrop"],
+            ["overlay", "--color-overlay"],
         ],
     },
     {
-        name: "info",
+        name: "text",
         vars: [
-            ["info-100", "--color-info-100"],
-            ["info-200", "--color-info-200"],
-            ["info-300", "--color-info-300"],
-            ["info-400", "--color-info-400"],
-            ["info-500", "--color-info-500"],
-            ["info-600", "--color-info-600"],
-            ["info-700", "--color-info-700"],
-            ["info-800", "--color-info-800"],
-            ["info-900", "--color-info-900"],
+            ["fg", "--color-fg"],
+            ["fg-muted", "--color-fg-muted"],
+            ["fg-subtle", "--color-fg-subtle"],
+            ["fg-inverse", "--color-fg-inverse"],
         ],
     },
     {
-        name: "success",
+        name: "line",
         vars: [
-            ["success-100", "--color-success-100"],
-            ["success-200", "--color-success-200"],
-            ["success-300", "--color-success-300"],
-            ["success-400", "--color-success-400"],
-            ["success-500", "--color-success-500"],
-            ["success-600", "--color-success-600"],
-            ["success-700", "--color-success-700"],
-            ["success-800", "--color-success-800"],
-            ["success-900", "--color-success-900"],
+            ["line", "--color-line"],
+            ["line-muted", "--color-line-muted"],
+            ["focus", "--color-focus"],
         ],
     },
     {
-        name: "warning",
+        name: "status",
         vars: [
-            ["warning-100", "--color-warning-100"],
-            ["warning-200", "--color-warning-200"],
-            ["warning-300", "--color-warning-300"],
-            ["warning-400", "--color-warning-400"],
-            ["warning-500", "--color-warning-500"],
-            ["warning-600", "--color-warning-600"],
-            ["warning-700", "--color-warning-700"],
-            ["warning-800", "--color-warning-800"],
-            ["warning-900", "--color-warning-900"],
+            ["live", "--color-live"],
+            ["live-strong", "--color-live-strong"],
+            ["upcoming", "--color-upcoming"],
+            ["ended", "--color-ended"],
+            ["social", "--color-social"],
+            ["position", "--color-position"],
         ],
     },
     {
-        name: "danger",
+        name: "feedback",
         vars: [
-            ["danger-100", "--color-danger-100"],
-            ["danger-200", "--color-danger-200"],
-            ["danger-300", "--color-danger-300"],
-            ["danger-400", "--color-danger-400"],
-            ["danger-500", "--color-danger-500"],
-            ["danger-600", "--color-danger-600"],
-            ["danger-700", "--color-danger-700"],
-            ["danger-800", "--color-danger-800"],
-            ["danger-900", "--color-danger-900"],
+            ["danger", "--color-danger"],
+            ["danger-surface", "--color-danger-surface"],
+            ["success", "--color-success"],
+            ["success-surface", "--color-success-surface"],
+            ["warning", "--color-warning"],
+            ["warning-surface", "--color-warning-surface"],
+            ["info", "--color-info"],
+            ["info-surface", "--color-info-surface"],
+        ],
+    },
+    {
+        name: "map",
+        vars: [
+            ["map-ground", "--color-map-ground"],
+            ["map-block", "--color-map-block"],
+            ["map-water", "--color-map-water"],
+            ["map-road", "--color-map-road"],
         ],
     },
 ] as const
@@ -152,7 +125,7 @@ export const ColorsShowcase = () => {
                         {group.vars.map(([name]) => (
                             <div
                                 key={name}
-                                className="flex w-32 flex-col gap-1 overflow-clip rounded-lg border border-neutral-200 pb-2 dark:border-neutral-700"
+                                className="border-line-muted flex w-32 flex-col gap-1 overflow-clip rounded-lg border pb-2"
                             >
                                 <div
                                     className="h-16 w-full"
@@ -160,8 +133,8 @@ export const ColorsShowcase = () => {
                                         backgroundColor: `var(--color-${name})`,
                                     }}
                                 />
-                                <span className="tp-mono-b2 px-2">{name}</span>
-                                <span className="tp-mono-b2 px-2 text-neutral-500 dark:text-neutral-400">
+                                <span className="tp-pixel-md px-2">{name}</span>
+                                <span className="tp-pixel-md text-fg-muted px-2">
                                     {colors[name]?.toUpperCase()}
                                 </span>
                             </div>

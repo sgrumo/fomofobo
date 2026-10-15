@@ -15,21 +15,21 @@ interface TableShowcaseProps {
 export const TableShowcase = (props: TableShowcaseProps) => (
     <div className={cn("grid grid-cols-1 gap-6 lg:grid-cols-2", props.className)}>
         <div className="flex flex-col gap-2">
-            <p className="tp-h4-semibold">Standard (few rows)</p>
+            <p className="tp-pixel-lg">Standard (few rows)</p>
             <TableStandardShowcase />
         </div>
         <div className="flex flex-col gap-2">
-            <p className="tp-h4-semibold">Empty (fallback)</p>
+            <p className="tp-pixel-lg">Empty (fallback)</p>
             <TableEmptyShowcase />
         </div>
         <div className="flex flex-col gap-2">
-            <p className="tp-h4-semibold">Standard (20 rows)</p>
+            <p className="tp-pixel-lg">Standard (20 rows)</p>
             <div className="max-h-[25rem] overflow-auto">
                 <TableManyRowsShowcase />
             </div>
         </div>
         <div className="flex flex-col gap-2">
-            <p className="tp-h4-semibold">Long content</p>
+            <p className="tp-pixel-lg">Long content</p>
             <TableLongContentShowcase />
         </div>
     </div>

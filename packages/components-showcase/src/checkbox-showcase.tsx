@@ -23,7 +23,7 @@ export const CheckboxShowcase = () => {
     return (
         <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Checkbox</p>
+                <p className="tp-pixel-lg">Checkbox</p>
                 <div className="flex flex-wrap gap-6">
                     <Field label="Default" labelSide="right" required={false}>
                         <Checkbox value={checked} onValueChange={setChecked} />
@@ -70,7 +70,7 @@ export const CheckboxShowcase = () => {
                 </div>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Checkbox Group</p>
+                <p className="tp-pixel-lg">Checkbox Group</p>
                 <div className="flex flex-wrap gap-8">
                     <Field label="Fruits" required={false}>
                         <CheckboxGroup

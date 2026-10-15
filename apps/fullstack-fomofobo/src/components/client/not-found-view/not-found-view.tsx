@@ -12,12 +12,12 @@ export const NotFoundView = () => {
 
     return (
         <div className="flex grow flex-col items-center justify-center gap-4 p-4">
-            <span className="tp-h1">{t("NotFound.Title")}</span>
+            <span className="tp-pixel-2xl">{t("NotFound.Title")}</span>
             <RouteLink
                 route={routes.root}
                 parameters={{ lang: language }}
                 query={{}}
-                className="tp-b1-medium text-primary-600 dark:text-primary-300 underline"
+                className="tp-pixel-md text-fg underline"
             >
                 {t("NotFound.BackHome")}
             </RouteLink>

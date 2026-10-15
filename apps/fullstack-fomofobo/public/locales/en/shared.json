@@ -5,11 +5,6 @@
         "en": "English",
         "it": "Italiano"
     },
-    "Theme": {
-        "light": "Light",
-        "dark": "Dark",
-        "system": "System"
-    },
     "Routes": {
         "Home": "Home",
         "Dev": "Dev"

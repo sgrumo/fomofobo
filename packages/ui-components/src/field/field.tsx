@@ -100,11 +100,11 @@ export const Field = (props: FieldProps) => {
         .with(P.union("right", "bottom"), () => "end")
         .exhaustive()
 
-    const labelClassName = cn("w-fit text-neutral-800 dark:text-neutral-100", {
+    const labelClassName = cn("text-fg w-fit", {
         "sr-only": !!props.srOnly,
-        "tp-b2-regular": labelWeight === "normal",
-        "tp-b2-medium": labelWeight === "medium",
-        "tp-b2-semibold": labelWeight === "semibold",
+        "tp-pixel-sm": labelWeight === "normal",
+        "tp-pixel-md": labelWeight !== "normal",
+        "font-bold": labelWeight === "semibold",
         "cursor-not-allowed": disabled && mode === "edit",
     })
 
@@ -122,7 +122,7 @@ export const Field = (props: FieldProps) => {
                     </span>
                 )}
                 {props.required && mode === "edit" && (
-                    <span className="text-danger-600 dark:text-danger-400">*</span>
+                    <span className="text-danger">*</span>
                 )}
             </div>
             {isDefined(props.description) && (
@@ -147,7 +147,7 @@ export const Field = (props: FieldProps) => {
                         ),
                     }}
                 >
-                    <IconInfo className="size-4 text-neutral-500 dark:text-neutral-400" />
+                    <IconInfo className="text-fg-muted size-4" />
                 </Tooltip>
             )}
         </div>
@@ -168,11 +168,7 @@ export const Field = (props: FieldProps) => {
                 {position === "end" && label}
             </div>
             {showError && (
-                <ul
-                    id={errorId}
-
-                    className="tp-c1-regular text-danger-600 dark:text-danger-400 flex flex-col"
-                >
+                <ul id={errorId} className="tp-body-sm text-danger flex flex-col">
                     {errors.map(error => (
                         <li key={error}>{error}</li>
                     ))}

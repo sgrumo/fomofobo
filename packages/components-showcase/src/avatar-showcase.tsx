@@ -9,13 +9,13 @@ interface AvatarShowcaseProps {
 }
 export const AvatarShowcase = (props: AvatarShowcaseProps) => (
     <div className={cn("flex flex-col gap-6", props.className)}>
-        <p className="tp-h4-semibold">With image</p>
+        <p className="tp-pixel-lg">With image</p>
         <div className="flex items-center gap-4">
             <Avatar size="sm" src={avatarSrc} fullName="Lisa Turner" fallback="LT" />
             <Avatar size="md" src={avatarSrc} fullName="Lisa Turner" fallback="LT" />
             <Avatar size="lg" src={avatarSrc} fullName="Lisa Turner" fallback="LT" />
         </div>
-        <p className="tp-h4-semibold">Fallback (initials)</p>
+        <p className="tp-pixel-lg">Fallback (initials)</p>
         <div className="flex items-center gap-4">
             <Avatar size="sm" src={undefined} fullName="User" fallback="AB" />
             <Avatar size="md" src={undefined} fullName="User" fallback="CD" />

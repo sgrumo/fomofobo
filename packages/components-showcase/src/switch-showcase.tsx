@@ -14,19 +14,19 @@ export const SwitchShowcase = () => {
     return (
         <div className="flex w-full flex-col gap-8 lg:flex-row">
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Sm</p>
+                <p className="tp-pixel-lg">Sm</p>
                 <Field label="Enabled" labelSide="right" required={false}>
                     <Switch value={smValue} onValueChange={setSmValue} size="sm" />
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Md</p>
+                <p className="tp-pixel-lg">Md</p>
                 <Field label="Enabled" labelSide="right" required={false}>
                     <Switch value={mdValue} onValueChange={setMdValue} size="md" />
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">With description</p>
+                <p className="tp-pixel-lg">With description</p>
                 <Field
                     label="Notifications"
                     description="Turn on to receive email notifications."
@@ -41,7 +41,7 @@ export const SwitchShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Sm disabled</p>
+                <p className="tp-pixel-lg">Sm disabled</p>
                 <Field label="Off" disabled={true} labelSide="right" required={false}>
                     <Switch
                         value={smDisabledOffValue}
@@ -58,7 +58,7 @@ export const SwitchShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Md disabled</p>
+                <p className="tp-pixel-lg">Md disabled</p>
                 <Field label="Off" disabled={true} labelSide="right" required={false}>
                     <Switch
                         value={mdDisabledOffValue}

@@ -6,12 +6,12 @@ interface InputRootStylesOpts {
     error: boolean
 }
 export const inputRootStyles = styles((opts: InputRootStylesOpts) => [
-    "inline-flex items-center rounded-lg bg-white outline-1 -outline-offset-1 transition-colors has-[:is(input,textarea):disabled]:opacity-75 has-[:is(input,textarea):focus-visible]:bg-white has-[:is(input,textarea):enabled]:has-[:is(input,textarea):not(:focus-visible)]:has-[:is(input,textarea):hover]:bg-neutral-100 dark:bg-neutral-900 dark:has-[:is(input,textarea):focus-visible]:bg-neutral-900 dark:has-[:is(input,textarea):enabled]:has-[:is(input,textarea):not(:focus-visible)]:has-[:is(input,textarea):hover]:bg-neutral-800 [&:is(button)[aria-haspopup=dialog]:disabled]:opacity-75 [&:is(button)[aria-haspopup=dialog]:enabled:not(:focus-visible):hover:not(:has([data-input-reset]:hover))]:bg-neutral-100 dark:[&:is(button)[aria-haspopup=dialog]:enabled:not(:focus-visible):hover:not(:has([data-input-reset]:hover))]:bg-neutral-800 [&:is(button)[aria-haspopup=dialog]:focus-visible]:bg-white dark:[&:is(button)[aria-haspopup=dialog]:focus-visible]:bg-neutral-900 [&:is(button)[aria-haspopup=dialog][aria-expanded=true]]:bg-white dark:[&:is(button)[aria-haspopup=dialog][aria-expanded=true]]:bg-neutral-900",
+    "bg-surface has-[:is(input,textarea):focus-visible]:bg-surface has-[:is(input,textarea):enabled]:has-[:is(input,textarea):not(:focus-visible)]:has-[:is(input,textarea):hover]:bg-surface-muted [&:is(button)[aria-haspopup=dialog]:enabled:not(:focus-visible):hover:not(:has([data-input-reset]:hover))]:bg-surface-muted [&:is(button)[aria-haspopup=dialog]:focus-visible]:bg-surface [&:is(button)[aria-haspopup=dialog][aria-expanded=true]]:bg-surface inline-flex items-center rounded-lg outline-1 -outline-offset-1 transition-colors has-[:is(input,textarea):disabled]:opacity-75 [&:is(button)[aria-haspopup=dialog]:disabled]:opacity-75",
     {
-        "outline-neutral-400 dark:outline-neutral-600": !opts.error,
-        "has-[:is(input,textarea):focus-visible]:outline-primary-600 dark:has-[:is(input,textarea):focus-visible]:outline-primary-300 [&:is(button)[aria-haspopup=dialog][aria-expanded=true]]:outline-primary-600 dark:[&:is(button)[aria-haspopup=dialog][aria-expanded=true]]:outline-primary-300 [&:is(button)[aria-haspopup=dialog]:focus-visible]:outline-primary-600 dark:[&:is(button)[aria-haspopup=dialog]:focus-visible]:outline-primary-300":
+        "outline-line": !opts.error,
+        "has-[:is(input,textarea):focus-visible]:outline-focus [&:is(button)[aria-haspopup=dialog][aria-expanded=true]]:outline-focus [&:is(button)[aria-haspopup=dialog]:focus-visible]:outline-focus":
             !opts.error,
-        "outline-danger-600 dark:outline-danger-400": opts.error && !opts.disabled,
+        "outline-danger": opts.error && !opts.disabled,
         "h-8 gap-1 px-2 py-1": opts.size === "sm",
         "h-10 gap-2 p-2": opts.size === "md",
     },
@@ -21,7 +21,7 @@ interface InputViewRootStylesOpts {
     forceSquare: boolean
 }
 export const inputViewRootStyles = styles((opts: InputViewRootStylesOpts) => [
-    "inline-flex items-center rounded-lg bg-white outline-1 -outline-offset-1 outline-neutral-400 dark:bg-neutral-900 dark:outline-neutral-600",
+    "bg-surface outline-line inline-flex items-center rounded-lg outline-1 -outline-offset-1",
     {
         "h-8 gap-1 px-2 py-1": opts.size === "sm",
         "h-10 gap-2 p-2": opts.size === "md",
@@ -29,10 +29,10 @@ export const inputViewRootStyles = styles((opts: InputViewRootStylesOpts) => [
         "w-10": opts.forceSquare && opts.size === "md",
     },
 ])
-export const inputViewValueStyles = styles(() => "tp-b2-regular w-full truncate")
+export const inputViewValueStyles = styles(() => "tp-body-md w-full truncate")
 export const inputAffixStyles = styles(
-    () => "tp-b2-regular appearance-none outline-0 select-none",
+    () => "tp-body-md appearance-none outline-0 select-none",
 )
 export const inputInputStyles = styles(
-    () => "tp-b2-regular w-full appearance-none outline-0",
+    () => "tp-body-md w-full appearance-none outline-0",
 )

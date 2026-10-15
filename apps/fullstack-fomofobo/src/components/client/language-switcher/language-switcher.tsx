@@ -16,7 +16,7 @@ export const LanguageSwitcher = () => {
     return (
         <nav
             aria-label={t("Language.Label")}
-            className="flex w-fit items-center gap-1 rounded-md border border-neutral-200 p-1 dark:border-neutral-700"
+            className="border-line bg-surface flex w-fit items-center gap-1 rounded-md border-2 p-1"
         >
             <Suspense fallback={<LanguageLinks search="" />}>
                 <LanguageLinksWithSearch />
@@ -51,9 +51,9 @@ const LanguageLinks = (props: LanguageLinksProps) => {
             replace={true}
             scroll={false}
             prefetch={false}
-            className="focus-visible:outline-primary-500 rounded focus-visible:outline-2 focus-visible:outline-offset-1"
+            className="focus-visible:outline-focus rounded focus-visible:outline-2 focus-visible:outline-offset-1"
         >
-            <SettingToggleRenderItem toggledBy="state" toggled={item === language}>
+            <SettingToggleRenderItem toggled={item === language}>
                 {item.toUpperCase()}
             </SettingToggleRenderItem>
         </Link>

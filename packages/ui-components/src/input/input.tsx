@@ -144,7 +144,7 @@ interface InputIconProps {
 export const InputIcon = ({ icon, size, className }: InputIconProps) => (
     <div
         className={cn(
-            "[&>svg]:text-neutral-600 dark:[&>svg]:text-neutral-300",
+            "[&>svg]:text-fg-muted",
             {
                 "[&>svg]:size-4": size === "sm",
                 "[&>svg]:size-5": size === "md",

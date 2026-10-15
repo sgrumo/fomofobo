@@ -55,7 +55,7 @@ export const SelectShowcase = () => {
     return (
         <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),18rem))] justify-center gap-8">
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Standard</p>
+                <p className="tp-pixel-lg">Standard</p>
                 <Field required={false} label="Single">
                     <Select
                         multiple={false}
@@ -82,7 +82,7 @@ export const SelectShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Error</p>
+                <p className="tp-pixel-lg">Error</p>
                 <Field required={false} label="Single" errors={["Selection is required"]}>
                     <Select
                         multiple={false}
@@ -113,7 +113,7 @@ export const SelectShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Complex</p>
+                <p className="tp-pixel-lg">Complex</p>
                 <Field required={false} label="Single">
                     <Select
                         multiple={false}
@@ -162,7 +162,7 @@ export const SelectShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Loading</p>
+                <p className="tp-pixel-lg">Loading</p>
                 <Field required={false} label="Single">
                     <Select
                         multiple={false}
@@ -191,7 +191,7 @@ export const SelectShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Disabled</p>
+                <p className="tp-pixel-lg">Disabled</p>
                 <Field required={false} label="Single" disabled={true}>
                     <Select
                         multiple={false}
@@ -218,7 +218,7 @@ export const SelectShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Disabled with values</p>
+                <p className="tp-pixel-lg">Disabled with values</p>
                 <Field required={false} label="Single" disabled={true}>
                     <Select
                         multiple={false}
@@ -245,7 +245,7 @@ export const SelectShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Injected value</p>
+                <p className="tp-pixel-lg">Injected value</p>
                 <Field required={false} label="Single">
                     <Select
                         multiple={false}
@@ -272,7 +272,7 @@ export const SelectShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">With description</p>
+                <p className="tp-pixel-lg">With description</p>
                 <Field
                     required={false}
                     label="Single"
@@ -307,7 +307,7 @@ export const SelectShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Empty</p>
+                <p className="tp-pixel-lg">Empty</p>
                 <Field required={false} label="Single">
                     <Select<Fruit>
                         multiple={false}
@@ -334,7 +334,7 @@ export const SelectShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Not resettable</p>
+                <p className="tp-pixel-lg">Not resettable</p>
                 <Field label="Single" required={true}>
                     <Select
                         multiple={false}

@@ -22,7 +22,7 @@ interface AlertDialogSectionShowcaseProps {
 }
 const AlertDialogSectionShowcase = (props: AlertDialogSectionShowcaseProps) => (
     <div className="flex flex-col gap-4">
-        <p className="tp-h4-semibold">{props.heading}</p>
+        <p className="tp-pixel-lg">{props.heading}</p>
         <div className="flex flex-wrap gap-4">{props.children}</div>
     </div>
 )
@@ -57,7 +57,7 @@ export const AlertDialogShowcase = (props: AlertDialogShowcaseProps) => {
                             <AlertDialogDescription>
                                 Confirm that you want to delete this item.
                             </AlertDialogDescription>
-                            <p className="tp-b2-regular text-neutral-800 dark:text-neutral-100">
+                            <p className="tp-body-md text-fg">
                                 This action cannot be undone. This will permanently delete
                                 the item and all associated data.
                             </p>

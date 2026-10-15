@@ -198,7 +198,7 @@ const SamplePopover = () => (
 
 const SampleContextMenu = () => (
     <ContextMenu>
-        <ContextMenuTrigger className="tp-b2-regular flex h-20 w-full items-center justify-center rounded-lg border-2 border-dashed border-neutral-300 text-neutral-500 dark:border-neutral-600 dark:text-neutral-400">
+        <ContextMenuTrigger className="tp-body-md border-line-muted text-fg-muted flex h-20 w-full items-center justify-center rounded-lg border-2 border-dashed">
             Right-click here
         </ContextMenuTrigger>
         <ContextMenuContent>
@@ -323,7 +323,7 @@ interface StackingSectionShowcaseProps {
 }
 const StackingSectionShowcase = (props: StackingSectionShowcaseProps) => (
     <div className="flex w-full flex-col gap-3">
-        <p className="tp-h4-semibold">{props.title}</p>
+        <p className="tp-pixel-lg">{props.title}</p>
         <div className="flex flex-wrap items-start gap-3">{props.children}</div>
     </div>
 )

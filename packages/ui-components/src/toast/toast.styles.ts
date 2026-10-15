@@ -13,7 +13,7 @@ export const toastViewportStyles = styles(
 )
 
 export const toastRootStyles = styles((toast: ToastData) => [
-    "absolute right-0 bottom-0 left-auto z-[calc(1000-var(--toast-index))] mr-0 h-[var(--height)] w-full origin-bottom [transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--peek))-(var(--shrink)*var(--height))))_scale(var(--scale))] rounded-lg p-4 shadow-lg select-none [--gap:0.75rem] [--height:var(--toast-frontmost-height,var(--toast-height))] [--offset-y:calc(var(--toast-offset-y)*-1+calc(var(--toast-index)*var(--gap)*-1)+var(--toast-swipe-movement-y))] [--peek:0.75rem] [--scale:calc(max(0,1-(var(--toast-index)*0.1)))] [--shrink:calc(1-var(--scale))] [transition:transform_0.5s_cubic-bezier(0.22,1,0.36,1),opacity_0.5s,height_0.15s] after:absolute after:top-full after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-[''] data-[ending-style]:opacity-0 data-[expanded]:h-[var(--toast-height)] data-[expanded]:[transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--offset-y)))] data-[limited]:opacity-0 data-[starting-style]:[transform:translateY(150%)] data-[ending-style]:data-[swipe-direction=down]:[transform:translateY(calc(var(--toast-swipe-movement-y)+150%))] data-[expanded]:data-[ending-style]:data-[swipe-direction=down]:[transform:translateY(calc(var(--toast-swipe-movement-y)+150%))] data-[ending-style]:data-[swipe-direction=left]:[transform:translateX(calc(var(--toast-swipe-movement-x)-150%))_translateY(var(--offset-y))] data-[expanded]:data-[ending-style]:data-[swipe-direction=left]:[transform:translateX(calc(var(--toast-swipe-movement-x)-150%))_translateY(var(--offset-y))] data-[ending-style]:data-[swipe-direction=right]:[transform:translateX(calc(var(--toast-swipe-movement-x)+150%))_translateY(var(--offset-y))] data-[expanded]:data-[ending-style]:data-[swipe-direction=right]:[transform:translateX(calc(var(--toast-swipe-movement-x)+150%))_translateY(var(--offset-y))] data-[ending-style]:data-[swipe-direction=up]:[transform:translateY(calc(var(--toast-swipe-movement-y)-150%))] data-[expanded]:data-[ending-style]:data-[swipe-direction=up]:[transform:translateY(calc(var(--toast-swipe-movement-y)-150%))] dark:shadow-none [&[data-ending-style]:not([data-limited]):not([data-swipe-direction])]:[transform:translateY(150%)]",
+    "shadow-hard-lg absolute right-0 bottom-0 left-auto z-[calc(1000-var(--toast-index))] mr-0 h-[var(--height)] w-full origin-bottom [transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--peek))-(var(--shrink)*var(--height))))_scale(var(--scale))] rounded-lg p-4 select-none [--gap:0.75rem] [--height:var(--toast-frontmost-height,var(--toast-height))] [--offset-y:calc(var(--toast-offset-y)*-1+calc(var(--toast-index)*var(--gap)*-1)+var(--toast-swipe-movement-y))] [--peek:0.75rem] [--scale:calc(max(0,1-(var(--toast-index)*0.1)))] [--shrink:calc(1-var(--scale))] [transition:transform_0.5s_cubic-bezier(0.22,1,0.36,1),opacity_0.5s,height_0.15s] after:absolute after:top-full after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-[''] data-[ending-style]:opacity-0 data-[expanded]:h-[var(--toast-height)] data-[expanded]:[transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--offset-y)))] data-[limited]:opacity-0 data-[starting-style]:[transform:translateY(150%)] data-[ending-style]:data-[swipe-direction=down]:[transform:translateY(calc(var(--toast-swipe-movement-y)+150%))] data-[expanded]:data-[ending-style]:data-[swipe-direction=down]:[transform:translateY(calc(var(--toast-swipe-movement-y)+150%))] data-[ending-style]:data-[swipe-direction=left]:[transform:translateX(calc(var(--toast-swipe-movement-x)-150%))_translateY(var(--offset-y))] data-[expanded]:data-[ending-style]:data-[swipe-direction=left]:[transform:translateX(calc(var(--toast-swipe-movement-x)-150%))_translateY(var(--offset-y))] data-[ending-style]:data-[swipe-direction=right]:[transform:translateX(calc(var(--toast-swipe-movement-x)+150%))_translateY(var(--offset-y))] data-[expanded]:data-[ending-style]:data-[swipe-direction=right]:[transform:translateX(calc(var(--toast-swipe-movement-x)+150%))_translateY(var(--offset-y))] data-[ending-style]:data-[swipe-direction=up]:[transform:translateY(calc(var(--toast-swipe-movement-y)-150%))] data-[expanded]:data-[ending-style]:data-[swipe-direction=up]:[transform:translateY(calc(var(--toast-swipe-movement-y)-150%))] [&[data-ending-style]:not([data-limited]):not([data-swipe-direction])]:[transform:translateY(150%)]",
     alertBackgroundStyles(toast.type),
 ])
 
@@ -30,17 +30,13 @@ export const toastCopyStyles = styles((toast: ToastData) => [
 ])
 
 export const toastCopiedLabelStyles = styles((toast: ToastData, visible: boolean) => [
-    "tp-mono-c1 pointer-events-none absolute -left-1 inline-flex -translate-x-full items-center gap-0.5 rounded-sm px-0.5 py-0.25 whitespace-nowrap uppercase opacity-0 transition-opacity [transition-duration:150ms] [&>svg]:size-4",
+    "tp-pixel-sm pointer-events-none absolute -left-1 inline-flex -translate-x-full items-center gap-0.5 rounded-sm px-0.5 py-0.25 whitespace-nowrap opacity-0 transition-opacity [transition-duration:150ms] [&>svg]:size-4",
     {
         "opacity-100": visible,
-        "text-info-100 bg-info-800 dark:text-info-800 dark:bg-info-200":
-            toast.type === "info",
-        "text-success-100 bg-success-800 dark:text-success-800 dark:bg-success-200":
-            toast.type === "success",
-        "text-warning-100 bg-warning-800 dark:text-warning-800 dark:bg-warning-200":
-            toast.type === "warning",
-        "text-danger-100 bg-danger-800 dark:text-danger-800 dark:bg-danger-200":
-            toast.type === "error",
+        "text-info-surface bg-info": toast.type === "info",
+        "text-success-surface bg-success": toast.type === "success",
+        "text-warning-surface bg-warning": toast.type === "warning",
+        "text-danger-surface bg-danger": toast.type === "error",
     },
 ])
 
@@ -50,7 +46,7 @@ export const toastCloseStyles = styles((toast: ToastData) => [
 ])
 
 export const toastTitleStyles = styles((toast: ToastData) => [
-    "tp-b2-regular w-full text-start",
+    "tp-body-md w-full text-start",
     alertForegroundStyles(toast.type),
 ])
 
@@ -67,8 +63,8 @@ export const toastDescriptionItemStyles = styles(
     (toast: ToastData, item: ToastDescriptionItem) => [
         "block",
         {
-            "tp-c1-regular": item.style === "standard",
-            "tp-mono-c1": item.style === "mono",
+            "tp-body-sm": item.style === "standard",
+            "tp-pixel-sm": item.style === "mono",
         },
         alertForegroundStyles(toast.type),
     ],

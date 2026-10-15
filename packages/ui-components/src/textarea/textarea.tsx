@@ -58,7 +58,7 @@ export const Textarea = ({
                 )}
             >
                 <span
-                    className="tp-b2-regular w-full whitespace-pre-wrap"
+                    className="tp-body-md w-full whitespace-pre-wrap"
                     style={{ minHeight: `${rows}lh` }}
                 >
                     {value}

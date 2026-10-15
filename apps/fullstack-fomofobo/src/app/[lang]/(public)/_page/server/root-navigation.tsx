@@ -19,7 +19,7 @@ export const RootNavigation = (props: RootNavigationProps) => {
                 route={routes.devShowcase}
                 parameters={parameters}
                 query={{}}
-                className="tp-b2-regular"
+                className="tp-body-md"
             >
                 {t("Routes.Dev")}
             </RouteLink>

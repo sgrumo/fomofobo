@@ -38,7 +38,7 @@ export const SessionMenu = (props: SessionMenuProps) => {
         <MenuRoot>
             <MenuTrigger
                 aria-label={t("Session.Menu")}
-                className="focus-visible:outline-primary-500 rounded-full focus-visible:outline-2 focus-visible:outline-offset-1"
+                className="focus-visible:outline-focus rounded-full focus-visible:outline-2 focus-visible:outline-offset-1"
             >
                 <Avatar
                     size="sm"

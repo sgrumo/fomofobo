@@ -66,9 +66,7 @@ const StepperInteractiveShowcase = () => {
 
     return (
         <div className="flex flex-col gap-2">
-            <p className="tp-c1-regular text-neutral-500 dark:text-neutral-400">
-                Current step: {currentStep}
-            </p>
+            <p className="tp-body-sm text-fg-muted">Current step: {currentStep}</p>
             <Stepper
                 steps={steps}
                 currentStep={currentStep}
@@ -113,25 +111,23 @@ interface StepperShowcaseProps {
 
 export const StepperShowcase = (props: StepperShowcaseProps) => (
     <div className={cn("flex w-full flex-col gap-6", props.className)}>
-        <p className="tp-h4-semibold">
-            Interactive — the ring (current) moves, fills stay
-        </p>
+        <p className="tp-pixel-lg">Interactive — the ring (current) moves, fills stay</p>
         <StepperInteractiveShowcase />
-        <p className="tp-h4-semibold">Fill states — empty, partial, complete</p>
+        <p className="tp-pixel-lg">Fill states — empty, partial, complete</p>
         <StepperExampleShowcase
             initialCurrentStep="profile"
             completionById={fillCompletions}
             enabledById={allEnabled}
             numberById={sequentialNumbers}
         />
-        <p className="tp-h4-semibold">Current on an empty step, with a disabled step</p>
+        <p className="tp-pixel-lg">Current on an empty step, with a disabled step</p>
         <StepperExampleShowcase
             initialCurrentStep="billing"
             completionById={currentOnEmptyCompletion}
             enabledById={oneDisabled}
             numberById={sequentialNumbers}
         />
-        <p className="tp-h4-semibold">Custom step numbers</p>
+        <p className="tp-pixel-lg">Custom step numbers</p>
         <StepperExampleShowcase
             initialCurrentStep="profile"
             completionById={fillCompletions}

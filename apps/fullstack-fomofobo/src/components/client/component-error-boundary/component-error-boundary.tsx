@@ -79,17 +79,17 @@ class ComponentErrorBoundaryInner extends Component<
         return (
             <div
                 className={cn(
-                    "bg-danger-600 dark:bg-danger-800 flex flex-col content-center items-center justify-center gap-2 rounded p-4",
+                    "bg-danger flex flex-col content-center items-center justify-center gap-2 rounded p-4",
                     this.props.className,
                 )}
             >
-                <p className="tp-b2-semibold text-center text-white">
+                <p className="tp-pixel-md text-fg-inverse text-center">
                     {this.props.t("ErrorBoundary.Title")}
                 </p>
                 <button
                     type="button"
                     onClick={onCopy}
-                    className="tp-b2-medium flex items-center gap-2 rounded text-white transition-transform active:scale-95"
+                    className="tp-pixel-md text-fg-inverse flex items-center gap-2 rounded transition-transform active:scale-95"
                 >
                     <IconCopy className="h-4 w-4" />
                     {this.props.t("ErrorBoundary.CopyError")}

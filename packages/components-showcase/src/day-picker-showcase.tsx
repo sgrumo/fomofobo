@@ -20,12 +20,12 @@ export const DayPickerShowcase = () => {
     return (
         <div className="grid h-full w-full grow grid-cols-1 items-start justify-items-center gap-8 p-4 lg:grid-cols-2 lg:p-8">
             <div className="flex flex-col gap-4">
-                <h3 className="tp-b2-semibold">Default</h3>
+                <h3 className="tp-pixel-md">Default</h3>
                 <DayPicker value={date} onValueChange={setDate} />
             </div>
 
             <div className="flex flex-col gap-4">
-                <h3 className="tp-b2-semibold">With Min Date</h3>
+                <h3 className="tp-pixel-md">With Min Date</h3>
                 <DayPicker
                     value={dateWithMin}
                     onValueChange={setDateWithMin}
@@ -34,7 +34,7 @@ export const DayPickerShowcase = () => {
             </div>
 
             <div className="flex flex-col gap-4">
-                <h3 className="tp-b2-semibold">With Max Date</h3>
+                <h3 className="tp-pixel-md">With Max Date</h3>
                 <DayPicker
                     value={dateWithMax}
                     onValueChange={setDateWithMax}
@@ -43,7 +43,7 @@ export const DayPickerShowcase = () => {
             </div>
 
             <div className="flex flex-col gap-4">
-                <h3 className="tp-b2-semibold">With Min + Max</h3>
+                <h3 className="tp-pixel-md">With Min + Max</h3>
                 <DayPicker
                     value={dateWithMinMax}
                     onValueChange={setDateWithMinMax}
@@ -53,7 +53,7 @@ export const DayPickerShowcase = () => {
             </div>
 
             <div className="flex flex-col gap-4">
-                <h3 className="tp-b2-semibold">Disabled</h3>
+                <h3 className="tp-pixel-md">Disabled</h3>
                 <DayPicker
                     value={disabledDate}
                     onValueChange={setDisabledDate}
@@ -62,16 +62,14 @@ export const DayPickerShowcase = () => {
             </div>
 
             <div className="flex flex-col gap-4">
-                <h3 className="tp-b2-semibold">
-                    In Field (label + disabled via context)
-                </h3>
+                <h3 className="tp-pixel-md">In Field (label + disabled via context)</h3>
                 <Field label="Appointment date" disabled={true} required={false}>
                     <DayPicker value={fieldDate} onValueChange={setFieldDate} />
                 </Field>
             </div>
 
             <div className="flex flex-col gap-4">
-                <h3 className="tp-b2-semibold">In Field (with description)</h3>
+                <h3 className="tp-pixel-md">In Field (with description)</h3>
                 <Field
                     label="Delivery date"
                     description="Pick the day the package should arrive."

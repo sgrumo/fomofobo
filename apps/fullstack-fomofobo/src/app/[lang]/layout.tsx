@@ -1,12 +1,12 @@
 import "../globals.css"
-import "@fontsource-variable/funnel-display"
 import "@fontsource-variable/funnel-sans"
+import "@fontsource/space-mono/400.css"
+import "@fontsource/space-mono/700.css"
 import { languageKeySchema } from "i18n/i18n"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
 import { DevQuadrant } from "@/components/client/dev-quadrant/dev-quadrant"
-import { DocumentTheme } from "@/components/client/document-theme/document-theme"
 import { GlobalProviders } from "@/components/client/global-providers/global-providers"
 import { HydrationMarker } from "@/components/client/hydration-marker/hydration-marker"
 import { I18nProvider } from "@/components/client/i18n-provider/i18n-provider"
@@ -27,13 +27,8 @@ const RootLayout = async (props: LayoutProps<"/[lang]">) => {
     }
 
     return (
-        <html
-            lang={language.data}
-            className="bg-white dark:bg-neutral-950"
-            suppressHydrationWarning={true}
-        >
+        <html lang={language.data}>
             <body>
-                <DocumentTheme />
                 <HydrationMarker />
                 <div id="root">
                     <I18nProvider

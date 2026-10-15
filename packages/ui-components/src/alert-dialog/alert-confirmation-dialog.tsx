@@ -191,7 +191,7 @@ const AlertConfirmationDialogInnerContent = (
         <>
             <AlertDialogHeader>
                 <div className="flex items-center gap-2">
-                    <IconWarningCircle className="text-danger-600 dark:text-danger-400 size-6 shrink-0" />
+                    <IconWarningCircle className="text-danger size-6 shrink-0" />
                     <AlertDialogTitle>{props.title}</AlertDialogTitle>
                 </div>
             </AlertDialogHeader>
@@ -199,9 +199,9 @@ const AlertConfirmationDialogInnerContent = (
                 <AlertDialogDescription>{props.description}</AlertDialogDescription>
                 {props.enterToConfirm && (
                     <div className="flex flex-col gap-1">
-                        <div className="tp-b2-regular text-neutral-800 dark:text-neutral-100">
+                        <div className="tp-body-md text-fg">
                             <span>{`${i18n.t("AlertConfirmationDialog.EnterText", undefined)} `}</span>
-                            <span className="tp-b2-semibold">{`"${props.enterToConfirm}"`}</span>
+                            <span className="tp-pixel-md">{`"${props.enterToConfirm}"`}</span>
                             <span>{` ${i18n.t("AlertConfirmationDialog.ToConfirm", undefined)}`}</span>
                         </div>
                         <StringInput

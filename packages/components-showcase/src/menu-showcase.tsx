@@ -15,11 +15,11 @@ interface MenuShowcaseProps {
 }
 export const MenuShowcase = (props: MenuShowcaseProps) => (
     <div className={cn("flex flex-col gap-6", props.className)}>
-        <p className="tp-h4-semibold">Basic</p>
+        <p className="tp-pixel-lg">Basic</p>
         <MenuBasicShowcase />
-        <p className="tp-h4-semibold">With groups</p>
+        <p className="tp-pixel-lg">With groups</p>
         <MenuGroupsShowcase />
-        <p className="tp-h4-semibold">Destructive item</p>
+        <p className="tp-pixel-lg">Destructive item</p>
         <MenuDestructiveShowcase />
     </div>
 )

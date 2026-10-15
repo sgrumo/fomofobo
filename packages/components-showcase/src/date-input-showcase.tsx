@@ -32,7 +32,7 @@ export const DateInputShowcase = () => {
             noValidate={false}
         >
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-semibold">Custom</p>
+                <p className="tp-pixel-lg">Custom</p>
                 <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),18rem))] justify-center gap-4">
                     <Field label="Default" required={true}>
                         <DateInput
@@ -93,7 +93,7 @@ export const DateInputShowcase = () => {
                 </div>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-semibold">Native</p>
+                <p className="tp-pixel-lg">Native</p>
                 <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),18rem))] justify-center gap-4">
                     <Field label="Default" required={true}>
                         <DateInput

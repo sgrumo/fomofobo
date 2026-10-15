@@ -16,15 +16,15 @@ interface ToggleShowcaseProps {
 }
 export const ToggleShowcase = (props: ToggleShowcaseProps) => (
     <div className={cn("flex flex-col gap-6", props.className)}>
-        <p className="tp-h4-semibold">Button (standalone)</p>
+        <p className="tp-pixel-lg">Button (standalone)</p>
         <ButtonToggleStandaloneShowcase />
-        <p className="tp-h4-semibold">Button group (single)</p>
+        <p className="tp-pixel-lg">Button group (single)</p>
         <ButtonToggleGroupSingleShowcase />
-        <p className="tp-h4-semibold">Button group (multiple)</p>
+        <p className="tp-pixel-lg">Button group (multiple)</p>
         <ButtonToggleGroupMultipleShowcase />
-        <p className="tp-h4-semibold">Generic group (custom renderItem)</p>
+        <p className="tp-pixel-lg">Generic group (custom renderItem)</p>
         <GenericToggleGroupShowcase />
-        <p className="tp-h4-semibold">Generic group (with description)</p>
+        <p className="tp-pixel-lg">Generic group (with description)</p>
         <DescribedToggleGroupShowcase />
     </div>
 )
@@ -137,10 +137,10 @@ const GenericToggleGroupShowcase = () => {
             renderItem={({ item, toggled }) => (
                 <span
                     className={cn(
-                        "tp-b2-medium rounded-full border px-3 py-1 transition-colors",
+                        "tp-pixel-md rounded-full border px-3 py-1 transition-colors",
                         toggled
-                            ? "border-primary-600 bg-primary-600 dark:border-primary-300 dark:bg-primary-300 text-white dark:text-black"
-                            : "border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800",
+                            ? "border-line bg-surface-inverse text-fg-inverse"
+                            : "border-line-muted bg-surface text-fg hover:bg-surface-muted",
                     )}
                 >
                     {sizeLabels[item]}

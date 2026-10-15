@@ -17,7 +17,7 @@ export const sliderControlStyles = styles((opts: SliderSizeOpts) => [
 ])
 
 export const sliderTrackStyles = styles((opts: SliderSizeOpts) => [
-    "relative grow rounded-full bg-neutral-200 dark:bg-neutral-700",
+    "bg-line-muted relative grow rounded-full",
     {
         "h-1.5": opts.size === "sm",
         "h-2": opts.size === "md",
@@ -25,11 +25,11 @@ export const sliderTrackStyles = styles((opts: SliderSizeOpts) => [
 ])
 
 export const sliderIndicatorStyles = styles(() => [
-    "bg-primary-600 dark:bg-primary-300 absolute h-full rounded-full",
+    "bg-surface-inverse absolute h-full rounded-full",
 ])
 
 export const sliderThumbStyles = styles((opts: SliderSizeOpts) => [
-    "enabled:data-[dragging]:border-primary-600 has-[:focus-visible]:outline-primary-500 dark:has-[:focus-visible]:outline-primary-200 has-[:focus-visible]:border-primary-500 dark:has-[:focus-visible]:border-primary-200 absolute rounded-full border border-neutral-400 bg-white shadow-sm transition-[border-color,background] hover:bg-neutral-100 enabled:cursor-grab disabled:cursor-not-allowed disabled:opacity-50 has-[:focus-visible]:outline-3 has-[:focus-visible]:-outline-offset-1 dark:shadow-none dark:hover:bg-neutral-200",
+    "has-[:focus-visible]:outline-focus border-line bg-surface shadow-hard-sm hover:bg-surface-muted absolute rounded-full border transition-[border-color,background] enabled:cursor-grab disabled:cursor-not-allowed disabled:opacity-50 has-[:focus-visible]:outline-3 has-[:focus-visible]:-outline-offset-1",
     {
         "size-4": opts.size === "sm",
         "size-5": opts.size === "md",

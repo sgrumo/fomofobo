@@ -15,11 +15,11 @@ interface PopoverShowcaseProps {
 }
 export const PopoverShowcase = (props: PopoverShowcaseProps) => (
     <div className={cn("flex flex-col gap-6", props.className)}>
-        <p className="tp-h4-semibold">Basic</p>
+        <p className="tp-pixel-lg">Basic</p>
         <PopoverBasicShowcase />
-        <p className="tp-h4-semibold">With Arrow</p>
+        <p className="tp-pixel-lg">With Arrow</p>
         <PopoverWithArrowShowcase />
-        <p className="tp-h4-semibold">Positions</p>
+        <p className="tp-pixel-lg">Positions</p>
         <PopoverPositionsShowcase />
     </div>
 )

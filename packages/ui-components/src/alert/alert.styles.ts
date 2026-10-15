@@ -3,27 +3,27 @@ import { styles } from "frontend-shared/styles"
 import type { AlertType } from "./alert.helper"
 
 export const alertBackgroundStyles = styles((type: AlertType) => ({
-    "bg-neutral-100 dark:bg-neutral-900": type === "loading",
-    "bg-info-100 dark:bg-info-900": type === "info",
-    "bg-success-100 dark:bg-success-900": type === "success",
-    "bg-warning-100 dark:bg-warning-900": type === "warning",
-    "bg-danger-100 dark:bg-danger-900": type === "error",
+    "bg-surface-muted": type === "loading",
+    "bg-info-surface": type === "info",
+    "bg-success-surface": type === "success",
+    "bg-warning-surface": type === "warning",
+    "bg-danger-surface": type === "error",
 }))
 
 export const alertIconColorStyles = styles((type: AlertType) => ({
-    "text-neutral-600 dark:text-neutral-200": type === "loading",
-    "text-info-600 dark:text-info-200": type === "info",
-    "text-success-600 dark:text-success-200": type === "success",
-    "text-warning-600 dark:text-warning-200": type === "warning",
-    "text-danger-600 dark:text-danger-200": type === "error",
+    "text-fg-muted": type === "loading",
+    "text-info": type === "info",
+    "text-success": type === "success",
+    "text-warning": type === "warning",
+    "text-danger": type === "error",
 }))
 
 export const alertForegroundStyles = styles((type: AlertType) => ({
-    "text-neutral-800 dark:text-neutral-200": type === "loading",
-    "text-info-800 dark:text-info-200": type === "info",
-    "text-success-800 dark:text-success-200": type === "success",
-    "text-warning-800 dark:text-warning-200": type === "warning",
-    "text-danger-800 dark:text-danger-200": type === "error",
+    "text-fg": type === "loading",
+    "text-info": type === "info",
+    "text-success": type === "success",
+    "text-warning": type === "warning",
+    "text-danger": type === "error",
 }))
 
 export const alertRootStyles = styles((type: AlertType) => [
@@ -50,6 +50,6 @@ export const alertTextStyles = styles((hasText: boolean) => [
 ])
 
 export const alertLineStyles = styles((type: AlertType) => [
-    "tp-b2-regular",
+    "tp-body-md",
     alertForegroundStyles(type),
 ])

@@ -11,7 +11,7 @@ const regionSchema = z.object({ lang: languageKeySchema, region: z.enum(["eu", "
 
 const catalogRoute = createStaticRoute({
     segments: ["[lang]", "[region]", "catalog"],
-    title: ({ t }) => t("Theme.light"),
+    title: ({ t }) => t("PageTitle.NotFound"),
     parametersSchema: regionSchema,
     generateStaticParams: () => [
         { lang: "en", region: "eu" },
@@ -28,7 +28,7 @@ const shelvesRoute = createDynamicRoute({
 
 const bookSearchRoute = createDynamicRoute({
     segments: ["[lang]", "[region]", "books"],
-    title: ({ t }) => t("Theme.dark"),
+    title: ({ t }) => t("Routes.Dev"),
     parametersSchema: regionSchema,
     querySchema: z.object({
         author: z.string().min(1).optional().catch(undefined),
@@ -72,7 +72,7 @@ describe("getStaticRoute", () => {
         expect(values).toStrictEqual({
             parameters: { lang: "en", region: "eu" },
             path: "/en/eu/catalog",
-            title: "Light",
+            title: "Page not found",
         })
     })
 
@@ -80,7 +80,7 @@ describe("getStaticRoute", () => {
         const values = await getStaticRoute(catalogRoute, {
             params: Promise.resolve({ lang: "it", region: "us" }),
         })
-        expect(values.title).toBe("Chiaro")
+        expect(values.title).toBe("Pagina non trovata")
         expect(values.path).toBe("/it/us/catalog")
     })
 
@@ -114,7 +114,7 @@ describe("getDynamicRoute", () => {
             parameters: { lang: "en", region: "us" },
             query: { author: "Calvino", sort: "year", available: true },
             path: "/en/us/books?author=Calvino&sort=year&available=yes",
-            title: "Dark",
+            title: "Dev",
         })
     })
 

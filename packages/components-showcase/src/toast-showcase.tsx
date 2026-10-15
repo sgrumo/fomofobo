@@ -131,7 +131,7 @@ export const ToastShowcase = (props: ToastShowcaseProps) => {
         <div className={cn("flex flex-col gap-4", props.className)}>
             {sections.map(section => (
                 <div key={section.heading} className="flex flex-col gap-4">
-                    <p className="tp-h4-semibold">{section.heading}</p>
+                    <p className="tp-pixel-lg">{section.heading}</p>
                     <div className="flex flex-wrap gap-4">
                         {section.buttons.map(button => (
                             <Button

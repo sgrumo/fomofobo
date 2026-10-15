@@ -7,7 +7,7 @@ interface PaginationSizeOpts {
 }
 
 export const paginationNavStyles = styles((opts: PaginationSizeOpts) => [
-    "flex shrink-0 items-center justify-center text-neutral-800 transition-colors enabled:hover:bg-neutral-100 disabled:opacity-40 dark:text-neutral-100 dark:enabled:hover:bg-neutral-800",
+    "text-fg enabled:hover:bg-surface-muted flex shrink-0 items-center justify-center transition-colors disabled:opacity-40",
     {
         "size-7 rounded-lg [&>svg]:size-4": opts.size === "md",
         "size-6 rounded-md [&>svg]:size-3.5": opts.size === "sm",
@@ -20,19 +20,17 @@ interface PaginationItemStylesOpts extends PaginationSizeOpts {
 export const paginationItemStyles = styles((opts: PaginationItemStylesOpts) => [
     "flex shrink-0 items-center justify-center transition-colors disabled:opacity-40",
     {
-        "tp-b2-medium size-7 rounded-lg": opts.size === "md",
-        "tp-c1-medium size-6 rounded-md": opts.size === "sm",
-        "bg-primary-600 text-primary-100 dark:bg-primary-100 dark:text-primary-800":
-            opts.selected,
-        "text-neutral-800 enabled:hover:bg-neutral-100 dark:text-neutral-100 dark:enabled:hover:bg-neutral-800":
-            !opts.selected,
+        "tp-pixel-md size-7 rounded-lg": opts.size === "md",
+        "tp-pixel-sm size-6 rounded-md": opts.size === "sm",
+        "bg-surface-inverse text-fg-inverse": opts.selected,
+        "text-fg enabled:hover:bg-surface-muted": !opts.selected,
     },
 ])
 
 export const paginationEllipsisStyles = styles((opts: PaginationSizeOpts) => [
-    "flex shrink-0 items-center justify-center text-neutral-400 dark:text-neutral-500",
+    "text-fg-subtle flex shrink-0 items-center justify-center",
     {
-        "tp-b2-medium size-7": opts.size === "md",
-        "tp-c1-medium size-6": opts.size === "sm",
+        "tp-pixel-md size-7": opts.size === "md",
+        "tp-pixel-sm size-6": opts.size === "sm",
     },
 ])

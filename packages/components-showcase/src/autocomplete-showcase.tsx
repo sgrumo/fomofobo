@@ -18,7 +18,7 @@ export const AutocompleteShowcase = () => {
     return (
         <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),18rem))] justify-center gap-8">
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Standard</p>
+                <p className="tp-pixel-lg">Standard</p>
                 <Field label="Autocomplete" required={false}>
                     <Autocomplete
                         itemSchema={fruitSchema}
@@ -33,7 +33,7 @@ export const AutocompleteShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Complex</p>
+                <p className="tp-pixel-lg">Complex</p>
                 <Field label="Autocomplete" required={false}>
                     <Autocomplete
                         itemSchema={fruitSchema}
@@ -56,7 +56,7 @@ export const AutocompleteShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Loading</p>
+                <p className="tp-pixel-lg">Loading</p>
                 <Field label="Autocomplete" required={false}>
                     <Autocomplete
                         itemSchema={fruitSchema}
@@ -72,7 +72,7 @@ export const AutocompleteShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Disabled</p>
+                <p className="tp-pixel-lg">Disabled</p>
                 <Field label="Autocomplete" disabled={true} required={false}>
                     <Autocomplete
                         itemSchema={fruitSchema}
@@ -87,7 +87,7 @@ export const AutocompleteShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Disabled with value</p>
+                <p className="tp-pixel-lg">Disabled with value</p>
                 <Field label="Autocomplete" disabled={true} required={false}>
                     <Autocomplete
                         itemSchema={fruitSchema}
@@ -102,7 +102,7 @@ export const AutocompleteShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">With description</p>
+                <p className="tp-pixel-lg">With description</p>
                 <Field
                     label="Autocomplete"
                     description="Start typing to filter the fruit suggestions."
@@ -121,7 +121,7 @@ export const AutocompleteShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Empty</p>
+                <p className="tp-pixel-lg">Empty</p>
                 <Field label="Autocomplete" required={false}>
                     <Autocomplete
                         itemSchema={fruitSchema}

@@ -11,25 +11,25 @@ export const SliderShowcase = () => {
     return (
         <div className="flex w-full max-w-[20rem] flex-col gap-6">
             <div className="flex flex-col gap-2">
-                <p className="tp-h4-medium">Sm</p>
+                <p className="tp-pixel-lg">Sm</p>
                 <Field label="Volume" required={false}>
                     <Slider value={smValue} onValueChange={setSmValue} size="sm" />
                 </Field>
             </div>
             <div className="flex flex-col gap-2">
-                <p className="tp-h4-medium">Md</p>
+                <p className="tp-pixel-lg">Md</p>
                 <Field label="Volume" required={false}>
                     <Slider value={mdValue} onValueChange={setMdValue} size="md" />
                 </Field>
             </div>
             <div className="flex flex-col gap-2">
-                <p className="tp-h4-medium">Disabled</p>
+                <p className="tp-pixel-lg">Disabled</p>
                 <Field label="Volume" disabled={true} required={false}>
                     <Slider value={30} onValueChange={noop} size="sm" />
                 </Field>
             </div>
             <div className="flex flex-col gap-2">
-                <p className="tp-h4-medium">With description</p>
+                <p className="tp-pixel-lg">With description</p>
                 <Field
                     label="Volume"
                     description="Sets the playback volume from 0 to 100."

@@ -21,9 +21,8 @@
         "fmt:check": "oxfmt --check"
     },
     "dependencies": {
-        "@fontsource-variable/funnel-display": "catalog:",
         "@fontsource-variable/funnel-sans": "catalog:",
-        "@fontsource-variable/roboto-mono": "catalog:",
+        "@fontsource/space-mono": "^5.3.0",
         "@hono/swagger-ui": "catalog:",
         "@hono/zod-openapi": "catalog:",
         "@opennextjs/cloudflare": "1.20.12",

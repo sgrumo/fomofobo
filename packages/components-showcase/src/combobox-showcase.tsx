@@ -132,7 +132,7 @@ export const ComboboxShowcase = () => {
     return (
         <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),18rem))] justify-center gap-8">
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Standard</p>
+                <p className="tp-pixel-lg">Standard</p>
                 <Field label="Single" required={false}>
                     <Combobox
                         type="standard"
@@ -165,7 +165,7 @@ export const ComboboxShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Error</p>
+                <p className="tp-pixel-lg">Error</p>
                 <Field label="Single" errors={["Selection is required"]} required={false}>
                     <Combobox
                         type="standard"
@@ -202,7 +202,7 @@ export const ComboboxShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Complex</p>
+                <p className="tp-pixel-lg">Complex</p>
                 <Field label="Single" required={false}>
                     <Combobox
                         type="standard"
@@ -257,7 +257,7 @@ export const ComboboxShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Loading</p>
+                <p className="tp-pixel-lg">Loading</p>
                 <Field label="Single" required={false}>
                     <Combobox
                         type="standard"
@@ -292,7 +292,7 @@ export const ComboboxShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Disabled</p>
+                <p className="tp-pixel-lg">Disabled</p>
                 <Field label="Single" disabled={true} required={false}>
                     <Combobox
                         type="standard"
@@ -325,7 +325,7 @@ export const ComboboxShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Injected value</p>
+                <p className="tp-pixel-lg">Injected value</p>
                 <Field label="Single" required={false}>
                     <Combobox
                         type="standard"
@@ -358,7 +358,7 @@ export const ComboboxShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Disabled with values</p>
+                <p className="tp-pixel-lg">Disabled with values</p>
                 <Field label="Single" disabled={true} required={false}>
                     <Combobox
                         type="standard"
@@ -391,7 +391,7 @@ export const ComboboxShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Async (min length {minimumSearchLength})</p>
+                <p className="tp-pixel-lg">Async (min length {minimumSearchLength})</p>
                 <Field label="Single" required={false}>
                     <Combobox
                         type="standard"
@@ -432,7 +432,7 @@ export const ComboboxShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Not searchable</p>
+                <p className="tp-pixel-lg">Not searchable</p>
                 <Field label="Single" required={false}>
                     <Combobox
                         type="standard"
@@ -467,7 +467,7 @@ export const ComboboxShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Query</p>
+                <p className="tp-pixel-lg">Query</p>
                 <Button
                     variant="secondary"
                     size="sm"
@@ -517,7 +517,7 @@ export const ComboboxShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">
+                <p className="tp-pixel-lg">
                     Async query (min length {minimumSearchLength})
                 </p>
                 <Field label="Single" required={false}>
@@ -562,7 +562,7 @@ export const ComboboxShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">With description</p>
+                <p className="tp-pixel-lg">With description</p>
                 <Field
                     label="Single"
                     description="Search and pick your favorite fruit."
@@ -603,7 +603,7 @@ export const ComboboxShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Empty</p>
+                <p className="tp-pixel-lg">Empty</p>
                 <Field label="Single" required={false}>
                     <Combobox<Fruit>
                         type="standard"
@@ -636,7 +636,7 @@ export const ComboboxShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Empty not searchable</p>
+                <p className="tp-pixel-lg">Empty not searchable</p>
                 <Field label="Single" required={false}>
                     <Combobox<Fruit>
                         type="standard"
@@ -671,7 +671,7 @@ export const ComboboxShowcase = () => {
                 </Field>
             </div>
             <div className="flex flex-col gap-4">
-                <p className="tp-h4-medium">Not resettable</p>
+                <p className="tp-pixel-lg">Not resettable</p>
                 <Field label="Single" required={true}>
                     <Combobox
                         type="standard"

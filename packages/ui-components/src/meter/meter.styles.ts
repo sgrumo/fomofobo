@@ -9,7 +9,7 @@ interface MeterSizeOpts {
 export const meterRootStyles = styles(() => "w-full")
 
 export const meterTrackStyles = styles((opts: MeterSizeOpts) => [
-    "relative w-full rounded-full bg-neutral-200 dark:bg-neutral-700",
+    "bg-line-muted relative w-full rounded-full",
     {
         "h-2": opts.size === "sm",
         "h-3": opts.size === "md",
@@ -17,5 +17,5 @@ export const meterTrackStyles = styles((opts: MeterSizeOpts) => [
 ])
 
 export const meterIndicatorStyles = styles(() => [
-    "bg-primary-600 dark:bg-primary-300 h-full rounded-full transition-[width]",
+    "bg-surface-inverse h-full rounded-full transition-[width]",
 ])

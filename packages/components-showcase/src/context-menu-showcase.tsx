@@ -14,16 +14,16 @@ interface ContextMenuShowcaseProps {
 }
 export const ContextMenuShowcase = (props: ContextMenuShowcaseProps) => (
     <div className={cn("flex flex-col gap-6", props.className)}>
-        <p className="tp-h4-semibold">Basic</p>
+        <p className="tp-pixel-lg">Basic</p>
         <ContextMenuBasicShowcase />
-        <p className="tp-h4-semibold">With groups</p>
+        <p className="tp-pixel-lg">With groups</p>
         <ContextMenuGroupsShowcase />
     </div>
 )
 
 const ContextMenuBasicShowcase = () => (
     <ContextMenu>
-        <ContextMenuTrigger className="flex h-32 w-64 items-center justify-center rounded-lg border-2 border-dashed border-neutral-300 text-neutral-500 dark:border-neutral-600 dark:text-neutral-400">
+        <ContextMenuTrigger className="border-line-muted text-fg-muted flex h-32 w-64 items-center justify-center rounded-lg border-2 border-dashed">
             Right-click here
         </ContextMenuTrigger>
         <ContextMenuContent>
@@ -36,7 +36,7 @@ const ContextMenuBasicShowcase = () => (
 
 const ContextMenuGroupsShowcase = () => (
     <ContextMenu>
-        <ContextMenuTrigger className="flex h-32 w-64 items-center justify-center rounded-lg border-2 border-dashed border-neutral-300 text-neutral-500 dark:border-neutral-600 dark:text-neutral-400">
+        <ContextMenuTrigger className="border-line-muted text-fg-muted flex h-32 w-64 items-center justify-center rounded-lg border-2 border-dashed">
             Right-click here
         </ContextMenuTrigger>
         <ContextMenuContent>

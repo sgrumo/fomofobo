@@ -5,7 +5,7 @@ interface SelectionIndicatorIconStylesOpts {
 }
 export const selectionIndicatorIconStyles = styles(
     (opts: SelectionIndicatorIconStylesOpts) => [
-        "text-neutral-800 dark:text-neutral-100",
+        "text-fg",
         {
             "size-4": opts.size === "sm",
             "size-5": opts.size === "md",

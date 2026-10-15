@@ -6,11 +6,11 @@ import type { DrawerContext } from "./drawer.helper"
 
 export const drawerBackdropStyles = styles(
     () =>
-        "bg-absolute-black fixed inset-0 min-h-dvh opacity-20 transition-all duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+        "bg-backdrop fixed inset-0 min-h-dvh opacity-20 transition-all duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
 )
 
 export const drawerPopupStyles = styles((opts: Pick<DrawerContext, "side">) => [
-    "shadow-400 fixed flex flex-col gap-4 rounded-t-xl bg-white p-6 transition-transform duration-200 ease-out dark:bg-neutral-900 dark:shadow-none",
+    "shadow-hard-lg bg-surface fixed flex flex-col gap-4 rounded-t-xl p-6 transition-transform duration-200 ease-out",
     {
         "inset-x-0 bottom-0 grid max-h-[85dvh] grid-cols-1 grid-rows-[auto_1fr] gap-2 data-[ending-style]:translate-y-full data-[starting-style]:translate-y-full":
             opts.side === "bottom",
@@ -24,7 +24,7 @@ export const drawerPopupStyles = styles((opts: Pick<DrawerContext, "side">) => [
 ])
 
 export const drawerHandleStyles = styles((opts: Pick<DrawerContext, "side">) => [
-    "shrink-0 rounded-full bg-neutral-300",
+    "bg-line-muted shrink-0 rounded-full",
     {
         "mx-auto h-1 w-10": opts.side === "top" || opts.side === "bottom",
         "my-auto h-10 w-1": opts.side === "right" || opts.side === "left",
@@ -39,9 +39,9 @@ export const drawerContentStyles = styles((opts: Pick<DrawerContext, "side">) =>
 }))
 
 export const drawerTitleStyles = styles((opts: TypographyOpts) => [
-    "text-primary-600 dark:text-primary-300",
+    "text-fg",
     {
-        "tp-h4-regular": typographyNotOverridden(opts),
+        "tp-pixel-lg": typographyNotOverridden(opts),
     },
 ])
 
@@ -50,15 +50,14 @@ export const drawerHeaderStyles = styles(() => "flex items-start justify-between
 export const drawerHeaderContentStyles = styles(() => "flex flex-col gap-1")
 
 export const drawerCloseIconStyles = styles(
-    () =>
-        "text-neutral-400 transition-colors enabled:hover:text-neutral-500 dark:text-neutral-500 dark:enabled:hover:text-neutral-400 [&>svg]:size-6",
+    () => "text-fg-subtle enabled:hover:text-fg-muted transition-colors [&>svg]:size-6",
 )
 
 export const drawerBodyStyles = styles(() => "min-h-0 grow overflow-auto")
 
 export const drawerDescriptionStyles = styles((opts: TypographyOpts) => [
-    "text-neutral-500 dark:text-neutral-400",
+    "text-fg-muted",
     {
-        "tp-b2-regular": typographyNotOverridden(opts),
+        "tp-body-md": typographyNotOverridden(opts),
     },
 ])

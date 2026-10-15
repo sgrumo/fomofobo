@@ -153,9 +153,9 @@ interface SamplesSectionProps {
 const SamplesSection = (props: SamplesSectionProps) => (
     <section
         aria-label={props.title}
-        className="flex flex-col gap-4 border-b border-neutral-600 p-4"
+        className="border-line flex flex-col gap-4 border-b p-4"
     >
-        <h2 className="tp-d4">{props.title}</h2>
+        <h2 className="tp-pixel-2xl">{props.title}</h2>
         <div className="flex flex-col gap-4">{props.children}</div>
     </section>
 )
