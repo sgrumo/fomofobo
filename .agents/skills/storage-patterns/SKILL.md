@@ -275,6 +275,7 @@ public async createItemWithTags(item: Item, tagIds: string[]): Promise<void> {
 #### Inside a batch
 
 - Build each statement on `this.db` and pass it unawaited. An awaited statement runs on its own, outside the batch.
+- A batch maps joined rows by column name, so two joined columns with one name overwrite each other, for example `id`, `name`, or `created_at`. Alias each such column with ``sql<T>`${column}`.as("alias")``, or run the joined read outside the batch. A read outside a batch maps by position and needs neither.
 - A statement cannot read the result of an earlier one. Decide every value before the batch: generate the ids in the service, pass them in.
 - Run no network call between the reads and the batch that depends on them. Load what the method needs first.
 
