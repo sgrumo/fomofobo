@@ -65,6 +65,7 @@ The `packages/storage/migrations/` directory holds Drizzle-generated SQL migrati
 | `pnpm db:gen-migration`    | Generate migration SQL from schema changes             |
 | `pnpm db:custom-migration` | Generate an empty migration for a data change          |
 | `pnpm db:migrate`          | Apply pending migrations to the local D1 database      |
+| `pnpm db:seed`             | Replace the local D1 rows with the dev seed            |
 
 ### Env files
 

@@ -9,6 +9,7 @@
         "build:worker": "opennextjs-cloudflare build",
         "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview --var APP_ENV:local",
         "db:migrate:local": "wrangler d1 migrations apply DB --local",
+        "db:seed:local": "wrangler d1 execute DB --local --file ../../packages/storage/seed/dev-seed.sql",
         "clean": "rm -rf .next .open-next .wrangler next-env.d.ts *.tsbuildinfo",
         "start": "next start",
         "typecheck": "next typegen && tsc -b",
