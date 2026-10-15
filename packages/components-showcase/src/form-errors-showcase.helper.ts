@@ -1,6 +1,13 @@
 import { mapValues } from "es-toolkit"
 import type { FormErrors, FormIssueKey, FormResult } from "frontend-shared/types"
-import { nonEmptyUpdate, semverSchema } from "models"
+import {
+    eventUpsertSchema,
+    localDateTimeSchema,
+    nonEmptyUpdate,
+    recurrenceSchema,
+    semverSchema,
+    withTimeRange,
+} from "models"
 import { Result } from "shared/result"
 import { z } from "zod"
 import type { $ZodRawIssue } from "zod/v4/core"
@@ -57,6 +64,25 @@ const isJson = (value: string): boolean =>
 const pastDate = new Date("2020-01-01")
 const futureDate = new Date("2030-01-01")
 const sampleFile = () => new File(["a"], "sample.txt")
+
+const timeRangeSchema = withTimeRange(
+    z.object({ startsAt: localDateTimeSchema, endsAt: localDateTimeSchema }),
+)
+const weeklyRule = { frequency: "weekly", weekdays: ["wednesday"], until: "2026-12-30" }
+const categoryId = "6f9619ff-8b86-4d11-b42d-00c04fc964ff"
+const sampleEvent = {
+    title: "Jazz al Chiostro",
+    description: null,
+    categoryIds: [categoryId],
+    primaryCategoryId: categoryId,
+    venueId: "3f1a6d2e-9b7c-4c1f-8a2d-5e6f7a8b9c0d",
+    startsAt: "2026-10-14T21:00",
+    endsAt: "2026-10-15T00:30",
+    recurrence: null,
+    photoKeys: ["events/sample/cover.jpg"],
+    externalLinks: { instagramUrl: null, facebookUrl: null },
+    price: null,
+}
 
 /**
  * @remarks Typed as a full record, so every `FormIssueKey` needs a field raising it
@@ -397,6 +423,63 @@ export const formErrorsShowcaseFields: Record<FormIssueKey, FormErrorsShowcaseFi
     "FormErrors.Custom.empty-update": {
         schema: nonEmptyUpdate(z.object({ note: z.string().optional() })),
         initial: shown({}, "{}"),
+    },
+    "FormErrors.Custom.end-before-start": {
+        schema: timeRangeSchema,
+        initial: shown(
+            { startsAt: "2026-10-14T21:00", endsAt: "2026-10-14T20:00" },
+            "21:00 → 20:00",
+        ),
+    },
+    "FormErrors.Custom.duration-too-long": {
+        schema: timeRangeSchema,
+        initial: shown(
+            { startsAt: "2026-10-14T21:00", endsAt: "2026-10-17T21:00" },
+            "3 days",
+        ),
+    },
+    "FormErrors.Custom.until-before-first-date": {
+        schema: eventUpsertSchema,
+        initial: shown(
+            {
+                ...sampleEvent,
+                recurrence: {
+                    rule: { ...weeklyRule, until: "2026-10-01" },
+                    addedDates: [],
+                    removedDates: [],
+                },
+            },
+            "until 2026-10-01, first date 2026-10-14",
+        ),
+    },
+    "FormErrors.Custom.primary-category-not-in-list": {
+        schema: eventUpsertSchema,
+        initial: shown(
+            { ...sampleEvent, primaryCategoryId: crypto.randomUUID() },
+            "primary category outside the list",
+        ),
+    },
+    "FormErrors.Custom.duplicate-date": {
+        schema: recurrenceSchema,
+        initial: shown(
+            {
+                rule: weeklyRule,
+                addedDates: ["2026-10-20", "2026-10-20"],
+                removedDates: [],
+            },
+            "2026-10-20 added twice",
+        ),
+    },
+    "FormErrors.Custom.date-added-and-removed": {
+        schema: recurrenceSchema,
+        initial: shown(
+            {
+                rule: weeklyRule,
+                addedDates: ["2026-10-20"],
+                removedDates: ["2026-10-20"],
+            },
+            "2026-10-20 added and removed",
+        ),
     },
 }
 

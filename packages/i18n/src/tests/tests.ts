@@ -347,6 +347,12 @@ const formIssueKeyRecord: Record<FormIssueKey, true> = {
     "FormErrors.UnrecognizedKeys": true,
     "FormErrors.Custom.not-semver": true,
     "FormErrors.Custom.empty-update": true,
+    "FormErrors.Custom.end-before-start": true,
+    "FormErrors.Custom.duration-too-long": true,
+    "FormErrors.Custom.until-before-first-date": true,
+    "FormErrors.Custom.primary-category-not-in-list": true,
+    "FormErrors.Custom.duplicate-date": true,
+    "FormErrors.Custom.date-added-and-removed": true,
 }
 
 export const formIssueKeys: string[] = Object.keys(formIssueKeyRecord)

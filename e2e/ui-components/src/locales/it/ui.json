@@ -206,7 +206,13 @@
         "UnrecognizedKeys": "Rimuovi i campi non previsti: {{keys}}.",
         "Custom": {
             "not-semver": "Inserisci una versione semver, per esempio 1.4.0.",
-            "empty-update": "Modifica almeno un campo."
+            "empty-update": "Modifica almeno un campo.",
+            "end-before-start": "Deve essere successiva all'inizio.",
+            "duration-too-long": "L'evento è troppo lungo.",
+            "until-before-first-date": "La ripetizione deve terminare dalla prima data in poi.",
+            "primary-category-not-in-list": "Scegli la categoria principale tra quelle selezionate.",
+            "duplicate-date": "Ogni data può comparire una sola volta.",
+            "date-added-and-removed": "Una data non può essere sia aggiunta sia rimossa."
         }
     },
     "SelectionIndicator": {

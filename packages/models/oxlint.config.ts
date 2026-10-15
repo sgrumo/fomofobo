@@ -6,7 +6,7 @@ import { restrictedZodImport } from "../../configs/oxlint/shared.ts"
 
 export default defineConfig({
     extends: [nodeConfig, webConfig],
-    ignorePatterns: ["oxlint.config.ts"],
+    ignorePatterns: ["oxlint.config.ts", "vitest.config.ts"],
     rules: {
         "eslint/no-restricted-imports": ["error", { paths: [restrictedZodImport] }],
     },

@@ -206,7 +206,13 @@
         "UnrecognizedKeys": "Remove the unexpected fields: {{keys}}.",
         "Custom": {
             "not-semver": "Enter a semver version, for example 1.4.0.",
-            "empty-update": "Change at least one field."
+            "empty-update": "Change at least one field.",
+            "end-before-start": "Must be after the start.",
+            "duration-too-long": "The event is too long.",
+            "until-before-first-date": "The repetition must end on or after the first date.",
+            "primary-category-not-in-list": "Choose the main category among the selected ones.",
+            "duplicate-date": "Each date can appear once.",
+            "date-added-and-removed": "A date cannot be both added and removed."
         }
     },
     "SelectionIndicator": {
