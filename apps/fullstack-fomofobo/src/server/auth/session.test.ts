@@ -27,11 +27,6 @@ describe("session cookies", () => {
     describe("on a deployed shape, where the names carry the __Host- prefix", () => {
         beforeEach(() => {
             vi.stubEnv("APP_ENV", "docker")
-            vi.stubEnv("PGHOST", "postgres")
-            vi.stubEnv("PGUSER", "postgres")
-            vi.stubEnv("PGPASSWORD", "secret")
-            vi.stubEnv("PGDATABASE", "postgres")
-            vi.stubEnv("PGPORT", "5432")
             vi.stubEnv("S3_ENDPOINT", "https://s3.example.com")
             vi.stubEnv("S3_ACCESS_KEY", "access")
             vi.stubEnv("S3_SECRET_KEY", "secret")

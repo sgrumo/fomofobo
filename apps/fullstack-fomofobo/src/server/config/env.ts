@@ -6,7 +6,7 @@ import {
     oidcIssuerSchema,
     oidcJwksUrlSchema,
 } from "backend-shared/auth"
-import { portSchema, s3EndpointSchema } from "backend-shared/config"
+import { s3EndpointSchema } from "backend-shared/config"
 import { formatEnvFailure, optionalEnv } from "shared/env"
 
 import { appEnvValues } from "./app-config"
@@ -55,11 +55,6 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         OIDC_JWKS_URL: optionalEnv(oidcJwksUrlSchema),
         OIDC_SCOPE: z.string().nonempty().default(defaultScope),
         APP_BASE_URL: appBaseUrlSchema.default("http://localhost:3000"),
-        PGHOST: z.string().nonempty().default("localhost"),
-        PGUSER: z.string().nonempty().default("postgres"),
-        PGPASSWORD: z.string().nonempty().default("postgres"),
-        PGDATABASE: z.string().nonempty().default("postgres"),
-        PGPORT: portSchema.default(5432),
         S3_BUCKET: z.string().nonempty().default("fomofobo"),
         S3_REGION: z.string().nonempty().default("eu-west-1"),
         S3_ENDPOINT: s3EndpointSchema.default("http://localhost:9000"),
@@ -75,11 +70,6 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         OIDC_JWKS_URL: optionalEnv(oidcJwksUrlSchema),
         OIDC_SCOPE: z.string().nonempty().default(defaultScope),
         APP_BASE_URL: appBaseUrlSchema,
-        PGHOST: z.string().nonempty(),
-        PGUSER: z.string().nonempty(),
-        PGPASSWORD: z.string().nonempty(),
-        PGDATABASE: z.string().nonempty(),
-        PGPORT: portSchema,
         S3_BUCKET: z.string().nonempty().default("fomofobo"),
         S3_REGION: z.string().nonempty().default("eu-west-1"),
         S3_ENDPOINT: s3EndpointSchema,
@@ -95,11 +85,6 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         OIDC_JWKS_URL: optionalEnv(oidcJwksUrlSchema),
         OIDC_SCOPE: z.string().nonempty().default(defaultScope),
         APP_BASE_URL: appBaseUrlSchema,
-        PGHOST: z.string().nonempty(),
-        PGUSER: z.string().nonempty(),
-        PGPASSWORD: z.string().nonempty(),
-        PGDATABASE: z.string().nonempty(),
-        PGPORT: portSchema,
         S3_BUCKET: z.string().nonempty(),
         S3_REGION: z.string().nonempty(),
         S3_ENDPOINT: s3EndpointSchema,

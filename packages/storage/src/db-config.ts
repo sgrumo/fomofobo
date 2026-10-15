@@ -1,28 +1,21 @@
+import type { D1Database } from "@cloudflare/workers-types"
 import { logger } from "backend-shared"
 import { DefaultLogger } from "drizzle-orm"
-import type { NodePgDatabase } from "drizzle-orm/node-postgres"
-import { drizzle } from "drizzle-orm/node-postgres"
-import type { PoolConfig } from "pg"
-import { Pool } from "pg"
+import type { DrizzleD1Database } from "drizzle-orm/d1"
+import { drizzle } from "drizzle-orm/d1"
 
 // oxlint-disable-next-line import/no-namespace -- Drizzle requires a namespace import for schema
 import * as schema from "./db-schema"
 
-export type DbInstanceFromSchema = NodePgDatabase<typeof schema>
-export type DbTransaction = Parameters<
-    Parameters<DbInstanceFromSchema["transaction"]>[0]
->[0]
+export type DbInstanceFromSchema = DrizzleD1Database<typeof schema>
 export type DbSelect = Pick<DbInstanceFromSchema, "select">
 
 /**
- * @description Builds the Drizzle instance and the pg pool backing it
- * @param config Pool configuration of the connection
+ * @description Builds the Drizzle instance over a D1 binding
+ * @param database D1 binding of the request
  * @remarks Silences the query log when `DISABLE_DRIZZLE_LOGS` is `true`
  */
-export const buildDbInstance = (
-    config: PoolConfig,
-): { dbInstance: DbInstanceFromSchema; pgPool: Pool } => {
-    const pgPool = new Pool(config)
+export const buildDbInstance = (database: D1Database): DbInstanceFromSchema => {
     const shouldDisableLogs = process.env.DISABLE_DRIZZLE_LOGS === "true"
     const drizzleLogger = shouldDisableLogs
         ? false
@@ -33,7 +26,5 @@ export const buildDbInstance = (
                   },
               },
           })
-    const dbInstance = drizzle({ client: pgPool, logger: drizzleLogger, schema })
-
-    return { dbInstance, pgPool }
+    return drizzle(database, { logger: drizzleLogger, schema })
 }

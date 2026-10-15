@@ -1,4 +1,3 @@
-import { buildDbSsl } from "storage"
 import { describe, expect, it } from "vitest"
 
 import type { AppEnv } from "./app-config"
@@ -23,23 +22,5 @@ describe("resolveAppConfig", () => {
             { verboseErrors: false, apiDocsEnabled: false },
             { verboseErrors: false, apiDocsEnabled: false },
         ])
-    })
-
-    it("should encrypt the database connection on Vercel only", () => {
-        expect(
-            appEnvValues.filter(appEnv => resolveAppConfig(appEnv).dbSsl !== "off"),
-        ).toStrictEqual(["vercel"])
-    })
-
-    it("should verify the RDS certificate wherever it encrypts", () => {
-        expect(buildDbSsl(resolveAppConfig("vercel").dbSsl)).toMatchObject({
-            rejectUnauthorized: true,
-        })
-    })
-
-    it("should keep the pool small on Vercel, where each instance holds its own", () => {
-        expect(resolveAppConfig("vercel").dbPoolSize).toBeLessThan(
-            resolveAppConfig("local").dbPoolSize,
-        )
     })
 })

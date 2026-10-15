@@ -4,11 +4,6 @@ import { parseEnv } from "./env"
 
 const dockerEnv = {
     APP_ENV: "docker",
-    PGHOST: "postgres",
-    PGUSER: "postgres",
-    PGPASSWORD: "secret",
-    PGDATABASE: "postgres",
-    PGPORT: "5432",
     S3_ENDPOINT: "https://s3.example.com",
     S3_ACCESS_KEY: "access",
     S3_SECRET_KEY: "secret",
@@ -26,8 +21,6 @@ describe("parseEnv", () => {
     it("should apply the local defaults", () => {
         const env = parseEnv({})
 
-        expect(env.PGHOST).toBe("localhost")
-        expect(env.PGPORT).toBe(5432)
         expect(env.S3_BUCKET).toBe("fomofobo")
     })
 
@@ -58,7 +51,6 @@ describe("parseEnv", () => {
         const env = parseEnv(dockerEnv)
 
         expect(env.APP_ENV).toBe("docker")
-        expect(env.PGPORT).toBe(5432)
     })
 
     it("should apply the local OIDC defaults, which name the mock provider", () => {
@@ -103,25 +95,21 @@ describe("parseEnv", () => {
     })
 
     it("should reject a variable that is set but empty", () => {
-        expect(() => parseEnv({ ...dockerEnv, PGPASSWORD: "" })).toThrow(
-            "PGPASSWORD: set but empty",
+        expect(() => parseEnv({ ...dockerEnv, S3_SECRET_KEY: "" })).toThrow(
+            "S3_SECRET_KEY: set but empty",
         )
     })
 
     it("should reject a missing variable of the variant", () => {
-        const { PGHOST: _unused, ...withoutHost } = dockerEnv
+        const { S3_ACCESS_KEY: _unused, ...withoutAccessKey } = dockerEnv
 
-        expect(() => parseEnv(withoutHost)).toThrow("PGHOST: not set")
+        expect(() => parseEnv(withoutAccessKey)).toThrow("S3_ACCESS_KEY: not set")
     })
 
     it("should reject an S3 endpoint without a scheme", () => {
         expect(() => parseEnv({ ...dockerEnv, S3_ENDPOINT: "s3.example.com" })).toThrow(
             "must be a full URL",
         )
-    })
-
-    it("should reject a port outside the valid range", () => {
-        expect(() => parseEnv({ ...dockerEnv, PGPORT: "70000" })).toThrow("PGPORT")
     })
 
     it("should require every object store variable on Vercel", () => {

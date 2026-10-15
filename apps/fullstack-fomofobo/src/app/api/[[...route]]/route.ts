@@ -4,7 +4,7 @@ import { getApi } from "@/server/api"
 
 // The API reads the database and the object store, so it never prerenders.
 export const dynamic = "force-dynamic"
-// The Postgres driver and the AWS SDK both need Node, not the Edge runtime.
+// The AWS SDK needs Node, not the Edge runtime.
 export const runtime = "nodejs"
 
 /**

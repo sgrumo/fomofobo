@@ -8,6 +8,14 @@
         "directory": ".open-next/assets",
         "binding": "ASSETS",
     },
+    "d1_databases": [
+        {
+            "binding": "DB",
+            "database_name": "fomofobo",
+            "database_id": "local",
+            "migrations_dir": "../../packages/storage/migrations",
+        },
+    ],
     "services": [
         {
             "binding": "WORKER_SELF_REFERENCE",

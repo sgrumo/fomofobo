@@ -29,11 +29,11 @@ Shared libraries consumed by apps via pnpm workspace references.
 | `i18n`           | Framework-agnostic i18next core: language keys, translation mapping, and locale-file checks for app tests                                                 |
 | `react-i18n`     | React binding of the i18n package: language hooks, translation types                                                                                      |
 | `obfuscation`    | Reversible string obfuscation/deobfuscation primitives (no crypto)                                                                                        |
-| `storage`        | PostgreSQL data access layer using Drizzle ORM (schema, migrations, repositories)                                                                         |
+| `storage`        | Cloudflare D1 data access layer using Drizzle ORM (schema, migrations, repositories)                                                                      |
 
 ### Database
 
-The `packages/storage/migrations/` directory holds Drizzle-generated SQL migration files. Migrations are generated from the schema in `packages/storage/src/db-schema.ts` using the config at `packages/storage/drizzle.config.ts`.
+The `packages/storage/migrations/` directory holds Drizzle-generated SQL migration files. Migrations are generated from the schema in `packages/storage/src/db-schema.ts` using the config at `packages/storage/drizzle.config.ts`. Wrangler applies them to D1 from the `migrations_dir` of the app `wrangler.jsonc`.
 
 ### Infrastructure
 
@@ -64,8 +64,7 @@ The `packages/storage/migrations/` directory holds Drizzle-generated SQL migrati
 | `pnpm build`               | Build all packages                                     |
 | `pnpm db:gen-migration`    | Generate migration SQL from schema changes             |
 | `pnpm db:custom-migration` | Generate an empty migration for a data change          |
-| `pnpm db:migrate`          | Run pending migrations                                 |
-| `pnpm db:force-push`       | Push schema directly to DB (dev only)                  |
+| `pnpm db:migrate`          | Apply pending migrations to the local D1 database      |
 
 ### Env files
 

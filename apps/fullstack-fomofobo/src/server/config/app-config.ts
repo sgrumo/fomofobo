@@ -1,5 +1,4 @@
 import "server-only"
-import type { DbSslMode } from "storage"
 import { match } from "ts-pattern"
 
 /**
@@ -7,17 +6,15 @@ import { match } from "ts-pattern"
  * `resolveAppConfig`
  * @remarks Drives every environment-shaped capability through `APP_ENV` alone, with no
  * per-feature override flag:
- * - `test` — E2E and CI, Testcontainers Postgres
- * - `local` — host development, RustFS and local Postgres
+ * - `test` — E2E and CI
+ * - `local` — host development, RustFS and local D1
  * - `docker` — on-prem stack, `infra/docker`
- * - `vercel` — Vercel deploy, a pooled Postgres and a managed object store
+ * - `vercel` — Vercel deploy, a managed object store
  */
 export const appEnvValues = ["test", "local", "docker", "vercel"] as const
 export type AppEnv = (typeof appEnvValues)[number]
 
 export interface AppConfig {
-    /** Postgres TLS mode. */
-    dbSsl: DbSslMode
     /**
      * Expose the stack, the cause and the `5xx` message in error responses. A server
      * failure names the host a driver could not reach or the column a constraint guards.
@@ -30,8 +27,6 @@ export interface AppConfig {
      * sample props the E2E suite drives.
      */
     devPagesEnabled: boolean
-    /** Connections the pool opens. A serverless instance keeps its own pool. */
-    dbPoolSize: number
     /**
      * Mark the session cookies `Secure`, and prefix them with `__Host-`.
      *
@@ -59,37 +54,28 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
             secureCookies: false,
             allowInsecureOidc: true,
             devPagesEnabled: true,
-            dbSsl: "off",
             verboseErrors: true,
             apiDocsEnabled: true,
-            dbPoolSize: 10,
         }))
         .with("local", () => ({
             secureCookies: false,
             allowInsecureOidc: true,
             devPagesEnabled: true,
-            dbSsl: "off",
             verboseErrors: true,
             apiDocsEnabled: true,
-            dbPoolSize: 10,
         }))
         .with("docker", () => ({
             secureCookies: true,
             allowInsecureOidc: false,
             devPagesEnabled: false,
-            dbSsl: "off",
             verboseErrors: false,
             apiDocsEnabled: false,
-            dbPoolSize: 10,
         }))
-        // Every warm serverless instance holds its own pool, so each one stays small.
         .with("vercel", () => ({
             secureCookies: true,
             allowInsecureOidc: false,
             devPagesEnabled: false,
-            dbSsl: "verify-rds",
             verboseErrors: false,
             apiDocsEnabled: false,
-            dbPoolSize: 2,
         }))
         .exhaustive()
