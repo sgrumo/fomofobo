@@ -31,7 +31,7 @@ The reference implementation is the todo domain: `packages/api-routes/src/todo-r
 | ---------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | Route definition | Declares the path, the method, the request and response schemas, and every status            | Holds logic                                                                                                          |
 | Router           | Reads the validated input, calls **one** service method, answers with `respond`              | Branches on data, maps a `null` to a 404, maps or filters data, calls a second service, reads storage, logs an event |
-| Service          | Holds the domain rules: decisions, ids, errors, the choice of the storage method             | Opens a transaction, calls storage in a loop, filters or joins rows in JS, runs two writes for one operation         |
+| Service          | Holds the domain rules: decisions, ids, errors, the choice of the storage method             | Builds a batch, calls storage in a loop, filters or joins rows in JS, runs two writes for one operation              |
 | Storage          | Runs the queries that `/storage-patterns` describes, one method per read or per atomic write | Decides whether a write happens                                                                                      |
 
 When a router needs an `if`, the decision belongs to the service. When a service needs a second storage call for the same response, the read belongs to storage as one query.
@@ -148,7 +148,7 @@ export class ItemService {
 
 A response that needs rows of related tables comes from one storage read. Related means the rows share a key: an order and its customer, a project and its time entries.
 
-- Join the parents, aggregate the children in a subquery or with `json_agg`, and compute sums and counts in SQL. `complex-reads.md` of `/storage-patterns` shows the shape.
+- Join the parents, aggregate the children in a subquery or with `json_group_array`, and compute sums and counts in SQL. `complex-reads.md` of `/storage-patterns` shows the shape.
 - `Promise.all` runs reads that share no key, such as two unrelated lists on one page. It never runs two reads of the same entity.
 - Never call storage once per row. A `getById` or a `listForX` in a loop becomes one read with `inArray`.
 - Never load a table to filter, join, group or sum it in JS. The `WHERE`, the join and the aggregate go in the query.
@@ -156,12 +156,12 @@ A response that needs rows of related tables comes from one storage read. Relate
 
 ### Writes across tables
 
-An operation that writes more than one row calls one storage method. That method runs the writes in one transaction. See Transactions in `/storage-patterns`.
+An operation that writes more than one row calls one storage method. That method runs the writes in one D1 batch. See Batches in `/storage-patterns`.
 
-- Two awaited writes in one service method mean a transaction is missing. Move them into one storage method named for what it writes.
+- Two awaited writes in one service method mean a batch is missing. Move them into one storage method named for what it writes.
 - A write per row in a loop becomes one bulk write.
 - A value computed from other rows, such as the next sort index, is computed in the write query. A read and then a write lets two requests take the same value.
-- A call to object storage or to another service is not part of the transaction. Run it after the DB write. A failure then leaves an unused object, not a row that points to nothing.
+- A call to object storage or to another service is not part of the batch. Run it after the DB write. A failure then leaves an unused object, not a row that points to nothing.
 
 ### Refactor a fan-out
 
@@ -169,7 +169,7 @@ A service method that awaits three or more storage reads, or a `Promise.all` of 
 
 1. List each read with its table and its key.
 2. Group the reads that share a key.
-3. Write one storage read per group: joins for one-to-one rows, an aggregate subquery or `json_agg` for one-to-many rows.
+3. Write one storage read per group: joins for one-to-one rows, an aggregate subquery or `json_group_array` for one-to-many rows.
 4. Map the result in one mapper, and keep the response schema the same.
 5. Delete each storage method that has no caller left.
 6. Run the E2E suite of the app. The response must not change.
