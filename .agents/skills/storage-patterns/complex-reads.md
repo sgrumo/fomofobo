@@ -13,7 +13,7 @@ import type { DbSelect } from "../db-config"
 
 /**
  * @description Builds the select of orders with customer, assignee and line totals
- * @param db Database or transaction the query runs on
+ * @param db Database the query runs on
  */
 const selectOrderRows = (db: DbSelect) => {
     const lineTotals = db
@@ -82,7 +82,7 @@ export class OrderStorage {
 ```
 
 - Name the function `select<Entity>Rows`, its row type `<Entity>Row`, and the mapper `to<Entity>`.
-- Type the parameter `DbSelect`, so the function can only start a select. Pass `this.db` from a method and `tx` inside a transaction.
+- Type the parameter `DbSelect`, so the function can only start a select. Pass `this.db` from a method.
 - Never pass the `where` as a parameter of the shared select. The read chains it.
 - A `leftJoin` makes each column of the joined table nullable. The mapper picks the fallback, as `lineCount ?? 0` does.
-- If the shared select joins a one-to-many table directly, it returns one row per child. A `limit` or an `offset` then counts child rows and cuts a parent across two pages. Aggregate the children in a subquery, as `lineTotals` does, or into one column with `json_agg`, so each parent stays one row. Otherwise, page the parent ids first, then read the shared select for those ids.
+- If the shared select joins a one-to-many table directly, it returns one row per child. A `limit` or an `offset` then counts child rows and cuts a parent across two pages. Aggregate the children in a subquery, as `lineTotals` does, or into one column with `json_group_array`, so each parent stays one row. Otherwise, page the parent ids first, then read the shared select for those ids.

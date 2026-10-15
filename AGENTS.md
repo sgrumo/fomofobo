@@ -185,9 +185,8 @@ Critical rules for **ALL** packages. **Non-compliance will not be tolerated.**
 ### Enums
 
 - Default to `z.enum(["a", "b", "c"])` in models - no `as const` array needed
-- Extract values into an `xxxValues = [...] as const` array **only** when the enum is also used at DB level (`pgEnum`) - see `/storage-patterns` for the full pattern
-- **ALWAYS** kebab-case enum values: `"in-progress"`, never `"inProgress"` or `"in_progress"`. The oxlint rule `custom/kebab-case-enum-values` enforces this for `z.enum` and `pgEnum`
-- The `pgEnum` **type name** stays snake_case (`pgEnum("todo_priority", ...)`) - the rule checks values only
+- Extract values into an `xxxValues = [...] as const` array **only** when the enum is also used at DB level (a D1 `text` enum column with its CHECK constraint) - see `/storage-patterns` for the full pattern
+- **ALWAYS** kebab-case enum values: `"in-progress"`, never `"inProgress"` or `"in_progress"`. The oxlint rule `custom/kebab-case-enum-values` enforces this for `z.enum`
 - Values in an external format keep that format (MIME types, language tags). Silence the rule with `// oxlint-disable-next-line custom/kebab-case-enum-values`
 
 ## Infrastructure & Deployment

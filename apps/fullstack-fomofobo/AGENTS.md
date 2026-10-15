@@ -137,7 +137,7 @@ OpenID Connect Authorization Code with PKCE, owned by `openid-client`. No hand-w
 
 ## Environment
 
-- `APP_ENV` drives database SSL, error verbosity, API docs, pool size. No default on Vercel, which refuses `local` and `test`. Off Vercel a production build defaults to `local`
+- `APP_ENV` drives error verbosity, API docs, the dev pages and the cookie flags. No default on Vercel, which refuses `local` and `test`. Off Vercel a production build defaults to `local`
 - `src/server/config/env.ts`: one block per shape, every field in every block. Read the remarks there before you add a variable
 
 ## i18n

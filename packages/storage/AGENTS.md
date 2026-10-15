@@ -29,10 +29,11 @@ Leave out these comments:
 1. Run `pnpm db:gen-migration`. If one scope both gains and loses an item, it shows a rename prompt. Examples are a column added and a column dropped in one table, or a table added and a table dropped. In that case, ask the user to run it and to pick the right option at each prompt.
 2. If the command does not write a new migration or does not stop, it waits for a prompt. Stop it and ask the user to run it.
 3. Read the generated `.sql` file. If it fails or loses data by accident on the rows that exist, edit it. If it drops data on purpose, tell the user.
+4. If the file holds `PRAGMA foreign_keys=OFF`, replace it with `PRAGMA defer_foreign_keys = on`. D1 ignores the first one and fails the table rebuild on its foreign keys.
 
 Always start from the generated file. Do not write a schema migration by hand.
 
-A migration needs no follow-up after the commit. Each deploy applies it, and the E2E suites push the current schema. The user applies migrations to their local dev database on their own.
+A migration needs no follow-up after the commit. Each deploy and each E2E run apply the migrations with `wrangler d1 migrations apply`, which reads the top-level `.sql` files of `migrations/` in name order. The user applies them to the local database with `pnpm db:migrate`.
 
 ### Rules for an edit
 
