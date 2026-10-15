@@ -1,28 +1,11 @@
-# Services the API needs on a dev machine. The API itself runs on the host.
+# Services the API needs on a dev machine. The API itself runs on the host, and D1
+# runs in the local wrangler state of the app.
 # `pnpm infra:up:local` starts it, `pnpm infra:down:local` stops it. Add `-v` to
 # the down command to drop the data.
 
 name: fomofobo
 
 services:
-    postgres:
-        image: postgres:18.6-trixie@sha256:1957b2ff3137e4ef7f3bc813e74fff50b1e1ffddc85c8b9d6f14ade972be8687
-        ports:
-            - "5432:5432"
-        environment:
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: postgres
-            POSTGRES_DB: postgres
-        volumes:
-            # PG 18+ keeps data in a per-major subdirectory (18/main), so the
-            # volume mounts one level above it.
-            - postgres_data:/var/lib/postgresql
-        healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U postgres"]
-            interval: 2s
-            timeout: 5s
-            retries: 10
-
     # RustFS: S3-compatible object storage for the file-upload example.
     # The backend runs on the HOST in dev, so it (and the browser) reach the
     # store via http://localhost:9000 — which is exactly the host the presigned
@@ -76,5 +59,4 @@ services:
             retries: 10
 
 volumes:
-    postgres_data:
     objectstore_data:

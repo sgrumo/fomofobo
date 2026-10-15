@@ -1,7 +1,8 @@
 # Local stack
 
-The local stack is PostgreSQL on port 5432, plus RustFS for the file-upload
-example. RustFS serves the S3 API on `:9000` and a web console at
+The local stack is RustFS for the photo uploads and a mock OpenID provider. D1
+needs no container: wrangler keeps the local database in the `.wrangler` folder
+of the app. RustFS serves the S3 API on `:9000` and a web console at
 `http://localhost:9001/rustfs/console/` (`admin` / `admin`). The
 root path of the console answers 403. `pnpm infra:up:local` waits for the
 store, then creates the private `fomofobo` bucket and its CORS rule.
@@ -9,7 +10,7 @@ store, then creates the private `fomofobo` bucket and its CORS rule.
 ```bash
 pnpm infra:up:local     # start
 pnpm infra:down:local   # stop, data kept
-pnpm db:force-push      # push the schema
+pnpm db:migrate         # apply the migrations to the local D1 database
 pnpm dev:<app>          # start an app on the host
 ```
 
