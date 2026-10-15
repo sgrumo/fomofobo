@@ -50,11 +50,11 @@ jobs:
                   if-no-files-found: ignore
                   retention-days: 1
 
-    e2e-liadrin:
+    e2e-fomofobo:
         needs: build-and-check
         uses: ./.github/workflows/quality-e2e.yaml
         with:
-            suite: fullstack-liadrin
+            suite: fullstack-fomofobo
             browser: true
 
     test-report:
@@ -64,7 +64,7 @@ jobs:
             image: node:24.19.0-bookworm
         needs:
             - unit-tests
-            - e2e-liadrin
+            - e2e-fomofobo
         if: ${{ !cancelled() }}
         steps:
             - uses: actions/checkout@v7

@@ -61,12 +61,12 @@ jobs:
                   esac
 
     deploy-vercel:
-        name: Deploy (Vercel fullstack-liadrin)
+        name: Deploy (Vercel fullstack-fomofobo)
         needs: [quality, resolve-env]
         if: needs.resolve-env.outputs.environment != ''
         uses: ./.github/workflows/deploy-vercel.yaml
         with:
-            app: fullstack-liadrin
+            app: fullstack-fomofobo
             environment: ${{ needs.resolve-env.outputs.environment }}
         secrets: inherit
 

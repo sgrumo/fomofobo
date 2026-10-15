@@ -6,7 +6,7 @@
     "scripts": {
         "clean": "pnpm -r --if-present run clean && rm -rf .ignored/checklist.log .ignored/tests",
         "clean:hard": "pnpm clean && pnpm -r --if-present run clean:hard && find . -type d -name node_modules -prune -exec rm -rf {} +",
-        "dev:liadrin": "pnpm -C apps/fullstack-liadrin dev",
+        "dev:fomofobo": "pnpm -C apps/fullstack-fomofobo dev",
         "checklist": "bash scripts/checklist/checklist.sh --config configs/checklist/repo.json",
         "typecheck": "pnpm -r --if-present run typecheck",
         "lint": "FORCE_COLOR=${FORCE_COLOR:-1} pnpm -r --if-present run lint",
@@ -15,7 +15,7 @@
         "fmt:check": "oxfmt --check",
         "test": "pnpm -r --if-present run test",
         "e2e": "pnpm -r --workspace-concurrency=1 --filter \"./e2e/*\" --if-present run e2e",
-        "e2e:liadrin": "pnpm -C e2e/fullstack-liadrin e2e",
+        "e2e:fomofobo": "pnpm -C e2e/fullstack-fomofobo e2e",
         "build": "pnpm -r --if-present run build",
         "db:gen-migration": "pnpm -C packages/storage db:gen-migration",
         "db:custom-migration": "pnpm -C packages/storage db:custom-migration",

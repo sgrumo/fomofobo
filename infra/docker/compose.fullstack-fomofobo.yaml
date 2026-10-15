@@ -15,24 +15,24 @@ services:
     # two files declare, so this fragment adds a key of its own.
     objectstore-init:
         environment:
-            S3_CORS_EXTRA_ORIGIN: https://${LIADRIN_DOMAIN:-liadrin.localhost}
+            S3_CORS_EXTRA_ORIGIN: https://${FOMOFOBO_DOMAIN:-fomofobo.localhost}
 
     caddy:
         environment:
-            # Read by sites/fullstack-liadrin.caddy, which a project gets only when
+            # Read by sites/fullstack-fomofobo.caddy, which a project gets only when
             # another app owns "/" on DOMAIN.
-            LIADRIN_DOMAIN: ${LIADRIN_DOMAIN:-liadrin.localhost}
+            FOMOFOBO_DOMAIN: ${FOMOFOBO_DOMAIN:-fomofobo.localhost}
         depends_on:
-            fullstack-liadrin:
+            fullstack-fomofobo:
                 condition: service_healthy
 
-    fullstack-liadrin:
+    fullstack-fomofobo:
         build:
             context: ../../
             dockerfile: infra/docker/Dockerfile
             target: nextjs
             args:
-                APP_DIR: apps/fullstack-liadrin
+                APP_DIR: apps/fullstack-fomofobo
         restart: unless-stopped
         <<: *logging
         environment:
@@ -62,9 +62,9 @@ services:
             OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
             OIDC_AUDIENCE: ${OIDC_AUDIENCE:?Set OIDC_AUDIENCE in infra/docker/.env}
             # Every redirect URI is built from it, and the provider holds the result.
-            # It defaults to LIADRIN_DOMAIN, which the app answers on whenever another
+            # It defaults to FOMOFOBO_DOMAIN, which the app answers on whenever another
             # app owns "/" on DOMAIN. Set it by hand in a stack where this app owns
-            # "/" itself, because LIADRIN_DOMAIN goes unrouted there.
+            # "/" itself, because FOMOFOBO_DOMAIN goes unrouted there.
             APP_BASE_URL: ${APP_BASE_URL:-https://${DOMAIN:-localhost}}
         expose:
             - "3000"

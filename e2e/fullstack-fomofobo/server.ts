@@ -4,9 +4,9 @@ import path from "node:path"
 import { exec, ROOT_DIR } from "e2e-kit/infra"
 import type { ServerSpec } from "e2e-kit/server"
 
-const APP_DIR = path.resolve(ROOT_DIR, "apps/fullstack-liadrin")
+const APP_DIR = path.resolve(ROOT_DIR, "apps/fullstack-fomofobo")
 // `outputFileTracingRoot` is the repo root, so the bundle keeps the workspace layout.
-const STANDALONE_DIR = path.resolve(APP_DIR, ".next/standalone/apps/fullstack-liadrin")
+const STANDALONE_DIR = path.resolve(APP_DIR, ".next/standalone/apps/fullstack-fomofobo")
 
 export const LOCALES_DIR = path.resolve(APP_DIR, "public/locales")
 

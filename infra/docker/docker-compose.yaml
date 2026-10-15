@@ -6,4 +6,4 @@ name: fomofobo-stack
 include:
     - path: compose.core.yaml
     - path: compose.data.yaml
-    - path: compose.fullstack-liadrin.yaml
+    - path: compose.fullstack-fomofobo.yaml

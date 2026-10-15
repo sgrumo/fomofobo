@@ -12,9 +12,9 @@ Every package declares its own dependencies. `pnpm-workspace.yaml` holds the ver
 
 Deployable applications.
 
-| App                 | Description                                                                                                                                                    |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `fullstack-liadrin` | Next.js fullstack app - App Router with Hono + OpenAPI API routes, Server Component prefetch, Server Action mutations, Tailwind, TanStack Query, react-i18next |
+| App                  | Description                                                                                                                                                    |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fullstack-fomofobo` | Next.js fullstack app - App Router with Hono + OpenAPI API routes, Server Component prefetch, Server Action mutations, Tailwind, TanStack Query, react-i18next |
 
 ### Packages
 
@@ -41,31 +41,31 @@ The `packages/storage/migrations/` directory holds Drizzle-generated SQL migrati
 
 ### Scripts & Test
 
-| Package                 | Description                                                                                                  |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `i18n-sheets`           | Google Sheets translation download/export tooling                                                            |
-| `obfuscate`             | CLI that obfuscates a string via the `obfuscation` package                                                   |
-| `with-env`              | Bin that loads the env file of a Next or Expo dev script, then runs its command. See [Env files](#env-files) |
-| `e2e-kit`               | Harness the E2E suites share: containers, servers, lifecycle, Playwright config                              |
-| `e2e-ui-components`     | E2E helpers of every `ui-components` primitive, and the tests that drive them                                |
-| `e2e-fullstack-liadrin` | E2E suites of the fullstack app: the API (Vitest) and the pages (Playwright)                                 |
+| Package                  | Description                                                                                                  |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `i18n-sheets`            | Google Sheets translation download/export tooling                                                            |
+| `obfuscate`              | CLI that obfuscates a string via the `obfuscation` package                                                   |
+| `with-env`               | Bin that loads the env file of a Next or Expo dev script, then runs its command. See [Env files](#env-files) |
+| `e2e-kit`                | Harness the E2E suites share: containers, servers, lifecycle, Playwright config                              |
+| `e2e-ui-components`      | E2E helpers of every `ui-components` primitive, and the tests that drive them                                |
+| `e2e-fullstack-fomofobo` | E2E suites of the fullstack app: the API (Vitest) and the pages (Playwright)                                 |
 
 ## Commands
 
-| Command                    | Description                                           |
-| -------------------------- | ----------------------------------------------------- |
-| `pnpm dev:liadrin`         | Start the Liadrin fullstack dev server                |
-| `pnpm checklist`           | Full CI check: typecheck, test, lint, format, build   |
-| `pnpm typecheck`           | Typecheck all packages                                |
-| `pnpm lint:fix`            | Lint and autofix all packages                         |
-| `pnpm test`                | Run unit tests across all packages                    |
-| `pnpm e2e`                 | Run every E2E suite, one after the other              |
-| `pnpm e2e:liadrin`         | Run the E2E suites of the Liadrin app, API then pages |
-| `pnpm build`               | Build all packages                                    |
-| `pnpm db:gen-migration`    | Generate migration SQL from schema changes            |
-| `pnpm db:custom-migration` | Generate an empty migration for a data change         |
-| `pnpm db:migrate`          | Run pending migrations                                |
-| `pnpm db:force-push`       | Push schema directly to DB (dev only)                 |
+| Command                    | Description                                            |
+| -------------------------- | ------------------------------------------------------ |
+| `pnpm dev:fomofobo`        | Start the fomofobo fullstack dev server                |
+| `pnpm checklist`           | Full CI check: typecheck, test, lint, format, build    |
+| `pnpm typecheck`           | Typecheck all packages                                 |
+| `pnpm lint:fix`            | Lint and autofix all packages                          |
+| `pnpm test`                | Run unit tests across all packages                     |
+| `pnpm e2e`                 | Run every E2E suite, one after the other               |
+| `pnpm e2e:fomofobo`        | Run the E2E suites of the fomofobo app, API then pages |
+| `pnpm build`               | Build all packages                                     |
+| `pnpm db:gen-migration`    | Generate migration SQL from schema changes             |
+| `pnpm db:custom-migration` | Generate an empty migration for a data change          |
+| `pnpm db:migrate`          | Run pending migrations                                 |
+| `pnpm db:force-push`       | Push schema directly to DB (dev only)                  |
 
 ### Env files
 

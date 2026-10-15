@@ -1,8 +1,8 @@
 {
-    "name": "e2e-fullstack-liadrin",
+    "name": "e2e-fullstack-fomofobo",
     "version": "0.0.0",
     "private": true,
-    "description": "E2E suites of fullstack-liadrin: the API over HTTP, and the pages in a browser",
+    "description": "E2E suites of fullstack-fomofobo: the API over HTTP, and the pages in a browser",
     "type": "module",
     "scripts": {
         "clean": "rm -rf *.tsbuildinfo",

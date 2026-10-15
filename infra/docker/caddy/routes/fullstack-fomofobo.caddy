@@ -4,7 +4,7 @@
 # Only one app can own "/". This file fits when no other app claims a path on DOMAIN:
 # the SPA claims "/" and the standalone API claims "/api/*", which is the more
 # specific matcher and would swallow the calls of this app. With either of them
-# present, the app takes sites/fullstack-liadrin.caddy instead.
+# present, the app takes sites/fullstack-fomofobo.caddy instead.
 handle {
-	reverse_proxy fullstack-liadrin:3000
+	reverse_proxy fullstack-fomofobo:3000
 }

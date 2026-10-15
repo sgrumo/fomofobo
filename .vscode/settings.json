@@ -1,5 +1,5 @@
 {
-    "conventionalCommits.scopes": ["general", "liadrin", "ui-components"],
+    "conventionalCommits.scopes": ["general", "fomofobo", "ui-components"],
     "explorer.compactFolders": false,
     "editor.codeActionsOnSave": {
         "source.fixAll.oxc": "always"
