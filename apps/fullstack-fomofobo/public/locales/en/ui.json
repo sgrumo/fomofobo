@@ -212,7 +212,8 @@
             "until-before-first-date": "The repetition must end on or after the first date.",
             "primary-category-not-in-list": "Choose the main category among the selected ones.",
             "duplicate-date": "Each date can appear once.",
-            "date-added-and-removed": "A date cannot be both added and removed."
+            "date-added-and-removed": "A date cannot be both added and removed.",
+            "range-incomplete": "Choose both dates of the range."
         }
     },
     "SelectionIndicator": {

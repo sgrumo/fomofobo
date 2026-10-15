@@ -4,6 +4,7 @@ import {
     eventUpsertSchema,
     localDateTimeSchema,
     nonEmptyUpdate,
+    publicSearchQuerySchema,
     recurrenceSchema,
     semverSchema,
     withTimeRange,
@@ -479,6 +480,13 @@ export const formErrorsShowcaseFields: Record<FormIssueKey, FormErrorsShowcaseFi
                 removedDates: ["2026-10-20"],
             },
             "2026-10-20 added and removed",
+        ),
+    },
+    "FormErrors.Custom.range-incomplete": {
+        schema: publicSearchQuerySchema,
+        initial: shown(
+            { lat: "44.35", lng: "11.71", date: "range", from: "2026-10-14" },
+            "range from 2026-10-14 with no end",
         ),
     },
 }

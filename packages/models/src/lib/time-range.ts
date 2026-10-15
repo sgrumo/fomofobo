@@ -37,21 +37,3 @@ export const withTimeRange = <
                 }),
             },
         )
-
-/**
- * @description Builds a schema rejecting a `to` date before its `from` date
- * @template T Object schema holding `from` and `to` local dates
- * @param schema Object schema the rule attaches to
- */
-export const withDateRange = <
-    T extends z.ZodObject<{ from: z.ZodType<string>; to: z.ZodType<string> }>,
->(
-    schema: T,
-): T =>
-    schema.refine(range => range.to >= range.from, {
-        path: ["to"],
-        params: customErrorParamsSchema.encode({
-            errorCode: "end-before-start",
-            message: "must be on or after the start",
-        }),
-    })

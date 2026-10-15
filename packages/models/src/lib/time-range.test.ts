@@ -1,14 +1,11 @@
 import { z } from "@hono/zod-openapi"
 import { describe, expect, it } from "vitest"
 
-import { localDateSchema, localDateTimeSchema } from "./local-time"
-import { withDateRange, withTimeRange } from "./time-range"
+import { localDateTimeSchema } from "./local-time"
+import { withTimeRange } from "./time-range"
 
 const timeRangeSchema = withTimeRange(
     z.object({ startsAt: localDateTimeSchema, endsAt: localDateTimeSchema }),
-)
-const dateRangeSchema = withDateRange(
-    z.object({ from: localDateSchema, to: localDateSchema }),
 )
 
 describe("withTimeRange", () => {
@@ -50,21 +47,5 @@ describe("withTimeRange", () => {
                 endsAt: "2026-10-14T22:00",
             }).success,
         ).toBe(false)
-    })
-})
-
-describe("withDateRange", () => {
-    it("accepts a one-day range", () => {
-        expect(
-            dateRangeSchema.safeParse({ from: "2026-10-14", to: "2026-10-14" }).success,
-        ).toBe(true)
-    })
-
-    it("rejects a range that ends before it starts", () => {
-        const result = dateRangeSchema.safeParse({ from: "2026-10-14", to: "2026-10-13" })
-
-        expect(result.error?.issues).toMatchObject([
-            { code: "custom", params: { errorCode: "end-before-start" } },
-        ])
     })
 })
