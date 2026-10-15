@@ -16,30 +16,6 @@ export const RootNavigation = (props: RootNavigationProps) => {
     return (
         <nav className="flex flex-col gap-4 p-4">
             <RouteLink
-                route={routes.todos}
-                parameters={parameters}
-                query={{}}
-                className="tp-b2-regular"
-            >
-                {t("Routes.Todos")}
-            </RouteLink>
-            <RouteLink
-                route={routes.todosSearch}
-                parameters={parameters}
-                query={{}}
-                className="tp-b2-regular"
-            >
-                {t("Routes.TodosSearch")}
-            </RouteLink>
-            <RouteLink
-                route={routes.files}
-                parameters={parameters}
-                query={{}}
-                className="tp-b2-regular"
-            >
-                {t("Routes.Files")}
-            </RouteLink>
-            <RouteLink
                 route={routes.devShowcase}
                 parameters={parameters}
                 query={{}}

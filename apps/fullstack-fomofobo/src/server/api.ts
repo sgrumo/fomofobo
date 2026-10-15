@@ -12,8 +12,6 @@ import { getSessionCookieConfig } from "./auth/cookie-names"
 import { getContainer } from "./container"
 import type { AppErrorCode } from "./errors"
 import { handleRouteNotFound } from "./errors"
-import { buildFilesRouter } from "./routers/files-router"
-import { buildTodoRouter } from "./routers/todo-router"
 
 /**
  * Prefix the Next catch-all route answers on. Every route definition of
@@ -35,7 +33,6 @@ export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus 
         // The provider, not the caller: a retry is the answer, never a new login.
         .with("AuthProviderUnavailable", () => HttpStatus.ServiceUnavailable)
         .with("ForbiddenAction", () => HttpStatus.Forbidden)
-        .with("TodoAlreadyExists", () => HttpStatus.Conflict)
         .exhaustive()
 
 /**
@@ -47,7 +44,7 @@ export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus 
  * where it answers at all, because it describes the API and carries no data of anybody
  */
 const buildApi = (): OpenAPIHono => {
-    const { appConfig, todoService, filesService, tokenVerifier } = getContainer()
+    const { appConfig, tokenVerifier } = getContainer()
 
     const app = new OpenAPIHono()
 
@@ -76,9 +73,6 @@ const buildApi = (): OpenAPIHono => {
     )
 
     app.get(`${apiBasePath}/health`, c => c.json({ status: "ok" }))
-
-    app.route("/", buildTodoRouter(todoService))
-    app.route("/", buildFilesRouter(filesService))
 
     if (appConfig.apiDocsEnabled) {
         app.doc(`${apiBasePath}/doc`, {

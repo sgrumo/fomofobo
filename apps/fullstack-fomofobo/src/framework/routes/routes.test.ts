@@ -391,15 +391,6 @@ describe("route objects", () => {
     })
 })
 
-describe("todosSearch query schema", () => {
-    it("should keep `completed` for `true` alone, since the checkbox filters on completed todos only", () => {
-        const { querySchema } = routes.todosSearch
-        expect(querySchema.decode({ completed: "true" }).completed).toBe(true)
-        expect(querySchema.decode({ completed: "false" }).completed).toBeUndefined()
-        expect(querySchema.decode({}).completed).toBeUndefined()
-    })
-})
-
 describe("route handler objects", () => {
     it("should match one `route.ts` each, and every `route.ts` a handler", () => {
         const ledger = new Set(

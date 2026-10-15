@@ -7,7 +7,6 @@ export type AppErrorCode =
     | "AuthProviderUnavailable"
     | "ForbiddenAction"
     | "ItemNotFound"
-    | "TodoAlreadyExists"
     | "RouteNotFound"
     | "InvalidRequest"
     | "ResponseValidationError"

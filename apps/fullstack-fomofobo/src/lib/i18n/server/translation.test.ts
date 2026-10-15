@@ -4,13 +4,13 @@ import { getTranslation } from "./translation"
 
 describe("getTranslation", () => {
     it("should translate a shared key in each language", () => {
-        expect(getTranslation("en")("PageTitle.Todos")).toBe("Todos")
-        expect(getTranslation("it")("PageTitle.Todos")).toBe("Attività")
+        expect(getTranslation("en")("PageTitle.NotFound")).toBe("Page not found")
+        expect(getTranslation("it")("PageTitle.NotFound")).toBe("Pagina non trovata")
     })
 
     it("should return the same translation for the same language", () => {
-        expect(getTranslation("it")("PageTitle.Files")).toBe(
-            getTranslation("it")("PageTitle.Files"),
+        expect(getTranslation("it")("PageTitle.DevSamples")).toBe(
+            getTranslation("it")("PageTitle.DevSamples"),
         )
     })
 })

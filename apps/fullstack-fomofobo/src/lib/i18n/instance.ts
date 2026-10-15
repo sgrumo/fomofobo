@@ -3,7 +3,7 @@ import { defaultNS, fallbackLanguage } from "i18n/i18n"
 import type { FlatNamespace, i18n as I18nInstance, ResourceLanguage } from "i18next"
 import { createInstance } from "i18next"
 
-export const namespaces: FlatNamespace[] = ["shared", "ui", "files"]
+export const namespaces: FlatNamespace[] = ["shared", "ui"]
 
 /**
  * @description Builds an i18next instance of one language, initialized synchronously

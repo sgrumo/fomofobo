@@ -11,7 +11,6 @@ const appErrorCodes: AppErrorCode[] = [
     "AuthProviderUnavailable",
     "ForbiddenAction",
     "ItemNotFound",
-    "TodoAlreadyExists",
     "RouteNotFound",
     "InvalidRequest",
     "ResponseValidationError",
@@ -47,10 +46,6 @@ describe("mapErrorStatus", () => {
         expect(statusOf("ForbiddenAction")).toBe(HttpStatus.Forbidden)
     })
 
-    it("should map a duplicate todo to 409", () => {
-        expect(statusOf("TodoAlreadyExists")).toBe(HttpStatus.Conflict)
-    })
-
     it("should map a missing or refused token to 401", () => {
         expect(statusOf("Unauthenticated")).toBe(HttpStatus.Unauthorized)
     })
@@ -65,7 +60,6 @@ describe("mapErrorStatus", () => {
             "InvalidRequest",
             "ItemNotFound",
             "ForbiddenAction",
-            "TodoAlreadyExists",
             "Unauthenticated",
         ]
 

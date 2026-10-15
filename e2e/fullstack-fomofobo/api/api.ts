@@ -176,12 +176,12 @@ type ApiCallParams<T> = (ApiParams<T> extends never
  * @param route Route definition the caller targets
  * @example
  * ```typescript
- * import { TodoRoutes } from "api-routes"
+ * import { ClientCompatibilityRoutes } from "api-routes"
  *
- * export const createTodo = createApiCall(TodoRoutes.create)
+ * export const checkCompatibility = createApiCall(ClientCompatibilityRoutes.check)
  *
- * const res = await createTodo({ body: { title: "Buy milk" } })
- * expectStatus(res, 201)
+ * const res = await checkCompatibility({})
+ * expectStatus(res, 200)
  * ```
  */
 export const createApiCall =
