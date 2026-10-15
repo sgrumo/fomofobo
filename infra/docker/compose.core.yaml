@@ -1,0 +1,39 @@
+# The edge of every stack. An app fragment attaches itself to `caddy` with its
+# own `depends_on` and `environment` keys, so this file names no app.
+# Every path resolves against this directory.
+
+x-logging: &logging
+    logging:
+        driver: json-file
+        options:
+            max-size: "10m"
+            max-file: "5"
+
+services:
+    caddy:
+        image: caddy:2.11.7-alpine@sha256:d8542f48d34a9cf4e4c11a478865229840e87e4c96ea3f439101f31a5d35f75f
+        restart: unless-stopped
+        <<: *logging
+        ports:
+            - "80:80"
+            - "443:443"
+            - "443:443/udp"
+        environment:
+            DOMAIN: ${DOMAIN:-localhost}
+        # The whole directory, because the Caddyfile globs routes/ and sites/.
+        volumes:
+            - ./caddy:/etc/caddy:ro
+            - caddy_data:/data
+            - caddy_config:/config
+
+    dozzle:
+        image: amir20/dozzle:v11.3.0@sha256:a7d69d20891d3dcc82636e24afa4c1c162b41d0673ef798b14f09e6b69accc5a
+        restart: unless-stopped
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        ports:
+            - "8080:8080"
+
+volumes:
+    caddy_data:
+    caddy_config:

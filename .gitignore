@@ -1,0 +1,61 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Astro
+.astro
+
+# Next.js
+.next
+next-env.d.ts
+
+# Editor directories and files
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Env files
+.env
+.env.*
+!.env.template
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Translations downloader credentials
+credentials.json
+
+# Exported translations
+translation-exports
+
+# Test reports
+.vitest/
+
+# Claude
+.claude/settings.local.json
+
+# Antigravity
+.antigravitycli
+
+# Plans
+.plans/
+
+# Figma
+.figma.json
+
+# Local run artifacts (checklist logs, etc.)
+.ignored/

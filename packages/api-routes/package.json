@@ -1,0 +1,26 @@
+{
+    "name": "api-routes",
+    "version": "0.0.0",
+    "private": true,
+    "description": "",
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix"
+    },
+    "dependencies": {
+        "@hono/zod-openapi": "catalog:",
+        "models": "workspace:*",
+        "shared": "workspace:*"
+    },
+    "devDependencies": {
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "typescript": "catalog:"
+    }
+}

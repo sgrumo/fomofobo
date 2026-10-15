@@ -1,0 +1,39 @@
+{
+    "name": "frontend-shared",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        "./forms": "./src/forms/forms.ts",
+        "./random": "./src/random/random.ts",
+        "./storage": "./src/storage/storage.ts",
+        "./styles": "./src/styles/styles.ts",
+        "./types": "./src/types/types.ts"
+    },
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "typecheck:watch": "tsc -b -w",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "test": "vitest --run",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "clsx": "catalog:",
+        "csstype": "^3.2.3",
+        "es-toolkit": "catalog:",
+        "models": "workspace:*",
+        "shared": "workspace:*",
+        "tailwind-merge": "catalog:",
+        "ts-pattern": "catalog:",
+        "zod": "catalog:"
+    },
+    "devDependencies": {
+        "jsdom": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:"
+    }
+}

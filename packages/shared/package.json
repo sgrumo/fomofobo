@@ -1,0 +1,40 @@
+{
+    "name": "shared",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        "./debug": "./src/debug.ts",
+        "./env": "./src/env.ts",
+        "./function": "./src/function.ts",
+        "./result": "./src/result.ts",
+        "./semver": "./src/semver.ts",
+        "./temporal": "./src/temporal.ts",
+        "./types": "./src/types.ts",
+        "./values": "./src/values.ts",
+        "./zod": "./src/zod.ts"
+    },
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "typecheck:watch": "tsc -b -w",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "test": "vitest --run",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "date-fns": "catalog:",
+        "es-toolkit": "catalog:",
+        "semver": "^7.8.5",
+        "ts-pattern": "catalog:",
+        "zod": "catalog:"
+    },
+    "devDependencies": {
+        "@types/semver": "^7.8.0",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:"
+    }
+}

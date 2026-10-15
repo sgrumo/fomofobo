@@ -1,0 +1,20 @@
+{
+    "Title": "Files",
+    "Upload": "Upload file",
+    "Uploading": "Uploading...",
+    "UploadError": "Upload failed. Please try again.",
+    "Loading": "Loading...",
+    "Error": "Failed to load files",
+    "Empty": "No files yet",
+    "ColumnName": "Name",
+    "ColumnType": "Type",
+    "ColumnSize": "Size",
+    "ColumnCreatedAt": "Uploaded at",
+    "ColumnActions": "Actions",
+    "Download": "Download",
+    "Delete": "Delete",
+    "Validation": {
+        "TooLarge": "File is too large (max {{max}})",
+        "DisallowedType": "File type is not allowed"
+    }
+}

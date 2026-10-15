@@ -1,0 +1,325 @@
+{
+    "Shared": {
+        "Cancel": "Annulla",
+        "Close": "Chiudi",
+        "Confirm": "Conferma",
+        "Unknown": "Ignoto"
+    },
+    "AlertConfirmationDialog": {
+        "EnterText": "Scrivi",
+        "ToConfirm": "per confermare"
+    },
+    "Toast": {
+        "Common": {
+            "FormValidationError": "Il form non può essere inviato a causa di errori nei campi."
+        },
+        "Error": {
+            "Api": {
+                "StatusMessage": "Stato {{status}}",
+                "Title": "Errore API",
+                "UnknownDescription": "Si è verificato un errore API sconosciuto.",
+                "Validation": {
+                    "Description": "Non è stato possibile parsare una risposta API:",
+                    "Title": "Errore di validazione API"
+                }
+            },
+            "Generic": {
+                "Title": "Errore"
+            }
+        },
+        "Copied": "Copiato",
+        "Copy": "Copia",
+        "Success": {
+            "Title": "Successo"
+        },
+        "Warning": {
+            "Title": "Attenzione"
+        }
+    },
+    "FallbackBox": {
+        "EmptyTitle": "Nessun dato disponibile"
+    },
+    "Field": {
+        "MoreInfo": "Maggiori informazioni"
+    },
+    "FormErrors": {
+        "Required": "Questo campo è obbligatorio.",
+        "InvalidType": {
+            "Default": "Il valore non è nel formato corretto.",
+            "string": "Inserisci un testo.",
+            "number": "Inserisci un numero.",
+            "int": "Inserisci un numero intero.",
+            "boolean": "Seleziona sì o no.",
+            "bigint": "Inserisci un numero intero.",
+            "symbol": "Il valore non è nel formato corretto.",
+            "undefined": "Lascia vuoto questo campo.",
+            "null": "Lascia vuoto questo campo.",
+            "never": "Questo campo non accetta un valore.",
+            "void": "Lascia vuoto questo campo.",
+            "date": "Inserisci una data valida.",
+            "array": "Seleziona uno o più elementi.",
+            "object": "Il valore non è nel formato corretto.",
+            "tuple": "Il valore non è nel formato corretto.",
+            "record": "Il valore non è nel formato corretto.",
+            "map": "Il valore non è nel formato corretto.",
+            "set": "Seleziona uno o più elementi.",
+            "file": "Seleziona un file.",
+            "nonoptional": "Questo campo è obbligatorio.",
+            "nan": "Inserisci un numero.",
+            "function": "Il valore non è nel formato corretto."
+        },
+        "TooSmall": {
+            "Default": "Il valore è troppo piccolo.",
+            "string": {
+                "Inclusive_one": "Inserisci almeno {{count}} carattere.",
+                "Inclusive_other": "Inserisci almeno {{count}} caratteri.",
+                "Exact_one": "Inserisci esattamente {{count}} carattere.",
+                "Exact_other": "Inserisci esattamente {{count}} caratteri."
+            },
+            "array": {
+                "Inclusive_one": "Seleziona almeno {{count}} elemento.",
+                "Inclusive_other": "Seleziona almeno {{count}} elementi.",
+                "Exact_one": "Seleziona esattamente {{count}} elemento.",
+                "Exact_other": "Seleziona esattamente {{count}} elementi."
+            },
+            "set": {
+                "Inclusive_one": "Seleziona almeno {{count}} elemento.",
+                "Inclusive_other": "Seleziona almeno {{count}} elementi.",
+                "Exact_one": "Seleziona esattamente {{count}} elemento.",
+                "Exact_other": "Seleziona esattamente {{count}} elementi."
+            },
+            "map": {
+                "Inclusive_one": "Aggiungi almeno {{count}} voce.",
+                "Inclusive_other": "Aggiungi almeno {{count}} voci.",
+                "Exact_one": "Aggiungi esattamente {{count}} voce.",
+                "Exact_other": "Aggiungi esattamente {{count}} voci."
+            },
+            "file": {
+                "Inclusive_one": "Seleziona un file di almeno {{count}} byte.",
+                "Inclusive_other": "Seleziona un file di almeno {{count}} byte.",
+                "Exact_one": "Seleziona un file di esattamente {{count}} byte.",
+                "Exact_other": "Seleziona un file di esattamente {{count}} byte."
+            },
+            "number": {
+                "Inclusive": "Inserisci un valore maggiore o uguale a {{minimum}}.",
+                "Exclusive": "Inserisci un valore maggiore di {{minimum}}."
+            },
+            "int": {
+                "Inclusive": "Inserisci un valore maggiore o uguale a {{minimum}}.",
+                "Exclusive": "Inserisci un valore maggiore di {{minimum}}."
+            },
+            "bigint": {
+                "Inclusive": "Inserisci un valore maggiore o uguale a {{minimum}}.",
+                "Exclusive": "Inserisci un valore maggiore di {{minimum}}."
+            },
+            "date": {
+                "Inclusive": "Inserisci una data successiva.",
+                "Exclusive": "Inserisci una data successiva."
+            }
+        },
+        "TooBig": {
+            "Default": "Il valore è troppo grande.",
+            "string": {
+                "Inclusive_one": "Inserisci al massimo {{count}} carattere.",
+                "Inclusive_other": "Inserisci al massimo {{count}} caratteri.",
+                "Exact_one": "Inserisci esattamente {{count}} carattere.",
+                "Exact_other": "Inserisci esattamente {{count}} caratteri."
+            },
+            "array": {
+                "Inclusive_one": "Seleziona al massimo {{count}} elemento.",
+                "Inclusive_other": "Seleziona al massimo {{count}} elementi.",
+                "Exact_one": "Seleziona esattamente {{count}} elemento.",
+                "Exact_other": "Seleziona esattamente {{count}} elementi."
+            },
+            "set": {
+                "Inclusive_one": "Seleziona al massimo {{count}} elemento.",
+                "Inclusive_other": "Seleziona al massimo {{count}} elementi.",
+                "Exact_one": "Seleziona esattamente {{count}} elemento.",
+                "Exact_other": "Seleziona esattamente {{count}} elementi."
+            },
+            "map": {
+                "Inclusive_one": "Aggiungi al massimo {{count}} voce.",
+                "Inclusive_other": "Aggiungi al massimo {{count}} voci.",
+                "Exact_one": "Aggiungi esattamente {{count}} voce.",
+                "Exact_other": "Aggiungi esattamente {{count}} voci."
+            },
+            "file": {
+                "Inclusive_one": "Seleziona un file di al massimo {{count}} byte.",
+                "Inclusive_other": "Seleziona un file di al massimo {{count}} byte.",
+                "Exact_one": "Seleziona un file di esattamente {{count}} byte.",
+                "Exact_other": "Seleziona un file di esattamente {{count}} byte."
+            },
+            "number": {
+                "Inclusive": "Inserisci un valore minore o uguale a {{maximum}}.",
+                "Exclusive": "Inserisci un valore minore di {{maximum}}."
+            },
+            "int": {
+                "Inclusive": "Inserisci un valore minore o uguale a {{maximum}}.",
+                "Exclusive": "Inserisci un valore minore di {{maximum}}."
+            },
+            "bigint": {
+                "Inclusive": "Inserisci un valore minore o uguale a {{maximum}}.",
+                "Exclusive": "Inserisci un valore minore di {{maximum}}."
+            },
+            "date": {
+                "Inclusive": "Inserisci una data precedente.",
+                "Exclusive": "Inserisci una data precedente."
+            }
+        },
+        "InvalidFormat": {
+            "Default": "Il valore non è nel formato corretto.",
+            "email": "Inserisci un indirizzo email valido.",
+            "url": "Inserisci un URL valido.",
+            "emoji": "Inserisci un'emoji.",
+            "uuid": "Inserisci un identificativo valido.",
+            "guid": "Inserisci un identificativo valido.",
+            "nanoid": "Inserisci un identificativo valido.",
+            "cuid": "Inserisci un identificativo valido.",
+            "cuid2": "Inserisci un identificativo valido.",
+            "ulid": "Inserisci un identificativo valido.",
+            "xid": "Inserisci un identificativo valido.",
+            "ksuid": "Inserisci un identificativo valido.",
+            "datetime": "Inserisci una data e un'ora valide.",
+            "date": "Inserisci una data valida.",
+            "time": "Inserisci un'ora valida.",
+            "duration": "Inserisci una durata valida.",
+            "ipv4": "Inserisci un indirizzo IPv4 valido.",
+            "ipv6": "Inserisci un indirizzo IPv6 valido.",
+            "cidrv4": "Inserisci un intervallo IPv4 valido.",
+            "cidrv6": "Inserisci un intervallo IPv6 valido.",
+            "base64": "Inserisci un valore Base64 valido.",
+            "base64url": "Inserisci un valore Base64 valido.",
+            "json_string": "Inserisci un JSON valido.",
+            "e164": "Inserisci un numero di telefono valido.",
+            "credit_card": "Inserisci un numero di carta valido.",
+            "iban": "Inserisci un IBAN valido.",
+            "lowercase": "Usa solo lettere minuscole.",
+            "uppercase": "Usa solo lettere maiuscole.",
+            "regex": "Il valore non è nel formato corretto.",
+            "jwt": "Inserisci un token valido.",
+            "starts_with": "Il valore inizia con un testo errato.",
+            "ends_with": "Il valore termina con un testo errato.",
+            "includes": "Il valore non contiene il testo richiesto."
+        },
+        "InvalidValue": "Seleziona un'opzione valida.",
+        "NotMultipleOf": "Inserisci un multiplo di {{divisor}}.",
+        "UnrecognizedKeys": "Rimuovi i campi non previsti: {{keys}}.",
+        "Custom": {
+            "not-semver": "Inserisci una versione semver, per esempio 1.4.0.",
+            "empty-update": "Modifica almeno un campo."
+        }
+    },
+    "SelectionIndicator": {
+        "Selected": "Selezionato",
+        "NotSelected": "Non selezionato",
+        "Indeterminate": "Parzialmente selezionato"
+    },
+    "NumberInput": {
+        "FormatError": "Errore nella formattazione del numero",
+        "Increment": "Aumenta il valore",
+        "Decrement": "Diminuisci il valore"
+    },
+    "PasswordInput": {
+        "Show": "Mostra password",
+        "Hide": "Nascondi password"
+    },
+    "OtpInput": {
+        "Slot": "Carattere {{position}}"
+    },
+    "DateInput": {
+        "Placeholder": "Seleziona una data",
+        "Reset": "Cancella data"
+    },
+    "Combobox": {
+        "Placeholder": "Seleziona",
+        "Search": {
+            "Placeholder": "Cerca...",
+            "Prompt": {
+                "NoMinimumLength": "Scrivi per cercare...",
+                "MinimumLength": "Scrivi {{minLength}} caratteri per cercare..."
+            }
+        },
+        "Loading": "Caricamento...",
+        "Empty": "Nessun risultato",
+        "Chips": {
+            "NMoreSingular": "e {{count}} altro",
+            "NMorePlural": "e altri {{count}}",
+            "Remove": "Rimuovi elemento"
+        },
+        "Reset": "Cancella selezione"
+    },
+    "Pagination": {
+        "GoToPage": "Vai alla pagina {{page}}",
+        "Label": "Paginazione",
+        "NextPage": "Pagina successiva",
+        "PreviousPage": "Pagina precedente"
+    },
+    "Stepper": {
+        "GoToStep": "Vai allo step {{number}} ({{label}}, {{status}})",
+        "Status": {
+            "Completed": "completato",
+            "NotStarted": "non iniziato",
+            "Partial": "in corso"
+        },
+        "Step": "Step {{number}} ({{label}}, {{status}})",
+        "Steps": "Step"
+    },
+    "DayPicker": {
+        "PreviousMonth": "Mese precedente",
+        "NextMonth": "Mese successivo",
+        "PreviousYear": "Anno precedente",
+        "NextYear": "Anno successivo",
+        "PreviousYears": "Anni precedenti",
+        "NextYears": "Anni successivi"
+    },
+    "Days": {
+        "Full": {
+            "sunday": "Domenica",
+            "monday": "Lunedì",
+            "tuesday": "Martedì",
+            "wednesday": "Mercoledì",
+            "thursday": "Giovedì",
+            "friday": "Venerdì",
+            "saturday": "Sabato"
+        },
+        "Short": {
+            "sunday": "Do",
+            "monday": "Lu",
+            "tuesday": "Ma",
+            "wednesday": "Me",
+            "thursday": "Gi",
+            "friday": "Ve",
+            "saturday": "Sa"
+        }
+    },
+    "Months": {
+        "Full": {
+            "january": "Gennaio",
+            "february": "Febbraio",
+            "march": "Marzo",
+            "april": "Aprile",
+            "may": "Maggio",
+            "june": "Giugno",
+            "july": "Luglio",
+            "august": "Agosto",
+            "september": "Settembre",
+            "october": "Ottobre",
+            "november": "Novembre",
+            "december": "Dicembre"
+        },
+        "Short": {
+            "january": "Gen",
+            "february": "Feb",
+            "march": "Mar",
+            "april": "Apr",
+            "may": "Mag",
+            "june": "Giu",
+            "july": "Lug",
+            "august": "Ago",
+            "september": "Set",
+            "october": "Ott",
+            "november": "Nov",
+            "december": "Dic"
+        }
+    }
+}

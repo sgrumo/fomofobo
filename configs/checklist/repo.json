@@ -1,0 +1,7 @@
+[
+    { "command": "pnpm typecheck", "label": "Typecheck" },
+    { "command": "pnpm lint:fix", "label": "Lint" },
+    { "command": "pnpm -w fmt", "label": "Format" },
+    { "command": "pnpm test", "label": "Tests" },
+    { "command": "pnpm build", "label": "Build" }
+]

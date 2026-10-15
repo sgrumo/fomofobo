@@ -1,0 +1,92 @@
+{
+    "ClearCache": "Clear cache",
+    "Language": {
+        "Label": "Language",
+        "en": "English",
+        "it": "Italiano"
+    },
+    "Theme": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+    },
+    "Routes": {
+        "Home": "Home",
+        "Dev": "Dev",
+        "Todos": "Todos",
+        "Files": "Files",
+        "TodosSearch": "Todos search"
+    },
+    "PageTitle": {
+        "Home": "Home",
+        "Todos": "Todos",
+        "TodosSearch": "Todos search",
+        "Files": "Files",
+        "DevShowcase": "Showcase",
+        "DevSamples": "Samples",
+        "NotFound": "Page not found"
+    },
+    "NotFound": {
+        "Title": "404: Page Not Found",
+        "BackHome": "Back to homepage"
+    },
+    "ErrorBoundary": {
+        "Title": "A critical error occurred",
+        "Description": "Try to reload the page",
+        "DescriptionInsideLayout": "Try to reload the page or navigate to another section",
+        "CopyError": "Copy error",
+        "ErrorCopied": "Error copied",
+        "NoStack": "No stack trace available"
+    },
+    "Todos": {
+        "Cancel": "Cancel",
+        "ColumnStatus": "Status",
+        "ColumnTitle": "Title",
+        "Create": {
+            "Trigger": "New todo",
+            "Title": "New todo",
+            "Submit": "Create"
+        },
+        "Edit": "Edit",
+        "Empty": "No todos yet",
+        "Error": "Failed to load todos",
+        "Fields": {
+            "Title": "Title",
+            "Description": "Description",
+            "EndDate": "End date",
+            "Completed": "Completed"
+        },
+        "Loading": "Loading...",
+        "PaginatedTitle": "Paginated todos",
+        "StatusCompleted": "Completed",
+        "StatusPending": "Pending",
+        "Title": "Todos",
+        "Toast": {
+            "Created": "Todo created",
+            "Updated": "Todo updated",
+            "CloseWhileCreating": "The todo is still being created.",
+            "CloseWhileUpdating": "The todo is still being updated."
+        },
+        "Update": {
+            "Title": "Edit todo",
+            "Submit": "Save"
+        }
+    },
+    "TodosSearch": {
+        "ColumnStatus": "Status",
+        "ColumnTitle": "Title",
+        "CompletedOnly": "Completed only",
+        "Empty": "No todos match the search",
+        "Error": "Failed to search todos",
+        "Loading": "Loading...",
+        "StatusCompleted": "Completed",
+        "StatusPending": "Pending",
+        "TextPlaceholder": "Search by title",
+        "Title": "Todos search"
+    },
+    "Session": {
+        "Menu": "Account menu",
+        "SignedInAs": "Signed in as {{name}}",
+        "SignOut": "Sign out"
+    }
+}

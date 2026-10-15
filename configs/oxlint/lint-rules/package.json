@@ -1,0 +1,14 @@
+{
+    "name": "lint-rules",
+    "type": "module",
+    "scripts": {
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "test": "vitest --run"
+    },
+    "devDependencies": {
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "vitest": "catalog:"
+    }
+}

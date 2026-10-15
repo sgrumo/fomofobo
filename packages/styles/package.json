@@ -1,0 +1,22 @@
+{
+    "name": "styles",
+    "version": "0.0.0",
+    "private": true,
+    "description": "",
+    "type": "module",
+    "exports": {
+        ".": "./src/globals.css"
+    },
+    "scripts": {
+        "lint": "oxlint --no-error-on-unmatched-pattern --config oxlint.config.ts",
+        "lint:fix": "oxlint --no-error-on-unmatched-pattern --config oxlint.config.ts --fix"
+    },
+    "dependencies": {
+        "shared": "workspace:*",
+        "tailwindcss": "catalog:"
+    },
+    "devDependencies": {
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:"
+    }
+}

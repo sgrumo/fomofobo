@@ -1,0 +1,20 @@
+{
+    "tabWidth": 4,
+    "arrowParens": "avoid",
+    "semi": false,
+    "singleQuote": false,
+    "trailingComma": "all",
+    "printWidth": 90,
+    "sortImports": {},
+    "sortTailwindcss": {
+        "functions": ["clsx", "cn", "twmerge", "cva", "styles"]
+    },
+    "sortPackageJson": true,
+    "ignorePatterns": ["dist/**", "packages/storage/migrations/**", "openapi-dist/**"],
+    "overrides": [
+        {
+            "files": ["pnpm-workspace.yaml"],
+            "options": { "tabWidth": 2 }
+        }
+    ]
+}

@@ -1,0 +1,94 @@
+packages:
+  - apps/*
+  - configs/oxlint/lint-rules
+  - e2e/*
+  - infra/*
+  - packages/*
+  - scripts/*
+
+nodeLinker: isolated
+dedupePeers: true
+autoDedupe: true
+
+catalog:
+  # Toolchain
+  "@testing-library/dom": "^10.4.1"
+  "@testing-library/react": "^16.3.2"
+  jsdom: "^30.0.0"
+  oxfmt: "0.72.0"
+  oxlint: "1.87.0"
+  oxlint-tsgolint: "7.0.2004"
+  tsx: "4.21.0"
+  typescript: "~7.0.2"
+  vitest: "^5.0.0"
+
+  # E2E
+  "@faker-js/faker": "^10.5.0"
+  # The CI image tag (mcr.microsoft.com/playwright) pins the same version.
+  "@playwright/test": "1.61.1"
+
+  # Shared runtime
+  "@types/node": "^24.13.1"
+  axios: "^1.16.1"
+  date-fns: "^4.1.0"
+  es-toolkit: "^1.49.0"
+  ts-pattern: "^5.9.0"
+  zod: "4.6.6"
+
+  # Backend
+  "@aws-sdk/client-s3": "^3.1036.0"
+  "@hono/swagger-ui": "^0.6.1"
+  "@hono/zod-openapi": "1.6.3"
+  "@types/pg": "^8.11.10"
+  drizzle-orm: "^0.45.2"
+  hono: "4.13.7"
+  pg: "^8.13.0"
+
+  # React
+  "@rolldown/plugin-babel": "^0.2.3"
+  "@tanstack/react-query": "^5.90.20"
+  "@types/react": "^19.2.9"
+  "@types/react-dom": "^19.2.3"
+  "@types/react-is": "^19.2.0"
+  "@vitejs/plugin-react": "^6.0.2"
+  babel-plugin-react-compiler: "1.0.0"
+  react: "^19.2.8"
+  react-dom: "^19.2.8"
+  react-is: "^19.2.3"
+
+  # Frontend
+  "@fontsource-variable/funnel-display": "^5.2.8"
+  "@fontsource-variable/funnel-sans": "^5.2.8"
+  "@fontsource-variable/roboto-mono": "^5.2.9"
+  "@tailwindcss/postcss": "^4.3.3"
+  clsx: "^2.1.1"
+  i18next: "^26.3.6"
+  next: "16.3.8"
+  react-i18next: "^17.0.11"
+  tailwind-merge: "^3.4.0"
+  tailwindcss: "^4.1.18"
+
+# Shared versions the default catalog cannot carry:
+#   react-peer - stays wider than the default, so the native app's exact pin satisfies it
+catalogs:
+  react-peer:
+    react: "^19.2.3"
+    react-dom: "^19.2.3"
+
+overrides:
+  "@types/node": "catalog:"
+
+minimumReleaseAge: 4320
+minimumReleaseAgeExcludePrune: true
+
+allowBuilds:
+  cpu-features: false
+  esbuild: false
+  protobufjs: false
+  sharp: false
+  ssh2: false
+minimumReleaseAgeExclude:
+  # Renovate security update: next@16.3.6 || 16.3.8
+  - next@16.3.8
+  # Renovate security update: hono@4.13.7
+  - hono@4.13.7

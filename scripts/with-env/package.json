@@ -1,0 +1,23 @@
+{
+    "name": "with-env",
+    "private": true,
+    "bin": {
+        "with-env": "src/index.ts"
+    },
+    "type": "module",
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "test": "vitest --run"
+    },
+    "devDependencies": {
+        "@types/node": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:",
+        "zod": "catalog:"
+    }
+}

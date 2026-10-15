@@ -1,0 +1,28 @@
+{
+    "name": "e2e-ui-components",
+    "version": "0.0.0",
+    "private": true,
+    "description": "E2E helpers of every ui-components primitive, and the tests that drive them",
+    "type": "module",
+    "exports": {
+        "./*": "./src/*.ts"
+    },
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix"
+    },
+    "dependencies": {
+        "@playwright/test": "catalog:",
+        "e2e-kit": "workspace:*",
+        "shared": "workspace:*",
+        "ts-pattern": "catalog:"
+    },
+    "devDependencies": {
+        "@types/node": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "typescript": "catalog:"
+    }
+}

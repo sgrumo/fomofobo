@@ -1,0 +1,584 @@
+@import "tailwindcss";
+
+@custom-variant dark {
+    &:where(.dark, .dark *) {
+        @slot;
+    }
+    @media (prefers-color-scheme: dark) {
+        &:where(.system, .system *) {
+            @slot;
+        }
+    }
+}
+
+/* Theme */
+
+@theme {
+    /* Fonts */
+    --font-funnel-display: "Funnel Display Variable", sans-serif;
+    --font-funnel-sans: "Funnel Sans Variable", sans-serif;
+    --font-mono: "Roboto Mono", monospace;
+
+    /* Color palette */
+
+    /* Remove base styles */
+    --color-*: initial;
+
+    --color-white: #ffffff;
+    --color-absolute-black: #000000;
+    --color-black: #111114;
+
+    --color-neutral-50: #f7f7f8;
+    --color-neutral-100: #ededed;
+    --color-neutral-200: #d8d8dd;
+    --color-neutral-300: #b9bbc6;
+    --color-neutral-400: #8f92a3;
+    --color-neutral-500: #71717a;
+    --color-neutral-600: #3a3d4f;
+    --color-neutral-700: #2a2c3a;
+    --color-neutral-800: #1e1e1e;
+    --color-neutral-900: #16161e;
+    --color-neutral-950: #0a0a0e;
+
+    --color-primary-100: #ddd2ff;
+    --color-primary-200: #c2b0ff;
+    --color-primary-300: #a98eff;
+    --color-primary-400: #8f6cff;
+    --color-primary-500: #713eff;
+    --color-primary-600: #5e30e6;
+    --color-primary-700: #4b24bf;
+    --color-primary-800: #391a99;
+
+    --color-info-100: #e6f8ff;
+    --color-info-200: #beeaff;
+    --color-info-300: #85d7ff;
+    --color-info-400: #4cc3ff;
+    --color-info-500: #2db4f4;
+    --color-info-600: #0ea5e9;
+    --color-info-700: #0a7fb7;
+    --color-info-800: #075985;
+    --color-info-900: #043654;
+
+    --color-success-100: #e8fff7;
+    --color-success-200: #bdfce7;
+    --color-success-300: #78e7c0;
+    --color-success-400: #34d399;
+    --color-success-500: #1cb481;
+    --color-success-600: #059669;
+    --color-success-700: #057a57;
+    --color-success-800: #065f46;
+    --color-success-900: #04412f;
+
+    --color-warning-100: #f9ffcc;
+    --color-warning-200: #f4ffb3;
+    --color-warning-300: #e8f590;
+    --color-warning-400: #ddeb6e;
+    --color-warning-500: #c5d550;
+    --color-warning-600: #aebf32;
+    --color-warning-700: #8e9d26;
+    --color-warning-800: #6e7c1a;
+    --color-warning-900: #4a5310;
+
+    --color-danger-100: #fee2e2;
+    --color-danger-200: #fecaca;
+    --color-danger-300: #fb9e9e;
+    --color-danger-400: #f87171;
+    --color-danger-500: #ea4b4b;
+    --color-danger-600: #dc2626;
+    --color-danger-700: #ba2020;
+    --color-danger-800: #991b1b;
+    --color-danger-900: #661010;
+
+    /* Shadows */
+    --shadow-100: 0 1px 2px 0 rgba(30, 41, 59, 0.12);
+    --shadow-200:
+        0 0 2px 1px rgba(30, 41, 59, 0.04), 0 1px 8px -1px rgba(30, 41, 59, 0.12);
+    --shadow-300:
+        0 2px 2px -1px rgba(30, 41, 59, 0.04), 0 8px 16px -2px rgba(30, 41, 59, 0.12);
+    --shadow-400:
+        0 2px 2px -1px rgba(30, 41, 59, 0.04), 0 16px 24px -4px rgba(30, 41, 59, 0.16);
+
+    /* Utilities */
+    --max-radius: calc(infinity * 1px);
+}
+
+/* Resets */
+
+@layer base {
+    #root {
+        /* https://base-ui.com/react/overview/quick-start#portals */
+        isolation: isolate;
+    }
+
+    body {
+        /* https://base-ui.com/react/overview/quick-start#ios-26-safari */
+        position: relative;
+    }
+
+    button:enabled:not([aria-disabled="true"]) {
+        cursor: pointer;
+    }
+
+    textarea {
+        resize: none;
+    }
+
+    ::selection {
+        background-color: var(--color-primary-200);
+    }
+
+    .dark ::selection {
+        background-color: var(--color-primary-400);
+    }
+
+    .dark input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .system ::selection {
+            background-color: var(--color-primary-400);
+        }
+
+        .system input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+    }
+}
+
+/* Typography */
+
+@utility tp-d1 {
+    @apply font-funnel-display text-[6rem] leading-[6.625rem] font-semibold tracking-[-0.06rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-d2 {
+    @apply font-funnel-display text-[4.5rem] leading-[5.875rem] font-semibold tracking-[-0.045rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-d3 {
+    @apply font-funnel-display text-[3.25rem] leading-[4.25rem] font-semibold tracking-[-0.0325rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-d4 {
+    @apply font-funnel-display text-[2.5rem] leading-[3.25rem] font-semibold tracking-[-0.025rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-h1 {
+    @apply font-funnel-display text-[2rem] leading-[2.5rem] font-semibold text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-h2-semibold {
+    @apply font-funnel-display text-[1.75rem] leading-[2.25rem] font-semibold text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-h2-medium {
+    @apply font-funnel-display text-[1.75rem] leading-[2.25rem] font-medium text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-h2-regular {
+    @apply font-funnel-display text-[1.75rem] leading-[2.25rem] font-normal text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-h3-semibold {
+    @apply font-funnel-display text-[1.5rem] leading-[2.25rem] font-semibold text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-h3-medium {
+    @apply font-funnel-display text-[1.5rem] leading-[2.25rem] font-medium text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-h3-regular {
+    @apply font-funnel-display text-[1.5rem] leading-[2.25rem] font-normal text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-h4-semibold {
+    @apply font-funnel-display text-[1.25rem] leading-[1.875rem] font-semibold text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-h4-medium {
+    @apply font-funnel-display text-[1.25rem] leading-[1.875rem] font-medium text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-h4-regular {
+    @apply font-funnel-display text-[1.25rem] leading-[1.875rem] font-normal text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-b1-semibold {
+    @apply font-funnel-sans text-[1rem] leading-[1.5rem] font-semibold tracking-[0.01rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-b1-medium {
+    @apply font-funnel-sans text-[1rem] leading-[1.5rem] font-medium tracking-[0.01rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-b1-regular {
+    @apply font-funnel-sans text-[1rem] leading-[1.5rem] font-normal tracking-[0.01rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-b2-semibold {
+    @apply font-funnel-sans text-[0.875rem] leading-[1.25rem] font-semibold tracking-[0.00875rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-b2-medium {
+    @apply font-funnel-sans text-[0.875rem] leading-[1.25rem] font-medium tracking-[0.00875rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-b2-regular {
+    @apply font-funnel-sans text-[0.875rem] leading-[1.25rem] font-normal tracking-[0.00875rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-c1-semibold {
+    @apply font-funnel-sans text-[0.75rem] leading-[1.125rem] font-semibold tracking-[0.015rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-c1-medium {
+    @apply font-funnel-sans text-[0.75rem] leading-[1.125rem] font-medium tracking-[0.015rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-c1-regular {
+    @apply font-funnel-sans text-[0.75rem] leading-[1.125rem] font-normal tracking-[0.015rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-mono-b1 {
+    @apply font-mono text-[1rem] leading-[1.5rem] font-normal tracking-[0.01rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-mono-b2 {
+    @apply font-mono text-[0.875rem] leading-[1.25rem] font-normal tracking-[0.00875rem] text-neutral-800 dark:text-neutral-100;
+}
+
+@utility tp-mono-c1 {
+    @apply font-mono text-[0.75rem] leading-[1.125rem] font-normal tracking-[0.015rem] text-neutral-800 dark:text-neutral-100;
+}
+
+/* Utilities */
+
+@utility hidden-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@utility sr-only {
+    position: fixed;
+    margin: -1px;
+    padding: 0;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+    white-space: nowrap;
+}
+
+/* Animations */
+
+@theme inline {
+    --animation-delay-0: 0s;
+    --animation-delay-75: 75ms;
+    --animation-delay-100: 0.1s;
+    --animation-delay-150: 0.15s;
+    --animation-delay-200: 0.2s;
+    --animation-delay-300: 0.3s;
+    --animation-delay-500: 0.5s;
+    --animation-delay-700: 0.7s;
+    --animation-delay-1000: 1s;
+
+    --animation-repeat-0: 0;
+    --animation-repeat-1: 1;
+    --animation-repeat-infinite: infinite;
+
+    --animation-direction-normal: normal;
+    --animation-direction-reverse: reverse;
+    --animation-direction-alternate: alternate;
+    --animation-direction-alternate-reverse: alternate-reverse;
+
+    --animation-fill-mode-none: none;
+    --animation-fill-mode-forwards: forwards;
+    --animation-fill-mode-backwards: backwards;
+    --animation-fill-mode-both: both;
+
+    --percentage-0: 0;
+    --percentage-5: 0.05;
+    --percentage-10: 0.1;
+    --percentage-15: 0.15;
+    --percentage-20: 0.2;
+    --percentage-25: 0.25;
+    --percentage-30: 0.3;
+    --percentage-35: 0.35;
+    --percentage-40: 0.4;
+    --percentage-45: 0.45;
+    --percentage-50: 0.5;
+    --percentage-55: 0.55;
+    --percentage-60: 0.6;
+    --percentage-65: 0.65;
+    --percentage-70: 0.7;
+    --percentage-75: 0.75;
+    --percentage-80: 0.8;
+    --percentage-85: 0.85;
+    --percentage-90: 0.9;
+    --percentage-95: 0.95;
+    --percentage-100: 1;
+    --percentage-translate-full: 1;
+
+    --animate-in: enter var(--tw-duration, 150ms) var(--tw-ease, ease);
+    --animate-out: exit var(--tw-duration, 150ms) var(--tw-ease, ease);
+
+    --animate-accordion-down: accordion-down var(--tw-duration, 200ms) ease-out;
+    --animate-accordion-up: accordion-up var(--tw-duration, 200ms) ease-out;
+    --animate-backdrop-blur-in: backdrop-blur-in var(--tw-duration, 150ms) ease-out;
+    --animate-backdrop-blur-out: backdrop-blur-out var(--tw-duration, 150ms) ease-out;
+
+    @keyframes enter {
+        from {
+            transform: translate3d(
+                    var(--tw-enter-translate-x, 0),
+                    var(--tw-enter-translate-y, 0),
+                    0
+                )
+                scale3d(
+                    var(--tw-enter-scale, 1),
+                    var(--tw-enter-scale, 1),
+                    var(--tw-enter-scale, 1)
+                )
+                rotate(var(--tw-enter-rotate, 0));
+            opacity: var(--tw-enter-opacity, 1);
+            backdrop-filter: var(--tw-enter-backdrop-blur, blur(0));
+            -webkit-backdrop-filter: var(--tw-enter-backdrop-blur, blur(0));
+        }
+    }
+
+    @keyframes exit {
+        to {
+            transform: translate3d(
+                    var(--tw-exit-translate-x, 0),
+                    var(--tw-exit-translate-y, 0),
+                    0
+                )
+                scale3d(
+                    var(--tw-exit-scale, 1),
+                    var(--tw-exit-scale, 1),
+                    var(--tw-exit-scale, 1)
+                )
+                rotate(var(--tw-exit-rotate, 0));
+            opacity: var(--tw-exit-opacity, 1);
+            backdrop-filter: var(--tw-exit-backdrop-blur, blur(0));
+            -webkit-backdrop-filter: var(--tw-exit-backdrop-blur, blur(0));
+        }
+    }
+
+    @keyframes accordion-down {
+        from {
+            height: 0;
+        }
+        to {
+            height: var(
+                --radix-accordion-content-height,
+                var(--bits-accordion-content-height)
+            );
+        }
+    }
+    @keyframes accordion-up {
+        from {
+            height: var(
+                --radix-accordion-content-height,
+                var(--bits-accordion-content-height)
+            );
+        }
+        to {
+            height: 0;
+        }
+    }
+}
+
+@utility delay-* {
+    animation-delay: calc(--value(number) * 1ms);
+    animation-delay: --value(--animation-delay-*, [duration], [*]);
+}
+
+@utility repeat-* {
+    animation-iteration-count: --value(--animation-repeat-*, number);
+}
+
+@utility direction-* {
+    animation-direction: --value(--animation-direction-*);
+}
+
+@utility fill-mode-* {
+    animation-fill-mode: --value(--animation-fill-mode-*);
+}
+
+@utility running {
+    animation-play-state: running;
+}
+
+@utility paused {
+    animation-play-state: paused;
+}
+
+@utility fade-in {
+    --tw-enter-opacity: 0;
+}
+
+@utility fade-in-* {
+    --tw-enter-opacity: --value(--percentage-*, [*]);
+}
+
+@utility fade-out {
+    --tw-exit-opacity: 0;
+}
+
+@utility fade-out-* {
+    --tw-exit-opacity: --value(--percentage-*, [*]);
+}
+
+@utility zoom-in {
+    --tw-enter-scale: 0;
+}
+
+@utility zoom-in-* {
+    --tw-enter-scale: calc(--value([percentage]) / 100%);
+    --tw-enter-scale: calc(--value([ratio], [number]));
+    --tw-enter-scale: --value(--percentage-*);
+}
+
+@utility zoom-out {
+    --tw-exit-scale: 0;
+}
+
+@utility zoom-out-* {
+    --tw-exit-scale: calc(--value([percentage]) / 100%);
+    --tw-exit-scale: calc(--value([ratio], [number]));
+    --tw-exit-scale: --value(--percentage-*);
+}
+
+@utility spin-in {
+    --tw-enter-rotate: 30deg;
+}
+
+@utility spin-in-* {
+    --tw-enter-rotate: calc(--value(number) * 1deg);
+    --tw-enter-rotate: --value(--rotate-*, [angle]);
+}
+
+@utility spin-out {
+    --tw-exit-rotate: 30deg;
+}
+
+@utility spin-out-* {
+    --tw-exit-rotate: calc(--value(number) * 1deg);
+    --tw-exit-rotate: --value(--rotate-*, [angle]);
+}
+
+@utility slide-in-from-top {
+    --tw-enter-translate-y: -100%;
+}
+
+@utility slide-in-from-top-* {
+    --tw-enter-translate-y: calc(--value(integer) * var(--spacing) * -1);
+    --tw-enter-translate-y: calc(
+        --value(--percentage-*, --percentage-translate-*) * -100%
+    );
+    --tw-enter-translate-y: calc(--value(ratio) * 100%);
+    --tw-enter-translate-y: calc(--value(--translate-*, [percentage], [length]) * -1);
+}
+
+@utility slide-in-from-bottom {
+    --tw-enter-translate-y: 100%;
+}
+
+@utility slide-in-from-bottom-* {
+    --tw-enter-translate-y: calc(--value(integer) * var(--spacing));
+    --tw-enter-translate-y: calc(
+        --value(--percentage-*, --percentage-translate-*) * 100%
+    );
+    --tw-enter-translate-y: calc(--value(ratio) * 100%);
+    --tw-enter-translate-y: --value(--translate-*, [percentage], [length]);
+}
+
+@utility slide-in-from-left {
+    --tw-enter-translate-x: -100%;
+}
+
+@utility slide-in-from-left-* {
+    --tw-enter-translate-x: calc(--value(integer) * var(--spacing) * -1);
+    --tw-enter-translate-x: calc(
+        --value(--percentage-*, --percentage-translate-*) * -100%
+    );
+    --tw-enter-translate-x: calc(--value(ratio) * 100%);
+    --tw-enter-translate-x: calc(--value(--translate-*, [percentage], [length]) * -1);
+}
+
+@utility slide-in-from-right {
+    --tw-enter-translate-x: 100%;
+}
+
+@utility slide-in-from-right-* {
+    --tw-enter-translate-x: calc(--value(integer) * var(--spacing));
+    --tw-enter-translate-x: calc(
+        --value(--percentage-*, --percentage-translate-*) * 100%
+    );
+    --tw-enter-translate-x: calc(--value(ratio) * 100%);
+    --tw-enter-translate-x: --value(--translate-*, [percentage], [length]);
+}
+
+@utility slide-out-to-top {
+    --tw-exit-translate-y: -100%;
+}
+
+@utility slide-out-to-top-* {
+    --tw-exit-translate-y: calc(--value(integer) * var(--spacing) * -1);
+    --tw-exit-translate-y: calc(
+        --value(--percentage-*, --percentage-translate-*) * -100%
+    );
+    --tw-exit-translate-y: calc(--value(ratio) * 100%);
+    --tw-exit-translate-y: calc(--value(--translate-*, [percentage], [length]) * -1);
+}
+
+@utility slide-out-to-bottom {
+    --tw-exit-translate-y: 100%;
+}
+
+@utility slide-out-to-bottom-* {
+    --tw-exit-translate-y: calc(--value(integer) * var(--spacing));
+    --tw-exit-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+    --tw-exit-translate-y: calc(--value(ratio) * 100%);
+    --tw-exit-translate-y: --value(--translate-*, [percentage], [length]);
+}
+
+@utility slide-out-to-left {
+    --tw-exit-translate-x: -100%;
+}
+
+@utility slide-out-to-left-* {
+    --tw-exit-translate-x: calc(--value(integer) * var(--spacing) * -1);
+    --tw-exit-translate-x: calc(
+        --value(--percentage-*, --percentage-translate-*) * -100%
+    );
+    --tw-exit-translate-x: calc(--value(ratio) * 100%);
+    --tw-exit-translate-x: calc(--value(--translate-*, [percentage], [length]) * -1);
+}
+
+@utility slide-out-to-right {
+    --tw-exit-translate-x: 100%;
+}
+
+@utility slide-out-to-right-* {
+    --tw-exit-translate-x: calc(--value(integer) * var(--spacing));
+    --tw-exit-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+    --tw-exit-translate-x: calc(--value(ratio) * 100%);
+    --tw-exit-translate-x: --value(--translate-*, [percentage], [length]);
+}
+
+@utility backdrop-blur-in-* {
+    --tw-enter-backdrop-blur: calc(--value([percentage]) / 100%);
+    --tw-enter-backdrop-blur: calc(--value(integer) * 1px);
+}
+
+@utility backdrop-blur-out-* {
+    --tw-exit-backdrop-blur: calc(--value([percentage]) / 100%);
+    --tw-exit-backdrop-blur: calc(--value(integer) * 1px);
+}

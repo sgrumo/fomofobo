@@ -1,0 +1,39 @@
+name: Cache Cleanup
+
+on:
+    pull_request:
+        types: [closed]
+
+permissions:
+    actions: write
+
+jobs:
+    cleanup:
+        name: Purge branch caches
+        runs-on: ["self-hosted", "Linux", "X64"]
+        steps:
+            # `gh cache list/delete` wraps these two endpoints, so the API call is the
+            # whole job. github-script runs on the runner's own Node, so this job needs
+            # no container and no CLI.
+            #
+            # Caches from `pull_request` runs are scoped to refs/pull/<n>/merge. A
+            # feature branch never produces a refs/heads/* cache, so a branch-keyed
+            # delete finds nothing.
+            - name: Delete caches for pull request
+              uses: actions/github-script@v9
+              with:
+                  script: |
+                      const ref = `refs/pull/${context.payload.pull_request.number}/merge`
+                      const { data } = await github.rest.actions.getActionsCacheList({
+                          ...context.repo,
+                          ref,
+                          per_page: 100,
+                      })
+                      core.info(`Cleaning ${data.actions_caches.length} cache(s) for ${ref}`)
+                      for (const cache of data.actions_caches) {
+                          core.info(`Deleting ${cache.id} (${cache.key})`)
+                          await github.rest.actions.deleteActionsCacheById({
+                              ...context.repo,
+                              cache_id: cache.id,
+                          })
+                      }

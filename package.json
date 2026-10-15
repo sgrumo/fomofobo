@@ -1,0 +1,37 @@
+{
+    "name": "fomofobo",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "clean": "pnpm -r --if-present run clean && rm -rf .ignored/checklist.log .ignored/tests",
+        "clean:hard": "pnpm clean && pnpm -r --if-present run clean:hard && find . -type d -name node_modules -prune -exec rm -rf {} +",
+        "dev:liadrin": "pnpm -C apps/fullstack-liadrin dev",
+        "checklist": "bash scripts/checklist/checklist.sh --config configs/checklist/repo.json",
+        "typecheck": "pnpm -r --if-present run typecheck",
+        "lint": "FORCE_COLOR=${FORCE_COLOR:-1} pnpm -r --if-present run lint",
+        "lint:fix": "FORCE_COLOR=${FORCE_COLOR:-1} pnpm -r --if-present run lint:fix",
+        "fmt": "oxfmt",
+        "fmt:check": "oxfmt --check",
+        "test": "pnpm -r --if-present run test",
+        "e2e": "pnpm -r --workspace-concurrency=1 --filter \"./e2e/*\" --if-present run e2e",
+        "e2e:liadrin": "pnpm -C e2e/fullstack-liadrin e2e",
+        "build": "pnpm -r --if-present run build",
+        "db:gen-migration": "pnpm -C packages/storage db:gen-migration",
+        "db:custom-migration": "pnpm -C packages/storage db:custom-migration",
+        "db:migrate": "pnpm -C packages/storage db:migrate",
+        "db:force-push": "pnpm -C packages/storage db:force-push",
+        "infra:up:local": "docker compose -f infra/local/docker-compose.yaml up -d --wait && pnpm -r --if-present run objectstore:init",
+        "infra:down:local": "docker compose -f infra/local/docker-compose.yaml down",
+        "i18n:download": "pnpm -C scripts/i18n-sheets download-translations",
+        "i18n:export": "pnpm -C scripts/i18n-sheets export-translations",
+        "obfuscate": "pnpm -C scripts/obfuscate obfuscate"
+    },
+    "devDependencies": {
+        "@types/node": "catalog:",
+        "oxfmt": "catalog:",
+        "oxlint": "catalog:",
+        "vitest": "catalog:"
+    },
+    "packageManager": "pnpm@12.11.2+sha512.25a51652a196785af5f28bda6dfe8dc582ebefa4ac1d180221ce1390231c5fb76637822ea4b6e4633ce74acdcb0a77f725af11bad38177fdeddaee818a955cb9"
+}

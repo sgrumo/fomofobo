@@ -1,0 +1,43 @@
+name: Setup Monorepo
+description: Install pnpm, Node.js, and install workspace dependencies.
+
+inputs:
+    install:
+        # The Vercel deploy skips it: `vercel build` runs the project's own install
+        # command against the workspace, so a second install only costs time.
+        description: Run `pnpm install --frozen-lockfile`.
+        required: false
+        default: "true"
+    pnpm-dest:
+        # Jobs on the persistent macOS host (no container) point this at a throwaway
+        # directory, so the toolchain does not accumulate in a home directory shared
+        # with every other workflow. Containerised jobs keep the default.
+        description: Directory pnpm is installed into.
+        required: false
+        default: "~/setup-pnpm"
+
+runs:
+    using: composite
+    steps:
+        # Node must come first: pnpm's installer shells out to `npm`, and a self-hosted
+        # host can have a half-installed one that fails as "Cannot find module
+        # '../lib/cli.js'". setup-node puts a known-good npm in front of the host's.
+        # This order requires that setup-node's `cache: pnpm` stays unused, because
+        # that option needs pnpm first.
+        - name: Setup Node.js
+          uses: actions/setup-node@v7
+          with:
+              node-version-file: ".nvmrc"
+
+        - name: Install pnpm
+          uses: pnpm/action-setup@v6
+          with:
+              dest: ${{ inputs.pnpm-dest }}
+
+        - name: Install dependencies
+          if: inputs.install == 'true'
+          shell: bash
+          # Override the caller job's `defaults.run.working-directory` so install
+          # always runs from the workspace root (mobile jobs set a non-root default).
+          working-directory: ${{ github.workspace }}
+          run: pnpm install --frozen-lockfile

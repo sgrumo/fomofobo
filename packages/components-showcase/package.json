@@ -1,0 +1,42 @@
+{
+    "name": "components-showcase",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "typecheck:watch": "tsc -b -w",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "test": "vitest --run",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "date-fns": "catalog:",
+        "es-toolkit": "catalog:",
+        "frontend-shared": "workspace:*",
+        "models": "workspace:*",
+        "react-shared": "workspace:*",
+        "shared": "workspace:*",
+        "ts-pattern": "catalog:",
+        "ui-components": "workspace:*",
+        "zod": "catalog:"
+    },
+    "devDependencies": {
+        "@tanstack/react-query": "catalog:",
+        "@types/react": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "react": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:"
+    },
+    "peerDependencies": {
+        "@tanstack/react-query": "catalog:",
+        "react": "catalog:react-peer"
+    }
+}

@@ -1,0 +1,47 @@
+{
+    "name": "e2e-kit",
+    "version": "0.0.0",
+    "private": true,
+    "description": "Harness the E2E suites share: containers, servers, lifecycle, Playwright config",
+    "type": "module",
+    "exports": {
+        "./assertions": "./src/assertions.ts",
+        "./containers": "./src/containers.ts",
+        "./env": "./src/env.ts",
+        "./i18n": "./src/i18n.ts",
+        "./infra": "./src/infra.ts",
+        "./lifecycle": "./src/lifecycle.ts",
+        "./matchers": "./src/matchers.ts",
+        "./mocks": "./src/mocks.ts",
+        "./playwright": "./src/playwright.ts",
+        "./server": "./src/server.ts",
+        "./vitest-reset": "./src/vitest-reset.ts"
+    },
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix"
+    },
+    "dependencies": {
+        "@faker-js/faker": "catalog:",
+        "@playwright/test": "catalog:",
+        "@testcontainers/postgresql": "^12.0.0",
+        "drizzle-orm": "catalog:",
+        "es-toolkit": "catalog:",
+        "objectstore-init": "workspace:*",
+        "pg": "catalog:",
+        "shared": "workspace:*",
+        "storage": "workspace:*",
+        "testcontainers": "^12.0.0",
+        "vitest": "catalog:",
+        "zod": "catalog:"
+    },
+    "devDependencies": {
+        "@types/node": "catalog:",
+        "@types/pg": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "typescript": "catalog:"
+    }
+}

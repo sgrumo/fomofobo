@@ -1,0 +1,57 @@
+{
+    "env": {
+        "AGENT": "true"
+    },
+    "permissions": {
+        "allow": [
+            "Bash(pnpm checklist)",
+            "Bash(pnpm checklist:*)",
+            "Bash(pnpm typecheck:*)",
+            "Bash(pnpm test:*)",
+            "Bash(pnpm lint:*)",
+            "Bash(pnpm build:*)",
+            "Bash(pnpm -w fmt:*)",
+            "Bash(pnpm db:gen-migration*)",
+            "Bash(pnpm db:custom-migration*)",
+            "Bash(cd test && *vitest*)",
+            "Bash(git diff:*)",
+            "Bash(git status:*)",
+            "Bash(git log:*)",
+            "Bash(git show:*)",
+            "Bash(git range-diff:*)",
+            "Bash(git rev-parse:*)",
+            "Bash(git branch:*)"
+        ],
+        "ask": ["Bash(rm -rf *)", "Bash(rm -fr *)", "Bash(rm -r *)"],
+        "deny": [
+            "Bash(pnpm db:migrate*)",
+            "Bash(pnpm db:force-push*)",
+            "Bash(*--force*)",
+            "Bash(*--no-verify*)",
+            "Bash(git -C:*)",
+            "Bash(git -c:*)",
+            "Bash(git --git-dir:*)",
+            "Bash(git --work-tree:*)",
+            "Bash(git reset:*)",
+            "Bash(git push:*)",
+            "Bash(git checkout:*)",
+            "Bash(git switch:*)",
+            "Bash(git restore:*)",
+            "Bash(git rm:*)",
+            "Bash(git tag -d:*)",
+            "Bash(git worktree remove:*)",
+            "Bash(git branch -D:*)",
+            "Bash(git branch -d:*)",
+            "Bash(git branch -C:*)",
+            "Bash(git branch -M:*)",
+            "Bash(git branch -f:*)",
+            "Bash(git branch * -C*)",
+            "Bash(git branch * -M*)",
+            "Bash(git branch * -f*)",
+            "Bash(git stash)",
+            "Bash(git stash:*)",
+            "Bash(git clean:*)",
+            "Bash(git commit --amend:*)"
+        ]
+    }
+}

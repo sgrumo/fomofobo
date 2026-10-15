@@ -1,0 +1,36 @@
+{
+    "name": "e2e-fullstack-liadrin",
+    "version": "0.0.0",
+    "private": true,
+    "description": "E2E suites of fullstack-liadrin: the API over HTTP, and the pages in a browser",
+    "type": "module",
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "e2e": "pnpm e2e:api && pnpm e2e:ui",
+        "e2e:api": "vitest run --config api/vitest.config.ts",
+        "e2e:api:watch": "vitest --config api/vitest.config.ts",
+        "e2e:ui": "playwright test --config ui/playwright.config.ts",
+        "e2e:ui:interactive": "playwright test --ui --config ui/playwright.config.ts"
+    },
+    "dependencies": {
+        "api-routes": "workspace:*",
+        "axios": "catalog:",
+        "e2e-kit": "workspace:*",
+        "e2e-ui-components": "workspace:*",
+        "models": "workspace:*",
+        "shared": "workspace:*",
+        "zod": "catalog:"
+    },
+    "devDependencies": {
+        "@faker-js/faker": "catalog:",
+        "@playwright/test": "catalog:",
+        "@types/node": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:"
+    }
+}

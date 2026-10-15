@@ -1,0 +1,35 @@
+{
+    "name": "react-i18n",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        "./hooks": "./src/hooks/hooks.ts",
+        "./types": "./src/types/types.ts"
+    },
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "typecheck:watch": "tsc -b -w",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix"
+    },
+    "dependencies": {
+        "date-fns": "catalog:",
+        "es-toolkit": "catalog:",
+        "i18n": "workspace:*",
+        "i18next": "catalog:",
+        "react-i18next": "catalog:",
+        "shared": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/react": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "react": "catalog:",
+        "typescript": "catalog:"
+    },
+    "peerDependencies": {
+        "react": "catalog:react-peer"
+    }
+}

@@ -1,0 +1,87 @@
+name: Quality
+
+on:
+    workflow_call:
+
+permissions:
+    contents: read
+    # dorny/test-reporter creates the "Test Report" check run.
+    checks: write
+    # dorny/test-reporter reads the workflow run in a private repo.
+    actions: read
+    # dorny/paths-filter lists the PR files through the API.
+    pull-requests: read
+
+jobs:
+    build-and-check:
+        name: Build, Typecheck & Lint
+        runs-on: ["self-hosted", "Linux", "X64"]
+        container:
+            image: node:24.19.0-bookworm
+        steps:
+            - uses: actions/checkout@v7
+            - uses: ./.github/actions/setup-monorepo
+            - name: Build all packages
+              run: pnpm build
+            - name: Typecheck
+              run: pnpm typecheck
+            - name: Lint
+              run: pnpm lint
+
+    unit-tests:
+        name: Unit Tests
+        runs-on: ["self-hosted", "Linux", "X64"]
+        container:
+            image: node:24.19.0-bookworm
+        needs: build-and-check
+        steps:
+            - uses: actions/checkout@v7
+            - uses: ./.github/actions/setup-monorepo
+            - name: Run unit tests
+              run: pnpm test
+            - name: Upload unit test reports
+              if: ${{ !cancelled() }}
+              continue-on-error: true
+              uses: actions/upload-artifact@v7
+              with:
+                  name: junit-unit
+                  path: .ignored/tests/*.junit.xml
+                  include-hidden-files: true
+                  if-no-files-found: ignore
+                  retention-days: 1
+
+    e2e-liadrin:
+        needs: build-and-check
+        uses: ./.github/workflows/quality-e2e.yaml
+        with:
+            suite: fullstack-liadrin
+            browser: true
+
+    test-report:
+        name: Test Report
+        runs-on: ["self-hosted", "Linux", "X64"]
+        container:
+            image: node:24.19.0-bookworm
+        needs:
+            - unit-tests
+            - e2e-liadrin
+        if: ${{ !cancelled() }}
+        steps:
+            - uses: actions/checkout@v7
+            - name: Mark workspace as safe for git
+              run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+            - uses: actions/download-artifact@v8
+              continue-on-error: true
+              with:
+                  pattern: junit-*
+                  path: test-reports
+                  merge-multiple: true
+            - uses: dorny/test-reporter@v3
+              with:
+                  name: Test Report
+                  path: test-reports/*.junit.xml
+                  reporter: java-junit
+                  list-suites: failed
+                  list-tests: failed
+                  fail-on-error: false
+                  fail-on-empty: false

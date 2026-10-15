@@ -1,0 +1,31 @@
+{
+    "name": "obfuscation",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        "./obfuscate": "./src/obfuscate.ts",
+        "./deobfuscate": "./src/deobfuscate.ts"
+    },
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "typecheck:watch": "tsc -b -w",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "test": "vitest --run",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "es-toolkit": "catalog:",
+        "js-base64": "^3.7.8",
+        "shared": "workspace:*",
+        "ts-pattern": "catalog:"
+    },
+    "devDependencies": {
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:"
+    }
+}

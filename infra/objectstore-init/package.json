@@ -1,0 +1,25 @@
+{
+    "name": "objectstore-init",
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "objectstore:init": "tsx src/entry-points/provision.ts"
+    },
+    "dependencies": {
+        "@aws-sdk/client-s3": "catalog:",
+        "zod": "catalog:"
+    },
+    "devDependencies": {
+        "@types/node": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "tsx": "catalog:",
+        "typescript": "catalog:"
+    }
+}

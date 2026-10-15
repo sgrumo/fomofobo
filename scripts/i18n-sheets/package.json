@@ -1,0 +1,24 @@
+{
+    "name": "i18n-sheets",
+    "type": "module",
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "download-translations": "tsx src/entry-points/translations-downloader.ts",
+        "export-translations": "tsx src/entry-points/translations-exporter.ts"
+    },
+    "dependencies": {
+        "i18n": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/node": "catalog:",
+        "csv-parse": "7.0.2",
+        "googleapis": "183.0.0",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "tsx": "catalog:",
+        "typescript": "catalog:"
+    }
+}

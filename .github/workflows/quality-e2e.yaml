@@ -1,0 +1,56 @@
+name: Quality E2E
+
+on:
+    workflow_call:
+        inputs:
+            suite:
+                description: Directory of the suite under `e2e/`. The job runs its `e2e` script.
+                required: true
+                type: string
+            browser:
+                description: True when the suite drives a browser. The job then runs in the Playwright image.
+                required: false
+                type: boolean
+                default: false
+            timeout-minutes:
+                description: Job cap. Raise it for a slow suite.
+                required: false
+                type: number
+                default: 20
+            step-timeout-minutes:
+                description: Cap of the test step itself, which also builds the apps the suite drives.
+                required: false
+                type: number
+                default: 15
+
+permissions:
+    contents: read
+    actions: read
+
+jobs:
+    e2e-tests:
+        name: E2E Tests (${{ inputs.suite }})
+        runs-on: ["self-hosted", "Linux", "X64"]
+        container:
+            # Keep the Playwright tag in sync with the @playwright/test catalog version in pnpm-workspace.yaml.
+            image: ${{ inputs.browser && 'mcr.microsoft.com/playwright:v1.61.1-noble' || 'node:24.19.0-bookworm' }}
+            # Harness spins up Postgres via testcontainers; needs the Docker daemon.
+            volumes:
+                - /var/run/docker.sock:/var/run/docker.sock
+        timeout-minutes: ${{ inputs.timeout-minutes }}
+        steps:
+            - uses: actions/checkout@v7
+            - uses: ./.github/actions/setup-monorepo
+            - name: Run E2E tests
+              timeout-minutes: ${{ inputs.step-timeout-minutes }}
+              run: pnpm -C e2e/${{ inputs.suite }} e2e
+            - name: Upload E2E test reports
+              if: ${{ !cancelled() }}
+              continue-on-error: true
+              uses: actions/upload-artifact@v7
+              with:
+                  name: junit-${{ inputs.suite }}
+                  path: .ignored/tests/*.junit.xml
+                  include-hidden-files: true
+                  if-no-files-found: ignore
+                  retention-days: 1

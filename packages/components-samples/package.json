@@ -1,0 +1,35 @@
+{
+    "name": "components-samples",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "typecheck:watch": "tsc -b -w",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix"
+    },
+    "dependencies": {
+        "es-toolkit": "catalog:",
+        "frontend-shared": "workspace:*",
+        "shared": "workspace:*",
+        "ui-components": "workspace:*",
+        "zod": "catalog:"
+    },
+    "devDependencies": {
+        "@tanstack/react-query": "catalog:",
+        "@types/react": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "react": "catalog:",
+        "typescript": "catalog:"
+    },
+    "peerDependencies": {
+        "@tanstack/react-query": "catalog:",
+        "react": "catalog:react-peer"
+    }
+}

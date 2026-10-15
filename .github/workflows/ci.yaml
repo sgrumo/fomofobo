@@ -1,0 +1,96 @@
+name: CI
+
+# Quality on every event, then the deploys. Each deploy is a commented drop-in: uncomment
+# the job and its `needs:` line on send-notification. See .github/CICD.md.
+
+on:
+    pull_request:
+        types: [opened, synchronize, reopened]
+        paths-ignore: &paths-ignore
+            - "**/*.md"
+            - ".gitignore"
+            - "LICENSE"
+            - ".vscode/**"
+            - ".agents/**"
+            - "sync-state.json"
+    push:
+        branches:
+            - main
+            - dev
+        paths-ignore: *paths-ignore
+    workflow_dispatch:
+
+# Caps the permissions of the called workflows. Keep in sync with quality.yaml.
+permissions:
+    contents: read
+    # dorny/test-reporter creates the "Test Report" check run.
+    checks: write
+    # dorny/test-reporter reads the workflow run in a private repo.
+    actions: read
+    # dorny/paths-filter lists the PR files through the API.
+    pull-requests: read
+
+env:
+    PROJECT_NAME: fomofobo
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    # Cancel superseded PR runs. Never interrupt a push or deploy run mid-flight.
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+    quality:
+        uses: ./.github/workflows/quality.yaml
+
+    # Maps the branch to the deploy environment. A branch outside the map deploys nothing.
+    # To add an environment, add its branch here and under `on.push.branches`.
+    resolve-env:
+        name: Resolve environment
+        if: github.event_name != 'pull_request'
+        runs-on: ["self-hosted", "Linux", "X64"]
+        outputs:
+            environment: ${{ steps.map.outputs.environment }}
+        steps:
+            - id: map
+              env:
+                  BRANCH: ${{ github.ref_name }}
+              run: |
+                  case "$BRANCH" in
+                      main) echo "environment=prod" >> "$GITHUB_OUTPUT" ;;
+                      dev) echo "environment=dev" >> "$GITHUB_OUTPUT" ;;
+                  esac
+
+    deploy-vercel:
+        name: Deploy (Vercel fullstack-liadrin)
+        needs: [quality, resolve-env]
+        if: needs.resolve-env.outputs.environment != ''
+        uses: ./.github/workflows/deploy-vercel.yaml
+        with:
+            app: fullstack-liadrin
+            environment: ${{ needs.resolve-env.outputs.environment }}
+        secrets: inherit
+
+    # Drop-in: Docker Compose deploy. One stack serves every app, so there is nothing to pick.
+    # deploy-docker:
+    #     name: Deploy Docker stack
+    #     needs: [quality, resolve-env]
+    #     if: needs.resolve-env.outputs.environment != ''
+    #     uses: ./.github/workflows/deploy-docker.yaml
+    #     with:
+    #         environment: ${{ needs.resolve-env.outputs.environment }}
+    #     secrets: inherit
+
+    send-notification:
+        name: Send Discord notification
+        runs-on: ["self-hosted", "Linux", "X64"]
+        needs:
+            - quality
+            # - deploy-docker
+        if: always()
+        steps:
+            - uses: quinck-io/actions-notify-discord@v6
+              with:
+                  # Secret DISCORD_WEBHOOK: the webhook URL is the credential.
+                  webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+                  projectName: ${{ env.PROJECT_NAME }}
+                  needs: ${{ toJson(needs) }}

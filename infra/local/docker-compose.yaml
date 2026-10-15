@@ -1,0 +1,80 @@
+# Services the API needs on a dev machine. The API itself runs on the host.
+# `pnpm infra:up:local` starts it, `pnpm infra:down:local` stops it. Add `-v` to
+# the down command to drop the data.
+
+name: fomofobo
+
+services:
+    postgres:
+        image: postgres:18.6-trixie@sha256:1957b2ff3137e4ef7f3bc813e74fff50b1e1ffddc85c8b9d6f14ade972be8687
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: postgres
+        volumes:
+            # PG 18+ keeps data in a per-major subdirectory (18/main), so the
+            # volume mounts one level above it.
+            - postgres_data:/var/lib/postgresql
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 2s
+            timeout: 5s
+            retries: 10
+
+    # RustFS: S3-compatible object storage for the file-upload example.
+    # The backend runs on the HOST in dev, so it (and the browser) reach the
+    # store via http://localhost:9000 — which is exactly the host the presigned
+    # URLs will carry. See infra/local/README.md.
+    objectstore:
+        image: rustfs/rustfs:1.0.0-rc.5@sha256:c36b3efea3d1e503f1a2581abd0e7611e0e5820dd30e1850a52384b3fc52bda4
+        ports:
+            - "9000:9000" # S3 API (browser + backend talk here directly)
+            - "9001:9001" # web console
+        environment:
+            RUSTFS_ACCESS_KEY: admin
+            RUSTFS_SECRET_KEY: admin
+            RUSTFS_REGION: eu-west-1
+            RUSTFS_CONSOLE_ENABLE: "true"
+            # Empty sends the logs to stdout. The image default (/logs) writes
+            # them to a file that `docker logs` never sees.
+            RUSTFS_OBS_LOG_DIRECTORY: ""
+        volumes:
+            - objectstore_data:/data
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "curl -s -o /dev/null -w '%{http_code}' http://localhost:9000/ | grep -q 403",
+                ]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+
+    # OpenID provider of a dev machine. The app signs every visitor in, so it needs
+    # one; this image mints tokens for anybody with no login page of its own.
+    # `APP_ENV=local` points the app here by default.
+    oidc:
+        image: ghcr.io/navikt/mock-oauth2-server:6.0.4@sha256:47374fe063995d9b6d39ebb6ea21eb5f765025bf0aa08b61b08b439eb91adaf0
+        ports:
+            - "8090:8080"
+        environment:
+            # The claims land on every token. `aud` names the client, because an id
+            # token must, and the API of the app accepts the same value.
+            JSON_CONFIG: >-
+                {"interactiveLogin":false,"tokenCallbacks":[{"issuerId":"default",
+                "tokenExpiry":3600,"requestMappings":[{"requestParam":"grant_type",
+                "match":"*","claims":{"sub":"local-user","aud":["fomofobo"],
+                "name":"Local User","email":"local@example.com"}}]}]}
+        healthcheck:
+            # `wget`, not `curl`: the image carries no curl binary.
+            test:
+                ["CMD-SHELL", "wget -q --spider http://localhost:8080/isalive || exit 1"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+
+volumes:
+    postgres_data:
+    objectstore_data:

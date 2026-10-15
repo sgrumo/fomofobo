@@ -1,0 +1,92 @@
+{
+    "ClearCache": "Pulisci la cache",
+    "Language": {
+        "Label": "Lingua",
+        "en": "English",
+        "it": "Italiano"
+    },
+    "Theme": {
+        "light": "Chiaro",
+        "dark": "Scuro",
+        "system": "Sistema"
+    },
+    "Routes": {
+        "Home": "Home",
+        "Dev": "Dev",
+        "Todos": "Attività",
+        "Files": "File",
+        "TodosSearch": "Ricerca todo"
+    },
+    "PageTitle": {
+        "Home": "Home",
+        "Todos": "Attività",
+        "TodosSearch": "Ricerca todo",
+        "Files": "File",
+        "DevShowcase": "Showcase",
+        "DevSamples": "Esempi",
+        "NotFound": "Pagina non trovata"
+    },
+    "NotFound": {
+        "Title": "404: Pagina non trovata",
+        "BackHome": "Torna alla home"
+    },
+    "ErrorBoundary": {
+        "Title": "Si è verificato un errore critico",
+        "Description": "Prova a ricaricare la pagina",
+        "DescriptionInsideLayout": "Prova a ricaricare la pagina o a navigare in un'altra sezione",
+        "CopyError": "Copia errore",
+        "ErrorCopied": "Errore copiato",
+        "NoStack": "Nessuna stack trace disponibile"
+    },
+    "Todos": {
+        "Cancel": "Annulla",
+        "ColumnStatus": "Stato",
+        "ColumnTitle": "Titolo",
+        "Create": {
+            "Trigger": "Nuova attività",
+            "Title": "Nuova attività",
+            "Submit": "Crea"
+        },
+        "Edit": "Modifica",
+        "Empty": "Nessuna attività",
+        "Error": "Impossibile caricare le attività",
+        "Fields": {
+            "Title": "Titolo",
+            "Description": "Descrizione",
+            "EndDate": "Data di fine",
+            "Completed": "Completata"
+        },
+        "Loading": "Caricamento...",
+        "PaginatedTitle": "Attività paginate",
+        "StatusCompleted": "Completata",
+        "StatusPending": "Da fare",
+        "Title": "Attività",
+        "Toast": {
+            "Created": "Attività creata",
+            "Updated": "Attività aggiornata",
+            "CloseWhileCreating": "La creazione dell'attività è ancora in corso.",
+            "CloseWhileUpdating": "L'aggiornamento dell'attività è ancora in corso."
+        },
+        "Update": {
+            "Title": "Modifica attività",
+            "Submit": "Salva"
+        }
+    },
+    "TodosSearch": {
+        "ColumnStatus": "Stato",
+        "ColumnTitle": "Titolo",
+        "CompletedOnly": "Solo completati",
+        "Empty": "Nessun todo corrisponde alla ricerca",
+        "Error": "Ricerca dei todo non riuscita",
+        "Loading": "Caricamento...",
+        "StatusCompleted": "Completato",
+        "StatusPending": "In sospeso",
+        "TextPlaceholder": "Cerca per titolo",
+        "Title": "Ricerca todo"
+    },
+    "Session": {
+        "Menu": "Menu account",
+        "SignedInAs": "Accesso come {{name}}",
+        "SignOut": "Esci"
+    }
+}

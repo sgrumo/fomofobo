@@ -1,0 +1,37 @@
+{
+    "name": "api-client",
+    "version": "0.0.0",
+    "private": true,
+    "description": "",
+    "type": "module",
+    "exports": {
+        "./cache-keys": "./src/cache-keys.ts",
+        "./client": "./src/client.ts",
+        "./requests": "./src/requests.ts"
+    },
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "typecheck:watch": "tsc -b -w",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "test": "vitest --run",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "@hono/zod-openapi": "catalog:",
+        "api-routes": "workspace:*",
+        "models": "workspace:*",
+        "shared": "workspace:*"
+    },
+    "devDependencies": {
+        "@tanstack/react-query": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:"
+    },
+    "peerDependencies": {
+        "@tanstack/react-query": "catalog:"
+    }
+}

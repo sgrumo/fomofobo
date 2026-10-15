@@ -1,0 +1,21 @@
+{
+    "extends": "../../configs/tsconfig/tsconfig.web.json",
+    "compilerOptions": {
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
+        "incremental": true,
+        "allowJs": true,
+        "jsx": "preserve",
+        "types": ["node"],
+        "plugins": [{ "name": "next" }],
+        "paths": {
+            "@/*": ["./src/*"]
+        }
+    },
+    "include": [
+        "src",
+        "next.config.ts",
+        "next-env.d.ts",
+        ".next/types/**/*.ts",
+        ".next/dev/types/**/*.ts"
+    ]
+}
