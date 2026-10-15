@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url"
 
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare"
 import type { NextConfig } from "next"
 
 import { languageRedirects } from "./src/lib/i18n/language-redirects"
@@ -29,5 +30,8 @@ const nextConfig: NextConfig = {
     transpilePackages: workspacePackages,
     redirects: () => Promise.resolve(languageRedirects),
 }
+
+// Gives `next dev` the bindings of `wrangler.jsonc`, served from the local state.
+void initOpenNextCloudflareForDev()
 
 export default nextConfig

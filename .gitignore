@@ -19,6 +19,11 @@ dist-ssr
 .next
 next-env.d.ts
 
+# Cloudflare
+.open-next
+.wrangler
+.dev.vars
+
 # Editor directories and files
 .idea
 .DS_Store

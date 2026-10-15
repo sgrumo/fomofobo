@@ -6,7 +6,9 @@
     "scripts": {
         "dev": "with-env next dev",
         "build": "next build",
-        "clean": "rm -rf .next next-env.d.ts *.tsbuildinfo",
+        "build:worker": "opennextjs-cloudflare build",
+        "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+        "clean": "rm -rf .next .open-next .wrangler next-env.d.ts *.tsbuildinfo",
         "start": "next start",
         "typecheck": "next typegen && tsc -b",
         "typecheck:watch": "tsc -b -w",
@@ -23,6 +25,7 @@
         "@fontsource-variable/roboto-mono": "catalog:",
         "@hono/swagger-ui": "catalog:",
         "@hono/zod-openapi": "catalog:",
+        "@opennextjs/cloudflare": "1.20.12",
         "@tanstack/react-query": "catalog:",
         "api-client": "workspace:*",
         "api-routes": "workspace:*",
@@ -63,7 +66,8 @@
         "oxlint-tsgolint": "catalog:",
         "typescript": "catalog:",
         "vitest": "catalog:",
-        "with-env": "workspace:*"
+        "with-env": "workspace:*",
+        "wrangler": "4.149.0"
     },
     "engines": {
         "node": "24.x"
