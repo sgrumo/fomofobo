@@ -4,7 +4,7 @@ Interaction helpers for every `ui-components` primitive, one file for each primi
 
 ## Samples
 
-`src/samples.ts` is generated. Edit the `ui-samples.ts` generator, not the file. It exports `defineUiSamplesTests(app)`, which drives every helper against the samples page (`/dev/samples/`, package `components-samples`). Each browser suite calls it from its own `tests/ui-samples.test.ts` and passes the way its app opens that page. The helpers then run on every framework that renders the components.
+`src/samples.ts` holds one test for each primitive, in alphabetical order. It exports `defineUiSamplesTests(app)`, which drives every helper against the samples page (`/dev/samples/`, package `components-samples`). Each browser suite calls it from its own `tests/ui-samples.test.ts` and passes the way its app opens that page. The helpers then run on every framework that renders the components.
 
 The helpers read the `ui` strings from `src/locales/it/ui.json`, a generated copy of the `ui` namespace that every app ships. They never read the locales of one app.
 
@@ -26,7 +26,7 @@ Each helper is exactly one of these three kinds. Split a helper that does two jo
 
 ## Writing a helper
 
-- Before you write a manual interaction sequence, look in `src/` for a helper. If a helper is missing, add it there and cover it in the `ui-samples.ts` generator.
+- Before you write a manual interaction sequence, look in `src/` for a helper. If a helper is missing, add it there and cover it in `src/samples.ts`.
 - Give every helper a `scope` (`Page` or `Locator`) as its first parameter. Pass a narrower scope, such as a dialog or a section, when a label exists more than once on the page.
 - Write a text parameter of type `TextMatch` as a tuple: `["exact", "Apple"]`, `["contains", "App"]`, or `["regex", /App/]`. Every other matcher parameter is a plain string.
 - Query with `getByRole`, `getByPlaceholder` and `getByText`, in the query order of the component tests.

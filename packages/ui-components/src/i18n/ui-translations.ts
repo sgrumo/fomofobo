@@ -57,6 +57,7 @@ export type UiInterpolations = {
     "DayPicker.NextYear": undefined
     "DayPicker.PreviousYears": undefined
     "DayPicker.NextYears": undefined
+    "SearchField.Clear": undefined
 } & { [K in `Days.${"Full" | "Short"}.${WeekDay}`]: undefined } & {
     [K in `Months.${"Full" | "Short"}.${Month}`]: undefined
 }

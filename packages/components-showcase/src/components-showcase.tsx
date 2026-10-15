@@ -6,8 +6,11 @@ import { AlertDialogShowcase } from "./alert-dialog-showcase"
 import { AlertShowcase } from "./alert-showcase"
 import { AutocompleteShowcase } from "./autocomplete-showcase"
 import { AvatarShowcase } from "./avatar-showcase"
+import { BadgeShowcase } from "./badge-showcase"
+import { BottomSheetShowcase } from "./bottom-sheet-showcase"
 import { ButtonShowcase } from "./button-showcase"
 import { CheckboxShowcase } from "./checkbox-showcase"
+import { ChipShowcase } from "./chip-showcase"
 import { CollapsibleShowcase } from "./collapsible-showcase"
 import { ColorsShowcase } from "./colors-showcase"
 import { ComboboxShowcase } from "./combobox-showcase"
@@ -19,32 +22,39 @@ import { ContextMenuShowcase } from "./context-menu-showcase"
 import { DateInputShowcase } from "./date-input-showcase"
 import { DayPickerShowcase } from "./day-picker-showcase"
 import { DialogShowcase } from "./dialog-showcase"
+import { DitheredImageShowcase } from "./dithered-image-showcase"
 import { DrawerShowcase } from "./drawer-showcase"
 import { ErrorBoundaryShowcase } from "./error-boundary-showcase"
 import { FallbackBoxShowcase } from "./fallback-box-showcase"
 import { FieldShowcase } from "./field-showcase"
 import { FormErrorsShowcase } from "./form-errors-showcase"
+import { IconButtonShowcase } from "./icon-button-showcase"
 import { MenuShowcase } from "./menu-showcase"
 import { MeterShowcase } from "./meter-showcase"
 import { NumberInputShowcase } from "./number-input-showcase"
 import { OtpInputShowcase } from "./otp-input-showcase"
 import { PaginationShowcase } from "./pagination-showcase"
 import { PasswordInputShowcase } from "./password-input-showcase"
+import { PixelIconsShowcase } from "./pixel-icons-showcase"
 import { PopoverShowcase } from "./popover-showcase"
 import { ProgressShowcase } from "./progress-showcase"
 import { RadioShowcase } from "./radio-showcase"
+import { SearchFieldShowcase } from "./search-field-showcase"
 import { SelectShowcase } from "./select-showcase"
 import { SeparatorShowcase } from "./separator-showcase"
 import { SliderShowcase } from "./slider-showcase"
 import { SpinnerShowcase } from "./spinner-showcase"
 import { StackingShowcase } from "./stacking-showcase"
+import { StatGridShowcase } from "./stat-grid-showcase"
 import { StepperShowcase } from "./stepper-showcase"
 import { StringInputShowcase } from "./string-input-showcase"
 import { SwitchShowcase } from "./switch-showcase"
 import { TableShowcase } from "./table-showcase"
 import { TabsShowcase } from "./tabs-showcase"
 import { TextareaShowcase } from "./textarea-showcase"
+import { TickProgressShowcase } from "./tick-progress-showcase"
 import { TimeInputShowcase } from "./time-input-showcase"
+import { TimelineShowcase } from "./timeline-showcase"
 import { ToastShowcase } from "./toast-showcase"
 import { ToggleShowcase } from "./toggle-showcase"
 import { TooltipShowcase } from "./tooltip-showcase"
@@ -61,6 +71,40 @@ export const ComponentsShowcase = (props: ComponentsShowcaseProps) => (
         <ShowcaseSection cols={2} title="Typography" component={<TypographyShowcase />} />
         <ShowcaseSection cols={2} title="Colors" component={<ColorsShowcase />} />
         <ShowcaseSection cols={1} title="Button" component={<ButtonShowcase />} />
+        <ShowcaseSection cols={1} title="Badge" component={<BadgeShowcase />} />
+        <ShowcaseSection cols={1} title="Chip" component={<ChipShowcase />} />
+        <ShowcaseSection
+            cols={1}
+            title="Tick Progress"
+            component={<TickProgressShowcase />}
+        />
+        <ShowcaseSection cols={1} title="Timeline" component={<TimelineShowcase />} />
+        <ShowcaseSection
+            cols={1}
+            title="Icon Button"
+            component={<IconButtonShowcase />}
+        />
+        <ShowcaseSection
+            cols={1}
+            title="Bottom Sheet"
+            component={<BottomSheetShowcase />}
+        />
+        <ShowcaseSection cols={1} title="Stat Grid" component={<StatGridShowcase />} />
+        <ShowcaseSection
+            cols={1}
+            title="Search Field"
+            component={<SearchFieldShowcase />}
+        />
+        <ShowcaseSection
+            cols={2}
+            title="Pixel Icons"
+            component={<PixelIconsShowcase />}
+        />
+        <ShowcaseSection
+            cols={2}
+            title="Dithered Image"
+            component={<DitheredImageShowcase />}
+        />
         <ShowcaseSection
             cols={2}
             title="Field"

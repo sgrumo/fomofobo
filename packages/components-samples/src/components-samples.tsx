@@ -5,17 +5,22 @@ import { AlertDialogSamples } from "./alert-dialog-samples"
 import { AlertSamples } from "./alert-samples"
 import { AutocompleteSamples } from "./autocomplete-samples"
 import { AvatarSamples } from "./avatar-samples"
+import { BadgeSamples } from "./badge-samples"
+import { BottomSheetSamples } from "./bottom-sheet-samples"
 import { ButtonSamples } from "./button-samples"
 import { CheckboxSamples } from "./checkbox-samples"
+import { ChipSamples } from "./chip-samples"
 import { CollapsibleSamples } from "./collapsible-samples"
 import { ComboboxSamples } from "./combobox-samples"
 import { ContextMenuSamples } from "./context-menu-samples"
 import { DateInputSamples } from "./date-input-samples"
 import { DayPickerSamples } from "./day-picker-samples"
 import { DialogSamples } from "./dialog-samples"
+import { DitheredImageSamples } from "./dithered-image-samples"
 import { DrawerSamples } from "./drawer-samples"
 import { FallbackBoxSamples } from "./fallback-box-samples"
 import { FormSamples } from "./form-samples"
+import { IconButtonSamples } from "./icon-button-samples"
 import { InputSamples } from "./input-samples"
 import { MenuSamples } from "./menu-samples"
 import { MeterSamples } from "./meter-samples"
@@ -24,14 +29,18 @@ import { PaginationSamples } from "./pagination-samples"
 import { PopoverSamples } from "./popover-samples"
 import { ProgressSamples } from "./progress-samples"
 import { RadioSamples } from "./radio-samples"
+import { SearchFieldSamples } from "./search-field-samples"
 import { SelectSamples } from "./select-samples"
 import { SeparatorSamples } from "./separator-samples"
 import { SliderSamples } from "./slider-samples"
 import { SpinnerSamples } from "./spinner-samples"
+import { StatGridSamples } from "./stat-grid-samples"
 import { StepperSamples } from "./stepper-samples"
 import { SwitchSamples } from "./switch-samples"
 import { TableSamples } from "./table-samples"
 import { TabsSamples } from "./tabs-samples"
+import { TickProgressSamples } from "./tick-progress-samples"
+import { TimelineSamples } from "./timeline-samples"
 import { ToastSamples } from "./toast-samples"
 import { ToggleSamples } from "./toggle-samples"
 import { TooltipSamples } from "./tooltip-samples"
@@ -142,6 +151,33 @@ export const ComponentsSamples = () => (
         </SamplesSection>
         <SamplesSection title="Fallback Box Samples">
             <FallbackBoxSamples />
+        </SamplesSection>
+        <SamplesSection title="Badge Samples">
+            <BadgeSamples />
+        </SamplesSection>
+        <SamplesSection title="Bottom Sheet Samples">
+            <BottomSheetSamples />
+        </SamplesSection>
+        <SamplesSection title="Chip Samples">
+            <ChipSamples />
+        </SamplesSection>
+        <SamplesSection title="Dithered Image Samples">
+            <DitheredImageSamples />
+        </SamplesSection>
+        <SamplesSection title="Icon Button Samples">
+            <IconButtonSamples />
+        </SamplesSection>
+        <SamplesSection title="Search Field Samples">
+            <SearchFieldSamples />
+        </SamplesSection>
+        <SamplesSection title="Stat Grid Samples">
+            <StatGridSamples />
+        </SamplesSection>
+        <SamplesSection title="Tick Progress Samples">
+            <TickProgressSamples />
+        </SamplesSection>
+        <SamplesSection title="Timeline Samples">
+            <TimelineSamples />
         </SamplesSection>
     </div>
 )

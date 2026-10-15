@@ -10,7 +10,7 @@ export const dialogBackdropStyles = styles(
 
 export const dialogPopupStyles = styles(
     () =>
-        "after:bg-overlay bg-surface border-line shadow-hard-lg fixed top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-lg border-2 p-6 transition-all duration-150 after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:opacity-0 after:transition-opacity after:duration-150 data-[ending-style]:scale-90 data-[ending-style]:opacity-0 data-[nested-dialog-open]:after:opacity-100 data-[starting-style]:scale-90 data-[starting-style]:opacity-0",
+        "after:bg-overlay bg-surface border-line shadow-hard-lg fixed top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-lg border-2 p-6 transition-all duration-150 outline-none after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:opacity-0 after:transition-opacity after:duration-150 data-[ending-style]:scale-90 data-[ending-style]:opacity-0 data-[nested-dialog-open]:after:opacity-100 data-[starting-style]:scale-90 data-[starting-style]:opacity-0",
 )
 
 export const dialogTitleStyles = styles((opts: TypographyOpts) => [

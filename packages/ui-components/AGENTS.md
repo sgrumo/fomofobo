@@ -24,15 +24,19 @@ Headless, app-agnostic React UI primitives built on `@base-ui/react`. Consumed b
 - `select` - single-select dropdown
 - `combobox` - searchable single/multi select with chips
 - `autocomplete` - text input with suggestion list
+- `search-field` - search input with a leading icon, a block cursor placeholder and a clear button
 - `slider` - range slider
 - `stepper` - multi-step navigation/progress
 
 **Actions & overlays**
 
 - `button` - button primitive (variants/sizes)
+- `icon-button` - round icon-only button, `aria-label` required by type
+- `chip` - toggle with an icon, a label and a count, plus `ChipRow`, a scrolling labelled group
 - `dialog` - modal dialog
 - `alert-dialog` - confirmation dialog (+ typed-text "type to confirm" variant)
 - `drawer` - edge-anchored sheet
+- `bottom-sheet` - non-modal drawer from the bottom edge with a grab handle
 - `popover` - floating panel anchored to a trigger
 - `tooltip` - hover/focus hint
 - `menu` - dropdown menu
@@ -51,6 +55,8 @@ Headless, app-agnostic React UI primitives built on `@base-ui/react`. Consumed b
 - `alert` - inline alert banner
 - `toast` - transient notifications (manager + provider + hooks)
 - `progress` - progress bar
+- `tick-progress` - tick-mark progressbar with a value text
+- `timeline` - `tick-progress` with start, now and end labels
 - `meter` - gauge/meter
 - `spinner` - loading spinner
 - `fallback-box` - empty/error placeholder box
@@ -58,8 +64,12 @@ Headless, app-agnostic React UI primitives built on `@base-ui/react`. Consumed b
 **Display & navigation**
 
 - `avatar` - user avatar
+- `badge` - filled tag with an optional leading square dot
+- `stat-grid` - outlined grid of label and value cells
+- `dithered-image` - image drawn as a two-color ordered dither, the plain image as fallback
 - `pagination` - page navigation
 - `icons` - SVG icon component set
+- `pixel-icons` - pixel icon set on a 12 x 12 grid, one component per icon, plus `PixelIcon`, which takes the icon name
 
 **Infrastructure (non-component exports)**
 

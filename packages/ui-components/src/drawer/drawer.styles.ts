@@ -10,7 +10,7 @@ export const drawerBackdropStyles = styles(
 )
 
 export const drawerPopupStyles = styles((opts: Pick<DrawerContext, "side">) => [
-    "bg-surface border-line fixed flex flex-col gap-4 rounded-t-xl border-2 p-6 transition-transform duration-200 ease-out",
+    "bg-surface border-line fixed flex flex-col gap-4 rounded-t-xl border-2 p-6 transition-transform duration-200 ease-out outline-none",
     {
         "inset-x-0 bottom-0 grid max-h-[85dvh] grid-cols-1 grid-rows-[auto_1fr] gap-2 data-[ending-style]:translate-y-full data-[starting-style]:translate-y-full":
             opts.side === "bottom",

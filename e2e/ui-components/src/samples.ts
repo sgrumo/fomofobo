@@ -24,6 +24,13 @@ import {
     selectAutocompleteItem,
 } from "./autocomplete"
 import { expectAvatarFallback, expectAvatarImage } from "./avatar"
+import { expectBadge } from "./badge"
+import {
+    dismissBottomSheet,
+    expectBottomSheetClosed,
+    expectBottomSheetOpen,
+    openBottomSheet,
+} from "./bottom-sheet"
 import { clickButton, expectButtonDisabled, expectButtonEnabled } from "./button"
 import {
     checkCheckbox,
@@ -32,6 +39,13 @@ import {
     expectCheckboxUnchecked,
     uncheckCheckbox,
 } from "./checkbox"
+import {
+    expectChipNotPressed,
+    expectChipPressed,
+    getChipRow,
+    pressChip,
+    unpressChip,
+} from "./chip"
 import {
     closeCollapsible,
     expectCollapsibleClosed,
@@ -67,6 +81,7 @@ import {
     pickDayPickerDay,
 } from "./day-picker"
 import { closeDialog, expectDialogClosed, expectDialogOpen, openDialog } from "./dialog"
+import { expectDitheredImage } from "./dithered-image"
 import { closeDrawer, expectDrawerClosed, expectDrawerOpen, openDrawer } from "./drawer"
 import { expectEmptyFallback, expectErrorFallback } from "./fallback-box"
 import {
@@ -76,6 +91,7 @@ import {
     hoverFieldInfo,
 } from "./field"
 import { t } from "./i18n"
+import { clickIconButton } from "./icon-button"
 import {
     clearInput,
     clearInputByPlaceholder,
@@ -116,6 +132,7 @@ import {
 } from "./popover"
 import { expectProgressComplete, expectProgressValue } from "./progress"
 import { expectRadioNotSelected, expectRadioSelected, selectRadioItem } from "./radio"
+import { expectSearchFieldValue, fillSearchField, resetSearchField } from "./search-field"
 import {
     expectSelectOptions,
     expectSelectPlaceholder,
@@ -129,6 +146,7 @@ import type { TextMatch } from "./shared"
 import { monthKeyOf } from "./shared"
 import { expectSliderValue, setSliderValue } from "./slider"
 import { expectSpinner } from "./spinner"
+import { expectStatGridValue } from "./stat-grid"
 import {
     expectCurrentStep,
     expectStepDisabled,
@@ -146,6 +164,8 @@ import {
     getTable,
 } from "./table"
 import { expectSelectedTab, expectTabPanelContent, selectTab } from "./tabs"
+import { expectTickProgress } from "./tick-progress"
+import { expectTimeline } from "./timeline"
 import { dismissToast, expectToast } from "./toast"
 import {
     expectTogglePressed,
@@ -272,6 +292,34 @@ export const defineUiSamplesTests = (app: UiSamplesApp) => {
             await expectAvatarFallback(scope, "AL")
         })
 
+        test("badge", async ({ page }) => {
+            const scope = section(page, "Badge Samples")
+            await expectBadge(scope, ["exact", "Sample live badge"])
+            await expectBadge(scope, ["exact", "Sample upcoming badge"])
+        })
+
+        test("bottom sheet", async ({ page }) => {
+            const scope = section(page, "Bottom Sheet Samples")
+            await expectBottomSheetClosed(page, "Sample bottom sheet")
+
+            const sheet = await openBottomSheet(
+                scope,
+                "Open sample bottom sheet",
+                "Sample bottom sheet",
+            )
+            await expect(sheet.getByText("Sample bottom sheet content")).toBeVisible()
+            await clickButton(sheet, "Close sample bottom sheet")
+            await expectBottomSheetClosed(page, "Sample bottom sheet")
+
+            await openBottomSheet(
+                scope,
+                "Open sample bottom sheet",
+                "Sample bottom sheet",
+            )
+            await expectBottomSheetOpen(page, "Sample bottom sheet")
+            await dismissBottomSheet(page, "Sample bottom sheet")
+        })
+
         test("button", async ({ page }) => {
             const scope = section(page, "Button Samples")
             await expectButtonEnabled(scope, "Sample Button")
@@ -298,6 +346,16 @@ export const defineUiSamplesTests = (app: UiSamplesApp) => {
             await expectCheckboxChecked(scope, "Banana")
             await uncheckCheckbox(scope, "Banana")
             await expectCheckboxUnchecked(scope, "Banana")
+        })
+
+        test("chip", async ({ page }) => {
+            const row = getChipRow(section(page, "Chip Samples"), "Sample chip row")
+            await expectChipNotPressed(row, "Sample Music Chip 12")
+            await pressChip(row, "Sample Music Chip 12")
+            await expectChipPressed(row, "Sample Music Chip 12")
+            await expectChipNotPressed(row, "Sample Comedy Chip")
+            await unpressChip(row, "Sample Music Chip 12")
+            await expectChipNotPressed(row, "Sample Music Chip 12")
         })
 
         test("collapsible", async ({ page }) => {
@@ -435,6 +493,11 @@ export const defineUiSamplesTests = (app: UiSamplesApp) => {
             await dismissToast(page, { type: "success" }, "Toast success description")
         })
 
+        test("dithered image", async ({ page }) => {
+            const scope = section(page, "Dithered Image Samples")
+            await expectDitheredImage(scope, "Sample dithered image")
+        })
+
         test("drawer", async ({ page }) => {
             const scope = section(page, "Drawer Samples")
             const drawer = await openDrawer(scope, "Open sample drawer", "Sample drawer")
@@ -465,6 +528,12 @@ export const defineUiSamplesTests = (app: UiSamplesApp) => {
             await expectCheckboxChecked(scope, "View Checkbox")
             await hoverFieldInfo(scope, "Described Input")
             await expectFieldDescription(scope, "Described input help text")
+        })
+
+        test("icon button", async ({ page }) => {
+            const scope = section(page, "Icon Button Samples")
+            await clickIconButton(scope, "Sample icon button")
+            await expect(scope.getByText("Icon button clicks: 1")).toBeVisible()
         })
 
         test("input", async ({ page }) => {
@@ -595,6 +664,17 @@ export const defineUiSamplesTests = (app: UiSamplesApp) => {
             await expectRadioNotSelected(scope, "Banana")
         })
 
+        test("search field", async ({ page }) => {
+            const scope = section(page, "Search Field Samples")
+            await expect(
+                scope.getByPlaceholder("Sample search placeholder"),
+            ).toBeVisible()
+            await fillSearchField(scope, "Sample search", "jazz")
+            await expect(scope.getByText("Search value: jazz")).toBeVisible()
+            await resetSearchField(scope, "Sample search")
+            await expectSearchFieldValue(scope, "Sample search", "")
+        })
+
         test("select", async ({ page }) => {
             const scope = section(page, "Select Samples")
 
@@ -635,6 +715,12 @@ export const defineUiSamplesTests = (app: UiSamplesApp) => {
         test("spinner", async ({ page }) => {
             const scope = section(page, "Spinner Samples")
             await expectSpinner(scope, "Sample spinner")
+        })
+
+        test("stat grid", async ({ page }) => {
+            const scope = section(page, "Stat Grid Samples")
+            await expectStatGridValue(scope, "Sample stat date", "Sample stat Wed 14.10")
+            await expectStatGridValue(scope, "Sample stat entry", "Sample stat free")
         })
 
         test("stepper", async ({ page }) => {
@@ -695,6 +781,27 @@ export const defineUiSamplesTests = (app: UiSamplesApp) => {
             await selectTab(scope, "Tab Two")
             await expectSelectedTab(scope, "Tab Two")
             await expectTabPanelContent(scope, "Tab two panel content")
+        })
+
+        test("tick progress", async ({ page }) => {
+            const scope = section(page, "Tick Progress Samples")
+            await expectTickProgress(scope, "Sample tick progress", {
+                value: 30,
+                valueText: "Sample tick value text",
+            })
+        })
+
+        test("timeline", async ({ page }) => {
+            const scope = section(page, "Timeline Samples")
+            await expectTimeline(scope, "Sample timeline", {
+                start: "Sample timeline start",
+                now: "Sample timeline now",
+                end: "Sample timeline end",
+            })
+            await expectTickProgress(scope, "Sample timeline", {
+                value: 48,
+                valueText: "Sample timeline value text",
+            })
         })
 
         test("toast", async ({ page }) => {
