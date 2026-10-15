@@ -4,7 +4,7 @@ interface AvatarRootStylesOpts {
     size: "sm" | "md" | "lg"
 }
 export const avatarRootStyles = styles((opts: AvatarRootStylesOpts) => [
-    "bg-line-muted text-fg-muted relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full select-none",
+    "bg-upcoming text-fg border-line relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full border-2 select-none",
     {
         "tp-pixel-md size-8": opts.size === "sm",
         "tp-pixel-md size-10": opts.size === "md",

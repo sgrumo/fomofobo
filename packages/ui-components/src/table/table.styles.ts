@@ -14,14 +14,14 @@ export const tableHeaderStyles = styles((opts: TableHeaderStylesOpts) => [
 ])
 
 export const tableHeadStyles = styles(
-    () => "tp-pixel-md border-line-muted text-fg border-b p-3 text-left align-middle",
+    () => "tp-pixel-sm border-line text-fg border-b-2 p-3 text-left align-middle",
 )
 
 interface TableCellStylesOpts {
     ellipsis: boolean
 }
 export const tableCellStyles = styles((opts: TableCellStylesOpts) => [
-    "tp-body-md border-line-muted text-fg-muted border-b p-3 align-middle",
+    "tp-body-md border-line-muted text-fg border-b p-3 align-middle",
     {
         "max-w-none overflow-clip text-ellipsis whitespace-nowrap": opts.ellipsis,
     },

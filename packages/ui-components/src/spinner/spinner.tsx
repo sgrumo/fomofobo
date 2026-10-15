@@ -23,7 +23,7 @@ export const Spinner = ({
                 "h-8 w-8": size === "sm",
                 "h-12 w-12": size === "md",
                 "h-16 w-16": size === "lg",
-                "text-fg/50": theme === "default",
+                "text-fg": theme === "default",
             },
             className,
         )}

@@ -5,9 +5,9 @@ interface CheckboxRootStylesOpts {
     indeterminate: boolean
 }
 export const checkboxRootStyles = styles((opts: CheckboxRootStylesOpts) => [
-    "outline-focus border-line inline-flex size-4 items-center justify-center rounded-sm border outline-offset-1 transition-colors focus-visible:outline-1 disabled:cursor-not-allowed disabled:opacity-50",
+    "outline-focus border-line inline-flex size-5 items-center justify-center rounded-sm border-2 outline-offset-2 transition-colors focus-visible:outline-2 disabled:cursor-not-allowed disabled:opacity-50",
     {
-        "bg-surface enabled:hover:bg-line-muted": !opts.checked && !opts.indeterminate,
+        "bg-surface enabled:hover:bg-surface-muted": !opts.checked && !opts.indeterminate,
         "bg-surface-inverse text-fg-inverse": opts.checked || opts.indeterminate,
     },
 ])

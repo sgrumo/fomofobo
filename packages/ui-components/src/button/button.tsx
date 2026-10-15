@@ -29,13 +29,13 @@ type ButtonProps = StrictOmit<
               children?: never
           }
         | {
-              variant: "secondary" | "tertiary"
+              variant: "accent" | "secondary" | "tertiary"
               size: "sm" | "md"
               destructive?: false
               children?: ReactNode
           }
         | {
-              variant: "secondary" | "tertiary"
+              variant: "accent" | "secondary" | "tertiary"
               size: "icon"
               destructive?: false
               children?: never

@@ -27,7 +27,7 @@ export const alertForegroundStyles = styles((type: AlertType) => ({
 }))
 
 export const alertRootStyles = styles((type: AlertType) => [
-    "flex flex-col justify-center gap-2 rounded-lg p-4",
+    "border-line flex flex-col justify-center gap-2 rounded-lg border-2 p-4",
     alertBackgroundStyles(type),
 ])
 

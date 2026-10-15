@@ -348,6 +348,24 @@ export const ButtonShowcase = (props: ButtonShowcaseProps) => (
             </div>
         </div>
         <div className="flex flex-col gap-2">
+            <p className="tp-pixel-lg">Accent</p>
+            <div className="flex flex-wrap items-center gap-4">
+                <Button variant="accent" size="md" type="button">
+                    Medium
+                </Button>
+                <Button variant="accent" size="sm" type="button">
+                    Small
+                </Button>
+                <Button variant="accent" size="icon" type="button" icon={icon} />
+                <Button variant="accent" size="md" type="button" icon={icon}>
+                    Icon Start
+                </Button>
+                <Button variant="accent" size="md" type="button" disabled={true}>
+                    Disabled
+                </Button>
+            </div>
+        </div>
+        <div className="flex flex-col gap-2">
             <p className="tp-pixel-lg">Secondary</p>
             <div className="flex flex-wrap items-center gap-4">
                 <Button variant="secondary" size="md" type="button">

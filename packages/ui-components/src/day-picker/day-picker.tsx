@@ -117,12 +117,15 @@ const DayPickerDayCell = (props: DayPickerDayCellProps) => {
             onKeyDown={event => {
                 props.onKeyDown(event, props.day)
             }}
-            className={cn("tp-body-md m-auto size-6 rounded-full transition-colors", {
-                "bg-surface-inverse text-fg-inverse": props.selected,
-                "ring-focus ring-1": today && !props.selected,
-                "hover:bg-surface-muted/50": !props.selected && !props.disabled,
-                "cursor-not-allowed opacity-50": props.disabled,
-            })}
+            className={cn(
+                "tp-pixel-sm focus-visible:outline-focus m-auto size-6 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-1",
+                {
+                    "bg-surface-inverse text-fg-inverse": props.selected,
+                    "ring-live ring-2": today && !props.selected,
+                    "hover:bg-upcoming": !props.selected && !props.disabled,
+                    "cursor-not-allowed opacity-50": props.disabled,
+                },
+            )}
         >
             {props.day.getDate()}
         </button>
@@ -142,7 +145,7 @@ const DayPickerWeekDayHeaderRow = () => {
                     key={weekDay}
                     role="columnheader"
                     aria-label={i18n.t(`Days.Full.${weekDay}`, undefined)}
-                    className="tp-body-md text-fg-muted flex size-6 items-center justify-center"
+                    className="tp-pixel-sm text-fg-muted flex size-6 items-center justify-center"
                 >
                     {i18n.t(`Days.Short.${weekDay}`, undefined)}
                 </span>
@@ -203,11 +206,14 @@ const DayPickerMonthCell = (props: DayPickerMonthCellProps) => {
             onKeyDown={event => {
                 props.onKeyDown(event, props.month)
             }}
-            className={cn("tp-body-md m-auto size-8 rounded-full transition-colors", {
-                "bg-surface-inverse text-fg-inverse": props.selected,
-                "hover:bg-surface-muted/50": !props.selected && !props.disabled,
-                "cursor-not-allowed opacity-50": props.disabled,
-            })}
+            className={cn(
+                "tp-pixel-sm focus-visible:outline-focus m-auto size-8 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-1",
+                {
+                    "bg-surface-inverse text-fg-inverse": props.selected,
+                    "hover:bg-upcoming": !props.selected && !props.disabled,
+                    "cursor-not-allowed opacity-50": props.disabled,
+                },
+            )}
         >
             {monthLabel(props.month, "short", i18n.t)}
         </button>
@@ -264,11 +270,14 @@ const DayPickerYearCell = (props: DayPickerYearCellProps) => (
         onKeyDown={event => {
             props.onKeyDown(event, props.year)
         }}
-        className={cn("tp-body-md m-auto size-10 rounded-full transition-colors", {
-            "bg-surface-inverse text-fg-inverse": props.selected,
-            "hover:bg-surface-muted/50": !props.selected && !props.disabled,
-            "cursor-not-allowed opacity-50": props.disabled,
-        })}
+        className={cn(
+            "tp-pixel-sm focus-visible:outline-focus m-auto size-10 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-1",
+            {
+                "bg-surface-inverse text-fg-inverse": props.selected,
+                "hover:bg-upcoming": !props.selected && !props.disabled,
+                "cursor-not-allowed opacity-50": props.disabled,
+            },
+        )}
     >
         {props.year.getFullYear()}
     </button>
@@ -689,7 +698,7 @@ export const DayPicker = (props: DayPickerProps) => {
                 {(view === "day" || view === "month") && (
                     <button
                         type="button"
-                        className="tp-body-md flex items-center justify-center"
+                        className="tp-pixel-md flex items-center justify-center"
                         onClick={onCycleView}
                         disabled={disabled}
                         aria-live="polite"
@@ -699,7 +708,7 @@ export const DayPicker = (props: DayPickerProps) => {
                 )}
                 {view === "year" && (
                     <span
-                        className="tp-body-md flex items-center justify-center"
+                        className="tp-pixel-md flex items-center justify-center"
                         aria-live="polite"
                     >
                         {viewText}

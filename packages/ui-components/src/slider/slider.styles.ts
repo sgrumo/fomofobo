@@ -17,19 +17,17 @@ export const sliderControlStyles = styles((opts: SliderSizeOpts) => [
 ])
 
 export const sliderTrackStyles = styles((opts: SliderSizeOpts) => [
-    "bg-line-muted relative grow rounded-full",
+    "bg-surface border-line relative grow rounded-sm border-2",
     {
-        "h-1.5": opts.size === "sm",
-        "h-2": opts.size === "md",
+        "h-2.5": opts.size === "sm",
+        "h-3": opts.size === "md",
     },
 ])
 
-export const sliderIndicatorStyles = styles(() => [
-    "bg-surface-inverse absolute h-full rounded-full",
-])
+export const sliderIndicatorStyles = styles(() => ["bg-surface-inverse absolute h-full"])
 
 export const sliderThumbStyles = styles((opts: SliderSizeOpts) => [
-    "has-[:focus-visible]:outline-focus border-line bg-surface shadow-hard-sm hover:bg-surface-muted absolute rounded-full border transition-[border-color,background] enabled:cursor-grab disabled:cursor-not-allowed disabled:opacity-50 has-[:focus-visible]:outline-3 has-[:focus-visible]:-outline-offset-1",
+    "has-[:focus-visible]:outline-focus border-line bg-upcoming shadow-hard-sm hover:bg-surface absolute rounded-full border-2 transition-[border-color,background] enabled:cursor-grab disabled:cursor-not-allowed disabled:opacity-50 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2",
     {
         "size-4": opts.size === "sm",
         "size-5": opts.size === "md",

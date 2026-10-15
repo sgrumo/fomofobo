@@ -1,25 +1,27 @@
 import { styles } from "frontend-shared/styles"
 
 interface ButtonStylesOpts {
-    variant: "primary" | "secondary" | "tertiary"
+    variant: "primary" | "accent" | "secondary" | "tertiary"
     size: "sm" | "md" | "icon"
     destructive: boolean
 }
 
 export const buttonStyles = styles((opts: ButtonStylesOpts) => [
-    "inline-flex items-center justify-center transition-[background] aria-disabled:opacity-50",
+    "focus-visible:outline-focus inline-flex items-center justify-center transition-[background,translate,box-shadow] focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:opacity-50",
     {
-        "rounded-3xl": opts.size !== "icon",
+        "rounded-md": opts.size !== "icon",
         "gap-0 rounded-full p-2": opts.size === "icon",
         "tp-pixel-sm gap-1 px-3 py-1": opts.size === "sm",
-        "tp-pixel-md gap-2 px-4 py-2": opts.size === "md",
-        "bg-surface-inverse focus-visible:outline-focus text-fg-inverse -outline-offset-2 transition-colors focus-visible:outline-2":
+        "tp-pixel-md gap-2 px-4 py-2.5": opts.size === "md",
+        "border-line shadow-hard-md not-aria-disabled:active:shadow-hard-sm border-2 not-aria-disabled:active:translate-x-0.5 not-aria-disabled:active:translate-y-0.5":
+            opts.variant !== "tertiary",
+        "bg-surface-inverse text-fg-inverse shadow-live":
             opts.variant === "primary" && !opts.destructive,
-        "bg-danger focus-visible:outline-danger-surface text-fg-inverse -outline-offset-2 transition-colors focus-visible:outline-2":
-            opts.variant === "primary" && opts.destructive,
-        "focus-visible:outline-focus shadow-hard-sm text-fg border-line-muted bg-surface not-focus-visible:not-aria-disabled:hover:bg-surface-muted border -outline-offset-2 focus-visible:outline-2":
+        "bg-danger text-fg-inverse": opts.variant === "primary" && opts.destructive,
+        "bg-social text-fg": opts.variant === "accent",
+        "bg-surface text-fg not-aria-disabled:hover:bg-surface-muted":
             opts.variant === "secondary",
-        "focus-visible:outline-focus text-fg bg-surface -outline-offset-2 focus-visible:outline-2":
+        "text-fg not-aria-disabled:hover:bg-surface-muted bg-transparent":
             opts.variant === "tertiary",
     },
 ])

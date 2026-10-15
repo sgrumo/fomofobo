@@ -23,7 +23,7 @@ export const selectTriggerStyles = styles((opts: ComboboxTriggerStylesOpts) => [
     "enabled:[&:hover:not(:has([data-select-reset]:hover))]:bg-surface-muted",
 ])
 
-export const selectValueStyles = styles(() => "data-[placeholder]:text-fg-subtle")
+export const selectValueStyles = styles(() => "data-[placeholder]:text-fg-muted")
 
 interface SelectIconStylesOpts {
     rotate: 0 | 180
@@ -35,9 +35,9 @@ export const selectIconStyles = styles((opts: SelectIconStylesOpts) => [
     },
 ])
 
-export const selectItemIndicatorStyles = styles(() => "text-fg-muted [&>svg]:size-4")
+export const selectItemIndicatorStyles = styles(() => "text-fg [&>svg]:size-4")
 
-export const selectItemTextStyles = styles(() => "text-fg-muted")
+export const selectItemTextStyles = styles(() => "text-fg")
 
 export const selectScrollArrowStyles = styles((direction: "up" | "down") => [
     "bg-surface text-fg-muted absolute z-[1] flex h-4 w-full cursor-default items-center justify-center [&>svg]:size-4",

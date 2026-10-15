@@ -8,7 +8,7 @@ interface OtpInputSlotStylesOpts {
     error: boolean
 }
 export const otpInputSlotStyles = styles((opts: OtpInputSlotStylesOpts) => [
-    "tp-body-md bg-surface appearance-none rounded-lg text-center outline-1 -outline-offset-1 transition-colors",
+    "tp-pixel-lg bg-surface shadow-hard-sm appearance-none rounded-md text-center outline-2 -outline-offset-2 transition-colors",
     "enabled:hover:bg-surface-muted",
     "disabled:cursor-not-allowed disabled:opacity-75",
     {
@@ -20,6 +20,4 @@ export const otpInputSlotStyles = styles((opts: OtpInputSlotStylesOpts) => [
     },
 ])
 
-export const otpInputSeparatorStyles = styles(
-    () => "bg-fg-subtle h-px w-2 shrink-0 rounded-full",
-)
+export const otpInputSeparatorStyles = styles(() => "bg-line h-0.5 w-2 shrink-0")

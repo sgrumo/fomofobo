@@ -9,13 +9,13 @@ interface ProgressSizeOpts {
 export const progressRootStyles = styles(() => "w-full")
 
 export const progressTrackStyles = styles((opts: ProgressSizeOpts) => [
-    "bg-line-muted relative w-full overflow-hidden rounded-full",
+    "bg-surface border-line relative w-full overflow-hidden rounded-sm border-2",
     {
-        "h-2": opts.size === "sm",
-        "h-3": opts.size === "md",
+        "h-3": opts.size === "sm",
+        "h-4": opts.size === "md",
     },
 ])
 
 export const progressIndicatorStyles = styles(() => [
-    "bg-surface-inverse h-full transition-[width] data-[status=complete]:rounded-full data-[status=indeterminate]:w-full data-[status=indeterminate]:animate-pulse data-[status=progressing]:rounded-full",
+    "bg-surface-inverse h-full transition-[width] data-[status=indeterminate]:w-full data-[status=indeterminate]:animate-pulse",
 ])

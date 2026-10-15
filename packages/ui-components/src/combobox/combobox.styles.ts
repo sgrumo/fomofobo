@@ -7,7 +7,7 @@ export interface ComboboxTriggerStylesOpts {
     error: boolean
 }
 export const comboboxTriggerStyles = styles((opts: ComboboxTriggerStylesOpts) => [
-    "tp-body-md bg-surface outline-line flex h-10 cursor-default items-center justify-between gap-2 rounded-lg p-2 outline-1 -outline-offset-1 transition-colors select-none disabled:cursor-not-allowed",
+    "tp-body-md bg-surface outline-line shadow-hard-sm flex h-11 cursor-default items-center justify-between gap-2 rounded-md px-3 py-2 outline-2 -outline-offset-2 transition-colors select-none disabled:cursor-not-allowed disabled:opacity-75",
     {
         "focus-visible:outline-focus": !opts.error,
         "enabled:outline-danger": opts.error,
@@ -25,7 +25,7 @@ export const compositeComboboxTriggerStyles = styles(
     () => "flex items-center justify-between",
 )
 
-export const comboboxPlaceholderStyles = styles(() => "text-fg-subtle")
+export const comboboxPlaceholderStyles = styles(() => "text-fg-muted")
 
 interface ComboboxIconStylesOpts {
     rotate: 0 | 180
@@ -36,12 +36,12 @@ export const comboboxIconStyles = styles((opts: ComboboxIconStylesOpts) => [
 ])
 
 export const comboboxInputContainerStyles = styles(
-    () => "border-line-muted border-b p-2 [&>*]:w-full",
+    () => "border-line border-b-2 p-2 [&>*]:w-full",
 )
 
 export const comboboxNavigationInputStyles = styles(() => "sr-only")
 
-export const comboboxItemIndicatorStyles = styles(() => "text-fg-muted [&>svg]:size-4")
+export const comboboxItemIndicatorStyles = styles(() => "text-fg [&>svg]:size-4")
 
 export const comboboxResetStyles = styles(
     () => "[&>svg]:text-fg-muted rounded-sm [&>svg]:size-4",
@@ -50,7 +50,7 @@ export const comboboxResetStyles = styles(
 export const compositeMultipleComboboxTriggerStyles = styles(
     (opts: ComboboxTriggerStylesOpts) => [
         comboboxTriggerStyles(opts),
-        "enabled:[&:hover:not(:has([data-combobox-reset]:hover))]:bg-surface-muted enabled:[&:hover:not(:has([data-combobox-reset]:hover))_[data-combobox-chip]]:bg-surface h-auto min-h-10 flex-wrap items-center",
+        "enabled:[&:hover:not(:has([data-combobox-reset]:hover))]:bg-surface-muted enabled:[&:hover:not(:has([data-combobox-reset]:hover))_[data-combobox-chip]]:bg-surface h-auto min-h-11 flex-wrap items-center",
     ],
 )
 
@@ -60,7 +60,7 @@ export const comboboxChipsStyles = styles(
 
 export const comboboxChipStyles = styles(
     () =>
-        "tp-body-md bg-surface-muted text-fg flex items-center gap-1 rounded-md px-1.5 py-0.5 outline-none select-none",
+        "tp-pixel-sm bg-surface-muted text-fg outline-line flex items-center gap-1 rounded-sm px-1.5 py-0.5 outline-2 -outline-offset-2 select-none",
 )
 
 export const comboboxChipRemoveStyles = styles(
@@ -72,7 +72,7 @@ interface ComboboxPopupStylesOpts {
 }
 export const comboboxPopupStyles = fullStyles((opts: ComboboxPopupStylesOpts = {}) => ({
     className: [
-        "shadow-hard-md flex max-h-[23rem] max-w-[var(--available-width)] flex-col overflow-hidden rounded-lg bg-surface outline-1 outline-line-muted",
+        "shadow-hard-md bg-surface outline-line flex max-h-[23rem] max-w-[var(--available-width)] flex-col overflow-hidden rounded-md outline-2 -outline-offset-2",
         {
             "w-[calc(var(--anchor-width)+var(--custom-additional-width))]": isDefined(
                 opts.additionalWidth,
@@ -96,5 +96,5 @@ export const comboboxListStyles = styles(
 
 export const comboboxItemStyles = styles(
     () =>
-        "tp-body-md text-fg-muted data-[highlighted]:bg-surface-muted flex cursor-default items-center justify-between gap-2 p-2 outline-none select-none",
+        "tp-body-md text-fg data-[highlighted]:bg-upcoming flex cursor-default items-center justify-between gap-2 px-3 py-2 outline-none select-none",
 )

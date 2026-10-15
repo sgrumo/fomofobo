@@ -4,9 +4,9 @@ interface SeparatorStylesOpts {
     orientation: "horizontal" | "vertical"
 }
 export const separatorStyles = styles((opts: SeparatorStylesOpts) => [
-    "bg-line-muted shrink-0",
+    "bg-line shrink-0",
     {
-        "h-px w-full": opts.orientation === "horizontal",
-        "h-full w-px": opts.orientation === "vertical",
+        "h-0.5 w-full": opts.orientation === "horizontal",
+        "h-full w-0.5": opts.orientation === "vertical",
     },
 ])

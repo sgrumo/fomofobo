@@ -200,7 +200,7 @@ export const DateInput = ({
         >
             <span
                 className={cn("tp-body-md", {
-                    "text-fg-subtle": !propValue,
+                    "text-fg-muted": !propValue,
                 })}
             >
                 {formatted}
