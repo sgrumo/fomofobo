@@ -10,7 +10,9 @@
         "clean": "rm -rf *.tsbuildinfo",
         "typecheck": "tsc -b",
         "lint": "oxlint --config oxlint.config.ts",
-        "lint:fix": "oxlint --config oxlint.config.ts --fix"
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "test": "vitest --run",
+        "test:watch": "vitest"
     },
     "dependencies": {
         "@hono/zod-openapi": "catalog:",
@@ -19,6 +21,7 @@
     "devDependencies": {
         "oxlint": "catalog:",
         "oxlint-tsgolint": "catalog:",
-        "typescript": "catalog:"
+        "typescript": "catalog:",
+        "vitest": "catalog:"
     }
 }

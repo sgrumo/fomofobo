@@ -20,6 +20,7 @@
         "db:gen-migration": "pnpm -C packages/storage db:gen-migration",
         "db:custom-migration": "pnpm -C packages/storage db:custom-migration",
         "db:migrate": "pnpm -C apps/fullstack-fomofobo db:migrate:local",
+        "db:seed": "pnpm -C apps/fullstack-fomofobo db:seed:local",
         "infra:up:local": "docker compose -f infra/local/docker-compose.yaml up -d --wait && pnpm -r --if-present run objectstore:init",
         "infra:down:local": "docker compose -f infra/local/docker-compose.yaml down",
         "i18n:download": "pnpm -C scripts/i18n-sheets download-translations",

@@ -21,6 +21,7 @@
     "dependencies": {
         "@hono/zod-openapi": "catalog:",
         "api-routes": "workspace:*",
+        "es-toolkit": "catalog:",
         "models": "workspace:*",
         "shared": "workspace:*"
     },

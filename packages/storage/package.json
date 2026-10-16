@@ -19,7 +19,9 @@
     "dependencies": {
         "backend-shared": "workspace:*",
         "drizzle-orm": "catalog:",
-        "models": "workspace:*"
+        "es-toolkit": "catalog:",
+        "models": "workspace:*",
+        "shared": "workspace:*"
     },
     "devDependencies": {
         "@cloudflare/workers-types": "catalog:",

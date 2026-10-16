@@ -141,28 +141,20 @@ Write every backend filter as a Drizzle `WHERE` clause. Never filter rows in JS.
 `and()` and `or()` drop each `undefined` argument. Build an optional filter in one expression, without an `if` chain:
 
 ```typescript
-/**
- * @description Builds a `like` pattern that matches the text anywhere, with its wildcards escaped
- * @param text Caller text searched
- */
-const toContainsPattern = (text: string) => `%${text.replaceAll(/[\\%_]/gu, "\\$&")}%`
-
 const rows = await this.db
     .select()
     .from(items)
     .where(
         and(
             search.status === undefined ? undefined : eq(items.status, search.status),
-            search.text === undefined
-                ? undefined
-                : sql`${items.name} like ${toContainsPattern(search.text)} escape '\\'`,
+            search.text === undefined ? undefined : likeContains(items.name, search.text),
             search.ids === undefined ? undefined : inArray(items.id, search.ids),
         ),
     )
 ```
 
+- Search caller text with `likeContains` from `../utils/like`. SQLite `like` has no default escape character, and the helper escapes `\`, `%` and `_` and writes the `escape` clause. A hand-written `like` on caller text lets `%` match every row.
 - SQLite has no `ilike`. `like` ignores case for ASCII letters only, so `É` and `é` differ.
-- SQLite `like` has no default escape character. If a pattern holds caller text, escape `\`, `%`, and `_` with a backslash, and write `escape '\\'` in the clause as above. Without both, the caller text `%` matches every row.
 - One query binds at most 100 parameters. An `inArray` over caller ids counts one parameter per id: cap the list in the model, or split the read.
 
 For a page, map the page query with `toLimitOffset` from `../utils/pagination`. If the response carries a total, read the count and the page in one `batch`. A batch runs as one transaction, so `total` matches the page:
@@ -283,6 +275,7 @@ public async createItemWithTags(item: Item, tagIds: string[]): Promise<void> {
 #### Inside a batch
 
 - Build each statement on `this.db` and pass it unawaited. An awaited statement runs on its own, outside the batch.
+- A batch maps joined rows by column name, so two joined columns with one name overwrite each other, for example `id`, `name`, or `created_at`. Alias each such column with ``sql<T>`${column}`.as("alias")``, or run the joined read outside the batch. A read outside a batch maps by position and needs neither.
 - A statement cannot read the result of an earlier one. Decide every value before the batch: generate the ids in the service, pass them in.
 - Run no network call between the reads and the batch that depends on them. Load what the method needs first.
 

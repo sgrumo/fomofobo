@@ -1,6 +1,16 @@
 import { z } from "@hono/zod-openapi"
 
-export const customErrorCodeSchema = z.enum(["not-semver", "empty-update"])
+export const customErrorCodeSchema = z.enum([
+    "not-semver",
+    "empty-update",
+    "end-before-start",
+    "duration-too-long",
+    "until-before-first-date",
+    "primary-category-not-in-list",
+    "duplicate-date",
+    "date-added-and-removed",
+    "range-incomplete",
+])
 export type CustomErrorCode = z.infer<typeof customErrorCodeSchema>
 
 /**
