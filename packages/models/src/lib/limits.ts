@@ -1,3 +1,7 @@
+// PLACEHOLDER(OP-25): password policy
+export const MIN_PASSWORD_LENGTH = 12
+export const MAX_PASSWORD_LENGTH = 128
+
 // PLACEHOLDER(OP-13)
 export const MAX_EVENT_PHOTOS = 10
 

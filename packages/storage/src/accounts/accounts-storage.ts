@@ -81,22 +81,6 @@ export class AccountsStorage {
     }
 
     /**
-     * @description Persists one account, unblocked
-     * @param account Account inserted, carrying its id and lower-case email
-     */
-    public async insert(
-        account: Pick<Account, "id" | "name" | "email" | "role" | "createdAt">,
-    ): Promise<void> {
-        await this.db.insert(accounts).values({
-            id: account.id,
-            name: account.name,
-            email: account.email,
-            role: account.role,
-            createdAt: new Date(account.createdAt),
-        })
-    }
-
-    /**
      * @description Persists the block state of one account, or returns `null` when no row matches
      * @param id Account changed
      * @param blockedAt Instant of the block, `null` to unblock

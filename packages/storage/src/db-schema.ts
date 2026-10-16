@@ -29,7 +29,12 @@ export const accounts = sqliteTable(
         role: text("role", { enum: accountRoleValues }).notNull(),
         isBlocked: integer("is_blocked", { mode: "boolean" }).notNull().default(false),
         blockedAt: integer("blocked_at", { mode: "timestamp_ms" }),
+        emailVerified: integer("email_verified", { mode: "boolean" })
+            .notNull()
+            .default(false),
+        image: text("image"),
         createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+        updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
     },
     table => [
         check(
@@ -38,6 +43,71 @@ export const accounts = sqliteTable(
         ),
     ],
 )
+
+export const authSessions = sqliteTable(
+    "auth_sessions",
+    {
+        id: text("id").primaryKey(),
+        accountId: text("account_id")
+            .notNull()
+            .references(() => accounts.id, { onDelete: "cascade" }),
+        token: text("token").notNull().unique(),
+        expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+        ipAddress: text("ip_address"),
+        userAgent: text("user_agent"),
+        createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+        updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+    },
+    table => [index("auth_sessions_account_id_idx").on(table.accountId)],
+)
+
+export const authCredentials = sqliteTable(
+    "auth_credentials",
+    {
+        id: text("id").primaryKey(),
+        accountId: text("account_id")
+            .notNull()
+            .references(() => accounts.id, { onDelete: "cascade" }),
+        providerId: text("provider_id").notNull(),
+        // Equals `account_id` for a password credential
+        providerAccountId: text("provider_account_id").notNull(),
+        password: text("password"),
+        accessToken: text("access_token"),
+        refreshToken: text("refresh_token"),
+        idToken: text("id_token"),
+        accessTokenExpiresAt: integer("access_token_expires_at", {
+            mode: "timestamp_ms",
+        }),
+        refreshTokenExpiresAt: integer("refresh_token_expires_at", {
+            mode: "timestamp_ms",
+        }),
+        scope: text("scope"),
+        createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+        updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+    },
+    table => [index("auth_credentials_account_id_idx").on(table.accountId)],
+)
+
+export const authVerifications = sqliteTable(
+    "auth_verifications",
+    {
+        id: text("id").primaryKey(),
+        identifier: text("identifier").notNull(),
+        value: text("value").notNull(),
+        expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+        createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+        updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+    },
+    table => [index("auth_verifications_identifier_idx").on(table.identifier)],
+)
+
+export const authRateLimits = sqliteTable("auth_rate_limits", {
+    id: text("id").primaryKey(),
+    key: text("key").notNull().unique(),
+    count: integer("count").notNull(),
+    // Epoch milliseconds as a number: the library compares it with `Date.now()`
+    lastRequest: integer("last_request").notNull(),
+})
 
 export const categories = sqliteTable(
     "categories",

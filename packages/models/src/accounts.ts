@@ -1,5 +1,6 @@
 import { z } from "@hono/zod-openapi"
 
+import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from "./lib/limits"
 import { instantSchema } from "./lib/local-time"
 import { paginationQuerySchema } from "./lib/pagination"
 
@@ -17,8 +18,10 @@ export const accountSchema = z.object({
 })
 export type Account = z.infer<typeof accountSchema>
 
-// PLACEHOLDER(OP-25): password policy of the temporary password
-export const accountPasswordSchema = z.string().min(12).max(128)
+export const accountPasswordSchema = z
+    .string()
+    .min(MIN_PASSWORD_LENGTH)
+    .max(MAX_PASSWORD_LENGTH)
 export type AccountPassword = z.infer<typeof accountPasswordSchema>
 
 export const organizerCreationSchema = z.object({

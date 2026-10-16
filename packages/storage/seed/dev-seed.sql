@@ -2,6 +2,10 @@
 -- Instants follow the clock of the run, so one event is always live.
 -- The local wall-clock columns hold UTC times.
 
+DELETE FROM auth_rate_limits;
+DELETE FROM auth_verifications;
+DELETE FROM auth_sessions;
+DELETE FROM auth_credentials;
 DELETE FROM event_occurrences;
 DELETE FROM event_photos;
 DELETE FROM event_categories;
@@ -10,10 +14,10 @@ DELETE FROM venues;
 DELETE FROM categories;
 DELETE FROM accounts;
 
-INSERT INTO accounts (id, name, email, role, created_at) VALUES
-    ('0d8f2a4e-6c1b-4e7a-9f3d-2b5c8e1a7d40', 'Admin', 'admin@fomofobo.local', 'admin', unixepoch('now') * 1000),
-    ('4b7e9c2d-1a3f-4d6b-8e5c-7f2a9b1c3d50', 'Chiostro Live', 'chiostro@fomofobo.local', 'organizer', unixepoch('now') * 1000),
-    ('8c1d3e5f-7a9b-4c2d-9e4f-1a3b5c7d9e60', 'Rocca Eventi', 'rocca@fomofobo.local', 'organizer', unixepoch('now') * 1000);
+INSERT INTO accounts (id, name, email, role, created_at, updated_at) VALUES
+    ('0d8f2a4e-6c1b-4e7a-9f3d-2b5c8e1a7d40', 'Admin', 'admin@fomofobo.local', 'admin', unixepoch('now') * 1000, unixepoch('now') * 1000),
+    ('4b7e9c2d-1a3f-4d6b-8e5c-7f2a9b1c3d50', 'Chiostro Live', 'chiostro@fomofobo.local', 'organizer', unixepoch('now') * 1000, unixepoch('now') * 1000),
+    ('8c1d3e5f-7a9b-4c2d-9e4f-1a3b5c7d9e60', 'Rocca Eventi', 'rocca@fomofobo.local', 'organizer', unixepoch('now') * 1000, unixepoch('now') * 1000);
 
 INSERT INTO categories (id, name, icon, created_at) VALUES
     ('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c01', 'Musica', 'music', unixepoch('now') * 1000),
