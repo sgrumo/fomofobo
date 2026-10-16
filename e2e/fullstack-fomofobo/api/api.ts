@@ -1,17 +1,7 @@
 import type { AxiosRequestConfig, AxiosResponse, Method } from "axios"
 import axios from "axios"
-import { mintAccessToken, publishedOidcIssuer } from "e2e-kit/containers"
 import { publishedAppUrl } from "e2e-kit/env"
-import { lazyAsync } from "shared/function"
 import type { z } from "zod"
-
-/**
- * @description Returns the access token every call of this worker carries
- * @throws When the lifecycle published no issuer, or the provider refuses a token
- * @remarks Mints once per worker and shares the promise; a failed mint is retried on
- * the next call instead of failing every case of the worker
- */
-export const getE2eAccessToken = lazyAsync(() => mintAccessToken(publishedOidcIssuer()))
 
 interface RouteConfig {
     method: string
@@ -192,11 +182,8 @@ export const createApiCall =
         const body = "body" in params ? params.body : undefined
         const customHeaders = "headers" in params ? params.headers : undefined
 
-        // The API refuses a call without a token, so every call carries the token of
-        // the suite unless the case sets its own.
         const headers: Record<string, string> = {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${await getE2eAccessToken()}`,
             ...customHeaders,
         }
 

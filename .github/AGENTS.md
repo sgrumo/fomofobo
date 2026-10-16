@@ -24,7 +24,6 @@
 - The upload and download steps set `continue-on-error: true`. If the artifact quota of the organization is full, the test jobs keep their own result.
 - `test-report` publishes one `Test Report` check run and does not fail on a failed test: the test jobs fail on their own. If you add a test job, add it to `test-report.needs` and upload its reports as a `junit-*` artifact.
 - Each E2E job calls `quality-e2e.yaml` with the directory of its suite. The suite builds the apps it drives, so the job has no build step. A browser suite sets `browser: true` and runs in the Playwright image.
-- A suite whose app signs visitors in starts `mock-oauth2-server` on a mapped port. The lifecycle publishes its issuer, so the app, the browser and the test workers use the same URL.
 
 ## Native builds
 

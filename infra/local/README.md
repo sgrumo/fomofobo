@@ -1,6 +1,6 @@
 # Local stack
 
-The local stack is RustFS for the photo uploads and a mock OpenID provider. The
+The local stack is RustFS for the photo uploads. The
 database needs no container: `pnpm db:migrate` writes it to `.data/local.db` at
 the repo root, a libSQL file that the app reads by default. RustFS serves the
 S3 API on `:9000` and a web console at
@@ -23,11 +23,6 @@ The API needs no configuration here. `APP_ENV` defaults to `local`, which
 resolves the store endpoint and credentials to the local stack
 (`http://localhost:9000`, `admin`). To override them, set `S3_ENDPOINT`,
 `S3_ACCESS_KEY` and `S3_SECRET_KEY`.
-
-`pnpm infra:up:local` also starts a mock OpenID provider on
-`http://localhost:8090`, which an app with OIDC sign-in reads by default. It signs
-anybody in with no login page, so a dev machine needs no real tenant. Point
-`OIDC_ISSUER` at a real provider to work against one.
 
 The backend runs on the host, so it reaches the store at `localhost` and mints
 presigned URLs the browser can reach. `S3_CORS_ALLOW_ORIGIN` defaults to the

@@ -24,7 +24,7 @@ Storage has no unit tests. An E2E case through an endpoint covers it.
 - Build test data with one `faker` factory for each entity. The factory returns the type of the schema.
 - Use `crypto.randomUUID()` for a UUID. Zod rejects a placeholder such as `00000000-0000-0000-0000-000000000001`, and the result is a misleading 400.
 - Derive a case from the models and the requirements, not from the implementation. A test that mirrors the code cannot catch a bug in it.
-- Run each dependency of the app in a local container that the lifecycle starts, or in a local mock such as the OpenID provider. If the app gains a dependency, add its container to `e2e-kit/containers`.
+- Run each dependency of the app in a local container that the lifecycle starts, or in a local mock such as a fake of a third-party API. If the app gains a dependency, add its container to `e2e-kit/containers`.
 - Make each test independent. It sets up its own state and does not depend on the order of the tests.
 - If a test needs a precondition or a narrowed type, call a helper from `e2e-kit/assertions`. Do not put `expect` inside an `if`.
 

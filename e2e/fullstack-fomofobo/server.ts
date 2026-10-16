@@ -33,15 +33,21 @@ export const prepareDatabase = (runner: string): string => {
 /**
  * @description Builds the spec of the production server of the app
  * @param port Port the app listens on
+ * @param origin Origin the browser and the tests read the app on, which the auth library trusts
  * @param databaseUrl Database URL of the runner
  */
-export const appServer = (port: string, databaseUrl: string): ServerSpec => ({
+export const appServer = (
+    port: string,
+    origin: string,
+    databaseUrl: string,
+): ServerSpec => ({
     label: "app",
     command: "pnpm",
     args: ["exec", "next", "start", "--port", port],
     cwd: APP_DIR,
     env: {
         APP_ENV: "test",
+        APP_BASE_URL: origin,
         DISABLE_DRIZZLE_LOGS: "true",
         DATABASE_URL: databaseUrl,
     },

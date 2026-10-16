@@ -4,7 +4,7 @@ The harness that every suite imports. It holds no test. Each module is one entry
 
 ## Lifecycle
 
-The global setup of each suite calls `defineLifecycle`. The suite asks the stack for what it needs: free ports, the object store, the OpenID provider, and its servers. The database belongs to the app: the suite prepares its local database file and serves the app on it.
+The global setup of each suite calls `defineLifecycle`. The suite asks the stack for what it needs: free ports, the object store, and its servers. The database belongs to the app: the suite prepares its local database file and serves the app on it.
 
 - The lifecycle writes the connection variables into `process.env`, so every server and test worker inherits them.
 - An API suite lists `e2e-kit/vitest-reset` in `setupFiles`. Before each test it calls `POST /api/test/reset-database` on the published app URL, and the app deletes every row. Never write the database file of the running app from the test process: the app holds it open, and a second writer races its connection.

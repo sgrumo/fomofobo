@@ -38,7 +38,7 @@ Use these terms exactly. Do not substitute "component", "service", "API", or "bo
 Classify the dependencies of each candidate. The category sets how the deepened module is tested across its seam.
 
 1. **In-process**: pure computation, in-memory state, no I/O. Merge the modules and test through the new interface.
-2. **Local-substitutable**: a dependency with a local stand-in. Here those are the database, the object store, the OIDC provider, and the filesystem. The E2E suites run the database on a local libSQL file, and the object store and the OIDC provider in containers. The filesystem stand-in is a temporary directory. The seam stays internal.
+2. **Local-substitutable**: a dependency with a local stand-in. Here those are the database, the object store, and the filesystem. The E2E suites run the database on a local libSQL file, and the object store in a container. The filesystem stand-in is a temporary directory. The seam stays internal.
 3. **Ports & adapters**: our own remote process, for example the API app called by a frontend app. Define a port at the seam, with a production adapter and an in-memory adapter.
 4. **Mock**: a third-party service we do not control, for example a CMS or a cloud provider API. Inject it as a port. Tests use a mock adapter.
 

@@ -34,7 +34,7 @@ jobs:
         container:
             # Keep the Playwright tag in sync with the @playwright/test catalog version in pnpm-workspace.yaml.
             image: ${{ inputs.browser && 'mcr.microsoft.com/playwright:v1.61.1-noble' || 'node:24.19.0-bookworm' }}
-            # Harness spins up the object store and the OpenID provider via testcontainers; needs the Docker daemon.
+            # Harness spins up the object store via testcontainers; needs the Docker daemon.
             volumes:
                 - /var/run/docker.sock:/var/run/docker.sock
         timeout-minutes: ${{ inputs.timeout-minutes }}

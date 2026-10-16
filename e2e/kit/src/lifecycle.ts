@@ -7,10 +7,7 @@ import type { StartedTestContainer } from "./containers"
 import {
     OBJECT_STORE_PORT,
     objectStoreEnv,
-    oidcEnv,
-    oidcIssuer,
     startObjectStoreContainer,
-    startOidcProviderContainer,
 } from "./containers"
 import type { Log } from "./env"
 import { APP_URL_ENV } from "./env"
@@ -33,8 +30,6 @@ export interface Stack {
      * admits the browser origins in `corsOrigins`.
      */
     startObjectStore: (options: { corsOrigins: [string, ...string[]] }) => Promise<void>
-    /** Starts the OpenID provider, for an app that signs visitors in on `appOrigin`. */
-    startOidcProvider: (options: { appOrigin: string }) => Promise<void>
     /** Spawns a server, waits until it answers, and stops it with the stack. */
     startServer: (spec: ServerSpec) => Promise<void>
     /** Publishes the origin of the app under test to the runner and the test workers. */
@@ -45,8 +40,8 @@ export interface Stack {
  * @description Builds the global setup of a suite: what `start` asks the stack for
  * @param options Logger and deadline
  * @param start Starts the containers and servers of the suite
- * @remarks Writes the object store and provider variables into `process.env`, so every
- * server and test worker started later inherits them
+ * @remarks Writes the object store variables into `process.env`, so every server and
+ * test worker started later inherits them
  */
 export const defineLifecycle =
     (options: LifecycleOptions, start: (stack: Stack) => Promise<void>) =>
@@ -88,11 +83,6 @@ export const defineLifecycle =
                     corsAllowOrigins: corsOrigins,
                 })
                 Object.assign(process.env, s3Env)
-            },
-            startOidcProvider: async ({ appOrigin }) => {
-                const provider = await startOidcProviderContainer(log)
-                containers.push(provider)
-                Object.assign(process.env, oidcEnv(oidcIssuer(provider), appOrigin))
             },
             startServer: async spec => {
                 const proc = spawnServer(spec, log)

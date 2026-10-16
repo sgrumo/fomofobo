@@ -35,28 +35,5 @@ services:
             timeout: 5s
             retries: 10
 
-    # OpenID provider of a dev machine. The app signs every visitor in, so it needs
-    # one; this image mints tokens for anybody with no login page of its own.
-    # `APP_ENV=local` points the app here by default.
-    oidc:
-        image: ghcr.io/navikt/mock-oauth2-server:6.0.4@sha256:47374fe063995d9b6d39ebb6ea21eb5f765025bf0aa08b61b08b439eb91adaf0
-        ports:
-            - "8090:8080"
-        environment:
-            # The claims land on every token. `aud` names the client, because an id
-            # token must, and the API of the app accepts the same value.
-            JSON_CONFIG: >-
-                {"interactiveLogin":false,"tokenCallbacks":[{"issuerId":"default",
-                "tokenExpiry":3600,"requestMappings":[{"requestParam":"grant_type",
-                "match":"*","claims":{"sub":"local-user","aud":["fomofobo"],
-                "name":"Local User","email":"local@example.com"}}]}]}
-        healthcheck:
-            # `wget`, not `curl`: the image carries no curl binary.
-            test:
-                ["CMD-SHELL", "wget -q --spider http://localhost:8080/isalive || exit 1"]
-            interval: 5s
-            timeout: 5s
-            retries: 10
-
 volumes:
     objectstore_data:
