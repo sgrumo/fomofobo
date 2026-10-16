@@ -35,6 +35,11 @@ describe("session cookies", () => {
             vi.stubEnv("OIDC_CLIENT_ID", "fomofobo")
             vi.stubEnv("OIDC_AUDIENCE", "fomofobo-api")
             vi.stubEnv("APP_BASE_URL", "https://app.example.com")
+            vi.stubEnv(
+                "DATABASE_URL",
+                "libsql://fomofobo-dev-example.aws-eu-west-1.turso.io",
+            )
+            vi.stubEnv("DATABASE_AUTH_TOKEN", "token")
         })
 
         it("should write every cookie Secure, HttpOnly and SameSite=Lax", () => {

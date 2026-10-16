@@ -2,6 +2,8 @@ import "server-only"
 import type { TokenVerifier } from "backend-shared/auth"
 import { createTokenVerifier } from "backend-shared/auth"
 import { memoize } from "es-toolkit"
+import type { DbInstanceFromSchema } from "storage"
+import { buildDbInstance } from "storage"
 
 import type { AppConfig } from "./config/app-config"
 import { resolveAppConfig } from "./config/app-config"
@@ -9,6 +11,7 @@ import { parseEnv } from "./config/env"
 
 export interface Container {
     appConfig: AppConfig
+    db: DbInstanceFromSchema
     tokenVerifier: TokenVerifier
 }
 
@@ -22,6 +25,10 @@ const buildContainer = (): Container => {
 
     return {
         appConfig,
+        db: buildDbInstance({
+            url: env.DATABASE_URL,
+            authToken: env.DATABASE_AUTH_TOKEN,
+        }),
         // Holds the key set of the provider. It fetches it on the first verified
         // request, so a provider that is down delays no boot.
         tokenVerifier: createTokenVerifier({

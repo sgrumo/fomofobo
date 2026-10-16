@@ -12,6 +12,8 @@ const cloudflareEnv = {
     OIDC_CLIENT_ID: "fomofobo",
     OIDC_AUDIENCE: "fomofobo-api",
     APP_BASE_URL: "https://app.example.com",
+    DATABASE_URL: "libsql://fomofobo-dev-example.aws-eu-west-1.turso.io",
+    DATABASE_AUTH_TOKEN: "token",
 }
 
 describe("parseEnv", () => {
@@ -72,6 +74,25 @@ describe("parseEnv", () => {
         const { OIDC_ISSUER: _unused, ...withoutIssuer } = cloudflareEnv
 
         expect(() => parseEnv(withoutIssuer, true)).toThrow("OIDC_ISSUER: not set")
+    })
+
+    it("should default to the local database file, with no token", () => {
+        const env = parseEnv({}, false)
+
+        expect(env.DATABASE_URL).toBe("file:../../.data/local.db")
+        expect(env.DATABASE_AUTH_TOKEN).toBeUndefined()
+    })
+
+    it("should reject a database URL of another scheme", () => {
+        expect(() =>
+            parseEnv({ DATABASE_URL: "postgres://localhost/fomofobo" }, false),
+        ).toThrow("DATABASE_URL")
+    })
+
+    it("should require the database token of a deployed shape", () => {
+        const { DATABASE_AUTH_TOKEN: _unused, ...withoutToken } = cloudflareEnv
+
+        expect(() => parseEnv(withoutToken, true)).toThrow("DATABASE_AUTH_TOKEN: not set")
     })
 
     it("should reject a variable that is set but empty", () => {

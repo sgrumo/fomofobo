@@ -1,13 +1,12 @@
 import "server-only"
 import { swaggerUI } from "@hono/swagger-ui"
 import { OpenAPIHono } from "@hono/zod-openapi"
-import { getCloudflareContext } from "@opennextjs/cloudflare"
 import { createAuthMiddleware } from "backend-shared/auth"
 import type { ApplicationError } from "backend-shared/http"
 import { handleErrors, loggerMiddleware } from "backend-shared/http"
 import { memoize } from "es-toolkit"
 import { HttpStatus } from "models"
-import { buildDbInstance, deleteAllRows } from "storage"
+import { deleteAllRows } from "storage"
 import { match } from "ts-pattern"
 
 import { getSessionCookieConfig } from "./auth/cookie-names"
@@ -46,7 +45,7 @@ export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus 
  * where it answers at all, because it describes the API and carries no data of anybody
  */
 const buildApi = (): OpenAPIHono => {
-    const { appConfig, tokenVerifier } = getContainer()
+    const { appConfig, db, tokenVerifier } = getContainer()
 
     const app = new OpenAPIHono()
 
@@ -79,7 +78,7 @@ const buildApi = (): OpenAPIHono => {
 
     if (appConfig.databaseResetEnabled) {
         app.post(`${apiBasePath}/test/reset-database`, async c => {
-            await deleteAllRows(buildDbInstance(getCloudflareContext().env.DB))
+            await deleteAllRows(db)
             return c.body(null, HttpStatus.NoContent)
         })
     }

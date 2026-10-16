@@ -29,6 +29,14 @@ const appBaseUrlSchema = z
     )
     .transform(value => value.replace(/\/$/u, ""))
 
+/** libSQL URL of the database. A relative `file:` path resolves from the directory of the process. */
+const databaseUrlSchema = z
+    .string()
+    .nonempty()
+    .regex(/^(?:file|libsql|https?|wss?):/u, {
+        error: "must be a file: URL or the libsql: URL of the database",
+    })
+
 /** Scopes asked at login. `offline_access` is what several providers answer a refresh token to. */
 const defaultScope = "openid profile email offline_access"
 
@@ -55,6 +63,9 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         OIDC_JWKS_URL: optionalEnv(oidcJwksUrlSchema),
         OIDC_SCOPE: z.string().nonempty().default(defaultScope),
         APP_BASE_URL: appBaseUrlSchema.default("http://localhost:3000"),
+        // Local file of `pnpm db:migrate`, relative to the app directory
+        DATABASE_URL: databaseUrlSchema.default("file:../../.data/local.db"),
+        DATABASE_AUTH_TOKEN: optionalEnv(z.string().nonempty()),
         S3_BUCKET: z.string().nonempty().default("fomofobo"),
         S3_REGION: z.string().nonempty().default("eu-west-1"),
         S3_ENDPOINT: s3EndpointSchema.default("http://localhost:9000"),
@@ -70,6 +81,8 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         OIDC_JWKS_URL: optionalEnv(oidcJwksUrlSchema),
         OIDC_SCOPE: z.string().nonempty().default(defaultScope),
         APP_BASE_URL: appBaseUrlSchema,
+        DATABASE_URL: databaseUrlSchema,
+        DATABASE_AUTH_TOKEN: z.string().nonempty(),
         S3_BUCKET: z.string().nonempty(),
         S3_REGION: z.string().nonempty().default("auto"),
         S3_ENDPOINT: s3EndpointSchema,
