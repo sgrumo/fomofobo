@@ -17,10 +17,10 @@ import { likeContains } from "../utils/like"
 import { toLimitOffset } from "../utils/pagination"
 
 /**
- * @remarks Fits 100 bound parameters per query at 4 columns per row: change it with the
- * columns of `event_occurrences`
+ * @remarks Stays far under the 32,766 bound parameters of SQLite at 4 columns per row:
+ * change it with the columns of `event_occurrences`
  */
-const OCCURRENCE_ROWS_PER_INSERT = 25
+const OCCURRENCE_ROWS_PER_INSERT = 1000
 
 export interface StoredEventPhoto {
     id: string

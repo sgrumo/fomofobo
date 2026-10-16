@@ -1,6 +1,6 @@
 ---
 name: storage-patterns
-description: "Drizzle query patterns for the storage package on Cloudflare D1: filters, search, pagination, inserts, updates, deletes, batches. Also the table, enum, and storage class conventions. Use when you write or change a query, a storage method, or a table."
+description: "Drizzle query patterns for the storage package on libSQL (SQLite, Turso in production): filters, search, pagination, inserts, updates, deletes, batches. Also the table, enum, and storage class conventions. Use when you write or change a query, a storage method, or a table."
 user-invocable: true
 ---
 
@@ -8,7 +8,7 @@ user-invocable: true
 
 $ARGUMENTS
 
-The storage package (`packages/storage/`) is a thin DB access layer on Drizzle over Cloudflare D1, which is SQLite. A storage class runs queries, inserts, updates, and deletes. It contains no business logic. Validation, orchestration, id generation, and domain rules live in the service. A storage method can still run several writes that always go together. See [Batches](#batches). Logic that is part of one complex query (an aggregation, a join) can stay in storage.
+The storage package (`packages/storage/`) is a thin DB access layer on Drizzle over libSQL, which is SQLite: a local file in development and the E2E suite, Turso in production. A storage class runs queries, inserts, updates, and deletes. It contains no business logic. Validation, orchestration, id generation, and domain rules live in the service. A storage method can still run several writes that always go together. See [Batches](#batches). Logic that is part of one complex query (an aggregation, a join) can stay in storage.
 
 | Task                                       | Section                           |
 | ------------------------------------------ | --------------------------------- |
@@ -40,7 +40,7 @@ export const items = sqliteTable("items", {
 - Write DB column names in snake_case and TS fields in camelCase.
 - Make the primary key `text("id").primaryKey()`. It holds a UUID that the service generates.
 - Write `.notNull()` on each required column. A column without it is nullable.
-- Write a foreign key as `text("other_id").references(() => other.id)`. D1 always enforces foreign keys.
+- Write a foreign key as `text("other_id").references(() => other.id)`. libSQL enforces foreign keys on every connection.
 - Write a boolean as `integer(..., { mode: "boolean" })`.
 - Write an instant as `integer(..., { mode: "timestamp_ms" })`. Drizzle maps it to a `Date`. The service passes the value, so tests and seeds control it.
 - Write an ISO date or a local date-time as `text()`. It holds the string of the model.
@@ -129,7 +129,7 @@ export class ItemStorage {
 ```
 
 - Export the class from `packages/storage/src/index.ts`.
-- The class is concrete. The constructor takes `DbInstanceFromSchema`, which `buildDbInstance` builds from the D1 binding. Build it per request from `getCloudflareContext().env.DB`. That call works only inside a request, never at module scope.
+- The class is concrete. The constructor takes `DbInstanceFromSchema`, which `buildDbInstance` builds from the database URL. The app builds one instance per process in its container and passes it to every storage class.
 - Write one `toXxx` mapper per table, typed on `typeof table.$inferSelect`. Each method that returns rows uses it.
 - If a method targets one row and no row matches, return `null`. The service decides whether to throw its not-found error.
 - Give each public method a JSDoc, as the root `AGENTS.md` describes.
@@ -155,7 +155,7 @@ const rows = await this.db
 
 - Search caller text with `likeContains` from `../utils/like`. SQLite `like` has no default escape character, and the helper escapes `\`, `%` and `_` and writes the `escape` clause. A hand-written `like` on caller text lets `%` match every row.
 - SQLite has no `ilike`. `like` ignores case for ASCII letters only, so `É` and `é` differ.
-- One query binds at most 100 parameters. An `inArray` over caller ids counts one parameter per id: cap the list in the model, or split the read.
+- One query binds at most 32,766 parameters. An `inArray` over caller ids counts one parameter per id: cap the list in the model.
 
 For a page, map the page query with `toLimitOffset` from `../utils/pagination`. If the response carries a total, read the count and the page in one `batch`. A batch runs as one transaction, so `total` matches the page:
 
@@ -201,7 +201,7 @@ public async createItem(item: Item): Promise<void> {
 }
 ```
 
-A multi-row insert binds one parameter per column per row. Split the rows with `chunk` from `es-toolkit` into groups of `Math.floor(100 / columnCount)` rows, one insert per group, all in one batch.
+A multi-row insert binds one parameter per column per row. When the rows times the columns can pass 32,766, split the rows with `chunk` from `es-toolkit`, one insert per group, all in one batch.
 
 #### Update
 
@@ -241,7 +241,7 @@ public async deleteItem(id: string): Promise<Item | null> {
 
 ### Batches
 
-D1 has no interactive transaction. `db.transaction()` sends `BEGIN`, and D1 refuses it. `db.batch([...])` runs its statements in order as one transaction: they all land, or a failure rolls them all back.
+Never use `db.transaction()`. libSQL runs it, but an interactive transaction holds the write lock of the whole database across network round trips, and Turso ends it after 5 s. `db.batch([...])` runs its statements in order as one transaction in one round trip: they all land, or a failure rolls them all back.
 
 Use a batch when one method makes two or more writes that must all land or none land. Examples: a row and its child rows, or a set of rows replaced by a delete and an insert.
 
@@ -283,7 +283,7 @@ public async createItemWithTags(item: Item, tagIds: string[]): Promise<void> {
 
 Put the check in the `WHERE` clause of the write: `.where(and(eq(items.id, id), eq(items.status, "draft")))`. Then the write needs no read and no batch.
 
-If the write must use a value read first, write it with a `WHERE` that repeats the value read: the update matches no row when another writer changed it in between. `.returning()` then gives an empty array, and the service decides what that means. D1 has no `SELECT ... FOR UPDATE`.
+If the write must use a value read first, write it with a `WHERE` that repeats the value read: the update matches no row when another writer changed it in between. `.returning()` then gives an empty array, and the service decides what that means. SQLite has no `SELECT ... FOR UPDATE`.
 
 A rule across rows, such as one unique name or one primary row per parent, needs a DB constraint: a unique index, or a partial unique index.
 

@@ -19,6 +19,9 @@ dist-ssr
 .next
 next-env.d.ts
 
+# Local libSQL database of `pnpm db:migrate`
+.data
+
 # Cloudflare
 .open-next
 .wrangler

@@ -14,9 +14,12 @@
         "lint": "oxlint --config oxlint.config.ts",
         "lint:fix": "oxlint --config oxlint.config.ts --fix",
         "db:gen-migration": "drizzle-kit generate --config drizzle.config.ts",
-        "db:custom-migration": "drizzle-kit generate --custom --config drizzle.config.ts"
+        "db:custom-migration": "drizzle-kit generate --custom --config drizzle.config.ts",
+        "db:migrate": "drizzle-kit migrate --config drizzle.migrate.config.ts",
+        "db:run-sql": "node scripts/run-sql-file.ts"
     },
     "dependencies": {
+        "@libsql/client": "0.18.0",
         "backend-shared": "workspace:*",
         "drizzle-orm": "catalog:",
         "es-toolkit": "catalog:",
@@ -24,7 +27,6 @@
         "shared": "workspace:*"
     },
     "devDependencies": {
-        "@cloudflare/workers-types": "catalog:",
         "@types/node": "catalog:",
         "drizzle-kit": "0.31.5",
         "oxlint": "catalog:",

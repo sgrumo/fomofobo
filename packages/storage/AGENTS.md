@@ -29,15 +29,18 @@ Leave out these comments:
 1. Run `pnpm db:gen-migration`. If one scope both gains and loses an item, it shows a rename prompt. Examples are a column added and a column dropped in one table, or a table added and a table dropped. In that case, ask the user to run it and to pick the right option at each prompt.
 2. If the command does not write a new migration or does not stop, it waits for a prompt. Stop it and ask the user to run it.
 3. Read the generated `.sql` file. If it fails or loses data by accident on the rows that exist, edit it. If it drops data on purpose, tell the user.
-4. If the file holds `PRAGMA foreign_keys=OFF`, replace it with `PRAGMA defer_foreign_keys = on`. D1 ignores the first one and fails the table rebuild on its foreign keys.
+4. If the file holds `PRAGMA foreign_keys=OFF`, replace it with `PRAGMA defer_foreign_keys = on`. The migrator runs the migrations inside a transaction, where the first one is a no-op, and the table rebuild then fails on its foreign keys.
 
 Always start from the generated file. Do not write a schema migration by hand.
 
-A migration needs no follow-up after the commit. Each deploy and each E2E run apply the migrations with `wrangler d1 migrations apply`, which reads the top-level `.sql` files of `migrations/` in name order. The user applies them to the local database with `pnpm db:migrate`.
+A migration needs no follow-up after the commit. Each deploy and each E2E run apply the migrations with `drizzle-kit migrate` and `drizzle.migrate.config.ts`, which reads the journal of `migrations/` and records each applied file in `__drizzle_migrations`. The user applies them to the local database file with `pnpm db:migrate`.
+
+`drizzle.config.ts` sets `dialect: "sqlite"` for `generate`, so every migration stays plain SQLite. `drizzle.migrate.config.ts` uses `dialect: "turso"` to reach the database of `DATABASE_URL`: a `file:` URL or Turso.
 
 ### Rules for an edit
 
 - Edit only the `*.sql` files. Never edit `migrations/meta/`.
+- Never rebuild a table that other rows reference to add a column. `DROP TABLE` runs the `ON DELETE` actions of every row that references it: a `restrict` fails the migration, a `set null` or a `cascade` loses data. Add the column with a default instead, then backfill it with an `UPDATE`.
 - The final schema after the edit must be the same as the snapshot. Otherwise the next generated migration is wrong.
 - A committed migration is history. Never edit it. If it needs a fix, put the fix in a new migration.
 
