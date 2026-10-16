@@ -5,7 +5,7 @@ Fullstack app: one Next.js process serves the API and the pages. The API mounts 
 ## Next.js
 
 - The installed version differs from training data. Read `node_modules/next/dist/docs/` before you write App Router code
-- **NEVER** add `proxy.ts` (ex `middleware.ts`) - OpenNext runs the Node `proxy.ts` as an experimental feature. Redirects go in `next.config.ts`
+- **NEVER** add `proxy.ts` (ex `middleware.ts`) - it runs before every matched request and spends the monthly Active CPU of the Hobby plan. Redirects go in `next.config.ts`, and each protected page calls `requireSession`
 - **NEVER** enable `cacheComponents` / `"use cache"` - it forbids the `dynamic` segment config app-wide
 - Use the generated route types: `PageProps<'/route'>`, `LayoutProps`. `pnpm typecheck` runs `next typegen` first
 - Dev-only pages gate on `APP_ENV` through `devPagesEnabled()` + `notFound()`, **NEVER** on `NODE_ENV` - the E2E suite runs a production build with `APP_ENV=test`
@@ -49,7 +49,7 @@ Fullstack app: one Next.js process serves the API and the pages. The API mounts 
 - No data -> static, no segment config. Per-user or fresh data -> `force-dynamic`, no cache
 - Shared data a write marks stale -> `force-dynamic` + `unstable_cache(fn, keyParts, { tags })` **inside the service**. The writer calls `revalidateTag(tag, "max")`, plus `updateTag(tag)` when it reads its own write
 - Every value that changes the result goes in `keyParts`. **NEVER** cache a per-user read under a shared key
-- The Worker configures no OpenNext incremental cache, so `unstable_cache` stores nothing. Add the R2 incremental cache, the D1 tag cache and the queue of OpenNext before a read relies on it
+- The Vercel Data Cache keeps an `unstable_cache` result across instances until its tag is revalidated. A cached read spends no Active CPU and no Turso row read
 
 ## Client boundary
 
