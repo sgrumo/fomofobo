@@ -60,23 +60,11 @@ jobs:
                       dev) echo "environment=dev" >> "$GITHUB_OUTPUT" ;;
                   esac
 
-    # Drop-in: Cloudflare Workers deploy. Set up each environment with
-    # infra/cloudflare/README.md first.
-    # deploy-cloudflare:
-    #     name: Deploy Cloudflare
-    #     needs: [quality, resolve-env]
-    #     if: needs.resolve-env.outputs.environment != ''
-    #     uses: ./.github/workflows/deploy-cloudflare.yaml
-    #     with:
-    #         environment: ${{ needs.resolve-env.outputs.environment }}
-    #     secrets: inherit
-
     send-notification:
         name: Send Discord notification
         runs-on: ["self-hosted", "Linux", "X64"]
         needs:
             - quality
-            # - deploy-cloudflare
         if: always()
         steps:
             - uses: quinck-io/actions-notify-discord@v6

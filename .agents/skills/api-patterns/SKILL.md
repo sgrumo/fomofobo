@@ -156,7 +156,7 @@ A response that needs rows of related tables comes from one storage read. Relate
 
 ### Writes across tables
 
-An operation that writes more than one row calls one storage method. That method runs the writes in one D1 batch. See Batches in `/storage-patterns`.
+An operation that writes more than one row calls one storage method. That method runs the writes in one batch. See Batches in `/storage-patterns`.
 
 - Two awaited writes in one service method mean a batch is missing. Move them into one storage method named for what it writes.
 - A write per row in a loop becomes one bulk write.

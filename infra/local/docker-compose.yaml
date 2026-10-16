@@ -1,5 +1,5 @@
-# Services the API needs on a dev machine. The API itself runs on the host, and D1
-# runs in the local wrangler state of the app.
+# Services the API needs on a dev machine. The API itself runs on the host, and the
+# database is the local libSQL file of `pnpm db:migrate`.
 # `pnpm infra:up:local` starts it, `pnpm infra:down:local` stops it. Add `-v` to
 # the down command to drop the data.
 

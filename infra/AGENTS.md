@@ -20,12 +20,12 @@ Configuration is not a secret, because GitHub masks a secret in every log. A mas
 
 | Kind                         | Reader         | Store                                                                  |
 | ---------------------------- | -------------- | ---------------------------------------------------------------------- |
-| Configuration of the runtime | a deployed app | A committed file, one per target. See "Runtime env" below              |
+| Configuration of the runtime | a deployed app | A committed record, one per target. See "Runtime env" below            |
 | Credential of the runtime    | a deployed app | The store that the runtime reads. The document of each target names it |
 | Configuration of CI          | a workflow     | A GitHub variable                                                      |
 | Credential of CI             | a workflow     | A GitHub secret                                                        |
 
-One store stays outside the repository: the secrets of each Worker environment, set with `wrangler secret put`. It holds only the runtime credentials. `infra/cloudflare/README.md` lists their keys.
+One store stays outside the repository: the variables of the Vercel project. It holds the runtime credentials and, as an exception, the runtime configuration too. See "Runtime env" below.
 
 ### Add a value
 
@@ -35,12 +35,12 @@ One store stays outside the repository: the secrets of each Worker environment, 
     - A workflow secret: declare it under `on.workflow_call.secrets` of the called workflow, with a `description`. A deploy drop-in passes `secrets: inherit`. Every other caller passes the secret by name.
     - A deploy value that differs between environments: put it in each GitHub environment, under the same name.
     - A workflow variable: read it as `vars.X` in the workflow. Add no list of variables anywhere. Add an inline comment only for a fact the code does not show.
-    - A runtime value: the file or the template of that target.
+    - A runtime value: the committed record of that target. See "Runtime env" below.
 4. If the kind is not obvious, write the reason in that description.
 
 ## Runtime env
 
-The runtime configuration of the app is committed in `apps/fullstack-fomofobo/wrangler.jsonc`: the `vars` of each block under `env`, one block per deploy environment.
+Vercel reads every runtime value from the variables of the project, and no committed file feeds them. So the "Runtime values" table of `infra/vercel/README.md` is the committed record of the runtime configuration, one column per deploy environment.
 
-- `vars` hold no credential.
-- A variable left out of the block is unset in that environment. `infra/cloudflare/AGENTS.md` holds the rules for a new one.
+- The table names each credential, never its value.
+- A variable left out of a Vercel target is unset in that environment. `infra/vercel/AGENTS.md` holds the rules for a new one.

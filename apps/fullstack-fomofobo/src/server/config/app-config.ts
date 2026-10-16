@@ -40,7 +40,7 @@ export interface AppConfig {
      * instance refuses it, so a token never crosses the network in the clear.
      */
     allowInsecureOidc: boolean
-    /** Serve `POST /api/test/reset-database`, which deletes every row of D1. */
+    /** Serve `POST /api/test/reset-database`, which deletes every row of the database. */
     databaseResetEnabled: boolean
 }
 

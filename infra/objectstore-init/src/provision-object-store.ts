@@ -28,7 +28,7 @@ export interface ObjectStoreProvisionConfig {
  * @param config Bucket, endpoint, credentials and the allowed browser origins
  * @throws When the store rejects a call, so a deployment stops on a broken store
  * @remarks Needs credentials that can create a bucket, so only the local and E2E stores
- * run it, and `infra/cloudflare/README.md` describes the same state on R2
+ * run it, and `infra/vercel/README.md` describes the same state on R2
  */
 export const provisionObjectStore = async (
     config: ObjectStoreProvisionConfig,

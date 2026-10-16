@@ -29,6 +29,8 @@ To add an environment, for example `qa`:
 
 ## Enable a deploy
 
+The app deploys through the Git integration of Vercel, outside these workflows. See `infra/vercel/README.md`. The steps below apply to a deploy that a workflow runs.
+
 Each deploy sits in an entry workflow as a commented drop-in block. The README of the target says what to prepare first.
 
 1. Uncomment the deploy job **and** its line under `send-notification.needs`.

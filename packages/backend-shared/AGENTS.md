@@ -26,7 +26,7 @@ Route definition (packages/api-routes/src/)
   -> Router handler (respond + try/catch)
     -> Service (business logic)
       -> Storage (packages/storage/src/)
-        -> Cloudflare D1
+        -> libSQL (Turso)
 ```
 
 Wire a backend feature end-to-end along that chain. `/api-patterns` holds what goes in

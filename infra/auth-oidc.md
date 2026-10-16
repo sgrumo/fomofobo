@@ -11,16 +11,16 @@ Register two URLs at the provider, for each environment:
 - Sign-out URL: `$APP_BASE_URL/`
 
 `APP_BASE_URL` is the origin the browser reads the app on. Each deploy
-environment sets it in its block of `apps/fullstack-fomofobo/wrangler.jsonc`.
+environment sets it in its Vercel target, as `infra/vercel/README.md` lists.
 
-The provider must answer over HTTPS in `cloudflare`. Plain HTTP is
+The provider must answer over HTTPS in `vercel`. Plain HTTP is
 accepted in `local` and `test` alone, where the provider is a container on
 `localhost`. The app refuses to boot otherwise.
 
 Behind a proxy the app writes its session cookies with the `__Host-` prefix and
 the `Secure` flag. A browser keeps such a cookie only when the page arrived over
 HTTPS on the exact host the cookie names. So the proxy must terminate TLS and
-forward the `Host` header unchanged, as Cloudflare does in front of a Worker. A
+forward the `Host` header unchanged, as Vercel does in front of a function. A
 proxy that rewrites the host, or that speaks plain HTTP to the browser, leaves
 every visitor signed out with no error to read.
 
