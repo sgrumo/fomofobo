@@ -8,7 +8,7 @@ describe("resolveAppConfig", () => {
     })
 
     it("should hide the error detail and the API documentation in a deployed shape", () => {
-        const config = resolveAppConfig("cloudflare")
+        const config = resolveAppConfig("vercel")
 
         expect({
             verboseErrors: config.verboseErrors,

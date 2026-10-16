@@ -122,11 +122,11 @@ OpenID Connect Authorization Code with PKCE, owned by `openid-client`. No hand-w
 - `getSession()` reads claims **without** a signature check. Display and expiry only. **NEVER** decide access with it
 - A route handler sets cookies on the response it returns (`NextResponse.cookies.set`). `redirect()` of `next/navigation` drops the `cookies()` store
 - Cookies are `HttpOnly`, the browser never holds a token. The middleware reads the access cookie on a same-origin `GET`, the `Authorization` header in process
-- Cookie names and `Secure` follow `APP_ENV`: `__Host-` + `Secure` in `cloudflare`, plain in `local` and `test`. A deletion repeats path and flag
+- Cookie names and `Secure` follow `APP_ENV`: `__Host-` + `Secure` in `vercel`, plain in `local` and `test`. A deletion repeats path and flag
 - Provider unreachable -> `503` (`AuthProviderUnavailable`), **NEVER** `401` - a `401` signs everybody out
 - `/auth/refresh` keeps the cookies on a refused grant - two tabs share one token
 - `/auth/logout` answers a same-origin `POST` alone and redirects with `303` - a `307` replays the `POST` at the provider
-- `cloudflare` refuses a plain-HTTP issuer. `local` and `test` opt in through `allowInsecureOidc`
+- `vercel` refuses a plain-HTTP issuer. `local` and `test` opt in through `allowInsecureOidc`
 - Provider extras (password policies, admin SDKs, post-login hooks) stay out of this app
 
 ## API
@@ -137,7 +137,7 @@ OpenID Connect Authorization Code with PKCE, owned by `openid-client`. No hand-w
 
 ## Environment
 
-- `APP_ENV` drives error verbosity, API docs, the dev pages and the cookie flags. No default on Workers: each deploy environment sets it, and `pnpm preview` passes `local`. Under Node an unset value reads as `local`
+- `APP_ENV` drives error verbosity, API docs, the dev pages and the cookie flags. No default on Vercel (`VERCEL=1`): each environment of the project sets it. Elsewhere an unset value reads as `local`
 - `src/server/config/env.ts`: one block per shape, every field in every block. Read the remarks there before you add a variable
 
 ## i18n
@@ -154,4 +154,4 @@ OpenID Connect Authorization Code with PKCE, owned by `openid-client`. No hand-w
 
 ## Deployment
 
-`infra/auth-oidc.md` documents the provider setup, and `infra/cloudflare/README.md` the Worker deploy. Read them **before** you change env vars, secrets, the database, object storage or networking. **NEVER** assume a topology.
+`infra/auth-oidc.md` documents the provider setup, and `infra/vercel/README.md` the deploy. Read them **before** you change env vars, secrets, the database, object storage or networking. **NEVER** assume a topology.

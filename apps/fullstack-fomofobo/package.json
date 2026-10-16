@@ -6,9 +6,8 @@
     "scripts": {
         "dev": "with-env next dev",
         "build": "next build",
-        "build:worker": "opennextjs-cloudflare build",
-        "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview --var APP_ENV:local",
-        "clean": "rm -rf .next .open-next .wrangler next-env.d.ts *.tsbuildinfo",
+        "db:migrate:remote": "pnpm -C ../../packages/storage db:migrate",
+        "clean": "rm -rf .next next-env.d.ts *.tsbuildinfo",
         "start": "next start",
         "typecheck": "next typegen && tsc -b",
         "typecheck:watch": "tsc -b -w",
@@ -24,7 +23,6 @@
         "@fontsource/space-mono": "^5.3.0",
         "@hono/swagger-ui": "catalog:",
         "@hono/zod-openapi": "catalog:",
-        "@opennextjs/cloudflare": "1.20.12",
         "@tanstack/react-query": "catalog:",
         "api-client": "workspace:*",
         "api-routes": "workspace:*",
@@ -54,7 +52,6 @@
         "zod": "catalog:"
     },
     "devDependencies": {
-        "@cloudflare/workers-types": "catalog:",
         "@maplibre/maplibre-gl-style-spec": "^26.4.4",
         "@tailwindcss/postcss": "catalog:",
         "@types/react": "catalog:",
@@ -67,8 +64,7 @@
         "oxlint-tsgolint": "catalog:",
         "typescript": "catalog:",
         "vitest": "catalog:",
-        "with-env": "workspace:*",
-        "wrangler": "4.149.0"
+        "with-env": "workspace:*"
     },
     "engines": {
         "node": "24.x"

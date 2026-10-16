@@ -37,7 +37,6 @@ catalog:
 
   # Backend
   "@aws-sdk/client-s3": "^3.1036.0"
-  "@cloudflare/workers-types": "5.20261012.1"
   "@hono/swagger-ui": "^0.6.1"
   "@hono/zod-openapi": "1.6.3"
   drizzle-orm: "^0.45.2"
@@ -84,10 +83,8 @@ allowBuilds:
   protobufjs: false
   sharp: false
   ssh2: false
-  workerd: false
 minimumReleaseAgeExclude:
-  # Security update: next@16.4.1 with its platform packages, and the adapter
-  # release that requires it with the version of @opennextjs/aws it pins
+  # Security update: next@16.4.1 with its platform packages
   - next@16.4.1
   - "@next/env@16.4.1"
   - "@next/swc-darwin-arm64@16.4.1"
@@ -98,7 +95,5 @@ minimumReleaseAgeExclude:
   - "@next/swc-linux-x64-musl@16.4.1"
   - "@next/swc-win32-arm64-msvc@16.4.1"
   - "@next/swc-win32-x64-msvc@16.4.1"
-  - "@opennextjs/cloudflare@1.20.12"
-  - "@opennextjs/aws@4.1.11"
   # Renovate security update: hono@4.13.7
   - hono@4.13.7

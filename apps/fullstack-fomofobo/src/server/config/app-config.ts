@@ -7,10 +7,10 @@ import { match } from "ts-pattern"
  * @remarks Drives every environment-shaped capability through `APP_ENV` alone, with no
  * per-feature override flag:
  * - `test` — E2E and CI
- * - `local` — host development and the local Worker preview
- * - `cloudflare` — a deployed Worker, D1 and R2
+ * - `local` — host development
+ * - `vercel` — a deployment on Vercel, with Turso and R2
  */
-export const appEnvValues = ["test", "local", "cloudflare"] as const
+export const appEnvValues = ["test", "local", "vercel"] as const
 export type AppEnv = (typeof appEnvValues)[number]
 
 export interface AppConfig {
@@ -67,7 +67,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
             verboseErrors: true,
             apiDocsEnabled: true,
         }))
-        .with("cloudflare", () => ({
+        .with("vercel", () => ({
             databaseResetEnabled: false,
             secureCookies: true,
             allowInsecureOidc: false,

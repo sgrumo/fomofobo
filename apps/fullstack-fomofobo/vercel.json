@@ -1,0 +1,18 @@
+{
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "framework": "nextjs",
+    "regions": ["dub1"],
+    "buildCommand": "pnpm db:migrate:remote && pnpm build",
+    "functions": {
+        "src/app/**/*": {
+            "maxDuration": 30
+        }
+    },
+    "git": {
+        "deploymentEnabled": {
+            "**": false,
+            "main": true,
+            "dev": true
+        }
+    }
+}

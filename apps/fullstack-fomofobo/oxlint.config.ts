@@ -51,12 +51,10 @@ export default defineConfig({
     ignorePatterns: [
         "oxlint.config.ts",
         "next.config.ts",
-        "open-next.config.ts",
         "postcss.config.mjs",
         "vitest.config.ts",
         "vitest.setup.ts",
         ".next",
-        ".open-next",
     ],
     rules: {
         // typescript - native

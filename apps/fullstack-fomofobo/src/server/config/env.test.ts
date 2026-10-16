@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest"
 
 import { parseEnv } from "./env"
 
-const cloudflareEnv = {
-    APP_ENV: "cloudflare",
+const vercelEnv = {
+    APP_ENV: "vercel",
     S3_BUCKET: "fomofobo",
     S3_ENDPOINT: "https://account.r2.cloudflarestorage.com",
     S3_ACCESS_KEY: "access",
@@ -21,11 +21,11 @@ describe("parseEnv", () => {
         expect(parseEnv({}, false).APP_ENV).toBe("local")
     })
 
-    it("should reject an unset APP_ENV on Workers", () => {
+    it("should reject an unset APP_ENV on Vercel", () => {
         expect(() => parseEnv({}, true)).toThrow('APP_ENV="<unset>"')
     })
 
-    it("should accept a development shape set by hand on Workers", () => {
+    it("should accept a development shape set by hand on Vercel", () => {
         expect(parseEnv({ APP_ENV: "local" }, true).APP_ENV).toBe("local")
     })
 
@@ -39,10 +39,10 @@ describe("parseEnv", () => {
         )
     })
 
-    it("should parse the cloudflare variant, with the R2 region by default", () => {
-        const env = parseEnv(cloudflareEnv, true)
+    it("should parse the vercel variant, with the R2 region by default", () => {
+        const env = parseEnv(vercelEnv, true)
 
-        expect(env.APP_ENV).toBe("cloudflare")
+        expect(env.APP_ENV).toBe("vercel")
         expect(env.S3_REGION).toBe("auto")
     })
 
@@ -71,7 +71,7 @@ describe("parseEnv", () => {
     })
 
     it("should require the OIDC variables of a deployed shape", () => {
-        const { OIDC_ISSUER: _unused, ...withoutIssuer } = cloudflareEnv
+        const { OIDC_ISSUER: _unused, ...withoutIssuer } = vercelEnv
 
         expect(() => parseEnv(withoutIssuer, true)).toThrow("OIDC_ISSUER: not set")
     })
@@ -90,19 +90,19 @@ describe("parseEnv", () => {
     })
 
     it("should require the database token of a deployed shape", () => {
-        const { DATABASE_AUTH_TOKEN: _unused, ...withoutToken } = cloudflareEnv
+        const { DATABASE_AUTH_TOKEN: _unused, ...withoutToken } = vercelEnv
 
         expect(() => parseEnv(withoutToken, true)).toThrow("DATABASE_AUTH_TOKEN: not set")
     })
 
     it("should reject a variable that is set but empty", () => {
-        expect(() => parseEnv({ ...cloudflareEnv, S3_SECRET_KEY: "" }, true)).toThrow(
+        expect(() => parseEnv({ ...vercelEnv, S3_SECRET_KEY: "" }, true)).toThrow(
             "S3_SECRET_KEY: set but empty",
         )
     })
 
     it("should reject a missing variable of the variant", () => {
-        const { S3_BUCKET: _unused, ...withoutBucket } = cloudflareEnv
+        const { S3_BUCKET: _unused, ...withoutBucket } = vercelEnv
 
         expect(() => parseEnv(withoutBucket, true)).toThrow("S3_BUCKET: not set")
     })
@@ -110,7 +110,7 @@ describe("parseEnv", () => {
     it("should reject an S3 endpoint without a scheme", () => {
         expect(() =>
             parseEnv(
-                { ...cloudflareEnv, S3_ENDPOINT: "account.r2.cloudflarestorage.com" },
+                { ...vercelEnv, S3_ENDPOINT: "account.r2.cloudflarestorage.com" },
                 true,
             ),
         ).toThrow("must be a full URL")

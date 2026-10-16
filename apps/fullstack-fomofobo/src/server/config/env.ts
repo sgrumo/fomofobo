@@ -73,7 +73,7 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         S3_SECRET_KEY: z.string().nonempty().default("admin"),
     }),
     z.object({
-        APP_ENV: appEnv.extract(["cloudflare"]),
+        APP_ENV: appEnv.extract(["vercel"]),
         OIDC_ISSUER: oidcIssuerSchema,
         OIDC_CLIENT_ID: z.string().nonempty(),
         OIDC_CLIENT_SECRET: optionalEnv(z.string().nonempty()),
@@ -98,22 +98,19 @@ export type EnvSource = Partial<Record<string, string>>
 /**
  * @description Returns the environment matching the `APP_ENV` variant
  * @param source Raw process environment
- * @param onWorkers True when the code runs in the Workers runtime
- * @throws When `APP_ENV` is unset on Workers, or when a variable of the variant is
+ * @param onVercel True when the code runs on Vercel, which sets `VERCEL=1`
+ * @throws When `APP_ENV` is unset on Vercel, or when a variable of the variant is
  * missing or invalid
- * @remarks Reads an unset `APP_ENV` as `local` under Node only. On Workers the shape
- * comes from the vars of the deploy environment, and a missing value stops the boot: a deployed `local`
- * would serve stack traces in every error body, and the API documentation and the
- * `/dev/*` pages to the public
+ * @remarks Reads an unset `APP_ENV` as `local` off Vercel only. On Vercel the shape
+ * comes from the variables of the project, and a missing value stops the boot: a
+ * deployed `local` would serve stack traces in every error body, and the API
+ * documentation and the `/dev/*` pages to the public
  * @remarks `NODE_ENV=production` is **not** a deployment signal and must not gate this:
  * every build is a production build, the E2E suite included, which runs it with
  * `APP_ENV=test`
  */
-export const parseEnv = (
-    source: EnvSource,
-    onWorkers = navigator.userAgent === "Cloudflare-Workers",
-): Env => {
-    const appEnvValue = source.APP_ENV ?? (onWorkers ? undefined : "local")
+export const parseEnv = (source: EnvSource, onVercel = source.VERCEL === "1"): Env => {
+    const appEnvValue = source.APP_ENV ?? (onVercel ? undefined : "local")
 
     const result = envVariants.safeParse({ ...source, APP_ENV: appEnvValue })
     if (result.success) {
