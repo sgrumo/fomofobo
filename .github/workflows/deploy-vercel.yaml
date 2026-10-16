@@ -1,0 +1,126 @@
+name: Deploy Vercel
+
+# See infra/vercel/README.md.
+
+on:
+    workflow_call:
+        inputs:
+            environment:
+                description: "Deploy environment. It names the GitHub environment and the file under infra/vercel/env"
+                required: true
+                type: string
+        secrets:
+            VERCEL_TOKEN:
+                required: true
+            # Not required: GitHub checks a required secret against the caller, where an
+            # environment secret does not exist yet. The first step checks them.
+            DATABASE_AUTH_TOKEN:
+                description: "Turso token of the database of the environment"
+                required: false
+            S3_ACCESS_KEY:
+                description: "Key id of the R2 token of the environment"
+                required: false
+            S3_SECRET_KEY:
+                required: false
+
+permissions:
+    contents: read
+
+env:
+    # Pinned past the `minimumReleaseAge` window of pnpm-workspace.yaml.
+    VERCEL_CLI: vercel@63.1.2
+
+jobs:
+    deploy:
+        name: Deploy fullstack-fomofobo (Vercel)
+        environment: ${{ inputs.environment }}
+        runs-on: ubuntu-latest
+        container:
+            image: node:24.19.0-bookworm
+        env:
+            VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+            VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+            DATABASE_AUTH_TOKEN: ${{ secrets.DATABASE_AUTH_TOKEN }}
+            S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+            S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+            CONFIG_FILE: infra/vercel/env/${{ inputs.environment }}.env
+        steps:
+            - name: Check the credentials of the environment
+              run: |
+                  missing=""
+                  for name in DATABASE_AUTH_TOKEN S3_ACCESS_KEY S3_SECRET_KEY; do
+                      if [ -z "${!name}" ]; then missing="$missing $name"; fi
+                  done
+                  if [ -n "$missing" ]; then
+                      echo "::error::Set the secrets of the ${{ inputs.environment }} environment:$missing"
+                      exit 1
+                  fi
+              shell: bash
+
+            - uses: actions/checkout@v7
+
+            - uses: ./.github/actions/setup-monorepo
+
+            - name: Load the runtime configuration
+              run: |
+                  if grep -q "PLACEHOLDER" "$CONFIG_FILE"; then
+                      echo "::error file=$CONFIG_FILE::Replace every PLACEHOLDER value before the deploy"
+                      exit 1
+                  fi
+                  grep -E '^[A-Z0-9_]+=' "$CONFIG_FILE" >> "$GITHUB_ENV"
+
+            # Before the upload, so that the new code reads the new schema and a failed
+            # migration leaves the running version in place.
+            - name: Apply the migrations to Turso
+              run: pnpm -C packages/storage db:migrate
+
+            - name: Write the runtime values into the Vercel project
+              run: |
+                  add() {
+                      printf '%s' "$2" | pnpm dlx "$VERCEL_CLI" env add "$1" production \
+                          --force "$3" --token "$VERCEL_TOKEN" > /dev/null
+                  }
+                  while IFS='=' read -r name value; do
+                      add "$name" "$value" --no-sensitive
+                  done < <(grep -E '^[A-Z0-9_]+=' "$CONFIG_FILE")
+                  for name in DATABASE_AUTH_TOKEN S3_ACCESS_KEY S3_SECRET_KEY; do
+                      add "$name" "${!name}" --sensitive
+                  done
+              shell: bash
+
+            - name: Pull the Vercel project settings
+              run: pnpm dlx "$VERCEL_CLI" pull --yes --environment=production --token "$VERCEL_TOKEN"
+
+            - name: Build the deployment
+              run: pnpm dlx "$VERCEL_CLI" build --prod --token "$VERCEL_TOKEN"
+
+            # The upload must not see a git repository. With git metadata in reach,
+            # Vercel attributes the deployment to the commit author, and the Hobby plan
+            # refuses an author who is not the owner of the account.
+            - name: Stage the upload outside the repository
+              run: |
+                  mkdir -p "$RUNNER_TEMP/vercel-upload"
+                  cp -R .vercel "$RUNNER_TEMP/vercel-upload/.vercel"
+                  test ! -e "$RUNNER_TEMP/vercel-upload/.git"
+
+            # `--archive=tgz` uploads one tarball in place of each file, under the API
+            # rate limit.
+            - name: Deploy the prebuilt output
+              id: deploy
+              run: |
+                  URL=$(pnpm dlx "$VERCEL_CLI" deploy --prebuilt --archive=tgz --prod \
+                      --cwd "$RUNNER_TEMP/vercel-upload" --token "$VERCEL_TOKEN")
+                  echo "url=${URL}" >> "$GITHUB_OUTPUT"
+
+            - name: Deployment summary
+              if: always()
+              run: |
+                  {
+                      echo "### Vercel deploy"
+                      echo ""
+                      echo "**Environment:** ${{ inputs.environment }}"
+                      echo "**URL:** ${{ steps.deploy.outputs.url }}"
+                      echo "**Branch:** ${{ github.ref_name }}"
+                      echo "**Commit:** ${{ github.sha }}"
+                  } >> "$GITHUB_STEP_SUMMARY"

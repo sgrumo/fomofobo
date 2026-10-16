@@ -6,7 +6,6 @@
     "scripts": {
         "dev": "with-env next dev",
         "build": "next build",
-        "db:migrate:remote": "pnpm -C ../../packages/storage db:migrate",
         "clean": "rm -rf .next next-env.d.ts *.tsbuildinfo",
         "start": "next start",
         "typecheck": "next typegen && tsc -b",

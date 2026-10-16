@@ -3,17 +3,17 @@
 ## Structure
 
 - The entry workflows are `ci.yaml` on every pull request and push, `cache-cleanup.yaml` on a closed pull request, and, with the mobile app, `mobile-dev-release.yaml` and `mobile-store-release.yaml` on manual dispatch. Every other workflow is reusable and only `workflow_call` reaches it.
-- A deploy is a commented drop-in in an entry workflow. In `ci.yaml`, it needs `quality` and `resolve-env`, and runs only when `resolve-env` maps the branch to an environment.
+- A deploy is a job of an entry workflow. In `ci.yaml`, it needs `quality` and `resolve-env`, and runs only when `resolve-env` maps the branch to an environment. A deploy that a project does not use yet stays a commented drop-in.
 - `resolve-env` in `ci.yaml` is the only map from branch to deploy environment. Each deploy takes the result as its `environment` input and as its GitHub environment.
 - `mobile-dev-release.yaml` ships a tester build from any branch, and `mobile-store-release.yaml` ships a store release from `main`. Both ship only a commit that passed quality. `ci-gate.yaml` reads the jobs of the `ci.yaml` run whose names start with `quality / `, so keep the name of the `quality` job in `ci.yaml`. When no `ci.yaml` run checked the commit, the release calls `quality.yaml` itself, so its `permissions` match those of `ci.yaml`.
 - Never trigger a workflow on a tag push. `mobile-store-release.yaml` creates the `v<version>` tag after the stores accept the build.
 - `quality.yaml` takes no inputs. To scope it to a repository, remove the jobs that the repository has no code for. Do not gate them.
-- Each workflow declares its own `runs-on`. The iOS jobs need macOS and take the Mac Mini. Everything else runs on Linux.
+- Each workflow declares its own `runs-on`. A job runs on a GitHub-hosted `ubuntu-latest` runner, unless it needs another host, such as macOS for an iOS build.
 
 ## Secrets and variables
 
 - A reusable workflow declares every secret that it reads under `on.workflow_call.secrets`.
-- A deploy drop-in passes `secrets: inherit`, so its job reads the secrets of its GitHub environment. Every other caller passes each secret by name.
+- A deploy job passes `secrets: inherit`, so its job reads the secrets of its GitHub environment. Every other caller passes each secret by name.
 - Give a secret a `description` only for a fact that its name does not show.
 - A workflow reads a variable as `vars.X`. Add no list of variables anywhere.
 - `infra/AGENTS.md` holds the rule that decides secret or variable.
@@ -44,12 +44,4 @@
 
 ## Runner disk
 
-No workflow cleans the self-hosted runner host. [`quinck-io/runner-maintenance`](https://github.com/quinck-io/runner-maintenance) does it. Its README lists what the cleanup removes and what it keeps.
-
-**Before** a workflow change leaves new state on the runner host, read that README. Examples are a named volume, a bind mount, a directory outside the checkout, or a new image family.
-
-**If the cleanup does not cover that state:**
-
-1. Do not add a cleanup step to the workflow on your own. A job sees its own container and not the host.
-2. Find the options. Examples are a rule in `runner-maintenance`, or a bound on the state in the workflow.
-3. Report the gap and the options to the user. The user decides.
+GitHub discards each hosted runner after its job, so a workflow leaves no state on a host.

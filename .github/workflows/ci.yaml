@@ -1,7 +1,6 @@
 name: CI
 
-# Quality on every event, then the deploys. Each deploy is a commented drop-in: uncomment
-# the job and its `needs:` line on send-notification. See .github/CICD.md.
+# Quality on every event, then the deploy of the branch. See .github/CICD.md.
 
 on:
     pull_request:
@@ -47,7 +46,7 @@ jobs:
     resolve-env:
         name: Resolve environment
         if: github.event_name != 'pull_request'
-        runs-on: ["self-hosted", "Linux", "X64"]
+        runs-on: ubuntu-latest
         outputs:
             environment: ${{ steps.map.outputs.environment }}
         steps:
@@ -60,11 +59,21 @@ jobs:
                       dev) echo "environment=dev" >> "$GITHUB_OUTPUT" ;;
                   esac
 
+    deploy-vercel:
+        name: Deploy Vercel
+        needs: [quality, resolve-env]
+        if: needs.resolve-env.outputs.environment != ''
+        uses: ./.github/workflows/deploy-vercel.yaml
+        with:
+            environment: ${{ needs.resolve-env.outputs.environment }}
+        secrets: inherit
+
     send-notification:
         name: Send Discord notification
-        runs-on: ["self-hosted", "Linux", "X64"]
+        runs-on: ubuntu-latest
         needs:
             - quality
+            - deploy-vercel
         if: always()
         steps:
             - uses: quinck-io/actions-notify-discord@v6
