@@ -10,7 +10,7 @@ permissions:
 jobs:
     cleanup:
         name: Purge branch caches
-        runs-on: ["self-hosted", "Linux", "X64"]
+        runs-on: ubuntu-latest
         steps:
             # `gh cache list/delete` wraps these two endpoints, so the API call is the
             # whole job. github-script runs on the runner's own Node, so this job needs

@@ -15,7 +15,7 @@ permissions:
 jobs:
     build-and-check:
         name: Build, Typecheck & Lint
-        runs-on: ["self-hosted", "Linux", "X64"]
+        runs-on: ubuntu-latest
         container:
             image: node:24.19.0-bookworm
         steps:
@@ -30,7 +30,7 @@ jobs:
 
     unit-tests:
         name: Unit Tests
-        runs-on: ["self-hosted", "Linux", "X64"]
+        runs-on: ubuntu-latest
         container:
             image: node:24.19.0-bookworm
         needs: build-and-check
@@ -59,7 +59,7 @@ jobs:
 
     test-report:
         name: Test Report
-        runs-on: ["self-hosted", "Linux", "X64"]
+        runs-on: ubuntu-latest
         container:
             image: node:24.19.0-bookworm
         needs:

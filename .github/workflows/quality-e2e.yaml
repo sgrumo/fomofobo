@@ -30,7 +30,7 @@ permissions:
 jobs:
     e2e-tests:
         name: E2E Tests (${{ inputs.suite }})
-        runs-on: ["self-hosted", "Linux", "X64"]
+        runs-on: ubuntu-latest
         container:
             # Keep the Playwright tag in sync with the @playwright/test catalog version in pnpm-workspace.yaml.
             image: ${{ inputs.browser && 'mcr.microsoft.com/playwright:v1.61.1-noble' || 'node:24.19.0-bookworm' }}
