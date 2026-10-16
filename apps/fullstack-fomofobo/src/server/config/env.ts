@@ -37,6 +37,15 @@ const databaseUrlSchema = z
         error: "must be a file: URL or the libsql: URL of the database",
     })
 
+/**
+ * Key that signs the session cookies and the tokens of the auth library. Rotating it
+ * ends every session.
+ */
+const authSecretSchema = z
+    .string()
+    .nonempty()
+    .min(32, { error: "must hold at least 32 random characters" })
+
 /** Scopes asked at login. `offline_access` is what several providers answer a refresh token to. */
 const defaultScope = "openid profile email offline_access"
 
@@ -63,6 +72,9 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         OIDC_JWKS_URL: optionalEnv(oidcJwksUrlSchema),
         OIDC_SCOPE: z.string().nonempty().default(defaultScope),
         APP_BASE_URL: appBaseUrlSchema.default("http://localhost:3000"),
+        BETTER_AUTH_SECRET: authSecretSchema.default(
+            "local-and-test-only-auth-secret-0123456789",
+        ),
         // Local file of `pnpm db:migrate`, relative to the app directory
         DATABASE_URL: databaseUrlSchema.default("file:../../.data/local.db"),
         DATABASE_AUTH_TOKEN: optionalEnv(z.string().nonempty()),
@@ -81,6 +93,7 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         OIDC_JWKS_URL: optionalEnv(oidcJwksUrlSchema),
         OIDC_SCOPE: z.string().nonempty().default(defaultScope),
         APP_BASE_URL: appBaseUrlSchema,
+        BETTER_AUTH_SECRET: authSecretSchema,
         DATABASE_URL: databaseUrlSchema,
         DATABASE_AUTH_TOKEN: z.string().nonempty(),
         S3_BUCKET: z.string().nonempty(),

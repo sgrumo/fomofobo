@@ -5,6 +5,8 @@ import { memoize } from "es-toolkit"
 import type { DbInstanceFromSchema } from "storage"
 import { buildDbInstance } from "storage"
 
+import type { Auth } from "./auth/auth"
+import { buildAuth } from "./auth/auth"
 import type { AppConfig } from "./config/app-config"
 import { resolveAppConfig } from "./config/app-config"
 import { parseEnv } from "./config/env"
@@ -12,6 +14,7 @@ import { parseEnv } from "./config/env"
 export interface Container {
     appConfig: AppConfig
     db: DbInstanceFromSchema
+    auth: Auth
     tokenVerifier: TokenVerifier
 }
 
@@ -22,12 +25,19 @@ export interface Container {
 const buildContainer = (): Container => {
     const env = parseEnv(process.env)
     const appConfig = resolveAppConfig(env.APP_ENV)
+    const db = buildDbInstance({
+        url: env.DATABASE_URL,
+        authToken: env.DATABASE_AUTH_TOKEN,
+    })
 
     return {
         appConfig,
-        db: buildDbInstance({
-            url: env.DATABASE_URL,
-            authToken: env.DATABASE_AUTH_TOKEN,
+        db,
+        auth: buildAuth(db, {
+            baseUrl: env.APP_BASE_URL,
+            secret: env.BETTER_AUTH_SECRET,
+            secureCookies: appConfig.secureCookies,
+            rateLimitEnabled: appConfig.authRateLimitEnabled,
         }),
         // Holds the key set of the provider. It fetches it on the first verified
         // request, so a provider that is down delays no boot.

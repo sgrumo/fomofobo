@@ -62,11 +62,12 @@ The environment is ready when the deploy job of the branch ends green and `https
 
 `env/<env>.env` holds the configuration of each environment. The GitHub environment holds the credentials:
 
-| Secret                | Value                                                |
-| --------------------- | ---------------------------------------------------- |
-| `DATABASE_AUTH_TOKEN` | `turso db tokens create fomofobo-<env>`              |
-| `S3_ACCESS_KEY`       | Access key id of the R2 token of the environment     |
-| `S3_SECRET_KEY`       | Secret access key of the R2 token of the environment |
+| Secret                | Value                                                                                                |
+| --------------------- | ---------------------------------------------------------------------------------------------------- |
+| `DATABASE_AUTH_TOKEN` | `turso db tokens create fomofobo-<env>`                                                              |
+| `S3_ACCESS_KEY`       | Access key id of the R2 token of the environment                                                     |
+| `S3_SECRET_KEY`       | Secret access key of the R2 token of the environment                                                 |
+| `BETTER_AUTH_SECRET`  | At least 32 random characters, for example `openssl rand -base64 32`. A new value ends every session |
 
 The deploy writes a credential as Sensitive. A value set in the Vercel dashboard alone lasts until the next deploy overwrites it, or never reaches the next project.
 

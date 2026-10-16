@@ -22,6 +22,9 @@ on:
                 required: false
             S3_SECRET_KEY:
                 required: false
+            BETTER_AUTH_SECRET:
+                description: "Signs the sessions: a new value ends every session"
+                required: false
 
 permissions:
     contents: read
@@ -44,12 +47,13 @@ jobs:
             DATABASE_AUTH_TOKEN: ${{ secrets.DATABASE_AUTH_TOKEN }}
             S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
             S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+            BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
             CONFIG_FILE: infra/vercel/env/${{ inputs.environment }}.env
         steps:
             - name: Check the values of the environment
               run: |
                   missing=""
-                  for name in VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN DATABASE_AUTH_TOKEN S3_ACCESS_KEY S3_SECRET_KEY; do
+                  for name in VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN DATABASE_AUTH_TOKEN S3_ACCESS_KEY S3_SECRET_KEY BETTER_AUTH_SECRET; do
                       if [ -z "${!name}" ]; then missing="$missing $name"; fi
                   done
                   if [ -n "$missing" ]; then
@@ -78,7 +82,7 @@ jobs:
             - name: Write the runtime values into the Vercel project
               run: node .github/scripts/write-vercel-env.mjs
               env:
-                  SECRET_NAMES: DATABASE_AUTH_TOKEN S3_ACCESS_KEY S3_SECRET_KEY
+                  SECRET_NAMES: DATABASE_AUTH_TOKEN S3_ACCESS_KEY S3_SECRET_KEY BETTER_AUTH_SECRET
 
             - name: Pull the Vercel project settings
               run: pnpm dlx "$VERCEL_CLI" pull --yes --environment=production --token "$VERCEL_TOKEN"

@@ -40,6 +40,10 @@ describe("session cookies", () => {
                 "libsql://fomofobo-dev-example.aws-eu-west-1.turso.io",
             )
             vi.stubEnv("DATABASE_AUTH_TOKEN", "token")
+            vi.stubEnv(
+                "BETTER_AUTH_SECRET",
+                "a-deployed-secret-of-at-least-32-characters",
+            )
         })
 
         it("should write every cookie Secure, HttpOnly and SameSite=Lax", () => {

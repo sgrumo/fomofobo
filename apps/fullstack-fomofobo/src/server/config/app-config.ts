@@ -41,6 +41,11 @@ export interface AppConfig {
      * instance refuses it, so a token never crosses the network in the clear.
      */
     allowInsecureOidc: boolean
+    /**
+     * Limit the sign-in attempts per IP. Off where one client signs in again and again:
+     * the E2E suite and development.
+     */
+    authRateLimitEnabled: boolean
     /** Serve `POST /api/test/reset-database`, which deletes every row of the database. */
     databaseResetEnabled: boolean
 }
@@ -54,6 +59,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
         .returnType<AppConfig>()
         .with("test", () => ({
             databaseResetEnabled: true,
+            authRateLimitEnabled: false,
             secureCookies: false,
             allowInsecureOidc: true,
             devPagesEnabled: true,
@@ -62,6 +68,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
         }))
         .with("local", () => ({
             databaseResetEnabled: false,
+            authRateLimitEnabled: false,
             secureCookies: false,
             allowInsecureOidc: true,
             devPagesEnabled: true,
@@ -70,6 +77,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
         }))
         .with("preview", () => ({
             databaseResetEnabled: false,
+            authRateLimitEnabled: true,
             secureCookies: true,
             allowInsecureOidc: false,
             devPagesEnabled: true,
@@ -78,6 +86,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
         }))
         .with("vercel", () => ({
             databaseResetEnabled: false,
+            authRateLimitEnabled: true,
             secureCookies: true,
             allowInsecureOidc: false,
             devPagesEnabled: false,

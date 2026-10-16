@@ -14,6 +14,7 @@ const vercelEnv = {
     APP_BASE_URL: "https://app.example.com",
     DATABASE_URL: "libsql://fomofobo-dev-example.aws-eu-west-1.turso.io",
     DATABASE_AUTH_TOKEN: "token",
+    BETTER_AUTH_SECRET: "a-deployed-secret-of-at-least-32-characters",
 }
 
 describe("parseEnv", () => {
@@ -99,6 +100,18 @@ describe("parseEnv", () => {
         expect(parseEnv({ ...vercelEnv, APP_ENV: "preview" }, true).APP_ENV).toBe(
             "preview",
         )
+    })
+
+    it("should require the auth secret of a deployed shape, with no default", () => {
+        const { BETTER_AUTH_SECRET: _unused, ...withoutSecret } = vercelEnv
+
+        expect(() => parseEnv(withoutSecret, true)).toThrow("BETTER_AUTH_SECRET: not set")
+    })
+
+    it("should reject an auth secret shorter than 32 characters", () => {
+        expect(() =>
+            parseEnv({ ...vercelEnv, BETTER_AUTH_SECRET: "short" }, true),
+        ).toThrow("BETTER_AUTH_SECRET")
     })
 
     it("should reject a variable that is set but empty", () => {
