@@ -89,10 +89,13 @@ jobs:
             # The upload must not see a git repository. With git metadata in reach,
             # Vercel attributes the deployment to the commit author, and the Hobby plan
             # refuses an author who is not the owner of the account.
+            # The deploy also requires the Root Directory of the project to exist, and
+            # reads the deployment settings, such as the region, from its `vercel.json`.
             - name: Stage the upload outside the repository
               run: |
-                  mkdir -p "$RUNNER_TEMP/vercel-upload"
+                  mkdir -p "$RUNNER_TEMP/vercel-upload/apps/fullstack-fomofobo"
                   cp -R .vercel "$RUNNER_TEMP/vercel-upload/.vercel"
+                  cp apps/fullstack-fomofobo/vercel.json "$RUNNER_TEMP/vercel-upload/apps/fullstack-fomofobo/"
                   test ! -e "$RUNNER_TEMP/vercel-upload/.git"
 
             # `--archive=tgz` uploads one tarball in place of each file, under the API
