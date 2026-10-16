@@ -11,6 +11,7 @@ const appErrorCodes: AppErrorCode[] = [
     "AccountBlocked",
     "ForbiddenAction",
     "ItemNotFound",
+    "EmailTaken",
     "RouteNotFound",
     "InvalidRequest",
     "ResponseValidationError",
@@ -46,6 +47,10 @@ describe("mapErrorStatus", () => {
         expect(statusOf("ForbiddenAction")).toBe(HttpStatus.Forbidden)
     })
 
+    it("should map a taken email to 409", () => {
+        expect(statusOf("EmailTaken")).toBe(HttpStatus.Conflict)
+    })
+
     it("should map a missing session and a blocked account to 401", () => {
         expect(statusOf("Unauthenticated")).toBe(HttpStatus.Unauthorized)
         expect(statusOf("AccountBlocked")).toBe(HttpStatus.Unauthorized)
@@ -58,6 +63,7 @@ describe("mapErrorStatus", () => {
             "ForbiddenAction",
             "Unauthenticated",
             "AccountBlocked",
+            "EmailTaken",
         ]
 
         expect(clientErrors.map(statusOf).every(status => status < 500)).toBe(true)

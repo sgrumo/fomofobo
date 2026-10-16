@@ -7,6 +7,7 @@ export type AppErrorCode =
     | "AccountBlocked"
     | "ForbiddenAction"
     | "ItemNotFound"
+    | "EmailTaken"
     | "RouteNotFound"
     | "InvalidRequest"
     | "ResponseValidationError"

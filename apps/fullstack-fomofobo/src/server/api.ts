@@ -4,7 +4,7 @@ import { OpenAPIHono } from "@hono/zod-openapi"
 import type { ApplicationError } from "backend-shared/http"
 import { handleErrors, loggerMiddleware } from "backend-shared/http"
 import { memoize } from "es-toolkit"
-import { HttpStatus } from "models"
+import { accountRoleSchema, HttpStatus, organizerCreationSchema } from "models"
 import { deleteAllRows } from "storage"
 import { match } from "ts-pattern"
 
@@ -21,6 +21,8 @@ import { buildBackofficeSessionRouter } from "./routers/backoffice-session-route
  */
 export const apiBasePath = "/api"
 
+const testAccountSeedSchema = organizerCreationSchema.extend({ role: accountRoleSchema })
+
 /**
  * @description Maps an application error code to its HTTP status
  * @param err Application error read
@@ -32,6 +34,7 @@ export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus 
         .with("RouteNotFound", "ItemNotFound", () => HttpStatus.NotFound)
         .with("Unauthenticated", "AccountBlocked", () => HttpStatus.Unauthorized)
         .with("ForbiddenAction", () => HttpStatus.Forbidden)
+        .with("EmailTaken", () => HttpStatus.Conflict)
         .exhaustive()
 
 /**
@@ -65,10 +68,15 @@ const buildApi = (): OpenAPIHono => {
     app.use(`${apiBasePath}/backoffice/*`, backofficeSession(authAccounts))
     app.route("/", buildBackofficeSessionRouter())
 
-    if (appConfig.databaseResetEnabled) {
+    if (appConfig.testRoutesEnabled) {
         app.post(`${apiBasePath}/test/reset-database`, async c => {
             await deleteAllRows(db)
             return c.body(null, HttpStatus.NoContent)
+        })
+        app.post(`${apiBasePath}/test/accounts`, async c => {
+            const seed = testAccountSeedSchema.parse(await c.req.json())
+            const account = await authAccounts.createAccount(seed, seed.role)
+            return c.json(account, HttpStatus.Created)
         })
     }
 

@@ -1,7 +1,7 @@
 import "server-only"
 import { memoize } from "es-toolkit"
 import type { DbInstanceFromSchema } from "storage"
-import { buildDbInstance } from "storage"
+import { AccountsStorage, buildDbInstance } from "storage"
 
 import type { Auth } from "./auth/auth"
 import { buildAuth } from "./auth/auth"
@@ -40,7 +40,7 @@ const buildContainer = (): Container => {
         appConfig,
         db,
         auth,
-        authAccounts: new AuthAccountsService(auth),
+        authAccounts: new AuthAccountsService(auth, new AccountsStorage(db)),
     }
 }
 

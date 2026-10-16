@@ -132,7 +132,7 @@ OpenID Connect Authorization Code with PKCE, owned by `openid-client`. No hand-w
 ## API
 
 - Route definitions in `packages/api-routes` already carry `/api`. Hono declares **no** base path
-- Only `/api/health`, `/api/doc`, `/api/swagger` and `/api/test/reset-database` repeat the prefix by hand. Doc and Swagger answer outside production alone. The reset answers under `APP_ENV=test` alone, for the E2E suite
+- Only `/api/health`, `/api/doc`, `/api/swagger`, `/api/auth/sign-in/email` and the `/api/test/*` routes repeat the prefix by hand. Doc and Swagger answer outside production alone. `/api/test/reset-database` and `/api/test/accounts` (an account with a password, for a sign-in) answer under `APP_ENV=test` alone, for the E2E suite
 - The route handler builds the application on the first request, never at module evaluation
 
 ## Environment

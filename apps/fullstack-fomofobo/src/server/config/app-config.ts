@@ -39,8 +39,8 @@ export interface AppConfig {
      * the E2E suite and development.
      */
     authRateLimitEnabled: boolean
-    /** Serve `POST /api/test/reset-database`, which deletes every row of the database. */
-    databaseResetEnabled: boolean
+    /** Serve the `/api/test/*` routes of the E2E suite: the row reset and the account seed. */
+    testRoutesEnabled: boolean
 }
 
 /**
@@ -51,7 +51,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
     match(appEnv)
         .returnType<AppConfig>()
         .with("test", () => ({
-            databaseResetEnabled: true,
+            testRoutesEnabled: true,
             authRateLimitEnabled: false,
             secureCookies: false,
             devPagesEnabled: true,
@@ -59,7 +59,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
             apiDocsEnabled: true,
         }))
         .with("local", () => ({
-            databaseResetEnabled: false,
+            testRoutesEnabled: false,
             authRateLimitEnabled: false,
             secureCookies: false,
             devPagesEnabled: true,
@@ -67,7 +67,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
             apiDocsEnabled: true,
         }))
         .with("preview", () => ({
-            databaseResetEnabled: false,
+            testRoutesEnabled: false,
             authRateLimitEnabled: true,
             secureCookies: true,
             devPagesEnabled: true,
@@ -75,7 +75,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
             apiDocsEnabled: true,
         }))
         .with("vercel", () => ({
-            databaseResetEnabled: false,
+            testRoutesEnabled: false,
             authRateLimitEnabled: true,
             secureCookies: true,
             devPagesEnabled: false,

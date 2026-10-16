@@ -7,7 +7,7 @@ describe("resolveAppConfig", () => {
         expect(appEnvValues.map(resolveAppConfig)).toHaveLength(appEnvValues.length)
     })
 
-    it("should serve the dev pages but never the database reset in the preview shape", () => {
+    it("should serve the dev pages but never the test routes in the preview shape", () => {
         const config = resolveAppConfig("preview")
 
         expect({
@@ -15,13 +15,13 @@ describe("resolveAppConfig", () => {
             apiDocsEnabled: config.apiDocsEnabled,
             verboseErrors: config.verboseErrors,
             secureCookies: config.secureCookies,
-            databaseResetEnabled: config.databaseResetEnabled,
+            testRoutesEnabled: config.testRoutesEnabled,
         }).toStrictEqual({
             devPagesEnabled: true,
             apiDocsEnabled: true,
             verboseErrors: true,
             secureCookies: true,
-            databaseResetEnabled: false,
+            testRoutesEnabled: false,
         })
     })
 
