@@ -56,7 +56,8 @@ describe("languageRedirects", () => {
 
     it("should leave the route handlers, the Next assets and the public files alone", () => {
         expect(redirectOf("/api/health")).toBeUndefined()
-        expect(redirectOf("/auth/login")).toBeUndefined()
+        expect(redirectOf("/auth/logout")).toBeUndefined()
+        expect(redirectOf("/backoffice/login")).toBeUndefined()
         expect(redirectOf("/_next/static/chunk.js")).toBeUndefined()
         expect(redirectOf("/favicon.ico")).toBeUndefined()
         expect(redirectOf("/locales/en/shared.json")).toBeUndefined()
