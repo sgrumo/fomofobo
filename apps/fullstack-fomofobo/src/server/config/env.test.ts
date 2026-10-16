@@ -95,6 +95,12 @@ describe("parseEnv", () => {
         expect(() => parseEnv(withoutToken, true)).toThrow("DATABASE_AUTH_TOKEN: not set")
     })
 
+    it("should parse the preview shape with the variables of the vercel shape", () => {
+        expect(parseEnv({ ...vercelEnv, APP_ENV: "preview" }, true).APP_ENV).toBe(
+            "preview",
+        )
+    })
+
     it("should reject a variable that is set but empty", () => {
         expect(() => parseEnv({ ...vercelEnv, S3_SECRET_KEY: "" }, true)).toThrow(
             "S3_SECRET_KEY: set but empty",

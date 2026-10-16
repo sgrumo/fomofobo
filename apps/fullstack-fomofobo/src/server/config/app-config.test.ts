@@ -7,7 +7,27 @@ describe("resolveAppConfig", () => {
         expect(appEnvValues.map(resolveAppConfig)).toHaveLength(appEnvValues.length)
     })
 
-    it("should hide the error detail and the API documentation in a deployed shape", () => {
+    it("should serve the dev pages but never the database reset in the preview shape", () => {
+        const config = resolveAppConfig("preview")
+
+        expect({
+            devPagesEnabled: config.devPagesEnabled,
+            apiDocsEnabled: config.apiDocsEnabled,
+            verboseErrors: config.verboseErrors,
+            secureCookies: config.secureCookies,
+            allowInsecureOidc: config.allowInsecureOidc,
+            databaseResetEnabled: config.databaseResetEnabled,
+        }).toStrictEqual({
+            devPagesEnabled: true,
+            apiDocsEnabled: true,
+            verboseErrors: true,
+            secureCookies: true,
+            allowInsecureOidc: false,
+            databaseResetEnabled: false,
+        })
+    })
+
+    it("should hide the error detail and the API documentation in the vercel shape", () => {
         const config = resolveAppConfig("vercel")
 
         expect({

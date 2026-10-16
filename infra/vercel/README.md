@@ -7,6 +7,8 @@ The app runs on Vercel, the database on Turso, and the files on Cloudflare R2. E
 | `prod`      | `main` | `fomofobo-prod` | `fomofobo-prod` | `fomofobo-prod`, `fomofobo-prod-photos` |
 | `dev`       | `dev`  | `fomofobo-dev`  | `fomofobo-dev`  | `fomofobo-dev`, `fomofobo-dev-photos`   |
 
+`dev` runs the `preview` shape of `APP_ENV`, and `prod` runs `vercel`. `preview` serves the `/dev/*` pages, the API documentation and detailed errors to anyone who opens its URL. `apps/fullstack-fomofobo/src/server/config/app-config.ts` lists what each shape serves.
+
 `.github/workflows/deploy-vercel.yaml` deploys each push to `main` and `dev`, after the quality jobs pass. It runs these steps:
 
 1. Apply the pending migrations to the Turso database of the environment. A failed migration stops the deploy, and the running version keeps serving.

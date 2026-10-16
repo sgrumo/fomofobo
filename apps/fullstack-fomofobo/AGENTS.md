@@ -122,11 +122,11 @@ OpenID Connect Authorization Code with PKCE, owned by `openid-client`. No hand-w
 - `getSession()` reads claims **without** a signature check. Display and expiry only. **NEVER** decide access with it
 - A route handler sets cookies on the response it returns (`NextResponse.cookies.set`). `redirect()` of `next/navigation` drops the `cookies()` store
 - Cookies are `HttpOnly`, the browser never holds a token. The middleware reads the access cookie on a same-origin `GET`, the `Authorization` header in process
-- Cookie names and `Secure` follow `APP_ENV`: `__Host-` + `Secure` in `vercel`, plain in `local` and `test`. A deletion repeats path and flag
+- Cookie names and `Secure` follow `APP_ENV`: `__Host-` + `Secure` in `preview` and `vercel`, plain in `local` and `test`. A deletion repeats path and flag
 - Provider unreachable -> `503` (`AuthProviderUnavailable`), **NEVER** `401` - a `401` signs everybody out
 - `/auth/refresh` keeps the cookies on a refused grant - two tabs share one token
 - `/auth/logout` answers a same-origin `POST` alone and redirects with `303` - a `307` replays the `POST` at the provider
-- `vercel` refuses a plain-HTTP issuer. `local` and `test` opt in through `allowInsecureOidc`
+- `preview` and `vercel` refuse a plain-HTTP issuer. `local` and `test` opt in through `allowInsecureOidc`
 - Provider extras (password policies, admin SDKs, post-login hooks) stay out of this app
 
 ## API

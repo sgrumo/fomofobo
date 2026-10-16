@@ -73,7 +73,7 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         S3_SECRET_KEY: z.string().nonempty().default("admin"),
     }),
     z.object({
-        APP_ENV: appEnv.extract(["vercel"]),
+        APP_ENV: appEnv.extract(["preview", "vercel"]),
         OIDC_ISSUER: oidcIssuerSchema,
         OIDC_CLIENT_ID: z.string().nonempty(),
         OIDC_CLIENT_SECRET: optionalEnv(z.string().nonempty()),

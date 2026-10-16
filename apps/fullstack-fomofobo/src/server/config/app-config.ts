@@ -8,9 +8,10 @@ import { match } from "ts-pattern"
  * per-feature override flag:
  * - `test` — E2E and CI
  * - `local` — host development
- * - `vercel` — a deployment on Vercel, with Turso and R2
+ * - `preview` — a non-production deployment on Vercel, with Turso and R2
+ * - `vercel` — a production deployment on Vercel, with Turso and R2
  */
-export const appEnvValues = ["test", "local", "vercel"] as const
+export const appEnvValues = ["test", "local", "preview", "vercel"] as const
 export type AppEnv = (typeof appEnvValues)[number]
 
 export interface AppConfig {
@@ -63,6 +64,14 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
             databaseResetEnabled: false,
             secureCookies: false,
             allowInsecureOidc: true,
+            devPagesEnabled: true,
+            verboseErrors: true,
+            apiDocsEnabled: true,
+        }))
+        .with("preview", () => ({
+            databaseResetEnabled: false,
+            secureCookies: true,
+            allowInsecureOidc: false,
             devPagesEnabled: true,
             verboseErrors: true,
             apiDocsEnabled: true,

@@ -13,7 +13,7 @@ Register two URLs at the provider, for each environment:
 `APP_BASE_URL` is the origin the browser reads the app on. Each deploy
 environment sets it in its Vercel target, as `infra/vercel/README.md` lists.
 
-The provider must answer over HTTPS in `vercel`. Plain HTTP is
+The provider must answer over HTTPS in `preview` and `vercel`. Plain HTTP is
 accepted in `local` and `test` alone, where the provider is a container on
 `localhost`. The app refuses to boot otherwise.
 
