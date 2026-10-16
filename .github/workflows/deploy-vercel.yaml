@@ -75,25 +75,12 @@ jobs:
             - name: Apply the migrations to Turso
               run: pnpm -C packages/storage db:migrate
 
-            # Writes `.vercel/project.json` from the two ids, which `vercel env` needs.
-            - name: Link the Vercel project
-              run: pnpm dlx "$VERCEL_CLI" pull --yes --environment=production --token "$VERCEL_TOKEN"
-
             - name: Write the runtime values into the Vercel project
-              run: |
-                  add() {
-                      printf '%s' "$2" | pnpm dlx "$VERCEL_CLI" env add "$1" production \
-                          --force "$3" --token "$VERCEL_TOKEN" > /dev/null
-                  }
-                  while IFS='=' read -r name value; do
-                      add "$name" "$value" --no-sensitive
-                  done < <(grep -E '^[A-Z0-9_]+=' "$CONFIG_FILE")
-                  for name in DATABASE_AUTH_TOKEN S3_ACCESS_KEY S3_SECRET_KEY; do
-                      add "$name" "${!name}" --sensitive
-                  done
-              shell: bash
+              run: node .github/scripts/write-vercel-env.mjs
+              env:
+                  SECRET_NAMES: DATABASE_AUTH_TOKEN S3_ACCESS_KEY S3_SECRET_KEY
 
-            - name: Pull the Vercel project settings with the new values
+            - name: Pull the Vercel project settings
               run: pnpm dlx "$VERCEL_CLI" pull --yes --environment=production --token "$VERCEL_TOKEN"
 
             - name: Build the deployment
