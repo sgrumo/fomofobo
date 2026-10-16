@@ -26,7 +26,7 @@
         "api-client": "workspace:*",
         "api-routes": "workspace:*",
         "backend-shared": "workspace:*",
-        "better-auth": "1.7.7",
+        "better-auth": "catalog:",
         "components-samples": "workspace:*",
         "components-showcase": "workspace:*",
         "es-toolkit": "catalog:",

@@ -35,6 +35,14 @@ Shared libraries consumed by apps via pnpm workspace references.
 
 The `packages/storage/migrations/` directory holds Drizzle-generated SQL migration files. Migrations are generated from the schema in `packages/storage/src/db-schema.ts` using the config at `packages/storage/drizzle.config.ts`. `drizzle-kit migrate` applies them through `packages/storage/drizzle.migrate.config.ts` to the database of `DATABASE_URL`: the local file, or Turso on each deploy.
 
+The backoffice has no sign-up. To sign in, create an Admin with the `admin-accounts` CLI, which prompts for the password:
+
+```bash
+DATABASE_URL=file:../../.data/local.db pnpm admin-accounts create-admin --name "<name>" --email <email>
+```
+
+The CLI runs inside `scripts/admin-accounts`, so a `file:` URL is relative to that folder. For Turso, pass its `libsql:` URL and `DATABASE_AUTH_TOKEN`. `reset-password --email <email>` sets a new password of any account and ends its sessions. The dev seed accounts have no password until you set one.
+
 ### Infrastructure
 
 [`infra/`](infra/) holds the deploy docs, and [`.github/`](.github/) the CI docs.
@@ -44,6 +52,7 @@ The `packages/storage/migrations/` directory holds Drizzle-generated SQL migrati
 | Package                  | Description                                                                                                  |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------ |
 | `i18n-sheets`            | Google Sheets translation download/export tooling                                                            |
+| `admin-accounts`         | CLI that creates an Admin, or sets a new password of any account. See [Database](#database)                  |
 | `obfuscate`              | CLI that obfuscates a string via the `obfuscation` package                                                   |
 | `with-env`               | Bin that loads the env file of a Next or Expo dev script, then runs its command. See [Env files](#env-files) |
 | `e2e-kit`                | Harness the E2E suites share: containers, servers, lifecycle, Playwright config                              |

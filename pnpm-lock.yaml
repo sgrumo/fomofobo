@@ -216,6 +216,9 @@ catalogs:
     babel-plugin-react-compiler:
       specifier: 1.0.0
       version: 1.0.0
+    better-auth:
+      specifier: 1.7.7
+      version: 1.7.7
     clsx:
       specifier: ^2.1.1
       version: 2.1.1
@@ -330,7 +333,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/backend-shared
       better-auth:
-        specifier: 1.7.7
+        specifier: 'catalog:'
         version: 1.7.7(drizzle-kit@0.31.5)(drizzle-orm@0.45.4)(next@16.4.1)(pg@8.23.1)(react-dom@19.3.0)(react@19.3.0)(vitest@5.0.3)
       components-samples:
         specifier: workspace:*
@@ -1180,6 +1183,34 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 5.0.3(@types/node@24.19.1)(jsdom@30.1.2)(vite@8.3.4)
+
+  scripts/admin-accounts:
+    dependencies:
+      better-auth:
+        specifier: 'catalog:'
+        version: 1.7.7(drizzle-kit@0.31.5)(drizzle-orm@0.45.4)(next@16.4.1)(pg@8.23.1)(react-dom@19.3.0)(react@19.3.0)(vitest@5.0.3)
+      models:
+        specifier: workspace:*
+        version: link:../../packages/models
+      storage:
+        specifier: workspace:*
+        version: link:../../packages/storage
+    devDependencies:
+      '@types/node':
+        specifier: ^24.13.1
+        version: 24.19.1
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.87.0(oxlint-tsgolint@7.0.2004)
+      oxlint-tsgolint:
+        specifier: 'catalog:'
+        version: 7.0.2004
+      tsx:
+        specifier: 'catalog:'
+        version: 4.21.0
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
 
   scripts/i18n-sheets:
     dependencies:
