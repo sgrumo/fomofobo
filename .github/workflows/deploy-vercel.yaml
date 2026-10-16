@@ -46,14 +46,14 @@ jobs:
             S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
             CONFIG_FILE: infra/vercel/env/${{ inputs.environment }}.env
         steps:
-            - name: Check the credentials of the environment
+            - name: Check the values of the environment
               run: |
                   missing=""
-                  for name in DATABASE_AUTH_TOKEN S3_ACCESS_KEY S3_SECRET_KEY; do
+                  for name in VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN DATABASE_AUTH_TOKEN S3_ACCESS_KEY S3_SECRET_KEY; do
                       if [ -z "${!name}" ]; then missing="$missing $name"; fi
                   done
                   if [ -n "$missing" ]; then
-                      echo "::error::Set the secrets of the ${{ inputs.environment }} environment:$missing"
+                      echo "::error::Set for the ${{ inputs.environment }} environment:$missing. VERCEL_ORG_ID and VERCEL_PROJECT_ID are variables, the others secrets"
                       exit 1
                   fi
               shell: bash
@@ -75,6 +75,10 @@ jobs:
             - name: Apply the migrations to Turso
               run: pnpm -C packages/storage db:migrate
 
+            # Writes `.vercel/project.json` from the two ids, which `vercel env` needs.
+            - name: Link the Vercel project
+              run: pnpm dlx "$VERCEL_CLI" pull --yes --environment=production --token "$VERCEL_TOKEN"
+
             - name: Write the runtime values into the Vercel project
               run: |
                   add() {
@@ -89,7 +93,7 @@ jobs:
                   done
               shell: bash
 
-            - name: Pull the Vercel project settings
+            - name: Pull the Vercel project settings with the new values
               run: pnpm dlx "$VERCEL_CLI" pull --yes --environment=production --token "$VERCEL_TOKEN"
 
             - name: Build the deployment
