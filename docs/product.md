@@ -60,7 +60,11 @@ The app installs on the home screen and opens full-screen. Offline, the events a
 
 ### Backoffice access
 
-Organizers and Admins sign in with email and password, and nobody registers on their own. Admins create organizer accounts. A blocked organizer cannot sign in and loses every open session at once. (not built)
+Organizers and Admins sign in with email and password, and nobody registers on their own. A blocked organizer cannot sign in and loses every open session at once. (not built)
+
+An Admin creates an organizer account with a temporary password and hands it over. When an organizer loses the password, an Admin sets a new one, which ends every open session of the account. The app sends no email.
+
+Admin accounts come from a command-line tool that runs against the database. No Admin creates or manages another Admin in the app.
 
 ### Event management
 
@@ -76,5 +80,5 @@ Admins create organizer accounts with a name and an email, and block or unblock 
 - Server Components and route handlers serve the public reads, and Server Actions carry the backoffice writes.
 - Turso, a hosted libSQL database (SQLite), holds categories, venues, events, occurrences and accounts. Occurrences are stored as rows, because the map search filters them by time window and by area.
 - Cloudflare R2 holds the event photos, uploaded from the backoffice straight to the bucket.
-- Authentication runs inside the app with database sessions, because Admins create accounts and a block must end every open session at once.
+- Authentication runs inside the app with database sessions, because Admins create accounts and a block must end every open session at once. Every backoffice API call reads the session from the database, so a block applies on the next call.
 - Deploy: the app runs on Vercel, in the region of its Turso database. Every service runs on its free plan. The Vercel Hobby plan admits non-commercial use only.

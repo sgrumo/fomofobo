@@ -106,28 +106,26 @@ Client component  -> useMutation     -> api        -> apiAction       -> serverT
 
 ## Authentication
 
-OpenID Connect Authorization Code with PKCE, owned by `openid-client`. No hand-written cryptography or token parsing.
+Email and password through Better Auth, with database sessions on libSQL. No sign-up, no external provider, no hand-written cryptography.
 
 ```
-(protected)/<page>   -> requireSession(path) -> redirect to /auth/login?returnTo= when absent
-(protected)/layout   -> getSession()         -> avatar menu with sign-out
-/auth/login          -> PKCE + state cookie  -> provider
-/auth/callback       -> code exchange        -> session cookies -> returnTo
-/auth/refresh        -> refresh grant        -> new cookies, 401 keeps the old ones
-/auth/logout         -> POST, same origin    -> 303 to the end-session endpoint
+(protected)/<page>            -> requireSession(path) -> redirect to the login page with returnTo when absent
+(protected)/layout            -> getSession()         -> avatar menu with sign-out
+POST /api/auth/sign-in/email  -> the library          -> session cookie
+/api/backoffice/*             -> backofficeSession    -> c.var.account, or 401 Unauthenticated / AccountBlocked
+/auth/logout                  -> POST, same origin    -> 303 to the login page
 ```
 
 - **Every `(protected)` page calls `requireSession` with its own path** - never the layout (no pathname there), never `proxy.ts`
-- The guard gates pages. The security boundary is the Hono middleware of `backend-shared/auth`, which verifies the token of **every** API call
-- `getSession()` reads claims **without** a signature check. Display and expiry only. **NEVER** decide access with it
-- A route handler sets cookies on the response it returns (`NextResponse.cookies.set`). `redirect()` of `next/navigation` drops the `cookies()` store
-- Cookies are `HttpOnly`, the browser never holds a token. The middleware reads the access cookie on a same-origin `GET`, the `Authorization` header in process
-- Cookie names and `Secure` follow `APP_ENV`: `__Host-` + `Secure` in `preview` and `vercel`, plain in `local` and `test`. A deletion repeats path and flag
-- Provider unreachable -> `503` (`AuthProviderUnavailable`), **NEVER** `401` - a `401` signs everybody out
-- `/auth/refresh` keeps the cookies on a refused grant - two tabs share one token
-- `/auth/logout` answers a same-origin `POST` alone and redirects with `303` - a `307` replays the `POST` at the provider
-- `preview` and `vercel` refuse a plain-HTTP issuer. `local` and `test` opt in through `allowInsecureOidc`
-- Provider extras (password policies, admin SDKs, post-login hooks) stay out of this app
+- The guard gates pages. The security boundary is `backofficeSession` on `/api/backoffice/*`, which reads the session row on **every** call. An Admin-only route adds `requireRole("admin")` -> `403 ForbiddenAction`
+- `AuthAccountsService` is the one wrapper of the library: session reads, account creation, password, block. A write that ends sessions runs in one storage batch with them
+- Hono mounts one library endpoint, the sign-in. **NEVER** mount the whole library handler - it serves sign-up, account changes and admin endpoints over HTTP
+- A blocked account signs in like a wrong password, and any backoffice call answers `401 AccountBlocked` and deletes its sessions. The `401` sends the browser to the login page
+- `session.cookieCache` stays off, so a block or a revoked session applies on the next request
+- The `nextCookies` plugin writes a refreshed session cookie in a route handler and a Server Action. A page reads with `refresh: false`: a Server Component cannot write a cookie. Keep `nextCookies` the last plugin
+- Cookies carry the `fomofobo` prefix, plus `__Secure-` and `Secure` in `preview` and `vercel`. The library accepts a sign-in from the origin of `APP_BASE_URL` alone
+- `/auth/logout` answers a same-origin `POST` alone and redirects with `303` - a `307` replays the `POST` at the login page
+- Admins create Organizers in the backoffice. The `admin-accounts` CLI creates Admins
 
 ## API
 
@@ -154,4 +152,4 @@ OpenID Connect Authorization Code with PKCE, owned by `openid-client`. No hand-w
 
 ## Deployment
 
-`infra/auth-oidc.md` documents the provider setup, and `infra/vercel/README.md` the deploy. Read them **before** you change env vars, secrets, the database, object storage or networking. **NEVER** assume a topology.
+`infra/vercel/README.md` documents the deploy. Read it **before** you change env vars, secrets, the database, object storage or networking. **NEVER** assume a topology.

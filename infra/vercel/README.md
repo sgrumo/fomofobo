@@ -49,12 +49,14 @@ At repository level, set the variable `VERCEL_ORG_ID` and the secret `VERCEL_TOK
     ```
 
 5. Create an R2 API token with Object Read and Write on the buckets of the environment.
-6. In Vercel, create an empty project `fomofobo-<env>` with Root Directory `apps/fullstack-fomofobo`, and connect no Git repository. Write its production domain into `APP_BASE_URL` of `env/<env>.env`.
+6. In Vercel, create an empty project `fomofobo-<env>` with Root Directory `apps/fullstack-fomofobo`, and connect no Git repository. Write its production domain into `APP_BASE_URL` of `env/<env>.env`. The auth library accepts a sign-in only from this origin.
 7. In GitHub, create the environment `<env>`. Give it the variable `VERCEL_PROJECT_ID`, the id of the project, and the secrets of "Runtime values".
 8. Replace every `PLACEHOLDER` of `env/<env>.env`. The deploy refuses a file that holds one.
 9. Push the branch of the environment.
 
 The environment is ready when the deploy job of the branch ends green and `https://<app origin>/api/health` answers `200`.
+
+The backoffice has no sign-up. Create the first Admin with the `admin-accounts` CLI, on the Turso URL of the environment and a database token. "Database" in the root `README.md` shows the command.
 
 `engines.node` in `package.json` of the app sets the Node version of the build and of the functions.
 
