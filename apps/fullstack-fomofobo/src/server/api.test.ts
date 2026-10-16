@@ -8,6 +8,7 @@ import type { AppErrorCode } from "./errors"
 const appErrorCodes: AppErrorCode[] = [
     "GenericError",
     "Unauthenticated",
+    "AccountBlocked",
     "ForbiddenAction",
     "ItemNotFound",
     "RouteNotFound",
@@ -45,8 +46,9 @@ describe("mapErrorStatus", () => {
         expect(statusOf("ForbiddenAction")).toBe(HttpStatus.Forbidden)
     })
 
-    it("should map a missing session to 401", () => {
+    it("should map a missing session and a blocked account to 401", () => {
         expect(statusOf("Unauthenticated")).toBe(HttpStatus.Unauthorized)
+        expect(statusOf("AccountBlocked")).toBe(HttpStatus.Unauthorized)
     })
 
     it("should never answer a client error with a server status", () => {
@@ -55,6 +57,7 @@ describe("mapErrorStatus", () => {
             "ItemNotFound",
             "ForbiddenAction",
             "Unauthenticated",
+            "AccountBlocked",
         ]
 
         expect(clientErrors.map(statusOf).every(status => status < 500)).toBe(true)

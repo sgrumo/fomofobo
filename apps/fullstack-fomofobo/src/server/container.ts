@@ -8,11 +8,13 @@ import { buildAuth } from "./auth/auth"
 import type { AppConfig } from "./config/app-config"
 import { resolveAppConfig } from "./config/app-config"
 import { parseEnv } from "./config/env"
+import { AuthAccountsService } from "./services/auth-accounts-service"
 
 export interface Container {
     appConfig: AppConfig
     db: DbInstanceFromSchema
     auth: Auth
+    authAccounts: AuthAccountsService
 }
 
 /**
@@ -27,15 +29,18 @@ const buildContainer = (): Container => {
         authToken: env.DATABASE_AUTH_TOKEN,
     })
 
+    const auth = buildAuth(db, {
+        baseUrl: env.APP_BASE_URL,
+        secret: env.BETTER_AUTH_SECRET,
+        secureCookies: appConfig.secureCookies,
+        rateLimitEnabled: appConfig.authRateLimitEnabled,
+    })
+
     return {
         appConfig,
         db,
-        auth: buildAuth(db, {
-            baseUrl: env.APP_BASE_URL,
-            secret: env.BETTER_AUTH_SECRET,
-            secureCookies: appConfig.secureCookies,
-            rateLimitEnabled: appConfig.authRateLimitEnabled,
-        }),
+        auth,
+        authAccounts: new AuthAccountsService(auth),
     }
 }
 

@@ -2,6 +2,7 @@ import "server-only"
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { APIError } from "better-auth/api"
+import { nextCookies } from "better-auth/next-js"
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from "models"
 import type { DbInstanceFromSchema } from "storage"
 import {
@@ -35,6 +36,8 @@ const invalidCredentialsError = (): APIError =>
  * @description Builds the auth library instance over the database
  * @param db Database of the process
  * @param settings Origin, secret and environment flags
+ * @remarks Writes a refreshed session cookie through the Next cookie store, which a route
+ * handler and a Server Action carry onto their response
  */
 export const buildAuth = (db: DbInstanceFromSchema, settings: AuthSettings) => {
     const accountsStorage = new AccountsStorage(db)
@@ -100,6 +103,8 @@ export const buildAuth = (db: DbInstanceFromSchema, settings: AuthSettings) => {
                 },
             },
         },
+        // Last plugin: it writes the cookies the other plugins set
+        plugins: [nextCookies()],
     })
 }
 

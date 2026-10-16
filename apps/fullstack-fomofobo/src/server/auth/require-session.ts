@@ -1,13 +1,13 @@
 import "server-only"
+import type { Account } from "models"
 import { redirect } from "next/navigation"
 
 import { buildLoginPath } from "@/lib/auth/return-path"
 
-import type { Session } from "./session"
 import { getSession } from "./session"
 
 /**
- * @description Returns the session of the request, or sends the visitor to the login page
+ * @description Returns the account of the request session, or sends the visitor to the login page
  * @param returnTo Path of the page, which the sign-in ends on
  * @throws When nobody is signed in, through the redirect Next raises
  * @remarks Called by every protected page, not by its layout: Next hands a layout no
@@ -16,10 +16,10 @@ import { getSession } from "./session"
  * @remarks Gates the page, not the data. The API checks the session of every
  * backoffice call on its own
  */
-export const requireSession = async (returnTo: string): Promise<Session> => {
-    const session = await getSession()
-    if (session === undefined) {
+export const requireSession = async (returnTo: string): Promise<Account> => {
+    const account = await getSession()
+    if (account === undefined) {
         redirect(buildLoginPath(returnTo))
     }
-    return session
+    return account
 }

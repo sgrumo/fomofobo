@@ -5,29 +5,31 @@ import type { ApiError } from "models"
 import { HttpStatus } from "models"
 
 /**
- * @description Returns a `400` response for a failed validation, or `undefined` to
- * continue
- * @param result Validation result of the request
- * @param c Request context
+ * @description Builds the hook that answers a failed validation with `400`, or returns
+ * `undefined` to continue
+ * @template T Bindings and variables of the router the hook serves
  */
-export const defaultValidationHook: Hook<unknown, Env, string, unknown> = (result, c) => {
-    if (!result.success) {
-        return c.json<ApiError>(
-            {
-                code: "InvalidRequest",
-                message: z.prettifyError(result.error),
-                status: HttpStatus.BadRequest,
-            },
-            HttpStatus.BadRequest,
-        )
+export const buildValidationHook =
+    <T extends Env>(): Hook<unknown, T, string, unknown> =>
+    (result, c) => {
+        if (!result.success) {
+            return c.json<ApiError>(
+                {
+                    code: "InvalidRequest",
+                    message: z.prettifyError(result.error),
+                    status: HttpStatus.BadRequest,
+                },
+                HttpStatus.BadRequest,
+            )
+        }
+        return undefined
     }
-    return undefined
-}
 
 /**
  * @description Returns a router applying the shared validation hook
+ * @template T Bindings and variables the middlewares of the app set
  */
-export const createRouter = (): OpenAPIHono =>
-    new OpenAPIHono({
-        defaultHook: defaultValidationHook,
+export const createRouter = <T extends Env = Env>(): OpenAPIHono<T> =>
+    new OpenAPIHono<T>({
+        defaultHook: buildValidationHook<T>(),
     })

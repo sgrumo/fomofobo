@@ -18,8 +18,8 @@ const jsonError = (description: string): JsonErrorResponse => ({
 
 export const badRequestResponse: JsonErrorResponse = jsonError("Invalid input")
 export const sessionErrorResponses: { 401: JsonErrorResponse; 403: JsonErrorResponse } = {
-    401: jsonError("No valid session"),
-    403: jsonError("Account blocked, or action outside its role"),
+    401: jsonError("No valid session, or a blocked account"),
+    403: jsonError("Action outside the role of the account"),
 }
 /**
  * @description Builds a not-found response naming the missing entity

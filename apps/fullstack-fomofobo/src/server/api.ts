@@ -8,9 +8,11 @@ import { HttpStatus } from "models"
 import { deleteAllRows } from "storage"
 import { match } from "ts-pattern"
 
+import { backofficeSession } from "./auth/backoffice-session"
 import { getContainer } from "./container"
 import type { AppErrorCode } from "./errors"
 import { handleRouteNotFound } from "./errors"
+import { buildBackofficeSessionRouter } from "./routers/backoffice-session-router"
 
 /**
  * Prefix the Next catch-all route answers on. Every route definition of
@@ -28,7 +30,7 @@ export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus 
         .with("GenericError", "ResponseValidationError", () => HttpStatus.InternalError)
         .with("InvalidRequest", () => HttpStatus.BadRequest)
         .with("RouteNotFound", "ItemNotFound", () => HttpStatus.NotFound)
-        .with("Unauthenticated", () => HttpStatus.Unauthorized)
+        .with("Unauthenticated", "AccountBlocked", () => HttpStatus.Unauthorized)
         .with("ForbiddenAction", () => HttpStatus.Forbidden)
         .exhaustive()
 
@@ -40,9 +42,11 @@ export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus 
  * @remarks Exposes one endpoint of the auth library, the sign-in. Its other endpoints,
  * the sign-up and the account changes included, answer `404`: the services call the
  * library on the server
+ * @remarks Checks the session of every `/api/backoffice/*` call, a route not mounted
+ * included, so an unknown backoffice path answers `401` to a visitor without one
  */
 const buildApi = (): OpenAPIHono => {
-    const { appConfig, auth, db } = getContainer()
+    const { appConfig, auth, authAccounts, db } = getContainer()
 
     const app = new OpenAPIHono()
 
@@ -57,6 +61,9 @@ const buildApi = (): OpenAPIHono => {
     app.get(`${apiBasePath}/health`, c => c.json({ status: "ok" }))
 
     app.post(`${apiBasePath}/auth/sign-in/email`, c => auth.handler(c.req.raw))
+
+    app.use(`${apiBasePath}/backoffice/*`, backofficeSession(authAccounts))
+    app.route("/", buildBackofficeSessionRouter())
 
     if (appConfig.databaseResetEnabled) {
         app.post(`${apiBasePath}/test/reset-database`, async c => {
