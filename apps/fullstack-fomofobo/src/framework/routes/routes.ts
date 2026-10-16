@@ -39,9 +39,6 @@ export const routes = {
 
 export const routeHandlers = {
     api: createRouteHandler({ segments: ["api", "[[...route]]"] }),
-    authLogin: createRouteHandler({ segments: ["auth", "login"] }),
-    authCallback: createRouteHandler({ segments: ["auth", "callback"] }),
-    authRefresh: createRouteHandler({ segments: ["auth", "refresh"] }),
     authLogout: createRouteHandler({ segments: ["auth", "logout"] }),
 } as const
 

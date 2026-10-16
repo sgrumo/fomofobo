@@ -8,7 +8,6 @@ import type { AppErrorCode } from "./errors"
 const appErrorCodes: AppErrorCode[] = [
     "GenericError",
     "Unauthenticated",
-    "AuthProviderUnavailable",
     "ForbiddenAction",
     "ItemNotFound",
     "RouteNotFound",
@@ -46,13 +45,8 @@ describe("mapErrorStatus", () => {
         expect(statusOf("ForbiddenAction")).toBe(HttpStatus.Forbidden)
     })
 
-    it("should map a missing or refused token to 401", () => {
+    it("should map a missing session to 401", () => {
         expect(statusOf("Unauthenticated")).toBe(HttpStatus.Unauthorized)
-    })
-
-    it("should map an unreachable provider to 503, never to 401", () => {
-        // A 401 sends the browser to the login; a provider outage deserves a retry.
-        expect(statusOf("AuthProviderUnavailable")).toBe(HttpStatus.ServiceUnavailable)
     })
 
     it("should never answer a client error with a server status", () => {

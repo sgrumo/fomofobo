@@ -1,6 +1,4 @@
 import "server-only"
-import type { TokenVerifier } from "backend-shared/auth"
-import { createTokenVerifier } from "backend-shared/auth"
 import { memoize } from "es-toolkit"
 import type { DbInstanceFromSchema } from "storage"
 import { buildDbInstance } from "storage"
@@ -15,7 +13,6 @@ export interface Container {
     appConfig: AppConfig
     db: DbInstanceFromSchema
     auth: Auth
-    tokenVerifier: TokenVerifier
 }
 
 /**
@@ -38,17 +35,6 @@ const buildContainer = (): Container => {
             secret: env.BETTER_AUTH_SECRET,
             secureCookies: appConfig.secureCookies,
             rateLimitEnabled: appConfig.authRateLimitEnabled,
-        }),
-        // Holds the key set of the provider. It fetches it on the first verified
-        // request, so a provider that is down delays no boot.
-        tokenVerifier: createTokenVerifier({
-            issuer: env.OIDC_ISSUER,
-            audience: env.OIDC_AUDIENCE,
-            // Absent by default: discovery resolves the key set from the issuer.
-            jwksUrl: env.OIDC_JWKS_URL,
-            // Plain HTTP for the container of `local` and `test` alone. A deployed
-            // shape refuses it, and the boot fails on the first request.
-            allowInsecure: appConfig.allowInsecureOidc,
         }),
     }
 }

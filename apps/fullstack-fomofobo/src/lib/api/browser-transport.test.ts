@@ -5,12 +5,11 @@ import type { ApiActionResult } from "./api-action-result"
 
 const clientTransport = vi.fn<() => Promise<string>>()
 const apiAction = vi.fn<() => Promise<ApiActionResult>>()
-const refreshSession = vi.fn<() => Promise<boolean>>()
 const redirectToLogin = vi.fn<() => void>()
 
 vi.mock(import("./client-transport"), () => ({ clientTransport }))
 vi.mock(import("@/actions/api-action"), () => ({ apiAction }))
-vi.mock(import("./session-refresh"), () => ({ refreshSession, redirectToLogin }))
+vi.mock(import("./login-redirect"), () => ({ redirectToLogin }))
 
 const { browserTransport } = await import("./browser-transport")
 const { ApiTransportError } = await import("./transport-error")
@@ -19,7 +18,6 @@ describe("browserTransport", () => {
     beforeEach(() => {
         clientTransport.mockReset().mockResolvedValue("http")
         apiAction.mockReset().mockResolvedValue({ outcome: "ok", data: "action" })
-        refreshSession.mockReset().mockResolvedValue(true)
         redirectToLogin.mockReset()
     })
 
@@ -88,19 +86,7 @@ describe("browserTransport", () => {
             )
         }
 
-        it("should refresh the session, then retry the call one time", async () => {
-            failWith(HttpStatus.Unauthorized)
-
-            await expect(
-                browserTransport({ method: "get", path: "/api/todos" }),
-            ).resolves.toBe("http")
-
-            expect(refreshSession).toHaveBeenCalledOnce()
-            expect(clientTransport).toHaveBeenCalledTimes(2)
-        })
-
-        it("should go to the provider when the refresh fails", async () => {
-            refreshSession.mockResolvedValue(false)
+        it("should send the browser to the login page, with no retry", async () => {
             failWith(HttpStatus.Unauthorized)
 
             await expect(
@@ -111,22 +97,7 @@ describe("browserTransport", () => {
             expect(clientTransport).toHaveBeenCalledOnce()
         })
 
-        it("should go to the provider on a second 401, instead of looping", async () => {
-            failWith(HttpStatus.Unauthorized)
-            failWith(HttpStatus.Unauthorized)
-
-            await expect(
-                browserTransport({ method: "get", path: "/api/todos" }),
-            ).rejects.toBeInstanceOf(ApiTransportError)
-
-            expect(refreshSession).toHaveBeenCalledOnce()
-            expect(clientTransport).toHaveBeenCalledTimes(2)
-            // A refresh that works and a retry that still fails means the session is
-            // over. Without this the visitor reads a toast on a page that never loads.
-            expect(redirectToLogin).toHaveBeenCalledOnce()
-        })
-
-        it("should refresh on an action that the API refused too", async () => {
+        it("should send the browser to the login page on an action that the API refused too", async () => {
             apiAction.mockResolvedValueOnce({
                 outcome: "error",
                 status: HttpStatus.Unauthorized,
@@ -136,9 +107,9 @@ describe("browserTransport", () => {
 
             await expect(
                 browserTransport({ method: "post", path: "/api/todos", body: {} }),
-            ).resolves.toBe("action")
+            ).rejects.toBeInstanceOf(ApiTransportError)
 
-            expect(refreshSession).toHaveBeenCalledOnce()
+            expect(redirectToLogin).toHaveBeenCalledOnce()
         })
 
         it("should leave every other failure alone", async () => {
@@ -148,7 +119,6 @@ describe("browserTransport", () => {
                 browserTransport({ method: "get", path: "/api/todos" }),
             ).rejects.toBeInstanceOf(ApiTransportError)
 
-            expect(refreshSession).not.toHaveBeenCalled()
             expect(redirectToLogin).not.toHaveBeenCalled()
         })
     })

@@ -15,14 +15,12 @@ describe("resolveAppConfig", () => {
             apiDocsEnabled: config.apiDocsEnabled,
             verboseErrors: config.verboseErrors,
             secureCookies: config.secureCookies,
-            allowInsecureOidc: config.allowInsecureOidc,
             databaseResetEnabled: config.databaseResetEnabled,
         }).toStrictEqual({
             devPagesEnabled: true,
             apiDocsEnabled: true,
             verboseErrors: true,
             secureCookies: true,
-            allowInsecureOidc: false,
             databaseResetEnabled: false,
         })
     })

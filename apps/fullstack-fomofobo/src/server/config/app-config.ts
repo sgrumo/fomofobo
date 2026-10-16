@@ -35,13 +35,6 @@ export interface AppConfig {
      */
     secureCookies: boolean
     /**
-     * Accept an OpenID provider served over plain HTTP.
-     *
-     * On for the mock provider of the E2E suite and for a local one. A deployed
-     * instance refuses it, so a token never crosses the network in the clear.
-     */
-    allowInsecureOidc: boolean
-    /**
      * Limit the sign-in attempts per IP. Off where one client signs in again and again:
      * the E2E suite and development.
      */
@@ -61,7 +54,6 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
             databaseResetEnabled: true,
             authRateLimitEnabled: false,
             secureCookies: false,
-            allowInsecureOidc: true,
             devPagesEnabled: true,
             verboseErrors: true,
             apiDocsEnabled: true,
@@ -70,7 +62,6 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
             databaseResetEnabled: false,
             authRateLimitEnabled: false,
             secureCookies: false,
-            allowInsecureOidc: true,
             devPagesEnabled: true,
             verboseErrors: true,
             apiDocsEnabled: true,
@@ -79,7 +70,6 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
             databaseResetEnabled: false,
             authRateLimitEnabled: true,
             secureCookies: true,
-            allowInsecureOidc: false,
             devPagesEnabled: true,
             verboseErrors: true,
             apiDocsEnabled: true,
@@ -88,7 +78,6 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
             databaseResetEnabled: false,
             authRateLimitEnabled: true,
             secureCookies: true,
-            allowInsecureOidc: false,
             devPagesEnabled: false,
             verboseErrors: false,
             apiDocsEnabled: false,

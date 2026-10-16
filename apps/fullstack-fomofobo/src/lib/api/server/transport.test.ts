@@ -79,25 +79,21 @@ describe("serverTransport", () => {
         expect(request.mock.calls[0]?.[1]?.headers).toStrictEqual({})
     })
 
-    it("should forward the access token of the session", async () => {
+    it("should forward the session cookies", async () => {
         await serverTransport(
             { method: "get", path: "/api/todos" },
-            {
-                accessToken: "token-abc",
-            },
+            { cookie: "fomofobo.session_token=abc" },
         )
 
         expect(request.mock.calls[0]?.[1]?.headers).toStrictEqual({
-            Authorization: "Bearer token-abc",
+            Cookie: "fomofobo.session_token=abc",
         })
     })
 
-    it("should send no authorization header when nobody is signed in", async () => {
+    it("should send no cookie header when the request holds none", async () => {
         await serverTransport(
             { method: "get", path: "/api/todos" },
-            {
-                accessToken: undefined,
-            },
+            { cookie: undefined },
         )
 
         expect(request.mock.calls[0]?.[1]?.headers).toStrictEqual({})

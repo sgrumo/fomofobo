@@ -8,9 +8,6 @@ const vercelEnv = {
     S3_ENDPOINT: "https://account.r2.cloudflarestorage.com",
     S3_ACCESS_KEY: "access",
     S3_SECRET_KEY: "secret",
-    OIDC_ISSUER: "https://auth.example.com/realms/app",
-    OIDC_CLIENT_ID: "fomofobo",
-    OIDC_AUDIENCE: "fomofobo-api",
     APP_BASE_URL: "https://app.example.com",
     DATABASE_URL: "libsql://fomofobo-dev-example.aws-eu-west-1.turso.io",
     DATABASE_AUTH_TOKEN: "token",
@@ -47,34 +44,14 @@ describe("parseEnv", () => {
         expect(env.S3_REGION).toBe("auto")
     })
 
-    it("should apply the local OIDC defaults, which name the mock provider", () => {
-        const env = parseEnv({}, false)
-
-        expect(env.OIDC_ISSUER).toBe("http://localhost:8090/default")
-        expect(env.OIDC_SCOPE).toContain("openid")
-        expect(env.APP_BASE_URL).toBe("http://localhost:3000")
-    })
-
-    it("should read no client secret as a public client", () => {
-        expect(parseEnv({}, false).OIDC_CLIENT_SECRET).toBeUndefined()
-        expect(
-            parseEnv({ OIDC_CLIENT_SECRET: "" }, false).OIDC_CLIENT_SECRET,
-        ).toBeUndefined()
-        expect(parseEnv({ OIDC_CLIENT_SECRET: "shh" }, false).OIDC_CLIENT_SECRET).toBe(
-            "shh",
-        )
+    it("should default to the origin of the local dev server", () => {
+        expect(parseEnv({}, false).APP_BASE_URL).toBe("http://localhost:3000")
     })
 
     it("should drop the trailing slash of the base URL", () => {
         expect(
             parseEnv({ APP_BASE_URL: "http://localhost:3000/" }, false).APP_BASE_URL,
         ).toBe("http://localhost:3000")
-    })
-
-    it("should require the OIDC variables of a deployed shape", () => {
-        const { OIDC_ISSUER: _unused, ...withoutIssuer } = vercelEnv
-
-        expect(() => parseEnv(withoutIssuer, true)).toThrow("OIDC_ISSUER: not set")
     })
 
     it("should default to the local database file, with no token", () => {

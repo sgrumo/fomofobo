@@ -1,7 +1,6 @@
 import "server-only"
 import { swaggerUI } from "@hono/swagger-ui"
 import { OpenAPIHono } from "@hono/zod-openapi"
-import { createAuthMiddleware } from "backend-shared/auth"
 import type { ApplicationError } from "backend-shared/http"
 import { handleErrors, loggerMiddleware } from "backend-shared/http"
 import { memoize } from "es-toolkit"
@@ -9,7 +8,6 @@ import { HttpStatus } from "models"
 import { deleteAllRows } from "storage"
 import { match } from "ts-pattern"
 
-import { getSessionCookieConfig } from "./auth/cookie-names"
 import { getContainer } from "./container"
 import type { AppErrorCode } from "./errors"
 import { handleRouteNotFound } from "./errors"
@@ -31,8 +29,6 @@ export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus 
         .with("InvalidRequest", () => HttpStatus.BadRequest)
         .with("RouteNotFound", "ItemNotFound", () => HttpStatus.NotFound)
         .with("Unauthenticated", () => HttpStatus.Unauthorized)
-        // The provider, not the caller: a retry is the answer, never a new login.
-        .with("AuthProviderUnavailable", () => HttpStatus.ServiceUnavailable)
         .with("ForbiddenAction", () => HttpStatus.Forbidden)
         .exhaustive()
 
@@ -41,32 +37,16 @@ export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus 
  * @throws When the environment misses a variable of its `APP_ENV` variant
  * @remarks Serves the OpenAPI document and its Swagger UI outside production only, so a
  * deployed build exposes neither
- * @remarks Guards every route but the infrastructure ones. The documentation stays open
- * where it answers at all, because it describes the API and carries no data of anybody
+ * @remarks Exposes one endpoint of the auth library, the sign-in. Its other endpoints,
+ * the sign-up and the account changes included, answer `404`: the services call the
+ * library on the server
  */
 const buildApi = (): OpenAPIHono => {
-    const { appConfig, db, tokenVerifier } = getContainer()
+    const { appConfig, auth, db } = getContainer()
 
     const app = new OpenAPIHono()
 
     app.use(loggerMiddleware)
-    // Guards the application, not one router: the in-process dispatch of a Server
-    // Component and the `fetch` of the browser both arrive here. The browser holds
-    // no token, so the cookie is what carries it on that path.
-    app.use(
-        createAuthMiddleware({
-            verifier: tokenVerifier,
-            unauthenticatedCode: "Unauthenticated",
-            unavailableCode: "AuthProviderUnavailable",
-            cookieName: getSessionCookieConfig().names.access,
-            publicPaths: [
-                `${apiBasePath}/health`,
-                `${apiBasePath}/doc`,
-                `${apiBasePath}/swagger`,
-                `${apiBasePath}/test/reset-database`,
-            ],
-        }),
-    )
     app.notFound(handleRouteNotFound)
     app.onError(
         handleErrors(mapErrorStatus, {
@@ -75,6 +55,8 @@ const buildApi = (): OpenAPIHono => {
     )
 
     app.get(`${apiBasePath}/health`, c => c.json({ status: "ok" }))
+
+    app.post(`${apiBasePath}/auth/sign-in/email`, c => auth.handler(c.req.raw))
 
     if (appConfig.databaseResetEnabled) {
         app.post(`${apiBasePath}/test/reset-database`, async c => {

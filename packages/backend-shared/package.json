@@ -6,7 +6,6 @@
     "type": "module",
     "exports": {
         ".": "./src/index.ts",
-        "./auth": "./src/auth/index.ts",
         "./config": "./src/config/index.ts",
         "./http": "./src/http/index.ts"
     },
@@ -23,7 +22,6 @@
         "@aws-sdk/s3-request-presigner": "^3.1036.0",
         "@hono/zod-openapi": "catalog:",
         "hono": "catalog:",
-        "jose": "^6.2.12",
         "models": "workspace:*",
         "shared": "workspace:*",
         "ts-pattern": "catalog:",

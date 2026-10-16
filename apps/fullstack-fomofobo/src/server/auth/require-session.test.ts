@@ -11,10 +11,10 @@ vi.mock(import("next/navigation"), () => ({ redirect }))
 const { requireSession } = await import("./require-session")
 
 const session: Session = {
-    accessToken: "token",
-    subject: "user-1",
-    name: "User One",
-    email: undefined,
+    accountId: "4b7e9c2d-1a3f-4d6b-8e5c-7f2a9b1c3d50",
+    name: "Rocca Eventi",
+    email: "rocca@fomofobo.local",
+    role: "organizer",
 }
 
 describe("requireSession", () => {
@@ -28,18 +28,18 @@ describe("requireSession", () => {
     it("should return the session of a signed-in visitor", async () => {
         getSession.mockResolvedValue(session)
 
-        await expect(requireSession("/todos")).resolves.toStrictEqual(session)
+        await expect(requireSession("/backoffice/events")).resolves.toStrictEqual(session)
         expect(redirect).not.toHaveBeenCalled()
     })
 
-    it("should send a signed-out visitor to the login, with the page to return to", async () => {
+    it("should send a signed-out visitor to the login page, with the page to return to", async () => {
         getSession.mockResolvedValue(undefined)
 
-        await expect(requireSession("/todos/search?text=milk")).rejects.toThrow(
+        await expect(requireSession("/backoffice/events?page=2")).rejects.toThrow(
             "NEXT_REDIRECT",
         )
         expect(redirect).toHaveBeenCalledWith(
-            "/auth/login?returnTo=%2Ftodos%2Fsearch%3Ftext%3Dmilk",
+            "/backoffice/login?returnTo=%2Fbackoffice%2Fevents%3Fpage%3D2",
         )
     })
 })

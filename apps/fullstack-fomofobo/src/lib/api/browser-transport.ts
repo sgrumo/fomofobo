@@ -4,7 +4,7 @@ import { HttpStatus } from "models"
 import { apiAction } from "@/actions/api-action"
 
 import { clientTransport } from "./client-transport"
-import { redirectToLogin, refreshSession } from "./session-refresh"
+import { redirectToLogin } from "./login-redirect"
 import { ApiTransportError } from "./transport-error"
 
 /**
@@ -39,44 +39,29 @@ const dispatch = async (request: ApiRequest): Promise<unknown> => {
 }
 
 /**
- * @description True when the failure is the API refusing the access token
+ * @description True when the failure is the API refusing the session
  * @param error Failure the dispatch raised
  */
 const isUnauthenticated = (error: unknown): boolean =>
     error instanceof ApiTransportError && error.status === HttpStatus.Unauthorized
 
 /**
- * @description Sends the request, and rotates the session once when the API refuses it
+ * @description Sends the request, and sends the browser to the login page when the API refuses the session
  * @param request Method, path, query and body of the call
  * @throws When the API answers outside the `2xx` range
  * @remarks Routes a plain read over same-origin HTTP. Everything else goes through a
  * Server Action: a change, because it must, and a `QUERY` read, because Next rejects
  * that method
- * @remarks Retries **one** time after a refresh. A second `401` means the session is
- * over, so the browser goes to the provider instead of looping
- * @remarks Carries the token in a cookie the browser cannot read, so the refresh is the
- * only way this side renews anything. There is no middleware to hold that logic
+ * @remarks Retries nothing on a `401`: a database session has no refresh, so a refused
+ * session is over
  */
 export const browserTransport = async (request: ApiRequest): Promise<unknown> => {
     try {
         return await dispatch(request)
     } catch (error) {
-        if (!isUnauthenticated(error)) {
-            throw error
-        }
-
-        if (!(await refreshSession())) {
+        if (isUnauthenticated(error)) {
             redirectToLogin()
-            throw error
         }
-
-        try {
-            return await dispatch(request)
-        } catch (retryError) {
-            if (isUnauthenticated(retryError)) {
-                redirectToLogin()
-            }
-            throw retryError
-        }
+        throw error
     }
 }

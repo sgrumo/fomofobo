@@ -1,11 +1,6 @@
 import "server-only"
 import { z } from "@hono/zod-openapi"
 import { logger } from "backend-shared"
-import {
-    oidcAudienceSchema,
-    oidcIssuerSchema,
-    oidcJwksUrlSchema,
-} from "backend-shared/auth"
 import { s3EndpointSchema } from "backend-shared/config"
 import { formatEnvFailure, optionalEnv } from "shared/env"
 
@@ -16,8 +11,8 @@ const appEnv = z.enum(appEnvValues)
 /**
  * Origin this application answers on, with no trailing slash.
  *
- * Every redirect URI is built from it, and the provider compares the result with
- * the one registered for the client. A wrong value fails the login, never the boot.
+ * The auth library trusts requests from this origin alone. A wrong value fails the
+ * sign-in, never the boot.
  */
 const appBaseUrlSchema = z
     .string()
@@ -46,9 +41,6 @@ const authSecretSchema = z
     .nonempty()
     .min(32, { error: "must hold at least 32 random characters" })
 
-/** Scopes asked at login. `offline_access` is what several providers answer a refresh token to. */
-const defaultScope = "openid profile email offline_access"
-
 /**
  * @description Builds one schema block per deployment shape, with every field in every
  * block
@@ -62,15 +54,6 @@ const defaultScope = "openid profile email offline_access"
 const envVariants = z.discriminatedUnion("APP_ENV", [
     z.object({
         APP_ENV: appEnv.extract(["local", "test"]),
-        OIDC_ISSUER: oidcIssuerSchema.default("http://localhost:8090/default"),
-        OIDC_CLIENT_ID: z.string().nonempty().default("fomofobo"),
-        OIDC_CLIENT_SECRET: optionalEnv(z.string().nonempty()),
-        // The mock provider of `infra/local` mints this audience, and it equals the
-        // client id there: its claims land on the id token too, which must name the
-        // client. A real provider sets the two apart and both variables carry it.
-        OIDC_AUDIENCE: oidcAudienceSchema.default("fomofobo"),
-        OIDC_JWKS_URL: optionalEnv(oidcJwksUrlSchema),
-        OIDC_SCOPE: z.string().nonempty().default(defaultScope),
         APP_BASE_URL: appBaseUrlSchema.default("http://localhost:3000"),
         BETTER_AUTH_SECRET: authSecretSchema.default(
             "local-and-test-only-auth-secret-0123456789",
@@ -86,12 +69,6 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
     }),
     z.object({
         APP_ENV: appEnv.extract(["preview", "vercel"]),
-        OIDC_ISSUER: oidcIssuerSchema,
-        OIDC_CLIENT_ID: z.string().nonempty(),
-        OIDC_CLIENT_SECRET: optionalEnv(z.string().nonempty()),
-        OIDC_AUDIENCE: oidcAudienceSchema,
-        OIDC_JWKS_URL: optionalEnv(oidcJwksUrlSchema),
-        OIDC_SCOPE: z.string().nonempty().default(defaultScope),
         APP_BASE_URL: appBaseUrlSchema,
         BETTER_AUTH_SECRET: authSecretSchema,
         DATABASE_URL: databaseUrlSchema,

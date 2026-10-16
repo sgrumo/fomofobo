@@ -20,7 +20,7 @@ Fullstack app: one Next.js process serves the API and the pages. The API mounts 
 │   │   ├── (protected)/             # Pages behind `requireSession`
 │   │   ├── (public)/                # Open pages
 │   │   └── [...rest]/               # Catch-all -> `notFound()`
-│   ├── auth/*/route.ts              # login, callback, refresh, logout
+│   ├── auth/logout/route.ts         # Sign-out, same-origin `POST` alone
 │   └── api/[[...route]]/route.ts    # Hono mount, one export per HTTP verb
 ├── src/server/                      # The API: api.ts (DI), container.ts, auth/, config/, errors.ts, routers/, services/
 ├── src/actions/                     # "use server" boundary: `apiAction` alone
@@ -71,7 +71,7 @@ Client component  -> useMutation     -> api        -> apiAction       -> serverT
 - Server Actions serve **mutations only**. They run serially, so a query goes over same-origin HTTP
 - `browserTransport` picks by method: `get` -> `clientTransport`, every other method -> `apiAction`
 - `apiAction` wraps the transport, never one endpoint. **NEVER** write a per-endpoint action - `api-client` owns endpoints, cache keys, invalidation
-- `browserTransport` refreshes **once** on a `401`, retries once, then sends the browser to the provider
+- `browserTransport` sends the browser to the login page on a `401`, with no retry: a database session has no refresh
 
 ## Pages
 

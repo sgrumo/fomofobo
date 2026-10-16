@@ -3,7 +3,7 @@ import type { ApiRequest } from "api-client/client"
 import { Result } from "shared/result"
 
 import { getApi } from "@/server/api"
-import { getAccessToken } from "@/server/auth/session"
+import { getSessionCookieHeader } from "@/server/auth/session"
 
 import { buildQueryString } from "../client-transport"
 import { buildTransportError } from "../transport-error"
@@ -19,19 +19,17 @@ export interface ApiDispatcher {
  * @description Sends the request into an application and parses its answer
  * @param api Application the request is dispatched into
  * @param request Method, path, query and body of the call
- * @param options Access token forwarded to the API, when the caller holds one
+ * @param options Session cookies forwarded to the API, when the caller holds them
  * @throws When the application answers outside the `2xx` range
  */
 export const dispatchToApi = async (
     api: ApiDispatcher,
     request: ApiRequest,
-    options?: { accessToken?: string },
+    options?: { cookie?: string },
 ): Promise<unknown> => {
     const headers = {
         ...(request.body === undefined ? {} : { "Content-Type": "application/json" }),
-        ...(options?.accessToken === undefined
-            ? {}
-            : { Authorization: `Bearer ${options.accessToken}` }),
+        ...(options?.cookie === undefined ? {} : { Cookie: options.cookie }),
     }
 
     const response = await api.request(
@@ -62,8 +60,8 @@ export const dispatchToApi = async (
  * @throws When the API answers outside the `2xx` range
  * @remarks Runs on the server only. It opens no socket, so a Server Component and a
  * Server Action both reach the API with no network hop and with no base URL to resolve
- * @remarks Forwards the access token of the session cookie, so the API identifies the
+ * @remarks Forwards the session cookies of the request, so the API identifies the
  * visitor on a prefetch and inside a Server Action exactly as it does over HTTP
  */
 export const serverTransport = async (request: ApiRequest): Promise<unknown> =>
-    await dispatchToApi(getApi(), request, { accessToken: await getAccessToken() })
+    await dispatchToApi(getApi(), request, { cookie: await getSessionCookieHeader() })

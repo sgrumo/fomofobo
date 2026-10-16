@@ -15,7 +15,7 @@ import {
 import { routeHandlers } from "@/framework/routes/routes"
 
 interface SessionMenuProps {
-    /** Name of the visitor, as the provider sends it. */
+    /** Name of the signed-in account. */
     name: string
 }
 

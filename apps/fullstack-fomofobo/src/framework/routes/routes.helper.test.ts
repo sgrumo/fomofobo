@@ -268,7 +268,7 @@ describe("types", () => {
             createDynamicRoute({ ...dynamicArgs, segments: ["[[...slug]]", "edit"] }),
             createRouteHandler({
                 // @ts-expect-error a segment holding `/`
-                segments: ["auth/login"],
+                segments: ["auth/logout"],
             }),
         ]
         expect(check).toBeTypeOf("function")

@@ -36,7 +36,6 @@
         "i18next": "catalog:",
         "models": "workspace:*",
         "next": "catalog:",
-        "openid-client": "^6.8.8",
         "react": "catalog:",
         "react-dom": "catalog:",
         "react-i18n": "workspace:*",
