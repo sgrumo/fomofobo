@@ -74,7 +74,7 @@ Admins create organizer accounts with a name and an email, and block or unblock 
 
 - One Next.js application serves the public app, the event pages and the backoffice, because the analysis keeps them in one program. The public app lives under a language segment of the URL, and the backoffice lives under `/backoffice` in one language.
 - Server Components and route handlers serve the public reads, and Server Actions carry the backoffice writes.
-- Cloudflare D1 holds categories, venues, events, occurrences and accounts. Occurrences are stored as rows, because the map search filters them by time window and by area.
+- Turso, a hosted libSQL database (SQLite), holds categories, venues, events, occurrences and accounts. Occurrences are stored as rows, because the map search filters them by time window and by area.
 - Cloudflare R2 holds the event photos, uploaded from the backoffice straight to the bucket.
 - Authentication runs inside the app with database sessions, because Admins create accounts and a block must end every open session at once.
-- Deploy: the app runs on Cloudflare Workers through the OpenNext adapter.
+- Deploy: the app runs on Vercel, in the region of its Turso database. Every service runs on its free plan. The Vercel Hobby plan admits non-commercial use only.
