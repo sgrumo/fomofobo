@@ -1,12 +1,19 @@
-import { and, count, desc, eq, isNull, sql } from "drizzle-orm"
+import { and, count, desc, eq, inArray, isNull, sql } from "drizzle-orm"
 import type { BatchItem } from "drizzle-orm/batch"
 import { chunk } from "es-toolkit"
-import type { Event, EventListItem, EventListQuery, Recurrence } from "models"
+import type {
+    AccountRole,
+    Event,
+    EventListItem,
+    EventListQuery,
+    Recurrence,
+} from "models"
 import type { StrictOmit } from "shared/types"
 
 import type { DbInstanceFromSchema } from "../db-config"
 import {
     accounts,
+    categories,
     eventCategories,
     eventOccurrences,
     eventPhotos,
@@ -132,6 +139,48 @@ export class EventsStorage {
                 .orderBy(eventPhotos.position),
         ])
         return toStoredEvent(row, categoryRows, photoRows)
+    }
+
+    /**
+     * @description Fetches what an event write refers to: its venue, its categories, the role of its organizer, and whether an event holds one of its photo keys
+     * @param refs Ids and photo keys of the write
+     */
+    public async findWriteReferences(refs: {
+        venueId: string
+        categoryIds: string[]
+        organizerId: string
+        photoKeys: string[]
+    }): Promise<{
+        venueExists: boolean
+        categoryIds: string[]
+        organizerRole: AccountRole | null
+        photoKeyTaken: boolean
+    }> {
+        const [venueRows, categoryRows, organizerRows, photoRows] = await this.db.batch([
+            this.db
+                .select({ id: venues.id })
+                .from(venues)
+                .where(eq(venues.id, refs.venueId)),
+            this.db
+                .select({ id: categories.id })
+                .from(categories)
+                .where(inArray(categories.id, refs.categoryIds)),
+            this.db
+                .select({ role: accounts.role })
+                .from(accounts)
+                .where(eq(accounts.id, refs.organizerId)),
+            this.db
+                .select({ objectKey: eventPhotos.objectKey })
+                .from(eventPhotos)
+                .where(inArray(eventPhotos.objectKey, refs.photoKeys))
+                .limit(1),
+        ])
+        return {
+            venueExists: venueRows.length > 0,
+            categoryIds: categoryRows.map(row => row.id),
+            organizerRole: organizerRows[0]?.role ?? null,
+            photoKeyTaken: photoRows.length > 0,
+        }
     }
 
     /**

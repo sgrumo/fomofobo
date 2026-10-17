@@ -14,6 +14,7 @@ import { getContainer } from "./container"
 import type { AppErrorCode } from "./errors"
 import { handleRouteNotFound } from "./errors"
 import { buildBackofficeCategoriesRouter } from "./routers/backoffice-categories-router"
+import { buildBackofficeEventsRouter } from "./routers/backoffice-events-router"
 import { buildBackofficeOrganizersRouter } from "./routers/backoffice-organizers-router"
 import { buildBackofficeSessionRouter } from "./routers/backoffice-session-router"
 import { buildBackofficeVenuesRouter } from "./routers/backoffice-venues-router"
@@ -77,8 +78,17 @@ export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus 
  * included, so an unknown backoffice path answers `401` to a visitor without one
  */
 const buildApi = (): OpenAPIHono => {
-    const { appConfig, auth, authAccounts, categories, db, organizers, venues } =
-        getContainer()
+    const {
+        appConfig,
+        auth,
+        authAccounts,
+        categories,
+        db,
+        events,
+        organizers,
+        photos,
+        venues,
+    } = getContainer()
 
     const app = new OpenAPIHono()
 
@@ -103,6 +113,7 @@ const buildApi = (): OpenAPIHono => {
     app.route("/", buildBackofficeCategoriesRouter(categories))
     app.route("/", buildBackofficeVenuesRouter(venues))
     app.route("/", buildBackofficeOrganizersRouter(organizers))
+    app.route("/", buildBackofficeEventsRouter(events, photos))
 
     if (appConfig.testRoutesEnabled) {
         app.post(`${apiBasePath}/test/reset-database`, async c => {

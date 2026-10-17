@@ -2,6 +2,12 @@ import { expectApiError, expectStatus } from "e2e-kit/assertions"
 import { describe, expect, it } from "vitest"
 
 import { signInAs } from "../auth/utils"
+import { createEvent, deleteEvent } from "../backoffice-events/api"
+import {
+    buildEventUpsert,
+    seedEventReferences,
+    uploadPhoto,
+} from "../backoffice-events/utils"
 import { listCategories } from "../public/api"
 import { createCategory, deleteCategory } from "./api"
 import { buildCategoryCreation } from "./utils"
@@ -18,6 +24,53 @@ describe("DELETE /api/backoffice/categories/{id}", () => {
         const list = await listCategories({})
         expectStatus(list, 200)
         expect(list.data).toStrictEqual([])
+    })
+
+    it("deletes a category that only deleted events use", async () => {
+        const admin = await signInAs("admin")
+        const organizer = await signInAs("organizer")
+        const { categoryId, venueId } = await seedEventReferences()
+        const photo = await uploadPhoto(organizer.headers)
+        const event = await createEvent({
+            headers: organizer.headers,
+            body: buildEventUpsert({ venueId, categoryId, photoKeys: [photo.key] }),
+        })
+        expectStatus(event, 201)
+        expectStatus(
+            await deleteEvent({
+                headers: organizer.headers,
+                pathParams: { id: event.data.id },
+            }),
+            204,
+        )
+
+        const res = await deleteCategory({
+            headers: admin.headers,
+            pathParams: { id: categoryId },
+        })
+
+        expectStatus(res, 204)
+    })
+
+    it("answers 409 while an event in place uses the category", async () => {
+        const admin = await signInAs("admin")
+        const organizer = await signInAs("organizer")
+        const { categoryId, venueId } = await seedEventReferences()
+        const photo = await uploadPhoto(organizer.headers)
+        expectStatus(
+            await createEvent({
+                headers: organizer.headers,
+                body: buildEventUpsert({ venueId, categoryId, photoKeys: [photo.key] }),
+            }),
+            201,
+        )
+
+        const res = await deleteCategory({
+            headers: admin.headers,
+            pathParams: { id: categoryId },
+        })
+
+        expectApiError(res, 409, { code: "CategoryInUse" })
     })
 
     it("answers 404 for an unknown category", async () => {

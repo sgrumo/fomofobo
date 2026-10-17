@@ -6,6 +6,7 @@ import {
     AccountsStorage,
     buildDbInstance,
     CategoriesStorage,
+    EventsStorage,
     VenuesStorage,
 } from "storage"
 
@@ -16,7 +17,9 @@ import { resolveAppConfig } from "./config/app-config"
 import { parseEnv } from "./config/env"
 import { AuthAccountsService } from "./services/auth-accounts-service"
 import { CategoriesService } from "./services/categories-service"
+import { EventsService } from "./services/events-service"
 import { OrganizersService } from "./services/organizers-service"
+import { PhotosService } from "./services/photos-service"
 import { VenuesService } from "./services/venues-service"
 
 export interface Container {
@@ -27,8 +30,8 @@ export interface Container {
     categories: CategoriesService
     venues: VenuesService
     organizers: OrganizersService
-    photoStorage: S3ObjectStorage
-    photosPublicBaseUrl: string
+    events: EventsService
+    photos: PhotosService
     geocoding: { baseUrl: string; apiKey: string | undefined }
 }
 
@@ -52,6 +55,13 @@ const buildContainer = (): Container => {
     })
 
     const accountsStorage = new AccountsStorage(db)
+    const photoStorage = new S3ObjectStorage({
+        bucket: env.S3_BUCKET,
+        region: env.S3_REGION,
+        endpoint: env.S3_ENDPOINT,
+        accessKeyId: env.S3_ACCESS_KEY,
+        secretAccessKey: env.S3_SECRET_KEY,
+    })
     const authAccounts = new AuthAccountsService(auth, accountsStorage)
 
     return {
@@ -62,14 +72,12 @@ const buildContainer = (): Container => {
         organizers: new OrganizersService(authAccounts, accountsStorage),
         categories: new CategoriesService(new CategoriesStorage(db)),
         venues: new VenuesService(new VenuesStorage(db)),
-        photoStorage: new S3ObjectStorage({
-            bucket: env.S3_BUCKET,
-            region: env.S3_REGION,
-            endpoint: env.S3_ENDPOINT,
-            accessKeyId: env.S3_ACCESS_KEY,
-            secretAccessKey: env.S3_SECRET_KEY,
-        }),
-        photosPublicBaseUrl: env.PHOTOS_PUBLIC_BASE_URL,
+        events: new EventsService(
+            new EventsStorage(db),
+            photoStorage,
+            env.PHOTOS_PUBLIC_BASE_URL,
+        ),
+        photos: new PhotosService(photoStorage),
         geocoding: { baseUrl: env.GEOAPIFY_BASE_URL, apiKey: env.GEOAPIFY_API_KEY },
     }
 }
