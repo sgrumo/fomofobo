@@ -18,7 +18,17 @@
         "NotFound": "Page not found"
     },
     "Map": {
-        "Label": "Event map"
+        "Label": "Event map",
+        "Locate": "Center on my position",
+        "LocationOff": "Location is off. Search for a place to see the events around it.",
+        "LocationBlocked": {
+            "Title": "Location is blocked",
+            "Description": "Allow location for this site in the browser settings, then try again."
+        },
+        "LocationUnavailable": {
+            "Title": "Location is not available",
+            "Description": "This device cannot tell its position right now. Search for a place instead."
+        }
     },
     "NotFound": {
         "Title": "404: Page Not Found",

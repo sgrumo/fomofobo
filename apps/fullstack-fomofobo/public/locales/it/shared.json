@@ -18,7 +18,17 @@
         "NotFound": "Pagina non trovata"
     },
     "Map": {
-        "Label": "Mappa degli eventi"
+        "Label": "Mappa degli eventi",
+        "Locate": "Centra sulla mia posizione",
+        "LocationOff": "La posizione è disattivata. Cerca un luogo per vedere gli eventi intorno.",
+        "LocationBlocked": {
+            "Title": "La posizione è bloccata",
+            "Description": "Consenti la posizione per questo sito nelle impostazioni del browser, poi riprova."
+        },
+        "LocationUnavailable": {
+            "Title": "Posizione non disponibile",
+            "Description": "Il dispositivo non riesce a rilevare la posizione. Cerca un luogo."
+        }
     },
     "NotFound": {
         "Title": "404: Pagina non trovata",
