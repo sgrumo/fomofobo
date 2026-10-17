@@ -45,3 +45,17 @@ export const signIn = async (credentials: { email: string; password: string }) =
  */
 export const toCookieHeader = (setCookie: string[] | undefined): string =>
     (setCookie ?? []).map(cookie => cookie.split(";")[0]).join("; ")
+
+/**
+ * @description Seeds an account of the role, signs it in, and returns it with the headers of its session
+ * @param role Role of the account
+ */
+export const signInAs = async (
+    role: AccountRole,
+): Promise<{ account: Account; headers: { Cookie: string } }> => {
+    const seed = buildAccountSeed(role)
+    const account = await seedAccount(seed)
+    const session = await signIn(seed)
+    expectRawStatus(session, 200)
+    return { account, headers: { Cookie: toCookieHeader(session.headers["set-cookie"]) } }
+}

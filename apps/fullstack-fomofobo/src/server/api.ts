@@ -13,7 +13,9 @@ import { requestClock } from "./clock"
 import { getContainer } from "./container"
 import type { AppErrorCode } from "./errors"
 import { handleRouteNotFound } from "./errors"
+import { buildBackofficeCategoriesRouter } from "./routers/backoffice-categories-router"
 import { buildBackofficeSessionRouter } from "./routers/backoffice-session-router"
+import { buildPublicRouter } from "./routers/public-router"
 
 /**
  * Prefix the Next catch-all route answers on. Every route definition of
@@ -73,7 +75,7 @@ export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus 
  * included, so an unknown backoffice path answers `401` to a visitor without one
  */
 const buildApi = (): OpenAPIHono => {
-    const { appConfig, auth, authAccounts, db } = getContainer()
+    const { appConfig, auth, authAccounts, categories, db } = getContainer()
 
     const app = new OpenAPIHono()
 
@@ -91,8 +93,11 @@ const buildApi = (): OpenAPIHono => {
 
     app.post(`${apiBasePath}/auth/sign-in/email`, c => auth.handler(c.req.raw))
 
+    app.route("/", buildPublicRouter(categories))
+
     app.use(`${apiBasePath}/backoffice/*`, backofficeSession(authAccounts))
     app.route("/", buildBackofficeSessionRouter())
+    app.route("/", buildBackofficeCategoriesRouter(categories))
 
     if (appConfig.testRoutesEnabled) {
         app.post(`${apiBasePath}/test/reset-database`, async c => {

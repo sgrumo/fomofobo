@@ -2,7 +2,7 @@ import "server-only"
 import { S3ObjectStorage } from "backend-shared"
 import { memoize } from "es-toolkit"
 import type { DbInstanceFromSchema } from "storage"
-import { AccountsStorage, buildDbInstance } from "storage"
+import { AccountsStorage, buildDbInstance, CategoriesStorage } from "storage"
 
 import type { Auth } from "./auth/auth"
 import { buildAuth } from "./auth/auth"
@@ -10,12 +10,14 @@ import type { AppConfig } from "./config/app-config"
 import { resolveAppConfig } from "./config/app-config"
 import { parseEnv } from "./config/env"
 import { AuthAccountsService } from "./services/auth-accounts-service"
+import { CategoriesService } from "./services/categories-service"
 
 export interface Container {
     appConfig: AppConfig
     db: DbInstanceFromSchema
     auth: Auth
     authAccounts: AuthAccountsService
+    categories: CategoriesService
     photoStorage: S3ObjectStorage
     photosPublicBaseUrl: string
     geocoding: { baseUrl: string; apiKey: string | undefined }
@@ -45,6 +47,7 @@ const buildContainer = (): Container => {
         db,
         auth,
         authAccounts: new AuthAccountsService(auth, new AccountsStorage(db)),
+        categories: new CategoriesService(new CategoriesStorage(db)),
         photoStorage: new S3ObjectStorage({
             bucket: env.S3_BUCKET,
             region: env.S3_REGION,

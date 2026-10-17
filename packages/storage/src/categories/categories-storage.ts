@@ -38,6 +38,18 @@ export class CategoriesStorage {
     }
 
     /**
+     * @description Fetches the category with the exact name, or `null` when no row matches
+     * @param name Name searched
+     */
+    public async findByName(name: string): Promise<Category | null> {
+        const [row] = await this.db
+            .select()
+            .from(categories)
+            .where(eq(categories.name, name))
+        return row ? toCategory(row) : null
+    }
+
+    /**
      * @description Persists one category
      * @param category Category inserted, carrying its id
      * @param createdAt Instant of the creation
