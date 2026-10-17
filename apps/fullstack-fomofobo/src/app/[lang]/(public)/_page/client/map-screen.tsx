@@ -4,15 +4,17 @@ import { useQuery } from "@tanstack/react-query"
 import type { GeoPoint, OccurrenceRef, OccurrenceSummary } from "models"
 import dynamic from "next/dynamic"
 import { useEffect, useRef, useState } from "react"
+import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import { match } from "ts-pattern"
 import { Alert } from "ui-components/alert"
 import { IconButton } from "ui-components/icon-button"
-import { PixelIconLocate } from "ui-components/pixel-icons"
+import { PixelIconLocate, PixelIconSaved } from "ui-components/pixel-icons"
 import { Spinner } from "ui-components/spinner"
 import { useToast } from "ui-components/toast"
 
 import { useDynamicRoute } from "@/framework/routes/route-hooks/use-dynamic-route"
+import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
@@ -45,6 +47,7 @@ const centerQuery = (point: GeoPoint) => {
 
 export const MapScreen = (props: RouteClientComponentProps<"root">) => {
     const { t } = useTranslation("shared")
+    const language = useLanguage()
     const toast = useToast()
     const { query, setQuery } = useDynamicRoute(routes[props.route])
     const geolocation = useGeolocation()
@@ -274,6 +277,15 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 {search.isFetching ? (
                     <Spinner title={t("Map.Loading")} size="xs" />
                 ) : undefined}
+                <RouteLink
+                    route={routes.saved}
+                    parameters={{ lang: language }}
+                    query={{}}
+                    aria-label={t("Saved.Open")}
+                    className="bg-surface text-fg border-line shadow-hard-md inline-flex size-10 shrink-0 items-center justify-center rounded-full border-2 [&>svg]:size-4"
+                >
+                    <PixelIconSaved />
+                </RouteLink>
                 <IconButton
                     aria-label={t("Map.Locate")}
                     icon={<PixelIconLocate />}

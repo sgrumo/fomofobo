@@ -19,6 +19,7 @@ import { PixelIconArrow, PixelIconBack, PixelIconClose } from "ui-components/pix
 import { Spinner } from "ui-components/spinner"
 import { TickProgress } from "ui-components/tick-progress"
 
+import { SaveToggle } from "@/components/client/save-toggle/save-toggle"
 import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
@@ -97,6 +98,7 @@ const PreviewBody = (props: PreviewBodyProps) => {
                             {t("Preview.Remaining", { time: remainingText })}
                         </span>
                     ) : undefined}
+                    <SaveToggle occurrence={occurrence} size="sm" />
                     {props.closeButton}
                 </div>
             </div>

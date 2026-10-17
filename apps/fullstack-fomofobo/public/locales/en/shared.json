@@ -121,5 +121,13 @@
         "Distance": "Distance",
         "Now": "now {{time}}",
         "Venue": "Venue"
+    },
+    "Saved": {
+        "Toggle": "Save",
+        "Open": "Saved events",
+        "Empty": "No saved events yet. Save one from its preview or its page.",
+        "NoneVisible": "Your saved events are no longer available.",
+        "Loading": "Loading saved events",
+        "Error": "The saved events could not be loaded."
     }
 }

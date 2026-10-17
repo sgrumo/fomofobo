@@ -4,6 +4,7 @@ import {
     createWebStorage,
     storagePrefix,
 } from "frontend-shared/storage"
+import { savedEventsStorageSchema } from "models"
 import { z } from "zod"
 
 export const localStorageSchema = {
@@ -15,6 +16,7 @@ export const localStorageSchema = {
         base: z.number().min(0),
         jitter: z.number().min(0),
     }),
+    "saved-events": savedEventsStorageSchema,
 }
 export type LocalStorageKey = keyof typeof localStorageSchema
 export type LocalStorageItem<K extends LocalStorageKey> = z.output<
@@ -26,6 +28,7 @@ export const localStorageDefaults: {
 } = {
     "api-delay": { base: 250, jitter: 50 },
     "dev-quadrant": { position: "bottom-right", minimized: true },
+    "saved-events": { version: 1, events: [] },
 }
 
 export const localStorage = createWebStorage(

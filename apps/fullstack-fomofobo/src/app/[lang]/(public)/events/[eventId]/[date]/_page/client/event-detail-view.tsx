@@ -2,7 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query"
 import type { GeoPoint, OccurrenceDetail } from "models"
-import { useRouter } from "next/navigation"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import { isDefined } from "shared/values"
@@ -19,6 +18,7 @@ import { StatGrid } from "ui-components/stat-grid"
 import { Timeline } from "ui-components/timeline"
 import { useToast } from "ui-components/toast"
 
+import { SaveToggle } from "@/components/client/save-toggle/save-toggle"
 import { useDynamicRoute } from "@/framework/routes/route-hooks/use-dynamic-route"
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
@@ -30,9 +30,9 @@ import { occurrenceStatus } from "@/lib/events/occurrence-status"
 import { directionsUrl, mapsProviderOf } from "@/lib/geo/directions-url"
 import { formatDistance } from "@/lib/geo/format-distance"
 import { haversineDistance } from "@/lib/geo/haversine-distance"
+import { useBackToMap } from "@/lib/hooks/use-back-to-map"
 import { useGeolocation } from "@/lib/hooks/use-geolocation"
 import { useNow } from "@/lib/hooks/use-now"
-import { hasInAppHistory } from "@/lib/navigation/in-app-history"
 import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 import { PhotoGallery } from "./photo-gallery"
@@ -45,7 +45,7 @@ const actionClassName =
 export const EventDetailView = (props: RouteClientComponentProps<"eventDetail">) => {
     const { t } = useTranslation("shared")
     const language = useLanguage()
-    const router = useRouter()
+    const goBack = useBackToMap()
     const toast = useToast()
     const now = useNow(CLOCK_TICK_MS)
     const geolocation = useGeolocation()
@@ -60,15 +60,6 @@ export const EventDetailView = (props: RouteClientComponentProps<"eventDetail">)
 
     if (occurrence === undefined) {
         return undefined
-    }
-
-    const goBack = () => {
-        // A page opened from a shared link has no page of the app to go back to.
-        if (hasInAppHistory()) {
-            router.back()
-            return
-        }
-        router.push(routes.root.path({ parameters: { lang: language }, query: {} }))
     }
 
     const copyLink = async (url: string) => {
@@ -107,11 +98,14 @@ export const EventDetailView = (props: RouteClientComponentProps<"eventDetail">)
                             icon={<PixelIconBack />}
                             onClick={goBack}
                         />
-                        <IconButton
-                            aria-label={t("Detail.Share")}
-                            icon={<PixelIconShare />}
-                            onClick={share}
-                        />
+                        <div className="flex gap-2">
+                            <SaveToggle occurrence={occurrence} />
+                            <IconButton
+                                aria-label={t("Detail.Share")}
+                                icon={<PixelIconShare />}
+                                onClick={share}
+                            />
+                        </div>
                     </>
                 }
             />
