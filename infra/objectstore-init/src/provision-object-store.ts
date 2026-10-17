@@ -2,10 +2,9 @@ import {
     BucketAlreadyExists,
     BucketAlreadyOwnedByYou,
     CreateBucketCommand,
-    DeleteBucketPolicyCommand,
     PutBucketCorsCommand,
+    PutBucketPolicyCommand,
     S3Client,
-    S3ServiceException,
 } from "@aws-sdk/client-s3"
 
 /**
@@ -24,7 +23,7 @@ export interface ObjectStoreProvisionConfig {
 }
 
 /**
- * @description Creates the bucket, keeps it private, and writes its CORS rule
+ * @description Creates the photos bucket, opens it to anonymous reads, and writes its CORS rule
  * @param config Bucket, endpoint, credentials and the allowed browser origins
  * @throws When the store rejects a call, so a deployment stops on a broken store
  * @remarks Needs credentials that can create a bucket, so only the local and E2E stores
@@ -54,18 +53,23 @@ export const provisionObjectStore = async (
         }
     }
 
-    // Reasserts the private state that a new bucket starts in, because an
-    // operator can have opened an existing bucket by hand.
-    try {
-        await client.send(new DeleteBucketPolicyCommand({ Bucket: config.bucket }))
-    } catch (error) {
-        if (
-            !(error instanceof S3ServiceException) ||
-            error.name !== "NoSuchBucketPolicy"
-        ) {
-            throw error
-        }
-    }
+    // Mirrors the public R2 bucket: anyone reads a photo by its URL, nobody lists the keys
+    await client.send(
+        new PutBucketPolicyCommand({
+            Bucket: config.bucket,
+            Policy: JSON.stringify({
+                Version: "2012-10-17",
+                Statement: [
+                    {
+                        Effect: "Allow",
+                        Principal: { AWS: ["*"] },
+                        Action: ["s3:GetObject"],
+                        Resource: [`arn:aws:s3:::${config.bucket}/*`],
+                    },
+                ],
+            }),
+        }),
+    )
 
     await client.send(
         new PutBucketCorsCommand({
@@ -74,7 +78,7 @@ export const provisionObjectStore = async (
                 CORSRules: [
                     {
                         AllowedOrigins: [...config.corsAllowOrigins],
-                        AllowedMethods: ["GET", "POST", "HEAD"],
+                        AllowedMethods: ["GET", "PUT", "HEAD"],
                         AllowedHeaders: ["*"],
                         ExposeHeaders: ["ETag"],
                         MaxAgeSeconds: CORS_MAX_AGE_SECONDS,

@@ -43,6 +43,13 @@ export default defineConfig({
             },
         },
         {
+            // A server script the lifecycle spawns, not a test file
+            files: ["geocoding-mock.ts"],
+            rules: {
+                "vitest/require-hook": "off",
+            },
+        },
+        {
             // The API clients cast the answers of another process
             files: ["api/**/api.ts"],
             rules: {

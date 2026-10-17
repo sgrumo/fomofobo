@@ -1,4 +1,5 @@
 import "server-only"
+import { S3ObjectStorage } from "backend-shared"
 import { memoize } from "es-toolkit"
 import type { DbInstanceFromSchema } from "storage"
 import { AccountsStorage, buildDbInstance } from "storage"
@@ -15,6 +16,9 @@ export interface Container {
     db: DbInstanceFromSchema
     auth: Auth
     authAccounts: AuthAccountsService
+    photoStorage: S3ObjectStorage
+    photosPublicBaseUrl: string
+    geocoding: { baseUrl: string; apiKey: string | undefined }
 }
 
 /**
@@ -41,6 +45,15 @@ const buildContainer = (): Container => {
         db,
         auth,
         authAccounts: new AuthAccountsService(auth, new AccountsStorage(db)),
+        photoStorage: new S3ObjectStorage({
+            bucket: env.S3_BUCKET,
+            region: env.S3_REGION,
+            endpoint: env.S3_ENDPOINT,
+            accessKeyId: env.S3_ACCESS_KEY,
+            secretAccessKey: env.S3_SECRET_KEY,
+        }),
+        photosPublicBaseUrl: env.PHOTOS_PUBLIC_BASE_URL,
+        geocoding: { baseUrl: env.GEOAPIFY_BASE_URL, apiKey: env.GEOAPIFY_API_KEY },
     }
 }
 

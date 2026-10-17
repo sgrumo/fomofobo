@@ -12,6 +12,9 @@ const vercelEnv = {
     DATABASE_URL: "libsql://fomofobo-dev-example.aws-eu-west-1.turso.io",
     DATABASE_AUTH_TOKEN: "token",
     BETTER_AUTH_SECRET: "a-deployed-secret-of-at-least-32-characters",
+    PHOTOS_PUBLIC_BASE_URL: "https://photos.example.com/",
+    GEOAPIFY_BASE_URL: "https://api.geoapify.com",
+    GEOAPIFY_API_KEY: "geoapify-key",
 }
 
 describe("parseEnv", () => {
@@ -94,6 +97,12 @@ describe("parseEnv", () => {
     it("should reject a variable that is set but empty", () => {
         expect(() => parseEnv({ ...vercelEnv, S3_SECRET_KEY: "" }, true)).toThrow(
             "S3_SECRET_KEY: set but empty",
+        )
+    })
+
+    it("should strip the trailing slash of the photos base URL", () => {
+        expect(parseEnv(vercelEnv, true).PHOTOS_PUBLIC_BASE_URL).toBe(
+            "https://photos.example.com",
         )
     })
 

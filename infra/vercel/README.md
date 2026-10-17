@@ -1,11 +1,11 @@
 # Vercel deploy
 
-The app runs on Vercel, the database on Turso, and the files on Cloudflare R2. Every service runs on its free plan.
+The app runs on Vercel, the database on Turso, the event photos on Cloudflare R2, and the place search on Geoapify. Every service runs on its free plan.
 
-| Environment | Branch | Vercel project  | Turso database  | R2 buckets                              |
-| ----------- | ------ | --------------- | --------------- | --------------------------------------- |
-| `prod`      | `main` | `fomofobo-prod` | `fomofobo-prod` | `fomofobo-prod`, `fomofobo-prod-photos` |
-| `dev`       | `dev`  | `fomofobo-dev`  | `fomofobo-dev`  | `fomofobo-dev`, `fomofobo-dev-photos`   |
+| Environment | Branch | Vercel project  | Turso database  | R2 bucket              |
+| ----------- | ------ | --------------- | --------------- | ---------------------- |
+| `prod`      | `main` | `fomofobo-prod` | `fomofobo-prod` | `fomofobo-prod-photos` |
+| `dev`       | `dev`  | `fomofobo-dev`  | `fomofobo-dev`  | `fomofobo-dev-photos`  |
 
 `dev` runs the `preview` shape of `APP_ENV`, and `prod` runs `vercel`. `preview` serves the `/dev/*` pages, the API documentation and detailed errors to anyone who opens its URL. `apps/fullstack-fomofobo/src/server/config/app-config.ts` lists what each shape serves.
 
@@ -32,9 +32,8 @@ The upload leaves the git metadata out, so Vercel runs no check on the commit au
 At repository level, set the variable `VERCEL_ORG_ID` and the secret `VERCEL_TOKEN` one time. `VERCEL_ORG_ID` is the id of the Vercel account that owns both projects.
 
 1. Create the database with `turso db create fomofobo-<env> --location aws-eu-west-1`. Write its URL, from `turso db show fomofobo-<env> --url`, into `DATABASE_URL` of `env/<env>.env`.
-2. Create the private bucket with `pnpm dlx wrangler r2 bucket create fomofobo-<env>`.
-3. Create the photos bucket with `pnpm dlx wrangler r2 bucket create fomofobo-<env>-photos`. In the Cloudflare dashboard, connect a custom domain to it and disable its `r2.dev` URL. R2 makes a whole bucket public, never a prefix, so the photos bucket holds photos alone. The domain must be a zone of the same Cloudflare account.
-4. Set the CORS rule of both buckets with `pnpm dlx wrangler r2 bucket cors set <bucket> --file cors.json`. The browser uploads with a presigned `PUT`, so the rule allows the app origin, the `PUT` method and the `Content-Type` header:
+2. Create the photos bucket with `pnpm dlx wrangler r2 bucket create fomofobo-<env>-photos`. R2 makes a whole bucket public, never a prefix, so the bucket holds photos alone. In the Cloudflare dashboard, connect a custom domain to it and disable its `r2.dev` URL. The domain must be a zone of the same Cloudflare account. Until `dev` has a domain (TQ-23), keep its `r2.dev` URL enabled and use it as the public URL. Cloudflare rate-limits that URL. Write the public URL into `PHOTOS_PUBLIC_BASE_URL` of `env/<env>.env`.
+3. Set the CORS rule of the bucket with `pnpm dlx wrangler r2 bucket cors set fomofobo-<env>-photos --file cors.json`. The browser uploads with a presigned `PUT`, so the rule allows the app origin, the `PUT` method and the `Content-Type` header:
 
     ```json
     [
@@ -48,7 +47,8 @@ At repository level, set the variable `VERCEL_ORG_ID` and the secret `VERCEL_TOK
     ]
     ```
 
-5. Create an R2 API token with Object Read and Write on the buckets of the environment.
+4. Create an R2 API token with Object Read and Write on the bucket of the environment.
+5. Create a Geoapify project for the environment at myprojects.geoapify.com, and copy its API key. The free plan gives 3,000 credits a day and needs no card. The public app shows the "Powered by Geoapify" link that the free plan asks for.
 6. In Vercel, create an empty project `fomofobo-<env>` with Root Directory `apps/fullstack-fomofobo`, and connect no Git repository. Write its production domain into `APP_BASE_URL` of `env/<env>.env`. The auth library accepts a sign-in only from this origin.
 7. In GitHub, create the environment `<env>`. Give it the variable `VERCEL_PROJECT_ID`, the id of the project, and the secrets of "Runtime values".
 8. Replace every `PLACEHOLDER` of `env/<env>.env`. The deploy refuses a file that holds one.
@@ -70,6 +70,7 @@ The backoffice has no sign-up. Create the first Admin with the `admin-accounts` 
 | `S3_ACCESS_KEY`       | Access key id of the R2 token of the environment                                                     |
 | `S3_SECRET_KEY`       | Secret access key of the R2 token of the environment                                                 |
 | `BETTER_AUTH_SECRET`  | At least 32 random characters, for example `openssl rand -base64 32`. A new value ends every session |
+| `GEOAPIFY_API_KEY`    | API key of the Geoapify project of the environment                                                   |
 
 The deploy writes a credential as Sensitive. A value set in the Vercel dashboard alone lasts until the next deploy overwrites it, or never reaches the next project.
 

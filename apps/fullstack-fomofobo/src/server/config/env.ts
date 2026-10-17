@@ -24,6 +24,13 @@ const appBaseUrlSchema = z
     )
     .transform(value => value.replace(/\/$/u, ""))
 
+/** Origin and path that a photo key joins to form its public URL, with no trailing slash. */
+const photosPublicBaseUrlSchema = z
+    .string()
+    .nonempty()
+    .pipe(z.url())
+    .transform(value => value.replace(/\/$/u, ""))
+
 /** libSQL URL of the database. A relative `file:` path resolves from the directory of the process. */
 const databaseUrlSchema = z
     .string()
@@ -66,6 +73,12 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         S3_ENDPOINT: s3EndpointSchema.default("http://localhost:9000"),
         S3_ACCESS_KEY: z.string().nonempty().default("admin"),
         S3_SECRET_KEY: z.string().nonempty().default("admin"),
+        PHOTOS_PUBLIC_BASE_URL: photosPublicBaseUrlSchema.default(
+            "http://localhost:9000/fomofobo",
+        ),
+        GEOAPIFY_BASE_URL: z.url().default("https://api.geoapify.com"),
+        // Unset: the places route answers 503 without a call
+        GEOAPIFY_API_KEY: optionalEnv(z.string().nonempty()),
     }),
     z.object({
         APP_ENV: appEnv.extract(["preview", "vercel"]),
@@ -78,6 +91,9 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         S3_ENDPOINT: s3EndpointSchema,
         S3_ACCESS_KEY: z.string().nonempty(),
         S3_SECRET_KEY: z.string().nonempty(),
+        PHOTOS_PUBLIC_BASE_URL: photosPublicBaseUrlSchema,
+        GEOAPIFY_BASE_URL: z.url(),
+        GEOAPIFY_API_KEY: z.string().nonempty(),
     }),
 ])
 export type Env = z.infer<typeof envVariants>

@@ -27,9 +27,12 @@ export interface Stack {
     freePort: () => Promise<number>
     /**
      * Starts the object store and creates the bucket, for the upload flows. The bucket
-     * admits the browser origins in `corsOrigins`.
+     * admits the browser origins in `corsOrigins`. Resolves to the endpoint of the store
+     * and the name of the bucket.
      */
-    startObjectStore: (options: { corsOrigins: [string, ...string[]] }) => Promise<void>
+    startObjectStore: (options: {
+        corsOrigins: [string, ...string[]]
+    }) => Promise<{ endpoint: string; bucket: string }>
     /** Spawns a server, waits until it answers, and stops it with the stack. */
     startServer: (spec: ServerSpec) => Promise<void>
     /** Publishes the origin of the app under test to the runner and the test workers. */
@@ -83,6 +86,7 @@ export const defineLifecycle =
                     corsAllowOrigins: corsOrigins,
                 })
                 Object.assign(process.env, s3Env)
+                return { endpoint, bucket: s3Env.S3_BUCKET }
             },
             startServer: async spec => {
                 const proc = spawnServer(spec, log)
