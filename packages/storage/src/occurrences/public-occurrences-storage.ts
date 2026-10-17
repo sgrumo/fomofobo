@@ -68,6 +68,19 @@ const visibleEvent = and(
 const distanceFrom = (center: GeoPoint): SQL<number> =>
     sql<number>`${EARTH_RADIUS_METERS} * acos(min(1, cos(radians(${center.latitude})) * cos(radians(${venues.latitude})) * cos(radians(${venues.longitude}) - radians(${center.longitude})) + sin(radians(${center.latitude})) * sin(radians(${venues.latitude}))))`
 
+/**
+ * @description Builds the condition of a venue inside the box and within the radius of the center
+ * @param area Center, radius and the box that holds the circle
+ */
+const insideArea = (
+    area: Pick<PublicOccurrenceSearch, "center" | "radiusMeters" | "box">,
+): SQL | undefined =>
+    and(
+        sql`${venues.latitude} between ${area.box.minLatitude} and ${area.box.maxLatitude}`,
+        sql`${venues.longitude} between ${area.box.minLongitude} and ${area.box.maxLongitude}`,
+        sql`${distanceFrom(area.center)} <= ${area.radiusMeters}`,
+    )
+
 const summaryColumns = {
     eventId: eventOccurrences.eventId,
     localDate: eventOccurrences.localDate,
@@ -156,9 +169,7 @@ export class PublicOccurrencesStorage {
             // PLACEHOLDER(OP-08): overlap with the window
             gt(eventOccurrences.endsAt, search.window.from),
             lt(eventOccurrences.startsAt, search.window.to),
-            sql`${venues.latitude} between ${search.box.minLatitude} and ${search.box.maxLatitude}`,
-            sql`${venues.longitude} between ${search.box.minLongitude} and ${search.box.maxLongitude}`,
-            sql`${distanceFrom(search.center)} <= ${search.radiusMeters}`,
+            insideArea(search),
             search.q === undefined ? undefined : likeContains(events.title, search.q),
         )
         const firstInWindow = search.onePerEvent
@@ -263,5 +274,40 @@ export class PublicOccurrencesStorage {
         }
         const results = await this.db.batch([first, ...rest])
         return results.flatMap(rows => rows.map(toSummary))
+    }
+
+    /**
+     * @description Fetches the visible events of the area whose title matches, each with its next occurrence that has not ended, soonest first
+     * @param search Text, area, clock and cap of the suggestions
+     */
+    public async suggestEvents(
+        search: Pick<
+            PublicOccurrenceSearch,
+            "center" | "radiusMeters" | "box" | "now" | "limit"
+        > & {
+            q: string
+        },
+    ): Promise<Array<{ eventId: string; localDate: string; title: string }>> {
+        const now = search.now.getTime()
+        return await this.db
+            .select({
+                eventId: eventOccurrences.eventId,
+                localDate: eventOccurrences.localDate,
+                title: events.title,
+            })
+            .from(eventOccurrences)
+            .innerJoin(events, eq(events.id, eventOccurrences.eventId))
+            .innerJoin(venues, eq(venues.id, events.venueId))
+            .innerJoin(accounts, eq(accounts.id, events.organizerId))
+            .where(
+                and(
+                    visibleEvent,
+                    insideArea(search),
+                    likeContains(events.title, search.q),
+                    sql`${eventOccurrences.startsAt} = (select min(next_occurrence.starts_at) from ${eventOccurrences} as next_occurrence where next_occurrence.event_id = ${eventOccurrences.eventId} and next_occurrence.ends_at > ${now})`,
+                ),
+            )
+            .orderBy(eventOccurrences.startsAt, eventOccurrences.eventId)
+            .limit(search.limit)
     }
 }

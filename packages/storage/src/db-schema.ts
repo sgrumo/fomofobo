@@ -109,6 +109,12 @@ export const authRateLimits = sqliteTable("auth_rate_limits", {
     lastRequest: integer("last_request").notNull(),
 })
 
+export const rateLimits = sqliteTable("rate_limits", {
+    key: text("key").primaryKey(),
+    windowStartedAt: integer("window_started_at", { mode: "timestamp_ms" }).notNull(),
+    count: integer("count").notNull(),
+})
+
 export const categories = sqliteTable(
     "categories",
     {
