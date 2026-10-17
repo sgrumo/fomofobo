@@ -2,6 +2,12 @@ import { cn } from "frontend-shared/styles"
 import { useState } from "react"
 import type { ReactNode } from "react"
 import { Autocomplete } from "ui-components/autocomplete"
+import {
+    BottomSheetContent,
+    BottomSheetRoot,
+    BottomSheetTitle,
+    BottomSheetTrigger,
+} from "ui-components/bottom-sheet"
 import { Button } from "ui-components/button"
 import { Combobox } from "ui-components/combobox"
 import {
@@ -260,6 +266,22 @@ const OverlayDrawer = (props: OverlayContainerProps) => (
     </DrawerRoot>
 )
 
+const OverlayBottomSheet = (props: OverlayContainerProps) => (
+    <BottomSheetRoot>
+        <BottomSheetTrigger
+            render={
+                <Button variant="secondary" size="md" type="button">
+                    {props.triggerLabel}
+                </Button>
+            }
+        />
+        <BottomSheetContent>
+            <BottomSheetTitle>{props.title}</BottomSheetTitle>
+            {props.children}
+        </BottomSheetContent>
+    </BottomSheetRoot>
+)
+
 interface OverlayKitProps {
     nested: boolean
 }
@@ -345,6 +367,12 @@ export const StackingShowcase = (props: StackingShowcaseProps) => (
             <OverlayDrawer triggerLabel="Open drawer" title="Drawer">
                 <OverlayKit nested={true} />
             </OverlayDrawer>
+        </StackingSectionShowcase>
+
+        <StackingSectionShowcase title="Bottom sheet">
+            <OverlayBottomSheet triggerLabel="Open bottom sheet" title="Bottom sheet">
+                <OverlayKit nested={false} />
+            </OverlayBottomSheet>
         </StackingSectionShowcase>
 
         <StackingSectionShowcase title="Sticky table header">
