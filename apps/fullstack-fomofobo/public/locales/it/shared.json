@@ -105,5 +105,21 @@
     "Countdown": {
         "HoursMinutes": "{{hours}}h{{minutes}}m",
         "Minutes": "{{minutes}}m"
+    },
+    "Detail": {
+        "Gallery": "Foto di {{title}}",
+        "Photo": "Foto {{index}} di {{total}}",
+        "PhotoCounter": "Foto {{index}}/{{total}}",
+        "Back": "Indietro",
+        "Share": "Condividi",
+        "LinkCopied": "Link copiato",
+        "Actions": "Azioni dell'evento",
+        "Directions": "Indicazioni",
+        "Date": "Data",
+        "Time": "Orario",
+        "Entry": "Ingresso",
+        "Distance": "Distanza",
+        "Now": "ora {{time}}",
+        "Venue": "Luogo"
     }
 }
