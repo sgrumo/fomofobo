@@ -15,8 +15,9 @@ import type { CategoriesService } from "../services/categories-service"
 export const buildBackofficeCategoriesRouter = (categories: CategoriesService) => {
     const router = createRouter<BackofficeEnv>()
 
-    router.use(BackofficeCategoriesRoutes.create.getRoutingPath(), requireRole("admin"))
-    router.use(BackofficeCategoriesRoutes.update.getRoutingPath(), requireRole("admin"))
+    const categoriesPath = BackofficeCategoriesRoutes.create.getRoutingPath()
+    router.use(categoriesPath, requireRole("admin"))
+    router.use(`${categoriesPath}/*`, requireRole("admin"))
 
     router.openapi(BackofficeCategoriesRoutes.create, async c => {
         try {

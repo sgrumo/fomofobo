@@ -16,12 +16,8 @@ export const buildPublicRouter = (categories: CategoriesService) => {
 
     router.openapi(PublicRoutes.listCategories, async c => {
         try {
-            return respond(
-                c,
-                PublicRoutes.listCategories,
-                HttpStatus.Ok,
-                await categories.list(),
-            )
+            const categoryList = await categories.list()
+            return respond(c, PublicRoutes.listCategories, HttpStatus.Ok, categoryList)
         } catch (error) {
             throw toApplicationError(error, "Error listing the categories")
         }

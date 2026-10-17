@@ -26,7 +26,7 @@ describe("PATCH /api/backoffice/categories/{id}", () => {
         expect(list.data).toStrictEqual([res.data])
     })
 
-    it("keeps its own name when the name does not change", async () => {
+    it("accepts the name that the category already holds", async () => {
         const { headers } = await signInAs("admin")
         const created = await createCategory({ headers, body: buildCategoryCreation() })
         expectStatus(created, 201)

@@ -34,7 +34,7 @@ describe("GET /api/backoffice/organizers/{id}", () => {
         expectApiError(res, 404, { code: "OrganizerNotFound" })
     })
 
-    it("answers 403 ForbiddenAction to an Organizer", async () => {
+    it("answers 403 to an Organizer", async () => {
         const { account, headers } = await signInAs("organizer")
 
         const res = await getOrganizer({ headers, pathParams: { id: account.id } })
