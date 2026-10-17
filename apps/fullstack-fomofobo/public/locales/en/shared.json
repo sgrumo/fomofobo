@@ -120,7 +120,10 @@
         "Entry": "Entry",
         "Distance": "Distance",
         "Now": "now {{time}}",
-        "Venue": "Venue"
+        "Venue": "Venue",
+        "Instagram": "Instagram",
+        "Facebook": "Facebook",
+        "Remaining": "-{{time}}"
     },
     "Saved": {
         "Toggle": "Save",

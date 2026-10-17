@@ -1,6 +1,6 @@
 "use client"
 
-import { format, isBefore, parseISO, startOfDay } from "date-fns"
+import { format, isBefore, parseISO } from "date-fns"
 import type { DateFilterKind, LocalDate } from "models"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -15,6 +15,8 @@ import { DateInput } from "ui-components/date-input"
 import { Field } from "ui-components/field"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
+import { localDateOf } from "@/lib/events/date-window"
+import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 interface DateFilter {
     date: DateFilterKind | undefined
@@ -42,7 +44,8 @@ export const DateChips = (props: DateChipsProps) => {
             ? `${format(parseISO(props.from), "dd.MM")}–${format(parseISO(props.to), "dd.MM")}`
             : t("Filters.Range")
     // PLACEHOLDER(OP-09): a range starts today at the earliest
-    const today = startOfDay(props.now)
+    // The range holds days of the platform zone, shown as midnights of the device.
+    const today = parseISO(localDateOf(props.now, PLATFORM_TIME_ZONE))
     const draftValid =
         draftFrom !== undefined &&
         draftTo !== undefined &&

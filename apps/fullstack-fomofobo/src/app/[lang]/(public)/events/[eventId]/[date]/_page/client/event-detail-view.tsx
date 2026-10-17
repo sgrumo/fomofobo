@@ -153,7 +153,7 @@ export const EventDetailView = (props: RouteClientComponentProps<"eventDetail">)
                         className={`${actionClassName} bg-social text-fg`}
                     >
                         <PixelIconInstagram />
-                        Instagram
+                        {t("Detail.Instagram")}
                     </a>
                 )}
                 {occurrence.externalLinks.facebookUrl === null ? undefined : (
@@ -164,7 +164,7 @@ export const EventDetailView = (props: RouteClientComponentProps<"eventDetail">)
                         className={`${actionClassName} bg-social text-fg`}
                     >
                         <PixelIconFacebook />
-                        Facebook
+                        {t("Detail.Facebook")}
                     </a>
                 )}
             </nav>
@@ -220,10 +220,12 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                     </Badge>
                     {status === "live" ? (
                         <span className="text-live-strong tp-pixel-2xl">
-                            -
-                            {remaining.hours > 0
-                                ? t("Countdown.HoursMinutes", { ...remaining })
-                                : t("Countdown.Minutes", { ...remaining })}
+                            {t("Detail.Remaining", {
+                                time:
+                                    remaining.hours > 0
+                                        ? t("Countdown.HoursMinutes", { ...remaining })
+                                        : t("Countdown.Minutes", { ...remaining }),
+                            })}
                         </span>
                     ) : undefined}
                 </div>
