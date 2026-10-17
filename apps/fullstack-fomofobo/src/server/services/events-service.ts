@@ -8,8 +8,9 @@ import type { EventsStorage, StoredEvent } from "storage"
 import { expandOccurrences } from "@/lib/events/expand-occurrences"
 import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
+import { eventTag, expireTags } from "../cache"
 import { appError } from "../errors"
-import { photoKeyPrefix } from "./photos-service"
+import { photoKeyPrefix, photoUrl } from "./photos-service"
 import type { Page } from "./to-page"
 import { toPage } from "./to-page"
 
@@ -119,6 +120,7 @@ export class EventsService {
         if (!(await this.eventsStorage.softDelete(id, new Date()))) {
             throw appError("EventNotFound", `Event ${id} not found`)
         }
+        expireTags(eventTag(id))
         await this.deletePhotoObjects(current.photos.map(photo => photo.objectKey))
     }
 
@@ -136,6 +138,7 @@ export class EventsService {
         if (!(await this.eventsStorage.setBlocked(id, block, new Date()))) {
             throw appError("EventNotFound", `Event ${id} not found`)
         }
+        expireTags(eventTag(id))
         return await this.getById(id, account)
     }
 
@@ -240,6 +243,7 @@ export class EventsService {
         await (current === null
             ? this.eventsStorage.insertWithChildren(write, new Date())
             : this.eventsStorage.updateWithChildren(write, new Date()))
+        expireTags(eventTag(id))
 
         const keptKeys = new Set(upsert.photoKeys)
         await this.deletePhotoObjects(
@@ -302,7 +306,7 @@ export class EventsService {
             ...event,
             photos: event.photos.map(photo => ({
                 id: photo.id,
-                url: `${this.photosPublicBaseUrl}/${photo.objectKey}`,
+                url: photoUrl(this.photosPublicBaseUrl, photo.objectKey),
                 position: photo.position,
             })),
         }

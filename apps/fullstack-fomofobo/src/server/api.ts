@@ -9,6 +9,7 @@ import { deleteAllRows } from "storage"
 import { match } from "ts-pattern"
 
 import { backofficeSession } from "./auth/backoffice-session"
+import { CATEGORIES_TAG, expireTags, PLACES_TAG, PUBLIC_TAG } from "./cache"
 import { requestClock } from "./clock"
 import { getContainer } from "./container"
 import type { AppErrorCode } from "./errors"
@@ -85,8 +86,10 @@ const buildApi = (): OpenAPIHono => {
         categories,
         db,
         events,
+        occurrences,
         organizers,
         photos,
+        places,
         venues,
     } = getContainer()
 
@@ -106,7 +109,7 @@ const buildApi = (): OpenAPIHono => {
 
     app.post(`${apiBasePath}/auth/sign-in/email`, c => auth.handler(c.req.raw))
 
-    app.route("/", buildPublicRouter(categories))
+    app.route("/", buildPublicRouter({ categories, occurrences, places }))
 
     app.use(`${apiBasePath}/backoffice/*`, backofficeSession(authAccounts))
     app.route("/", buildBackofficeSessionRouter())
@@ -118,6 +121,7 @@ const buildApi = (): OpenAPIHono => {
     if (appConfig.testRoutesEnabled) {
         app.post(`${apiBasePath}/test/reset-database`, async c => {
             await deleteAllRows(db)
+            expireTags(PUBLIC_TAG, CATEGORIES_TAG, PLACES_TAG)
             return c.body(null, HttpStatus.NoContent)
         })
         app.post(`${apiBasePath}/test/accounts`, async c => {

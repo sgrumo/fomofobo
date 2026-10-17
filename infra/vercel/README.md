@@ -24,6 +24,7 @@ The upload leaves the git metadata out, so Vercel runs no check on the commit au
 - Turso archives a free database after a period with no activity. An archived database answers no query. Run `turso group unarchive <group>` to wake it. `fomofobo-dev` sees the least traffic and archives first.
 - `vercel.json` pins the functions to `dub1`, next to the Turso location `aws-eu-west-1`. A request makes several round trips to the database, so the two stay in one region.
 - The workflows run on GitHub-hosted runners: free on a public repository, with a monthly allowance of minutes on a private one.
+- Geoapify gives 3,000 credits a day, one per place search that misses the cache. The places route allows 30 calls a minute per client, keyed on `x-forwarded-for`. Vercel overwrites that header with the client address, so a client cannot pick its own key.
 
 ## Set up an environment
 

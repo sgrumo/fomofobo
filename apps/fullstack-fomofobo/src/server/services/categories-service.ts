@@ -1,7 +1,9 @@
 import "server-only"
 import type { Category, CategoryCreation, CategoryUpdate } from "models"
+import { unstable_cache } from "next/cache"
 import type { CategoriesStorage } from "storage"
 
+import { CATEGORIES_TAG, expireTags } from "../cache"
 import { appError } from "../errors"
 
 export class CategoriesService {
@@ -11,10 +13,14 @@ export class CategoriesService {
     }
 
     /**
-     * @description Fetches every category, ordered by name
+     * @description Fetches every category, ordered by name, from the cache of public reads
      */
     public async list(): Promise<Category[]> {
-        return await this.categoriesStorage.list()
+        return await unstable_cache(
+            async () => await this.categoriesStorage.list(),
+            ["categories"],
+            { tags: [CATEGORIES_TAG] },
+        )()
     }
 
     /**
@@ -25,6 +31,7 @@ export class CategoriesService {
         await this.assertNameFree(creation.name)
         const category = { id: crypto.randomUUID(), ...creation }
         await this.categoriesStorage.insert(category, new Date())
+        expireTags(CATEGORIES_TAG)
         return category
     }
 
@@ -41,6 +48,7 @@ export class CategoriesService {
         if (category === null) {
             throw appError("CategoryNotFound", `Category ${id} not found`)
         }
+        expireTags(CATEGORIES_TAG)
         return category
     }
 
@@ -56,6 +64,7 @@ export class CategoriesService {
         if ((await this.categoriesStorage.deleteWithDeletedEventLinks(id)) === null) {
             throw appError("CategoryNotFound", `Category ${id} not found`)
         }
+        expireTags(CATEGORIES_TAG)
     }
 
     /**

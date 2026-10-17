@@ -8,6 +8,14 @@ import type { PhotoUploadRequest, PresignedUpload } from "models"
  */
 export const photoKeyPrefix = (accountId: string): string => `events/${accountId}/`
 
+/**
+ * @description Returns the public URL of a photo in the public bucket
+ * @param baseUrl Public base URL of the bucket, with no trailing slash
+ * @param objectKey Key of the photo
+ */
+export const photoUrl = (baseUrl: string, objectKey: string): string =>
+    `${baseUrl}/${objectKey}`
+
 export class PhotosService {
     private readonly photoStorage: S3ObjectStorage
     public constructor(photoStorage: S3ObjectStorage) {

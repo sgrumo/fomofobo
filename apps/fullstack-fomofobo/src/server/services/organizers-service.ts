@@ -2,6 +2,7 @@ import "server-only"
 import type { Account, OrganizerCreation, OrganizerListQuery } from "models"
 import type { AccountsStorage } from "storage"
 
+import { expireTags, PUBLIC_TAG } from "../cache"
 import { appError } from "../errors"
 import type { AuthAccountsService } from "./auth-accounts-service"
 import type { Page } from "./to-page"
@@ -57,6 +58,7 @@ export class OrganizersService {
         if (account === null) {
             throw appError("OrganizerNotFound", `Organizer ${id} not found`)
         }
+        expireTags(PUBLIC_TAG)
         return account
     }
 

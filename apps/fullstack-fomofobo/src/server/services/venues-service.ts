@@ -2,6 +2,7 @@ import "server-only"
 import type { Venue, VenueCreation, VenueListQuery, VenueUpdate } from "models"
 import type { VenuesStorage } from "storage"
 
+import { expireTags, PUBLIC_TAG } from "../cache"
 import { appError } from "../errors"
 import type { Page } from "./to-page"
 import { toPage } from "./to-page"
@@ -53,6 +54,7 @@ export class VenuesService {
         if (venue === null) {
             throw appError("VenueNotFound", `Venue ${id} not found`)
         }
+        expireTags(PUBLIC_TAG)
         return venue
     }
 }

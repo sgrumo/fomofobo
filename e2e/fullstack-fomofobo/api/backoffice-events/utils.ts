@@ -1,13 +1,13 @@
 import { faker } from "@faker-js/faker"
 import { expectRawStatus, expectStatus } from "e2e-kit/assertions"
-import type { EventUpsert, PhotoContentType, Recurrence, Venue } from "models"
+import type { Event, EventUpsert, PhotoContentType, Recurrence, Venue } from "models"
 
 import { signInAs } from "../auth/utils"
 import { createCategory } from "../backoffice-categories/api"
 import { buildCategoryCreation } from "../backoffice-categories/utils"
 import { createVenue } from "../backoffice-venues/api"
 import { buildVenueCreation } from "../backoffice-venues/utils"
-import { createPhotoUploadTicket } from "./api"
+import { createEvent, createPhotoUploadTicket } from "./api"
 
 /**
  * @description Builds the payload of a single event, 21:00 to 23:30 on the day, with the overrides
@@ -92,4 +92,24 @@ export const uploadPhoto = async (
 export const downloadPhoto = async (url: string): Promise<Uint8Array | null> => {
     const response = await fetch(url)
     return response.status === 200 ? new Uint8Array(await response.arrayBuffer()) : null
+}
+
+/**
+ * @description Uploads a photo and persists an event of the session with it, and returns the event
+ * @param headers Headers of the session that writes
+ * @param refs Venue and primary category of the event
+ * @param overrides Fields replaced
+ */
+export const seedEvent = async (
+    headers: { Cookie: string },
+    refs: { venueId: string; categoryId: string },
+    overrides: Partial<EventUpsert> = {},
+): Promise<Event> => {
+    const photo = await uploadPhoto(headers)
+    const res = await createEvent({
+        headers,
+        body: buildEventUpsert({ ...refs, photoKeys: [photo.key] }, overrides),
+    })
+    expectStatus(res, 201)
+    return res.data
 }

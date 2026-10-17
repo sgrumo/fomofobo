@@ -7,6 +7,8 @@ import {
     buildDbInstance,
     CategoriesStorage,
     EventsStorage,
+    PublicOccurrencesStorage,
+    RateLimitsStorage,
     VenuesStorage,
 } from "storage"
 
@@ -15,11 +17,14 @@ import { buildAuth } from "./auth/auth"
 import type { AppConfig } from "./config/app-config"
 import { resolveAppConfig } from "./config/app-config"
 import { parseEnv } from "./config/env"
+import { GeoapifyProvider } from "./geocoding/geoapify-provider"
 import { AuthAccountsService } from "./services/auth-accounts-service"
 import { CategoriesService } from "./services/categories-service"
 import { EventsService } from "./services/events-service"
 import { OrganizersService } from "./services/organizers-service"
 import { PhotosService } from "./services/photos-service"
+import { PlacesService } from "./services/places-service"
+import { PublicOccurrencesService } from "./services/public-occurrences-service"
 import { VenuesService } from "./services/venues-service"
 
 export interface Container {
@@ -32,7 +37,8 @@ export interface Container {
     organizers: OrganizersService
     events: EventsService
     photos: PhotosService
-    geocoding: { baseUrl: string; apiKey: string | undefined }
+    occurrences: PublicOccurrencesService
+    places: PlacesService
 }
 
 /**
@@ -63,6 +69,7 @@ const buildContainer = (): Container => {
         secretAccessKey: env.S3_SECRET_KEY,
     })
     const authAccounts = new AuthAccountsService(auth, accountsStorage)
+    const occurrencesStorage = new PublicOccurrencesStorage(db)
 
     return {
         appConfig,
@@ -78,7 +85,18 @@ const buildContainer = (): Container => {
             env.PHOTOS_PUBLIC_BASE_URL,
         ),
         photos: new PhotosService(photoStorage),
-        geocoding: { baseUrl: env.GEOAPIFY_BASE_URL, apiKey: env.GEOAPIFY_API_KEY },
+        occurrences: new PublicOccurrencesService(
+            occurrencesStorage,
+            env.PHOTOS_PUBLIC_BASE_URL,
+        ),
+        places: new PlacesService(
+            new GeoapifyProvider({
+                baseUrl: env.GEOAPIFY_BASE_URL,
+                apiKey: env.GEOAPIFY_API_KEY,
+            }),
+            new RateLimitsStorage(db),
+            occurrencesStorage,
+        ),
     }
 }
 
