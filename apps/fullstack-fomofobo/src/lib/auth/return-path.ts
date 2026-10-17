@@ -1,9 +1,12 @@
 import { Result } from "shared/result"
 
-// PLACEHOLDER(plan 009): the backoffice pages and their routes
-const BACKOFFICE_PATH = "/backoffice"
-export const BACKOFFICE_LOGIN_PATH = "/backoffice/login"
-const BACKOFFICE_HOME_PATH = "/backoffice/events"
+import { routes } from "@/framework/routes/routes"
+
+const BACKOFFICE_PATH = routes.backoffice.path({ parameters: {}, query: {} })
+export const BACKOFFICE_HOME_PATH = routes.backofficeEvents.path({
+    parameters: {},
+    query: {},
+})
 
 /** Origin the candidate resolves against. It is never served: only the comparison reads it. */
 const resolutionBase = new URL("http://return-path.invalid")
@@ -16,8 +19,8 @@ const resolutionBase = new URL("http://return-path.invalid")
  * `/\evil.example.com` reads as a path and resolves to another origin, which no
  * prefix check catches
  */
-export const sanitizeReturnPath = (candidate: string | null): string => {
-    if (candidate === null) {
+export const sanitizeReturnPath = (candidate: string | undefined): string => {
+    if (candidate === undefined) {
         return BACKOFFICE_HOME_PATH
     }
 
@@ -34,7 +37,8 @@ export const sanitizeReturnPath = (candidate: string | null): string => {
 
 /**
  * @description Builds the path of the login page that returns to the path after the sign-in
- * @param returnTo Path the visitor asked for
+ * @param returnTo Path the visitor asked for, none for the events list
+ * @param reason Why the session ended, shown on the login page
  */
-export const buildLoginPath = (returnTo: string): string =>
-    `${BACKOFFICE_LOGIN_PATH}?returnTo=${encodeURIComponent(returnTo)}`
+export const buildLoginPath = (returnTo?: string, reason?: "blocked"): string =>
+    routes.backofficeLogin.path({ parameters: {}, query: { returnTo, reason } })

@@ -47,14 +47,21 @@ describe("sanitizeReturnPath", () => {
     })
 
     it("should read an absent value as the events list", () => {
-        expect(sanitizeReturnPath(null)).toBe("/backoffice/events")
+        expect(sanitizeReturnPath(undefined)).toBe("/backoffice/events")
     })
 })
 
 describe("buildLoginPath", () => {
     it("should encode the path to return to", () => {
         expect(buildLoginPath("/backoffice/events?page=2")).toBe(
-            "/backoffice/login?returnTo=%2Fbackoffice%2Fevents%3Fpage%3D2",
+            "/backoffice/login?return-to=%2Fbackoffice%2Fevents%3Fpage%3D2",
         )
+    })
+
+    it("should carry the reason the session ended", () => {
+        expect(buildLoginPath("/backoffice/venues", "blocked")).toBe(
+            "/backoffice/login?return-to=%2Fbackoffice%2Fvenues&reason=blocked",
+        )
+        expect(buildLoginPath()).toBe("/backoffice/login")
     })
 })

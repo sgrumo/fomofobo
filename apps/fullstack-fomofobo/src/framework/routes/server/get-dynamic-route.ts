@@ -3,12 +3,12 @@ import { getTranslation } from "@/lib/i18n/server/translation"
 
 import type {
     DynamicRoute,
-    LocalizedRouteParameters,
+    RouteParameters,
     RouteQuery,
     RouteSegments,
     ServerDynamicRouteValues,
 } from "../routes.helper"
-import { decodeRouteQuery, parseRouteParameters } from "../routes.helper"
+import { decodeRouteQuery, parseRouteParameters, routeLanguage } from "../routes.helper"
 
 export interface RoutePageProps {
     params: Promise<object>
@@ -23,7 +23,8 @@ export interface RoutePageProps {
  * @param route Dynamic route of the page
  * @param props Props Next hands the page and `generateMetadata`
  * @throws When the parameters fail the schema, through the not-found error Next raises
- * @remarks Reads the language from the parsed `lang` parameter, not from the request
+ * @remarks Reads the language from the parsed `lang` parameter, not from the request,
+ * and the default language for a backoffice route, which has none
  * @remarks Reads the search parameters, which are request data, so the page renders
  * per request
  * @remarks Runs on the first load and on a reload alone: `setQuery` writes the URL
@@ -31,7 +32,7 @@ export interface RoutePageProps {
  */
 export const getDynamicRoute = async <
     TSegments extends RouteSegments,
-    TParameters extends LocalizedRouteParameters,
+    TParameters extends RouteParameters,
     TQuery extends RouteQuery,
 >(
     route: DynamicRoute<TSegments, TParameters, TQuery>,
@@ -48,6 +49,6 @@ export const getDynamicRoute = async <
         parameters,
         query,
         path: route.path({ parameters, query }),
-        title: route.title({ t: getTranslation(parameters.lang), parameters }),
+        title: route.title({ t: getTranslation(routeLanguage(parameters)), parameters }),
     }
 }

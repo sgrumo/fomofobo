@@ -5,7 +5,7 @@ import type { ApiActionResult } from "./api-action-result"
 
 const clientTransport = vi.fn<() => Promise<string>>()
 const apiAction = vi.fn<() => Promise<ApiActionResult>>()
-const redirectToLogin = vi.fn<() => void>()
+const redirectToLogin = vi.fn<(reason?: "blocked") => void>()
 
 vi.mock(import("./client-transport"), () => ({ clientTransport }))
 vi.mock(import("@/actions/api-action"), () => ({ apiAction }))
@@ -93,8 +93,27 @@ describe("browserTransport", () => {
                 browserTransport({ method: "get", path: "/api/todos" }),
             ).rejects.toBeInstanceOf(ApiTransportError)
 
-            expect(redirectToLogin).toHaveBeenCalledOnce()
+            expect(redirectToLogin).toHaveBeenCalledExactlyOnceWith(undefined)
             expect(clientTransport).toHaveBeenCalledOnce()
+        })
+
+        it("should tell the login page that the account is blocked", async () => {
+            clientTransport.mockRejectedValueOnce(
+                new ApiTransportError("blocked", {
+                    status: HttpStatus.Unauthorized,
+                    apiError: {
+                        code: "AccountBlocked",
+                        message: "blocked",
+                        status: HttpStatus.Unauthorized,
+                    },
+                }),
+            )
+
+            await expect(
+                browserTransport({ method: "get", path: "/api/backoffice/me" }),
+            ).rejects.toBeInstanceOf(ApiTransportError)
+
+            expect(redirectToLogin).toHaveBeenCalledExactlyOnceWith("blocked")
         })
 
         it("should send the browser to the login page on an action that the API refused too", async () => {

@@ -27,6 +27,17 @@ export const gotoPage = async (page: Page, pagePath: string): Promise<void> => {
 }
 
 /**
+ * @description Opens a backoffice page and waits until it hydrates
+ * @param page Page under test
+ * @param pagePath Path of the page, `/backoffice/events` for instance
+ * @remarks The backoffice lives outside the language segment
+ */
+export const gotoBackofficePage = async (page: Page, pagePath: string): Promise<void> => {
+    await page.goto(pagePath)
+    await waitForHydration(page)
+}
+
+/**
  * @description Reloads the current page and waits until it hydrates
  * @param page Page under test
  */

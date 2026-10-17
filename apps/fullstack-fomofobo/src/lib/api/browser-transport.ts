@@ -39,13 +39,6 @@ const dispatch = async (request: ApiRequest): Promise<unknown> => {
 }
 
 /**
- * @description True when the failure is the API refusing the session
- * @param error Failure the dispatch raised
- */
-const isUnauthenticated = (error: unknown): boolean =>
-    error instanceof ApiTransportError && error.status === HttpStatus.Unauthorized
-
-/**
  * @description Sends the request, and sends the browser to the login page when the API refuses the session
  * @param request Method, path, query and body of the call
  * @throws When the API answers outside the `2xx` range
@@ -59,8 +52,13 @@ export const browserTransport = async (request: ApiRequest): Promise<unknown> =>
     try {
         return await dispatch(request)
     } catch (error) {
-        if (isUnauthenticated(error)) {
-            redirectToLogin()
+        if (
+            error instanceof ApiTransportError &&
+            error.status === HttpStatus.Unauthorized
+        ) {
+            redirectToLogin(
+                error.apiError?.code === "AccountBlocked" ? "blocked" : undefined,
+            )
         }
         throw error
     }

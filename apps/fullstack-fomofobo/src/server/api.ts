@@ -8,6 +8,8 @@ import { accountRoleSchema, HttpStatus, organizerCreationSchema } from "models"
 import { deleteAllRows } from "storage"
 import { match } from "ts-pattern"
 
+import { SIGN_IN_PATH } from "@/lib/auth/sign-in"
+
 import { backofficeSession } from "./auth/backoffice-session"
 import { CATEGORIES_TAG, expireTags, PLACES_TAG, PUBLIC_TAG } from "./cache"
 import { requestClock } from "./clock"
@@ -107,7 +109,7 @@ const buildApi = (): OpenAPIHono => {
 
     app.get(`${apiBasePath}/health`, c => c.json({ status: "ok" }))
 
-    app.post(`${apiBasePath}/auth/sign-in/email`, c => auth.handler(c.req.raw))
+    app.post(SIGN_IN_PATH, c => auth.handler(c.req.raw))
 
     app.route("/", buildPublicRouter({ categories, occurrences, places }))
 

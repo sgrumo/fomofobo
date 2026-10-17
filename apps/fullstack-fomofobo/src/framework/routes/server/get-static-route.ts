@@ -2,12 +2,12 @@ import "server-only"
 import { getTranslation } from "@/lib/i18n/server/translation"
 
 import type {
-    LocalizedRouteParameters,
+    RouteParameters,
     RouteSegments,
     ServerStaticRouteValues,
     StaticRoute,
 } from "../routes.helper"
-import { parseRouteParameters } from "../routes.helper"
+import { parseRouteParameters, routeLanguage } from "../routes.helper"
 
 export interface StaticRoutePageProps {
     params: Promise<object>
@@ -20,12 +20,13 @@ export interface StaticRoutePageProps {
  * @param route Static route of the page
  * @param props Props Next hands the page and `generateMetadata`, `params` alone
  * @throws When the parameters fail the schema, through the not-found error Next raises
- * @remarks Reads the language from the parsed `lang` parameter, not from the request
+ * @remarks Reads the language from the parsed `lang` parameter, not from the request,
+ * and the default language for a backoffice route, which has none
  * @remarks Reads no request, so the page stays prerendered
  */
 export const getStaticRoute = async <
     TSegments extends RouteSegments,
-    TParameters extends LocalizedRouteParameters,
+    TParameters extends RouteParameters,
 >(
     route: StaticRoute<TSegments, TParameters>,
     props: StaticRoutePageProps,
@@ -36,6 +37,6 @@ export const getStaticRoute = async <
     return {
         parameters,
         path: route.path({ parameters, query }),
-        title: route.title({ t: getTranslation(parameters.lang), parameters }),
+        title: route.title({ t: getTranslation(routeLanguage(parameters)), parameters }),
     }
 }

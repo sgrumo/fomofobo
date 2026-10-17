@@ -18,6 +18,18 @@ const coordinateCodec = (limit: number) =>
         encode: value => value.toString(),
     })
 
+const pageCodec = z.codec(z.string().regex(/^[1-9]\d{0,5}$/u), z.int().min(1), {
+    decode: Number,
+    encode: value => value.toString(),
+})
+
+const backofficeListQuery = {
+    q: z.string().trim().min(1).optional().catch(undefined),
+    page: pageCodec.optional().catch(undefined),
+}
+
+const blockedFilterSchema = z.enum(["blocked", "active"])
+
 export const routes = {
     root: createDynamicRoute({
         segments: ["[lang]"],
@@ -63,6 +75,70 @@ export const routes = {
         segments: ["[lang]", "dev", "samples"],
         title: ({ t }) => t("PageTitle.DevSamples"),
         parametersSchema: z.object({ lang: languageKeySchema }),
+        querySchema: z.object({}),
+    }),
+    backoffice: createDynamicRoute({
+        segments: ["backoffice"],
+        title: ({ t }) => t("PageTitle.Backoffice.Events"),
+        parametersSchema: z.object({}),
+        querySchema: z.object({}),
+    }),
+    backofficeLogin: createDynamicRoute({
+        segments: ["backoffice", "login"],
+        title: ({ t }) => t("PageTitle.Backoffice.Login"),
+        parametersSchema: z.object({}),
+        querySchema: z.object({
+            returnTo: z.string().optional().catch(undefined),
+            reason: z.enum(["blocked"]).optional().catch(undefined),
+        }),
+    }),
+    backofficeEvents: createDynamicRoute({
+        segments: ["backoffice", "events"],
+        title: ({ t }) => t("PageTitle.Backoffice.Events"),
+        parametersSchema: z.object({}),
+        querySchema: z.object({
+            ...backofficeListQuery,
+            state: blockedFilterSchema.optional().catch(undefined),
+            organizer: z.uuid().optional().catch(undefined),
+        }),
+    }),
+    backofficeEventNew: createDynamicRoute({
+        segments: ["backoffice", "events", "new"],
+        title: ({ t }) => t("PageTitle.Backoffice.NewEvent"),
+        parametersSchema: z.object({}),
+        querySchema: z.object({}),
+    }),
+    backofficeEvent: createDynamicRoute({
+        segments: ["backoffice", "events", "[id]"],
+        title: ({ t }) => t("PageTitle.Backoffice.Event"),
+        parametersSchema: z.object({ id: z.string() }),
+        querySchema: z.object({}),
+    }),
+    backofficeVenues: createDynamicRoute({
+        segments: ["backoffice", "venues"],
+        title: ({ t }) => t("PageTitle.Backoffice.Venues"),
+        parametersSchema: z.object({}),
+        querySchema: z.object(backofficeListQuery),
+    }),
+    backofficeCategories: createDynamicRoute({
+        segments: ["backoffice", "categories"],
+        title: ({ t }) => t("PageTitle.Backoffice.Categories"),
+        parametersSchema: z.object({}),
+        querySchema: z.object({}),
+    }),
+    backofficeOrganizers: createDynamicRoute({
+        segments: ["backoffice", "organizers"],
+        title: ({ t }) => t("PageTitle.Backoffice.Organizers"),
+        parametersSchema: z.object({}),
+        querySchema: z.object({
+            ...backofficeListQuery,
+            state: blockedFilterSchema.optional().catch(undefined),
+        }),
+    }),
+    backofficeNotFound: createDynamicRoute({
+        segments: ["backoffice", "[...rest]"],
+        title: ({ t }) => t("PageTitle.NotFound"),
+        parametersSchema: z.object({ rest: z.array(z.string()) }),
         querySchema: z.object({}),
     }),
     localizedNotFound: createDynamicRoute({

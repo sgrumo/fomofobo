@@ -15,7 +15,16 @@
         "Saved": "Saved events",
         "DevShowcase": "Showcase",
         "DevSamples": "Samples",
-        "NotFound": "Page not found"
+        "NotFound": "Page not found",
+        "Backoffice": {
+            "Login": "Sign in",
+            "Events": "Events",
+            "NewEvent": "New event",
+            "Event": "Edit event",
+            "Venues": "Venues",
+            "Categories": "Categories",
+            "Organizers": "Organizers"
+        }
     },
     "Map": {
         "Label": "Event map",
@@ -132,5 +141,24 @@
         "NoneVisible": "Your saved events are no longer available.",
         "Loading": "Loading saved events",
         "Error": "The saved events could not be loaded."
+    },
+    "Backoffice": {
+        "Brand": "fomofobo backoffice",
+        "Nav": {
+            "Label": "Backoffice sections",
+            "Events": "Events",
+            "Venues": "Venues",
+            "Categories": "Categories",
+            "Organizers": "Organizers"
+        },
+        "Login": {
+            "Title": "Sign in",
+            "Email": "Email",
+            "Password": "Password",
+            "Submit": "Sign in",
+            "InvalidCredentials": "Wrong email or password.",
+            "Failed": "The sign-in failed. Try again in a moment.",
+            "Blocked": "Your account is blocked. Contact an Admin."
+        }
     }
 }

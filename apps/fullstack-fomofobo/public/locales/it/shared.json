@@ -15,7 +15,16 @@
         "Saved": "Eventi salvati",
         "DevShowcase": "Showcase",
         "DevSamples": "Esempi",
-        "NotFound": "Pagina non trovata"
+        "NotFound": "Pagina non trovata",
+        "Backoffice": {
+            "Login": "Accedi",
+            "Events": "Eventi",
+            "NewEvent": "Nuovo evento",
+            "Event": "Modifica evento",
+            "Venues": "Luoghi",
+            "Categories": "Categorie",
+            "Organizers": "Organizzatori"
+        }
     },
     "Map": {
         "Label": "Mappa degli eventi",
@@ -132,5 +141,24 @@
         "NoneVisible": "I tuoi eventi salvati non sono più disponibili.",
         "Loading": "Caricamento eventi salvati",
         "Error": "Non è stato possibile caricare gli eventi salvati."
+    },
+    "Backoffice": {
+        "Brand": "fomofobo backoffice",
+        "Nav": {
+            "Label": "Sezioni del backoffice",
+            "Events": "Eventi",
+            "Venues": "Luoghi",
+            "Categories": "Categorie",
+            "Organizers": "Organizzatori"
+        },
+        "Login": {
+            "Title": "Accedi",
+            "Email": "Email",
+            "Password": "Password",
+            "Submit": "Accedi",
+            "InvalidCredentials": "Email o password errate.",
+            "Failed": "Accesso non riuscito. Riprova tra poco.",
+            "Blocked": "Il tuo account è bloccato. Contatta un Admin."
+        }
     }
 }

@@ -186,12 +186,10 @@ describe("route objects", () => {
             expect(ledger).toStrictEqual(appFileSegments("page.tsx"))
         })
 
-        it("should open with the `[lang]` segment", () => {
+        it("should open with the `[lang]` segment, or with `backoffice`, which serves the default language", () => {
+            const languageSegments = new Set<string>(["[lang]", "backoffice"])
             const withoutLanguage = Object.entries(routes)
-                .filter(([, route]) => {
-                    const segments: readonly string[] = route.segments
-                    return segments[0] !== "[lang]"
-                })
+                .filter(([, route]) => !languageSegments.has(route.segments[0]))
                 .map(([name]) => name)
             expect(withoutLanguage).toStrictEqual([])
         })

@@ -24,6 +24,12 @@ export const accountPasswordSchema = z
     .max(MAX_PASSWORD_LENGTH)
 export type AccountPassword = z.infer<typeof accountPasswordSchema>
 
+export const accountCredentialsSchema = z.object({
+    email: accountSchema.shape.email,
+    password: z.string().min(1).max(MAX_PASSWORD_LENGTH),
+})
+export type AccountCredentials = z.infer<typeof accountCredentialsSchema>
+
 export const organizerCreationSchema = z.object({
     name: accountSchema.shape.name,
     email: accountSchema.shape.email,

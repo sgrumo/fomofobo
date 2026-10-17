@@ -2,11 +2,15 @@ import { buildLoginPath } from "@/lib/auth/return-path"
 
 /**
  * @description Sends the browser to the login page, keeping the current path
+ * @param reason Why the session ended, shown on the login page
  * @remarks Replaces the entry instead of pushing one, so `Back` does not land on a page
  * the visitor cannot read
  */
-export const redirectToLogin = (): void => {
+export const redirectToLogin = (reason?: "blocked"): void => {
     globalThis.location.replace(
-        buildLoginPath(`${globalThis.location.pathname}${globalThis.location.search}`),
+        buildLoginPath(
+            `${globalThis.location.pathname}${globalThis.location.search}`,
+            reason,
+        ),
     )
 }

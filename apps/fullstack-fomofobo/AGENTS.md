@@ -9,16 +9,19 @@ Fullstack app: one Next.js process serves the API and the pages. The API mounts 
 - **NEVER** enable `cacheComponents` / `"use cache"` - it forbids the `dynamic` segment config app-wide
 - Use the generated route types: `PageProps<'/route'>`, `LayoutProps`. `pnpm typecheck` runs `next typegen` first
 - Dev-only pages gate on `APP_ENV` through `devPagesEnabled()` + `notFound()`, **NEVER** on `NODE_ENV` - the E2E suite runs a production build with `APP_ENV=test`
-- The root layout mounts `HydrationMarker`, which sets `data-hydrated` on `<html>` once React hydrates. The E2E suite waits for it before it acts - keep it in the root layout
+- Two root layouts, `[lang]/layout.tsx` and `backoffice/layout.tsx`, render one `RootDocument`. It mounts `HydrationMarker`, which sets `data-hydrated` on `<html>` once React hydrates. The E2E suite waits for it before it acts - keep it in `RootDocument`
 
 ## Structure
 
 ```
 .
 ├── src/app/
-│   ├── [lang]/                      # Root layout. The language is the first URL segment
-│   │   ├── (protected)/             # Pages behind `requireSession`
+│   ├── [lang]/                      # Root layout of the public app. The language is the first URL segment
 │   │   ├── (public)/                # Open pages
+│   │   └── [...rest]/               # Catch-all -> `notFound()`
+│   ├── backoffice/                  # Root layout of the backoffice, default language
+│   │   ├── login/                   # The one backoffice page outside the guard
+│   │   ├── (protected)/             # Pages behind `requireSession`, inside the role-aware shell
 │   │   └── [...rest]/               # Catch-all -> `notFound()`
 │   ├── auth/logout/route.ts         # Sign-out, same-origin `POST` alone
 │   └── api/[[...route]]/route.ts    # Hono mount, one export per HTTP verb
@@ -94,12 +97,12 @@ Client component  -> useMutation     -> api        -> apiAction       -> serverT
 
 - Two variants by `type`. `createStaticRoute`: prerendered, empty query schema, holds `generateStaticParams` with complete parameters, `lang` included. `createDynamicRoute`: per request, holds `querySchema`
 - Every route holds `segments`, a `title` builder, `parametersSchema`, `querySchema`. `segments` uses the Next bracket grammar: `["[lang]", "todos", "[id]"]`
-- **Every** route opens with `"[lang]"` and holds `lang: languageKeySchema`. `getStaticRoute` / `getDynamicRoute` accept no route without it. Route groups such as `(protected)` stay out of the ledger
+- **Every** public route opens with `"[lang]"` and holds `lang: languageKeySchema`. The one exception: a backoffice route opens with `"backoffice"`, holds no `lang`, and renders the default language (`routeLanguage`). Route groups such as `(protected)` stay out of the ledger
 - Parameters schema: `[id]` -> `z.string()`, `[...slug]` -> `z.array(z.string())`, `[[...slug]]` -> that array `.optional()`. No check, no `.catch()` - validate in the page
 - Query schema: every key has `.catch()`, the empty object decodes, the default query encodes, every key survives kebab case
 - `title` receives `t` and `parameters`, never the query
 - `route.path({ parameters, query })` builds every href. **NEVER** write a path string by hand
-- A link passes `parameters={{ lang: language }}`: `useLanguage()` in a client component, `parameters.lang` of `getStaticRoute` / `getDynamicRoute` in a Server Component. A handler with no page passes `defaultLanguage`
+- A link passes `parameters={{ lang: language }}`: `useLanguage()` in a client component, `parameters.lang` of `getStaticRoute` / `getDynamicRoute` in a Server Component. A handler with no page passes `defaultLanguage`. A backoffice link passes `parameters={{}}`
 - Server: `getStaticRoute(route, props)` / `getDynamicRoute(route, props)`, route object of `const route`
 - Browser: `useStaticRoute(routes[props.route])` / `useDynamicRoute(routes[props.route])`. The prop is the literal key, so the index yields the exact route and the exact `parameters` / `query` types
 - Route hooks: `_page/client` alone, argument `routes[props.route]` alone (lint: `eslint/no-restricted-imports`, test: `structure.test.ts`). A shared component has no route of its own
@@ -112,18 +115,19 @@ Client component  -> useMutation     -> api        -> apiAction       -> serverT
 Email and password through Better Auth, with database sessions on libSQL. No sign-up, no external provider, no hand-written cryptography.
 
 ```
-(protected)/<page>            -> requireSession(path) -> redirect to the login page with returnTo when absent
-(protected)/layout            -> getSession()         -> avatar menu with sign-out
-POST /api/auth/sign-in/email  -> the library          -> session cookie
+backoffice/(protected)/<page> -> requireSession(path) -> redirect to the login page with return-to when absent
+backoffice/(protected)/layout -> getSession()         -> shell: navigation by role, menu with sign-out
+backoffice/login              -> signInWithEmail      -> POST /api/auth/sign-in/email -> session cookie
 /api/backoffice/*             -> backofficeSession    -> c.var.account, or 401 Unauthenticated / AccountBlocked
 /auth/logout                  -> POST, same origin    -> 303 to the login page
 ```
 
-- **Every `(protected)` page calls `requireSession` with its own path** - never the layout (no pathname there), never `proxy.ts`
+- **Every `(protected)` page calls `requireSession` with its own path** - never the layout (no pathname there), never `proxy.ts`. An Admin page calls `requireAdminSession`, which answers not found to an Organizer
+- The shell hides what the role cannot do. The API refuses it on its own
 - The guard gates pages. The security boundary is `backofficeSession` on `/api/backoffice/*`, which reads the session row on **every** call. An Admin-only route adds `requireRole("admin")` -> `403 ForbiddenAction`
 - `AuthAccountsService` is the one wrapper of the library: session reads, account creation, password, block. A write that ends sessions runs in one storage batch with them
 - Hono mounts one library endpoint, the sign-in. **NEVER** mount the whole library handler - it serves sign-up, account changes and admin endpoints over HTTP
-- A blocked account signs in like a wrong password, and any backoffice call answers `401 AccountBlocked` and deletes its sessions. The `401` sends the browser to the login page
+- A blocked account signs in like a wrong password, and any backoffice call answers `401 AccountBlocked` and deletes its sessions. The `401` sends the browser to the login page, with `reason=blocked` for `AccountBlocked`: only an open session learns of its block
 - `session.cookieCache` stays off, so a block or a revoked session applies on the next request
 - The `nextCookies` plugin writes a refreshed session cookie in a route handler and a Server Action. A page reads with `refresh: false`: a Server Component cannot write a cookie. Keep `nextCookies` the last plugin
 - Cookies carry the `fomofobo` prefix, plus `__Secure-` and `Secure` in `preview` and `vercel`. The library accepts a sign-in from the origin of `APP_BASE_URL` alone

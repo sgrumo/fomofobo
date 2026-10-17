@@ -1,6 +1,6 @@
 import "server-only"
 import type { Account } from "models"
-import { redirect } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 
 import { buildLoginPath } from "@/lib/auth/return-path"
 
@@ -20,6 +20,19 @@ export const requireSession = async (returnTo: string): Promise<Account> => {
     const account = await getSession()
     if (account === undefined) {
         redirect(buildLoginPath(returnTo))
+    }
+    return account
+}
+
+/**
+ * @description Returns the Admin account of the request session, sends the visitor to the login page, or answers not found to an Organizer
+ * @param returnTo Path of the page, which the sign-in ends on
+ * @throws When the account is not an Admin, through the not-found error Next raises
+ */
+export const requireAdminSession = async (returnTo: string): Promise<Account> => {
+    const account = await requireSession(returnTo)
+    if (account.role !== "admin") {
+        notFound()
     }
     return account
 }

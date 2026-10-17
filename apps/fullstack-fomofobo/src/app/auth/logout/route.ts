@@ -2,7 +2,7 @@ import { HttpStatus } from "models"
 import { NextResponse } from "next/server"
 import { Result } from "shared/result"
 
-import { BACKOFFICE_LOGIN_PATH } from "@/lib/auth/return-path"
+import { buildLoginPath } from "@/lib/auth/return-path"
 import { isSameOrigin } from "@/server/auth/same-origin"
 import { getContainer } from "@/server/container"
 
@@ -37,7 +37,7 @@ export const POST = async (request: Request): Promise<Response> => {
     )
 
     const response = NextResponse.redirect(
-        new URL(BACKOFFICE_LOGIN_PATH, request.url),
+        new URL(buildLoginPath(), request.url),
         seeOther,
     )
     for (const cookie of signOut.success ? signOut.value.headers.getSetCookie() : []) {

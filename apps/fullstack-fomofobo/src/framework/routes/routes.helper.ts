@@ -1,5 +1,6 @@
 import { camelCase, kebabCase, omitBy } from "es-toolkit"
 import type { LanguageKey } from "i18n/i18n"
+import { defaultLanguage, languageKeySchema } from "i18n/i18n"
 import { notFound } from "next/navigation"
 import type { UseNamespacedTranslation } from "react-i18n/types"
 import { isDefined } from "shared/values"
@@ -11,7 +12,14 @@ export type RouteSegments = readonly string[]
 
 export type RouteParameters = Record<string, unknown>
 
-export type LocalizedRouteParameters = RouteParameters & { lang: LanguageKey }
+/**
+ * @description Returns the language of a page: its `lang` parameter, or the default language for a backoffice page
+ * @param parameters Parameters parsed by the route schema
+ */
+export const routeLanguage = (parameters: RouteParameters): LanguageKey => {
+    const language = languageKeySchema.safeParse(parameters.lang)
+    return language.success ? language.data : defaultLanguage
+}
 
 export type RouteQuery = Record<string, unknown>
 
