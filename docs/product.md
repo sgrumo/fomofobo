@@ -54,11 +54,11 @@ Results match every active filter. One search field matches event titles and set
 
 ### Event page
 
-Each event has its own URL, and for a repeating event the URL refers to one occurrence. The page offers directions to the venue, the external link of the event and a save action. Share opens the share sheet of the device, or copies the link where none exists. (not built)
+Each event has its own URL, and for a repeating event the URL refers to one occurrence. The page offers directions to the venue, the external link of the event and a save action. Share opens the share sheet of the device, or copies the link where none exists. Directions open Apple Maps on iOS and iPadOS, and Google Maps elsewhere.
 
 ### Saved events
 
-Visitors save events with no account. Saved events stay on the device only, and the saved list shows only the visible ones. (not built)
+Visitors save events with no account. Saved events stay on the device only, and the saved list shows only the visible ones. A saved event stays in the list after it ends, until the visitor removes it.
 
 ### Installation and offline use
 
