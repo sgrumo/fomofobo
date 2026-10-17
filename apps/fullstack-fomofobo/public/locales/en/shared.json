@@ -64,5 +64,29 @@
         "live": "Live",
         "upcoming": "Upcoming",
         "ended": "Ended"
+    },
+    "Search": {
+        "Label": "Search events or places",
+        "Placeholder": "Search event, place",
+        "Places": "Places",
+        "Events": "Events",
+        "Loading": "Searching",
+        "Empty": "Nothing found.",
+        "Unavailable": "Place search is not available right now.",
+        "PoweredBy": "Powered by Geoapify"
+    },
+    "Filters": {
+        "Categories": "Categories",
+        "All": "All",
+        "Dates": "Dates",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "weekend": "Weekend",
+        "Range": "Dates…",
+        "RangeTitle": "Choose the dates",
+        "From": "From",
+        "To": "To",
+        "Apply": "Apply",
+        "Clear": "Clear"
     }
 }

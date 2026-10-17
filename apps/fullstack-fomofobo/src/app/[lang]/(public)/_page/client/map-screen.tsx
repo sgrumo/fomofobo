@@ -22,6 +22,9 @@ import { useGeolocation } from "@/lib/hooks/use-geolocation"
 import { useNow } from "@/lib/hooks/use-now"
 import { DEFAULT_CITY, PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
+import { CategoryChips } from "./category-chips"
+import { DateChips } from "./date-chips"
+import { PlaceSearch } from "./place-search"
 import { StatusBar } from "./status-bar"
 
 const EventMap = dynamic(() => import("./event-map").then(module => module.EventMap), {
@@ -146,6 +149,54 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 }}
             />
             <div className="pointer-events-none absolute inset-x-4 top-4 flex flex-col gap-2 [&>*]:pointer-events-auto">
+                <PlaceSearch
+                    // A new place, or a recenter that clears it, resets the typed text.
+                    key={query.place ?? ""}
+                    route={props.route}
+                    center={center}
+                    initialText={query.place ?? query.q ?? ""}
+                    onPlaceSelect={place => {
+                        setQuery({
+                            ...centerQuery(place.coordinates),
+                            place: place.label,
+                            q: undefined,
+                        })
+                    }}
+                    onEventSelect={ref => {
+                        setQuery({ event: ref.eventId, occurrence: ref.date })
+                    }}
+                    onTextSubmit={text => {
+                        setQuery({ q: text, place: undefined })
+                    }}
+                />
+                <CategoryChips
+                    route={props.route}
+                    categories={categories.data ?? []}
+                    counts={
+                        results === undefined
+                            ? undefined
+                            : new Map(
+                                  results.categoryCounts.map(entry => [
+                                      entry.categoryId,
+                                      entry.count,
+                                  ]),
+                              )
+                    }
+                    selected={query.category}
+                    onSelect={category => {
+                        setQuery({ category })
+                    }}
+                />
+                <DateChips
+                    route={props.route}
+                    now={now}
+                    date={query.date}
+                    from={query.from}
+                    to={query.to}
+                    onChange={filter => {
+                        setQuery(filter)
+                    }}
+                />
                 {notices}
             </div>
             {/* Clears the map attribution, which sits in the bottom corner. */}
