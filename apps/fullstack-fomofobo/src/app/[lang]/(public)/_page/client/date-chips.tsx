@@ -87,19 +87,19 @@ export const DateChips = (props: DateChipsProps) => {
                     <div className="flex flex-col gap-4">
                         <Field label={t("Filters.From")} required={true}>
                             <DateInput
-                                mode="native"
+                                mode="custom"
                                 value={draftFrom}
                                 onValueChange={setDraftFrom}
-                                min={today}
+                                isDayDisabled={day => isBefore(day, today)}
                                 className="w-full"
                             />
                         </Field>
                         <Field label={t("Filters.To")} required={true}>
                             <DateInput
-                                mode="native"
+                                mode="custom"
                                 value={draftTo}
                                 onValueChange={setDraftTo}
-                                min={draftFrom ?? today}
+                                isDayDisabled={day => isBefore(day, draftFrom ?? today)}
                                 className="w-full"
                             />
                         </Field>

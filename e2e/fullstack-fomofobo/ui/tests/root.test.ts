@@ -1,7 +1,9 @@
 import { expect, test } from "@playwright/test"
 import { expectAlert } from "e2e-ui-components/alert"
 import { getBottomSheet } from "e2e-ui-components/bottom-sheet"
+import { clickButton } from "e2e-ui-components/button"
 import { getChip, pressChip } from "e2e-ui-components/chip"
+import { pickDate } from "e2e-ui-components/date-input"
 import { clickIconButton } from "e2e-ui-components/icon-button"
 import { fillSearchField } from "e2e-ui-components/search-field"
 
@@ -177,6 +179,64 @@ test.describe("map", () => {
         await pressChip(page, t("shared", "Filters.tomorrow"))
 
         await expect(tomorrowPin).toBeVisible()
+        await expect(todayPin).toBeHidden()
+    })
+
+    test("keeps the results of a custom range picked in the sheet", async ({ page }) => {
+        const center = buildArea()
+        const category = await seedCategory()
+        const today = await seedPublicEvent(
+            {
+                venue: await seedVenue(
+                    offsetPoint(center, { latitude: 0.02, longitude: 0 }),
+                ),
+                category,
+            },
+            { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+        )
+        const monday = await seedPublicEvent(
+            {
+                venue: await seedVenue(
+                    offsetPoint(center, { latitude: -0.02, longitude: 0 }),
+                ),
+                category,
+            },
+            { startsAt: "2026-10-26T18:00", endsAt: "2026-10-26T20:00" },
+        )
+        const todayPin = page.getByRole("button", {
+            name: t("shared", "Map.Pin", {
+                title: today.title,
+                status: t("shared", "Status.upcoming"),
+                time: "18:00",
+            }),
+        })
+        const mondayPin = page.getByRole("button", {
+            name: t("shared", "Map.Pin", {
+                title: monday.title,
+                status: t("shared", "Status.upcoming"),
+                time: "18:00",
+            }),
+        })
+
+        await gotoPage(page, mapPath(center))
+        await expect(todayPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+
+        await getChip(page, t("shared", "Filters.Range")).click()
+        const sheet = getBottomSheet(page, t("shared", "Filters.RangeTitle"))
+        await pickDate(sheet, t("shared", "Filters.From"), {
+            year: 2026,
+            month: 10,
+            day: 25,
+        })
+        await pickDate(sheet, t("shared", "Filters.To"), {
+            year: 2026,
+            month: 10,
+            day: 26,
+        })
+        await clickButton(sheet, t("shared", "Filters.Apply"))
+
+        await expect(getChip(page, "25.10–26.10")).toHaveAttribute("aria-pressed", "true")
+        await expect(mondayPin).toBeVisible()
         await expect(todayPin).toBeHidden()
     })
 
