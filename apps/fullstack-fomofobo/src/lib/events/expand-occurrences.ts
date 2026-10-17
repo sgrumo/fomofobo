@@ -102,13 +102,13 @@ const ruleDates = (first: Date, rule: RecurrenceRule): Date[] => {
                     (_, n) => addDays(first, n),
                 ).filter(date => weekdayIndexes.has(getDay(date)))
             })
-            // PLACEHOLDER(OP-15): a month without the day is skipped
+            // `addMonths` clamps to the month end: the filter skips a month without the day
             .with({ frequency: "monthly", mode: "day-of-month" }, () =>
                 Array.from({ length: months }, (_, n) => addMonths(first, n)).filter(
                     date => getDate(date) === getDate(first),
                 ),
             )
-            // PLACEHOLDER(OP-15): a month without the nth weekday is skipped
+            // A month without the nth weekday is skipped
             .with({ frequency: "monthly", mode: "weekday-position" }, () => {
                 const weekOfMonth = Math.ceil(getDate(first) / 7)
                 return Array.from({ length: months }, (_, n) => {

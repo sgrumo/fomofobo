@@ -10,7 +10,6 @@ import { PLACES_TAG } from "../cache"
 import { appError } from "../errors"
 import type { GeocodingProvider } from "../geocoding/geoapify-provider"
 
-// PLACEHOLDER(TQ-16)
 const PLACES_CALLS_PER_WINDOW = 30
 const PLACES_WINDOW_MS = 60_000
 // Circle filter, not a bias: a place farther away never shows up

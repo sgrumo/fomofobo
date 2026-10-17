@@ -2,7 +2,7 @@ import type { StyleSpecification } from "@maplibre/maplibre-gl-style-spec"
 
 /**
  * @description Holds the flat retro MapLibre style of the event map
- * @remarks Points at placeholder tile and glyph URLs until PLACEHOLDER(OP-28) picks a provider, and copies the `--palette-map-*` values of `packages/styles`, PLACEHOLDER(TQ-08)
+ * @remarks Points at placeholder tile and glyph URLs in place of OpenFreeMap, PLACEHOLDER(plan 008), and copies the `--palette-map-*` values of `packages/styles`, PLACEHOLDER(TQ-08)
  */
 export const mapStyle = {
     version: 8,

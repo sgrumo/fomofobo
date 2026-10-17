@@ -80,7 +80,7 @@ export const buildAuth = (db: DbInstanceFromSchema, settings: AuthSettings) => {
             minPasswordLength: MIN_PASSWORD_LENGTH,
             maxPasswordLength: MAX_PASSWORD_LENGTH,
         },
-        // PLACEHOLDER(TQ-16): the library default of 3 sign-ins per 10 s and per IP
+        // Library default: 3 sign-ins per 10 s per IP
         rateLimit: {
             enabled: settings.rateLimitEnabled,
             storage: "database",

@@ -4,14 +4,12 @@ import { weekDays } from "shared/temporal"
 import { customErrorParamsSchema } from "./lib/custom-errors"
 import { localDateSchema } from "./lib/local-time"
 
-// PLACEHOLDER(OP-15)
 const weeklyRuleSchema = z.object({
     frequency: z.literal("weekly"),
     weekdays: z.array(z.enum(weekDays)).min(1),
     until: localDateSchema,
 })
 
-// PLACEHOLDER(OP-15)
 const monthlyRuleSchema = z.object({
     frequency: z.literal("monthly"),
     mode: z.enum(["day-of-month", "weekday-position"]),
