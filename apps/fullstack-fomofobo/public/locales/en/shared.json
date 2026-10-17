@@ -88,5 +88,22 @@
         "To": "To",
         "Apply": "Apply",
         "Clear": "Clear"
+    },
+    "Preview": {
+        "Title": "Event",
+        "Close": "Close",
+        "Loading": "Loading the event",
+        "Unavailable": "This event is no longer available.",
+        "Remaining": "{{time}} left",
+        "Elapsed": "Time elapsed",
+        "Free": "Free",
+        "Open": "Open the event",
+        "Previous": "Previous event here",
+        "Next": "Next event here",
+        "Position": "{{index}}/{{total}} here"
+    },
+    "Countdown": {
+        "HoursMinutes": "{{hours}}h{{minutes}}m",
+        "Minutes": "{{minutes}}m"
     }
 }

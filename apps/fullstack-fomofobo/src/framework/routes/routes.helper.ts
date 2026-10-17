@@ -203,7 +203,13 @@ export interface RouteValues<
  */
 export type RouteQuerySetter<TQuery extends RouteQuery> = (
     query: Partial<TQuery> | ((prev: TQuery) => Partial<TQuery>),
+    options?: RouteQuerySetterOptions,
 ) => void
+
+export interface RouteQuerySetterOptions {
+    // Overrides the `push` of the query options for one update
+    history?: "push" | "replace"
+}
 
 export interface ClientStaticRouteValues<TParameters extends RouteParameters> {
     parameters: TParameters

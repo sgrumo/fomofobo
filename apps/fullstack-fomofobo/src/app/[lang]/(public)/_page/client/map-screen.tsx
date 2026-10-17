@@ -1,9 +1,9 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import type { GeoPoint, OccurrenceSummary } from "models"
+import type { GeoPoint, OccurrenceRef, OccurrenceSummary } from "models"
 import dynamic from "next/dynamic"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { match } from "ts-pattern"
 import { Alert } from "ui-components/alert"
@@ -24,6 +24,7 @@ import { DEFAULT_CITY, PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 import { CategoryChips } from "./category-chips"
 import { DateChips } from "./date-chips"
+import { EventPreview } from "./event-preview"
 import { PlaceSearch } from "./place-search"
 import { StatusBar } from "./status-bar"
 
@@ -92,9 +93,68 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
         setResults(search.data)
     }
 
-    const icons = new Map(categories.data?.map(category => [category.id, category.icon]))
+    const categoriesById = new Map(
+        categories.data?.map(category => [category.id, category]),
+    )
     const iconOf = (occurrence: OccurrenceSummary) =>
-        icons.get(occurrence.primaryCategoryId) ?? "other"
+        categoriesById.get(occurrence.primaryCategoryId)?.icon ?? "other"
+
+    const selectedRef =
+        query.event === undefined || query.occurrence === undefined
+            ? undefined
+            : { eventId: query.event, date: query.occurrence }
+    const fromResults =
+        selectedRef === undefined
+            ? undefined
+            : results?.occurrences.find(
+                  occurrence =>
+                      occurrence.eventId === selectedRef.eventId &&
+                      occurrence.date === selectedRef.date,
+              )
+    // An event suggestion can name an occurrence outside the results.
+    const detail = useQuery({
+        ...api.getOccurrenceQuery({
+            params: { eventId: query.event ?? "", date: query.occurrence ?? "" },
+            query: {},
+        }),
+        enabled: selectedRef !== undefined && fromResults === undefined,
+    })
+    const selected = fromResults ?? detail.data
+    const sameSpot =
+        selected === undefined
+            ? []
+            : (results?.occurrences ?? []).filter(
+                  occurrence => occurrence.venue.id === selected.venue.id,
+              )
+    const spotIndex = sameSpot.findIndex(
+        occurrence =>
+            occurrence.eventId === selected?.eventId && occurrence.date === selected.date,
+    )
+
+    // True while the open preview owns the history entry that a close pops.
+    const previewPushedRef = useRef(false)
+    const openPreview = (ref: OccurrenceRef) => {
+        const opening = selectedRef === undefined
+        previewPushedRef.current = opening || previewPushedRef.current
+        setQuery(
+            { event: ref.eventId, occurrence: ref.date },
+            { history: opening ? "push" : "replace" },
+        )
+    }
+    const closePreview = () => {
+        if (previewPushedRef.current) {
+            previewPushedRef.current = false
+            globalThis.history.back()
+            return
+        }
+        setQuery({ event: undefined, occurrence: undefined }, { history: "replace" })
+    }
+    const showSpotEntry = (index: number) => {
+        const entry = sameSpot.at(index)
+        if (entry !== undefined && index >= 0) {
+            openPreview({ eventId: entry.eventId, date: entry.date })
+        }
+    }
 
     const locate = async () => {
         const result = await geolocation.locate()
@@ -144,9 +204,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 occurrences={results?.occurrences ?? []}
                 iconOf={iconOf}
                 now={now}
-                onSelect={ref => {
-                    setQuery({ event: ref.eventId, occurrence: ref.date })
-                }}
+                onSelect={openPreview}
             />
             <div className="pointer-events-none absolute inset-x-4 top-4 flex flex-col gap-2 [&>*]:pointer-events-auto">
                 <PlaceSearch
@@ -162,9 +220,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                             q: undefined,
                         })
                     }}
-                    onEventSelect={ref => {
-                        setQuery({ event: ref.eventId, occurrence: ref.date })
-                    }}
+                    onEventSelect={openPreview}
                     onTextSubmit={text => {
                         setQuery({ q: text, place: undefined })
                     }}
@@ -226,6 +282,30 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                     }}
                 />
             </div>
+            <EventPreview
+                route={props.route}
+                open={selectedRef !== undefined}
+                occurrence={selected}
+                loadFailed={detail.isError}
+                categories={categoriesById}
+                position={position}
+                now={now}
+                paging={
+                    sameSpot.length > 1 && spotIndex !== -1
+                        ? {
+                              index: spotIndex,
+                              total: sameSpot.length,
+                              onPrevious: () => {
+                                  showSpotEntry(spotIndex - 1)
+                              },
+                              onNext: () => {
+                                  showSpotEntry(spotIndex + 1)
+                              },
+                          }
+                        : undefined
+                }
+                onClose={closePreview}
+            />
         </section>
     )
 }

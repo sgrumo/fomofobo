@@ -9,7 +9,7 @@ import { Alert } from "ui-components/alert"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { localTimeOf } from "@/lib/events/local-format"
 import { occurrenceStatus } from "@/lib/events/occurrence-status"
-import { buildEventClusters } from "@/lib/map/event-clusters"
+import { buildEventClusters, CLUSTER_MAX_ZOOM } from "@/lib/map/event-clusters"
 import type { EventMapFeature } from "@/lib/map/event-clusters"
 import { mapStyle } from "@/lib/map/map-style"
 import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
@@ -189,11 +189,29 @@ export const EventMap = (props: EventMapProps) => {
                                       count={feature.properties.point_count}
                                       liveCount={feature.properties.liveCount}
                                       onExpand={() => {
+                                          const zoom =
+                                              clusters.getClusterExpansionZoom(clusterId)
+                                          // Past the last cluster zoom the points share one spot, so no zoom splits them.
+                                          const leaf =
+                                              zoom > CLUSTER_MAX_ZOOM
+                                                  ? clusters.getLeaves(clusterId, 1).at(0)
+                                                  : undefined
+                                          const first =
+                                              leaf === undefined
+                                                  ? undefined
+                                                  : props.occurrences.at(
+                                                        leaf.properties.index,
+                                                    )
+                                          if (first !== undefined) {
+                                              props.onSelect({
+                                                  eventId: first.eventId,
+                                                  date: first.date,
+                                              })
+                                              return
+                                          }
                                           map.easeTo({
                                               center: [point.longitude, point.latitude],
-                                              zoom: clusters.getClusterExpansionZoom(
-                                                  clusterId,
-                                              ),
+                                              zoom,
                                           })
                                       }}
                                   />

@@ -2,6 +2,8 @@ import type { GeoPoint } from "models"
 import Supercluster from "supercluster"
 import type { ClusterFeature, PointFeature } from "supercluster"
 
+export const CLUSTER_MAX_ZOOM = 17
+
 export interface EventPointProperties {
     index: number
     live: boolean
@@ -25,7 +27,7 @@ export const buildEventClusters = (
 ): Supercluster<EventPointProperties, EventClusterProperties> =>
     new Supercluster<EventPointProperties, EventClusterProperties>({
         radius: 48,
-        maxZoom: 17,
+        maxZoom: CLUSTER_MAX_ZOOM,
         map: properties => ({ liveCount: properties.live ? 1 : 0 }),
         reduce: (accumulated, properties) => {
             accumulated.liveCount += properties.liveCount

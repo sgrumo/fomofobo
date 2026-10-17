@@ -8,6 +8,7 @@ import type {
     RouteParameters,
     RouteQuery,
     RouteQuerySetter,
+    RouteQuerySetterOptions,
     RouteSegments,
 } from "../routes.helper"
 import { decodeRouteQuery } from "../routes.helper"
@@ -44,6 +45,7 @@ export const useRouteQuery = <
 
     const setQuery = (
         newPartialQuery: Partial<TQuery> | ((prev: TQuery) => Partial<TQuery>),
+        options?: RouteQuerySetterOptions,
     ) => {
         const newPartialQueryNormalized =
             typeof newPartialQuery === "function"
@@ -60,7 +62,11 @@ export const useRouteQuery = <
         pendingQueryRef.current = newCompleteQuery
 
         const href = route.path({ parameters, query: newCompleteQuery })
-        if (pushesHistory(route, newPartialQueryNormalized)) {
+        const push =
+            options?.history === undefined
+                ? pushesHistory(route, newPartialQueryNormalized)
+                : options.history === "push"
+        if (push) {
             globalThis.history.pushState(null, "", href)
         } else {
             globalThis.history.replaceState(null, "", href)

@@ -20,7 +20,7 @@ A venue is a reusable place with a name, an address and coordinates. Every event
 
 ### Events
 
-An event has a title, one or more categories, one venue, a start and an end, an ordered photo gallery whose first photo is the cover, optional Instagram and Facebook links, an optional price and an owning organizer. The end is later than the start and can fall on the next day. An event holds one to ten photos, and the account that writes the event uploads them.
+An event has a title, one or more categories, one venue, a start and an end, an ordered photo gallery whose first photo is the cover, optional Instagram and Facebook links, an optional price in free text and an owning organizer. The public app shows an event with no price as free. The end is later than the start and can fall on the next day. An event holds one to ten photos, and the account that writes the event uploads them.
 
 ### Recurrence and occurrences
 
@@ -40,15 +40,17 @@ An event and all its occurrences are visible only when neither the event nor its
 
 ### Search area
 
-The search center is the position of the device when the visitor grants location, else a default city until the visitor picks a place. Only occurrences at venues inside a fixed radius around the search center are results. Distance on an event is measured from the position of the device to the venue. (not built)
+The search center is the position of the device when the visitor grants location, else a default city until the visitor picks a place. Only occurrences at venues inside a fixed radius around the search center are results. Distance on an event is measured from the position of the device to the venue.
 
 ### Map
 
-Each result is a pin at its venue with the icon of its category, and its look follows the status. Pins too close to tell apart merge into a cluster with a count. A status bar shows the current date, the number of live results and the number of upcoming results of today. (not built)
+Each result is a pin at its venue with the icon of its category, and its look follows the status. Pins too close to tell apart merge into a cluster with a count. A status bar shows the current date, the number of live results and the number of upcoming results of today.
+
+A tap on a pin opens a preview of the occurrence. The preview shows status, remaining time when live, venue, categories, distance, price and times, with a link to the event page. When several results share one venue, the preview pages through them.
 
 ### Search and filters
 
-Results match every active filter. One search field matches event titles and sets a place as the search center. Category chips show the result count of each category under the other filters, and the date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days. (not built)
+Results match every active filter. One search field matches event titles and sets a place as the search center. Category chips select one category at a time and show the result count of each category under the other filters. The date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days.
 
 ### Event page
 
@@ -87,7 +89,7 @@ Admins create organizer accounts with a name and an email, and block or unblock 
 - Turso, a hosted libSQL database (SQLite), holds categories, venues, events, occurrences and accounts. Occurrences are stored as rows, because the map search filters them by time window and by area.
 - Cloudflare R2 holds the event photos in a public bucket, because shared and offline pages need a stable photo URL. The backoffice uploads the photos straight to the bucket.
 - Geoapify: place suggestions of the search field, inside 50 km of the search center. Each client gets 30 calls a minute, because the free plan has a daily credit limit.
-- OpenFreeMap: the tiles of the event map. (not built)
+- OpenFreeMap: the tiles of the event map.
 - The Next data cache holds the shared public reads: the categories, the event pages and the place suggestions. Every backoffice write expires its entries at once, because a block must hide an event on the next request.
 - Authentication runs inside the app with database sessions, because Admins create accounts and a block must end every open session at once. Every backoffice API call reads the session from the database, so a block applies on the next call.
 - Deploy: the app runs on Vercel, in the region of its Turso database. Every service runs on its free plan. The Vercel Hobby plan admits non-commercial use only.
