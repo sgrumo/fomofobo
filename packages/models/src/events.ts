@@ -29,6 +29,9 @@ export const eventPhotoSchema = z.object({
 })
 export type EventPhoto = z.infer<typeof eventPhotoSchema>
 
+export const eventGalleryPhotoSchema = eventPhotoSchema.extend({ key: z.string().min(1) })
+export type EventGalleryPhoto = z.infer<typeof eventGalleryPhotoSchema>
+
 export const eventExternalLinksSchema = z.object({
     instagramUrl: z
         .url({ protocol: /^https$/u, hostname: /^(?:www\.)?instagram\.com$/u })
@@ -62,7 +65,7 @@ export const eventSchema = z.object({
     startsAt: localDateTimeSchema,
     endsAt: localDateTimeSchema,
     recurrence: recurrenceSchema.nullable(),
-    photos: z.array(eventPhotoSchema).max(MAX_EVENT_PHOTOS),
+    photos: z.array(eventGalleryPhotoSchema).max(MAX_EVENT_PHOTOS),
     externalLinks: eventExternalLinksSchema,
     price: eventPriceSchema,
     organizer: accountSchema.pick({ id: true, name: true }),

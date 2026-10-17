@@ -298,7 +298,7 @@ export class EventsService {
     }
 
     /**
-     * @description Maps a stored event to its response, with the public URL of each photo
+     * @description Maps a stored event to its response, with the key and the public URL of each photo
      * @param event Stored event
      */
     private toEvent(event: StoredEvent): Event {
@@ -308,6 +308,7 @@ export class EventsService {
                 id: photo.id,
                 url: photoUrl(this.photosPublicBaseUrl, photo.objectKey),
                 position: photo.position,
+                key: photo.objectKey,
             })),
         }
     }

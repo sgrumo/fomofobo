@@ -231,6 +231,82 @@
                 "CloseWhileBlocking": "Wait until the event is blocked.",
                 "CloseWhileUnblocking": "Wait until the event is unblocked."
             }
+        },
+        "Photos": {
+            "Label": "Photos",
+            "Hint": "JPEG, PNG or WebP, up to 10 MB each. The first photo is the cover.",
+            "Cover": "Cover",
+            "Photo": "Photo {{index}}",
+            "MoveEarlier": "Move photo {{index}} earlier",
+            "MoveLater": "Move photo {{index}} later",
+            "Remove": "Remove photo {{index}}",
+            "Uploading": "Uploading {{name}}",
+            "TooMany": "An event holds {{max}} photos at most.",
+            "Failed": "{{name}} did not upload. Try again.",
+            "Invalid": {
+                "too-large": "{{name}} is larger than 10 MB.",
+                "disallowed-type": "{{name}} is not a JPEG, PNG or WebP image."
+            }
+        },
+        "EventForm": {
+            "Title": "Title",
+            "Description": "Short description",
+            "Categories": "Categories",
+            "PrimaryCategory": "Main category",
+            "PrimaryCategoryHint": "Its icon marks the event on the map.",
+            "Venue": "Venue",
+            "Organizer": "Organizer",
+            "StartDate": "Start date",
+            "StartTime": "Start time",
+            "EndDate": "End date",
+            "EndDateHint": "The end can fall on the next day, for example 21:00 to 00:30.",
+            "EndTime": "End time",
+            "Repeat": "Repetition",
+            "Repeats": {
+                "single": "Single date",
+                "weekly": "Every week",
+                "monthly": "Every month"
+            },
+            "Weekdays": "Days of the week",
+            "Weekday": {
+                "monday": "Monday",
+                "tuesday": "Tuesday",
+                "wednesday": "Wednesday",
+                "thursday": "Thursday",
+                "friday": "Friday",
+                "saturday": "Saturday",
+                "sunday": "Sunday"
+            },
+            "MonthlyMode": "Day of the month",
+            "MonthlyModes": {
+                "day-of-month": "Same day of the month",
+                "weekday-position": "Same weekday position, for example the second Wednesday"
+            },
+            "Until": "Repeat until",
+            "AddedDate": "Extra date",
+            "AddDate": "Add the date",
+            "Preview": "Dates",
+            "PreviewEmpty": "Pick the start and the end to see the dates.",
+            "PreviewCount": "Dates: {{count}}",
+            "RemoveDate": "Remove {{date}}",
+            "RestoreDate": "Restore {{date}}",
+            "Restore": "Restore",
+            "Price": "Price",
+            "PriceHint": "Free text. Leave it empty and the app shows the event as free.",
+            "Instagram": "Instagram page",
+            "Facebook": "Facebook page"
+        },
+        "EventEditor": {
+            "NewTitle": "New event",
+            "EditTitle": "Edit event",
+            "Saved": "\"{{title}}\" saved.",
+            "Blocked": "An Admin blocked this event: it is hidden from the public app.",
+            "BlockedWithReason": "An Admin blocked this event: it is hidden from the public app. Reason: {{reason}}",
+            "Leave": {
+                "Title": "Leave without saving?",
+                "Description": "Your changes are lost.",
+                "Confirm": "Leave"
+            }
         }
     }
 }

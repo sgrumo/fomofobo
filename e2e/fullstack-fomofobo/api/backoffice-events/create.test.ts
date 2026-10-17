@@ -43,7 +43,7 @@ describe("POST /api/backoffice/events", () => {
             startsAt: upsert.startsAt,
             endsAt: upsert.endsAt,
             recurrence: null,
-            photos: [{ id: anyUuid, url: anyHttpUrl, position: 0 }],
+            photos: [{ id: anyUuid, url: anyHttpUrl, position: 0, key: photo.key }],
             externalLinks: upsert.externalLinks,
             price: upsert.price,
             organizer: { id: account.id, name: account.name },

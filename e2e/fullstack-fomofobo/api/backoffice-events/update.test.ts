@@ -42,11 +42,12 @@ describe("PUT /api/backoffice/events/{id}", () => {
             title: "Jazz al chiostro",
             price: null,
             photos: [
-                { position: 0 },
+                { position: 0, key: added.key },
                 {
                     id: created.data.photos[1]?.id,
                     url: created.data.photos[1]?.url,
                     position: 1,
+                    key: kept.key,
                 },
             ],
         })

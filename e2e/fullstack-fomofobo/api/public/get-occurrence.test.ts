@@ -40,7 +40,7 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
             primaryCategoryId: categoryId,
             coverPhotoUrl: event.photos[0]?.url,
             price: event.price,
-            photos: event.photos,
+            photos: event.photos.map(({ id, url, position }) => ({ id, url, position })),
             externalLinks: event.externalLinks,
         })
     })

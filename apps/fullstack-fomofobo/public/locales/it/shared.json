@@ -231,6 +231,82 @@
                 "CloseWhileBlocking": "Attendi che l'evento sia bloccato.",
                 "CloseWhileUnblocking": "Attendi che l'evento sia sbloccato."
             }
+        },
+        "Photos": {
+            "Label": "Foto",
+            "Hint": "JPEG, PNG o WebP, fino a 10 MB ciascuna. La prima foto è la copertina.",
+            "Cover": "Copertina",
+            "Photo": "Foto {{index}}",
+            "MoveEarlier": "Sposta prima la foto {{index}}",
+            "MoveLater": "Sposta dopo la foto {{index}}",
+            "Remove": "Rimuovi la foto {{index}}",
+            "Uploading": "Caricamento di {{name}}",
+            "TooMany": "Un evento ha al massimo {{max}} foto.",
+            "Failed": "{{name}} non è stata caricata. Riprova.",
+            "Invalid": {
+                "too-large": "{{name}} supera i 10 MB.",
+                "disallowed-type": "{{name}} non è un'immagine JPEG, PNG o WebP."
+            }
+        },
+        "EventForm": {
+            "Title": "Titolo",
+            "Description": "Breve descrizione",
+            "Categories": "Categorie",
+            "PrimaryCategory": "Categoria principale",
+            "PrimaryCategoryHint": "La sua icona segna l'evento sulla mappa.",
+            "Venue": "Luogo",
+            "Organizer": "Organizzatore",
+            "StartDate": "Data di inizio",
+            "StartTime": "Ora di inizio",
+            "EndDate": "Data di fine",
+            "EndDateHint": "La fine può cadere il giorno dopo, per esempio dalle 21:00 alle 00:30.",
+            "EndTime": "Ora di fine",
+            "Repeat": "Ripetizione",
+            "Repeats": {
+                "single": "Data singola",
+                "weekly": "Ogni settimana",
+                "monthly": "Ogni mese"
+            },
+            "Weekdays": "Giorni della settimana",
+            "Weekday": {
+                "monday": "Lunedì",
+                "tuesday": "Martedì",
+                "wednesday": "Mercoledì",
+                "thursday": "Giovedì",
+                "friday": "Venerdì",
+                "saturday": "Sabato",
+                "sunday": "Domenica"
+            },
+            "MonthlyMode": "Giorno del mese",
+            "MonthlyModes": {
+                "day-of-month": "Stesso giorno del mese",
+                "weekday-position": "Stessa posizione del giorno, per esempio il secondo mercoledì"
+            },
+            "Until": "Ripeti fino al",
+            "AddedDate": "Data in più",
+            "AddDate": "Aggiungi la data",
+            "Preview": "Date",
+            "PreviewEmpty": "Scegli inizio e fine per vedere le date.",
+            "PreviewCount": "Date: {{count}}",
+            "RemoveDate": "Rimuovi il {{date}}",
+            "RestoreDate": "Ripristina il {{date}}",
+            "Restore": "Ripristina",
+            "Price": "Prezzo",
+            "PriceHint": "Testo libero. Se resta vuoto, l'app mostra l'evento come gratuito.",
+            "Instagram": "Pagina Instagram",
+            "Facebook": "Pagina Facebook"
+        },
+        "EventEditor": {
+            "NewTitle": "Nuovo evento",
+            "EditTitle": "Modifica evento",
+            "Saved": "\"{{title}}\" salvato.",
+            "Blocked": "Un Admin ha bloccato questo evento: non compare nell'app pubblica.",
+            "BlockedWithReason": "Un Admin ha bloccato questo evento: non compare nell'app pubblica. Motivo: {{reason}}",
+            "Leave": {
+                "Title": "Uscire senza salvare?",
+                "Description": "Le modifiche andranno perse.",
+                "Confirm": "Esci"
+            }
         }
     }
 }
