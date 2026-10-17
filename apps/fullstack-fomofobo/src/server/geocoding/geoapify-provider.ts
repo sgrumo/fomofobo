@@ -8,7 +8,7 @@ import { appError } from "../errors"
 export interface GeocodingProvider {
     suggest: (
         text: string,
-        area: { center: GeoPoint; radiusMeters: number },
+        area: { center: GeoPoint; countryCode: string },
     ) => Promise<PlaceSuggestion[]>
 }
 
@@ -30,14 +30,14 @@ export class GeoapifyProvider implements GeocodingProvider {
     }
 
     /**
-     * @description Fetches the places of the Geoapify autocomplete inside the circle
+     * @description Fetches the places of the Geoapify autocomplete in the country, the nearest to the center first
      * @param text Text typed by the Visitor
-     * @param area Center and radius of the circle
+     * @param area Center the results rank around, and the ISO 3166-1 alpha-2 code of the country
      * @throws When the key is unset, or when Geoapify fails, times out or answers an unknown shape
      */
     public async suggest(
         text: string,
-        area: { center: GeoPoint; radiusMeters: number },
+        area: { center: GeoPoint; countryCode: string },
     ): Promise<PlaceSuggestion[]> {
         if (this.apiKey === undefined) {
             throw appError("GeocodingUnavailable", "GEOAPIFY_API_KEY is unset")
@@ -46,7 +46,7 @@ export class GeoapifyProvider implements GeocodingProvider {
         const url = new URL("/v1/geocode/autocomplete", this.baseUrl)
         url.search = new URLSearchParams({
             text,
-            filter: `circle:${longitude},${latitude},${area.radiusMeters}`,
+            filter: `countrycode:${area.countryCode}`,
             bias: `proximity:${longitude},${latitude}`,
             limit: String(PLACES_PER_SUGGESTION),
             format: "json",

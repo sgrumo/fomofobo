@@ -88,7 +88,7 @@ Admins create organizer accounts with a name and an email, and block or unblock 
 - Server Components and route handlers serve the public reads, and Server Actions carry the backoffice writes.
 - Turso, a hosted libSQL database (SQLite), holds categories, venues, events, occurrences and accounts. Occurrences are stored as rows, because the map search filters them by time window and by area.
 - Cloudflare R2 holds the event photos in a public bucket, because shared and offline pages need a stable photo URL. The backoffice uploads the photos straight to the bucket.
-- Geoapify: place suggestions of the search field, inside 50 km of the search center. Each client gets 30 calls a minute, because the free plan has a daily credit limit.
+- Geoapify: place suggestions of the search field, from all of Italy, with the places nearest to the search center first. Each client gets 30 calls a minute, because the free plan has a daily credit limit.
 - OpenFreeMap: the tiles of the event map.
 - The Next data cache holds the shared public reads: the categories, the event pages and the place suggestions. Every backoffice write expires its entries at once, because a block must hide an event on the next request.
 - Authentication runs inside the app with database sessions, because Admins create accounts and a block must end every open session at once. Every backoffice API call reads the session from the database, so a block applies on the next call.

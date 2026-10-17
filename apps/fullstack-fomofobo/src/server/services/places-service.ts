@@ -12,8 +12,8 @@ import type { GeocodingProvider } from "../geocoding/geoapify-provider"
 
 const PLACES_CALLS_PER_WINDOW = 30
 const PLACES_WINDOW_MS = 60_000
-// Circle filter, not a bias: a place farther away never shows up
-const PLACES_RADIUS_METERS = 50_000
+// A bias, not a circle: a far city still shows up, after the nearby matches
+const PLACES_COUNTRY_CODE = "it"
 const PLACES_CACHE_SECONDS = 86_400
 const EVENTS_PER_SUGGESTION = 5
 
@@ -32,7 +32,7 @@ export class PlacesService {
     }
 
     /**
-     * @description Fetches the places near the center and the visible events of the area whose title matches the text
+     * @description Fetches the places of the country, the nearest to the center first, and the visible events of the area whose title matches the text
      * @param query Text and center of the search field
      * @param forwardedFor `x-forwarded-for` header of the request, which names the client on Vercel
      * @param now Instant of the call
@@ -65,10 +65,11 @@ export class PlacesService {
                 async () =>
                     await this.provider.suggest(text, {
                         center: cacheCenter,
-                        radiusMeters: PLACES_RADIUS_METERS,
+                        countryCode: PLACES_COUNTRY_CODE,
                     }),
                 [
                     "places",
+                    PLACES_COUNTRY_CODE,
                     text,
                     String(cacheCenter.latitude),
                     String(cacheCenter.longitude),

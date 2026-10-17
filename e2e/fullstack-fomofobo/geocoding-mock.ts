@@ -4,6 +4,8 @@ import { parseArgs } from "node:util"
 import { GEOCODING_FAILURE_TEXT } from "./geocoding-mock-contract.ts"
 
 const AUTOCOMPLETE_PATH = "/v1/geocode/autocomplete"
+// The app searches places of Italy alone, with no radius around the center
+const EXPECTED_PLACES_FILTER = "countrycode:it"
 
 /**
  * @description Builds the two results the mock answers for a text: one at the bias point, one north of it
@@ -47,6 +49,8 @@ createServer((request, response) => {
         answer(404, { message: "Not found" })
     } else if (url.searchParams.get("apiKey") === null) {
         answer(401, { message: "Invalid apiKey" })
+    } else if (url.searchParams.get("filter") !== EXPECTED_PLACES_FILTER) {
+        answer(400, { message: "Unexpected filter" })
     } else if (text === GEOCODING_FAILURE_TEXT) {
         answer(500, { message: "Internal error" })
     } else {
