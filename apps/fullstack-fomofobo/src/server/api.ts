@@ -9,6 +9,7 @@ import { deleteAllRows } from "storage"
 import { match } from "ts-pattern"
 
 import { backofficeSession } from "./auth/backoffice-session"
+import { requestClock } from "./clock"
 import { getContainer } from "./container"
 import type { AppErrorCode } from "./errors"
 import { handleRouteNotFound } from "./errors"
@@ -30,11 +31,34 @@ const testAccountSeedSchema = organizerCreationSchema.extend({ role: accountRole
 export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus =>
     match(err.code)
         .with("GenericError", "ResponseValidationError", () => HttpStatus.InternalError)
-        .with("InvalidRequest", () => HttpStatus.BadRequest)
-        .with("RouteNotFound", "ItemNotFound", () => HttpStatus.NotFound)
+        .with(
+            "InvalidRequest",
+            "InvalidPhotoUpload",
+            "InvalidEventReference",
+            "TooManyOccurrences",
+            "PastDateRange",
+            () => HttpStatus.BadRequest,
+        )
+        .with(
+            "RouteNotFound",
+            "ItemNotFound",
+            "OccurrenceNotFound",
+            "EventNotFound",
+            "VenueNotFound",
+            "CategoryNotFound",
+            "OrganizerNotFound",
+            () => HttpStatus.NotFound,
+        )
         .with("Unauthenticated", "AccountBlocked", () => HttpStatus.Unauthorized)
         .with("ForbiddenAction", () => HttpStatus.Forbidden)
-        .with("EmailTaken", () => HttpStatus.Conflict)
+        .with(
+            "EmailTaken",
+            "CategoryInUse",
+            "CategoryNameTaken",
+            () => HttpStatus.Conflict,
+        )
+        .with("TooManyRequests", () => HttpStatus.TooManyRequests)
+        .with("GeocodingUnavailable", () => HttpStatus.ServiceUnavailable)
         .exhaustive()
 
 /**
@@ -60,6 +84,8 @@ const buildApi = (): OpenAPIHono => {
             verboseErrors: appConfig.verboseErrors,
         }),
     )
+
+    app.use(`${apiBasePath}/*`, requestClock(appConfig.testRoutesEnabled))
 
     app.get(`${apiBasePath}/health`, c => c.json({ status: "ok" }))
 

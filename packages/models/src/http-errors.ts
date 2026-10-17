@@ -9,6 +9,7 @@ export const HttpStatus = {
     Forbidden: 403,
     NotFound: 404,
     Conflict: 409,
+    TooManyRequests: 429,
     InternalError: 500,
     ServiceUnavailable: 503,
 } as const

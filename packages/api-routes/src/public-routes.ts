@@ -15,6 +15,7 @@ import {
     badRequestResponse,
     notFoundResponse,
     serviceUnavailableResponse,
+    tooManyRequestsResponse,
 } from "./lib/common-responses"
 
 export const PublicRoutes = {
@@ -129,6 +130,7 @@ export const PublicRoutes = {
                 description: "Places and event titles that match the text",
             },
             400: badRequestResponse,
+            429: tooManyRequestsResponse,
             503: serviceUnavailableResponse("Geocoding provider unavailable"),
         },
         tags: ["Public"],

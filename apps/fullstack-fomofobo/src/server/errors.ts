@@ -11,6 +11,19 @@ export type AppErrorCode =
     | "RouteNotFound"
     | "InvalidRequest"
     | "ResponseValidationError"
+    | "OccurrenceNotFound"
+    | "EventNotFound"
+    | "VenueNotFound"
+    | "CategoryNotFound"
+    | "OrganizerNotFound"
+    | "CategoryInUse"
+    | "CategoryNameTaken"
+    | "InvalidPhotoUpload"
+    | "InvalidEventReference"
+    | "TooManyOccurrences"
+    | "PastDateRange"
+    | "TooManyRequests"
+    | "GeocodingUnavailable"
 
 export const { appError, toApplicationError, handleRouteNotFound } =
     createErrorUtils<AppErrorCode>({

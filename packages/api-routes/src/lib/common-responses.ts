@@ -31,3 +31,6 @@ export const conflictResponse = (description: string): JsonErrorResponse =>
     jsonError(description)
 export const serviceUnavailableResponse = (description: string): JsonErrorResponse =>
     jsonError(description)
+export const tooManyRequestsResponse: JsonErrorResponse = jsonError(
+    "Too many requests from this client",
+)

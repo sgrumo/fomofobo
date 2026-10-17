@@ -15,6 +15,19 @@ const appErrorCodes: AppErrorCode[] = [
     "RouteNotFound",
     "InvalidRequest",
     "ResponseValidationError",
+    "OccurrenceNotFound",
+    "EventNotFound",
+    "VenueNotFound",
+    "CategoryNotFound",
+    "OrganizerNotFound",
+    "CategoryInUse",
+    "CategoryNameTaken",
+    "InvalidPhotoUpload",
+    "InvalidEventReference",
+    "TooManyOccurrences",
+    "PastDateRange",
+    "TooManyRequests",
+    "GeocodingUnavailable",
 ]
 
 /**
@@ -51,6 +64,39 @@ describe("mapErrorStatus", () => {
         expect(statusOf("EmailTaken")).toBe(HttpStatus.Conflict)
     })
 
+    it("should map a refused domain write to 400", () => {
+        const codes: AppErrorCode[] = [
+            "InvalidPhotoUpload",
+            "InvalidEventReference",
+            "TooManyOccurrences",
+            "PastDateRange",
+        ]
+
+        expect(codes.map(statusOf)).toStrictEqual(codes.map(() => HttpStatus.BadRequest))
+    })
+
+    it("should map a missing domain entity to 404", () => {
+        const codes: AppErrorCode[] = [
+            "OccurrenceNotFound",
+            "EventNotFound",
+            "VenueNotFound",
+            "CategoryNotFound",
+            "OrganizerNotFound",
+        ]
+
+        expect(codes.map(statusOf)).toStrictEqual(codes.map(() => HttpStatus.NotFound))
+    })
+
+    it("should map a category conflict to 409", () => {
+        expect(statusOf("CategoryInUse")).toBe(HttpStatus.Conflict)
+        expect(statusOf("CategoryNameTaken")).toBe(HttpStatus.Conflict)
+    })
+
+    it("should map a client over its limit to 429 and a geocoding failure to 503", () => {
+        expect(statusOf("TooManyRequests")).toBe(HttpStatus.TooManyRequests)
+        expect(statusOf("GeocodingUnavailable")).toBe(HttpStatus.ServiceUnavailable)
+    })
+
     it("should map a missing session and a blocked account to 401", () => {
         expect(statusOf("Unauthenticated")).toBe(HttpStatus.Unauthorized)
         expect(statusOf("AccountBlocked")).toBe(HttpStatus.Unauthorized)
@@ -64,6 +110,18 @@ describe("mapErrorStatus", () => {
             "Unauthenticated",
             "AccountBlocked",
             "EmailTaken",
+            "OccurrenceNotFound",
+            "EventNotFound",
+            "VenueNotFound",
+            "CategoryNotFound",
+            "OrganizerNotFound",
+            "CategoryInUse",
+            "CategoryNameTaken",
+            "InvalidPhotoUpload",
+            "InvalidEventReference",
+            "TooManyOccurrences",
+            "PastDateRange",
+            "TooManyRequests",
         ]
 
         expect(clientErrors.map(statusOf).every(status => status < 500)).toBe(true)

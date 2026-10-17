@@ -2,11 +2,12 @@ import "server-only"
 import { createMiddleware } from "hono/factory"
 import type { Account, AccountRole } from "models"
 
+import type { ClockEnv } from "../clock"
 import { appError } from "../errors"
 import type { AuthAccountsService } from "../services/auth-accounts-service"
 
 export interface BackofficeEnv {
-    Variables: { account: Account }
+    Variables: ClockEnv["Variables"] & { account: Account }
 }
 
 /**
