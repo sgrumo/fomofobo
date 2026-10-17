@@ -1,4 +1,4 @@
-import { and, count, desc, eq, or } from "drizzle-orm"
+import { and, count, eq, or } from "drizzle-orm"
 import type { Account, AccountRole, OrganizerListQuery } from "models"
 
 import type { DbInstanceFromSchema } from "../db-config"
@@ -82,7 +82,7 @@ export class AccountsStorage {
     }
 
     /**
-     * @description Fetches one page of the organizers, newest first, with the total
+     * @description Fetches one page of the organizers, ordered by name, with the total
      * @param query Page, text searched in name and email, block state
      */
     public async listOrganizers(
@@ -108,7 +108,7 @@ export class AccountsStorage {
                 .select()
                 .from(accounts)
                 .where(whereClause)
-                .orderBy(desc(accounts.createdAt), accounts.id)
+                .orderBy(accounts.name, accounts.id)
                 .limit(limit)
                 .offset(offset),
         ])

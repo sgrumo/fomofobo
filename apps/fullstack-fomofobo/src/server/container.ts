@@ -2,7 +2,12 @@ import "server-only"
 import { S3ObjectStorage } from "backend-shared"
 import { memoize } from "es-toolkit"
 import type { DbInstanceFromSchema } from "storage"
-import { AccountsStorage, buildDbInstance, CategoriesStorage } from "storage"
+import {
+    AccountsStorage,
+    buildDbInstance,
+    CategoriesStorage,
+    VenuesStorage,
+} from "storage"
 
 import type { Auth } from "./auth/auth"
 import { buildAuth } from "./auth/auth"
@@ -11,6 +16,8 @@ import { resolveAppConfig } from "./config/app-config"
 import { parseEnv } from "./config/env"
 import { AuthAccountsService } from "./services/auth-accounts-service"
 import { CategoriesService } from "./services/categories-service"
+import { OrganizersService } from "./services/organizers-service"
+import { VenuesService } from "./services/venues-service"
 
 export interface Container {
     appConfig: AppConfig
@@ -18,6 +25,8 @@ export interface Container {
     auth: Auth
     authAccounts: AuthAccountsService
     categories: CategoriesService
+    venues: VenuesService
+    organizers: OrganizersService
     photoStorage: S3ObjectStorage
     photosPublicBaseUrl: string
     geocoding: { baseUrl: string; apiKey: string | undefined }
@@ -42,12 +51,17 @@ const buildContainer = (): Container => {
         rateLimitEnabled: appConfig.authRateLimitEnabled,
     })
 
+    const accountsStorage = new AccountsStorage(db)
+    const authAccounts = new AuthAccountsService(auth, accountsStorage)
+
     return {
         appConfig,
         db,
         auth,
-        authAccounts: new AuthAccountsService(auth, new AccountsStorage(db)),
+        authAccounts,
+        organizers: new OrganizersService(authAccounts, accountsStorage),
         categories: new CategoriesService(new CategoriesStorage(db)),
+        venues: new VenuesService(new VenuesStorage(db)),
         photoStorage: new S3ObjectStorage({
             bucket: env.S3_BUCKET,
             region: env.S3_REGION,
