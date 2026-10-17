@@ -159,6 +159,78 @@
             "InvalidCredentials": "Email o password errate.",
             "Failed": "Accesso non riuscito. Riprova tra poco.",
             "Blocked": "Il tuo account è bloccato. Contatta un Admin."
+        },
+        "List": {
+            "Loading": "Caricamento",
+            "Error": "Impossibile caricare l'elenco. Ricarica la pagina per riprovare.",
+            "Empty": "Ancora niente qui."
+        },
+        "Errors": {
+            "ForbiddenAction": "Il tuo account non può farlo.",
+            "EmailTaken": "Un altro account usa già questa email.",
+            "EventNotFound": "Questo evento non esiste più.",
+            "VenueNotFound": "Questo luogo non esiste più.",
+            "CategoryNotFound": "Questa categoria non esiste più.",
+            "OrganizerNotFound": "Questo organizzatore non esiste più.",
+            "CategoryInUse": "Alcuni eventi usano ancora questa categoria. Spostali prima in un'altra categoria.",
+            "CategoryNameTaken": "Un'altra categoria ha già questo nome.",
+            "InvalidPhotoUpload": "Una foto non è stata caricata. Rimuovila e aggiungila di nuovo.",
+            "InvalidEventReference": "Il luogo, una categoria o l'organizzatore non esiste più.",
+            "TooManyOccurrences": "La ripetizione genera troppe date. Scegli una data di fine precedente."
+        },
+        "Actions": {
+            "Cancel": "Annulla",
+            "Delete": "Elimina",
+            "Block": "Blocca",
+            "Unblock": "Sblocca",
+            "Edit": "Modifica",
+            "Save": "Salva"
+        },
+        "Filters": {
+            "State": "Stato",
+            "Any": "Tutti",
+            "blocked": "Bloccato",
+            "active": "Attivo"
+        },
+        "Events": {
+            "Title": "Eventi",
+            "Search": "Cerca eventi per titolo",
+            "New": "Nuovo evento",
+            "Organizer": "Organizzatore",
+            "Single": "Singolo",
+            "Repeating": "Ripetuto",
+            "Columns": {
+                "Title": "Titolo",
+                "Start": "Inizio",
+                "Venue": "Luogo",
+                "Repeat": "Date",
+                "Organizer": "Organizzatore",
+                "State": "Stato",
+                "Actions": "Azioni"
+            },
+            "Delete": {
+                "Title": "Eliminare l'evento?",
+                "Description": "\"{{title}}\" e tutte le sue date escono dall'app. Non si può annullare."
+            },
+            "Block": {
+                "Title": "Blocca l'evento",
+                "Description": "\"{{title}}\" sparisce dall'app pubblica finché un Admin non lo sblocca.",
+                "Reason": "Motivo",
+                "ReasonHint": "L'organizzatore lo legge.",
+                "Submit": "Blocca"
+            },
+            "Unblock": {
+                "Title": "Sbloccare l'evento?",
+                "Description": "\"{{title}}\" torna visibile nell'app pubblica."
+            },
+            "Toast": {
+                "Deleted": "\"{{title}}\" eliminato.",
+                "Blocked": "\"{{title}}\" bloccato.",
+                "Unblocked": "\"{{title}}\" sbloccato.",
+                "CloseWhileDeleting": "Attendi che l'evento sia eliminato.",
+                "CloseWhileBlocking": "Attendi che l'evento sia bloccato.",
+                "CloseWhileUnblocking": "Attendi che l'evento sia sbloccato."
+            }
         }
     }
 }

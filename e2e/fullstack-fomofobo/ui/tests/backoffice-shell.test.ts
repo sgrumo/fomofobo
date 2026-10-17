@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test"
 import { clickMenuItem } from "e2e-ui-components/menu"
 
-import { gotoBackofficePage, t } from "../app"
+import { backofficeT, gotoBackofficePage } from "../app"
 import { signInBrowser } from "../backoffice"
 
 test.describe("backoffice shell", () => {
@@ -17,10 +17,10 @@ test.describe("backoffice shell", () => {
             await gotoBackofficePage(page, "/backoffice/events")
 
             const navigation = page.getByRole("navigation", {
-                name: t("shared", "Backoffice.Nav.Label"),
+                name: backofficeT("shared", "Backoffice.Nav.Label"),
             })
             await expect(navigation.getByRole("link")).toHaveText(
-                names.map(name => t("shared", `Backoffice.Nav.${name}`)),
+                names.map(name => backofficeT("shared", `Backoffice.Nav.${name}`)),
             )
         }
     })
@@ -30,7 +30,9 @@ test.describe("backoffice shell", () => {
 
         await gotoBackofficePage(page, "/backoffice/organizers")
 
-        await expect(page.getByText(t("shared", "NotFound.Title"))).toBeVisible()
+        await expect(
+            page.getByText(backofficeT("shared", "NotFound.Title")),
+        ).toBeVisible()
     })
 
     test("sends a visitor with no session to the login page, with the page to return to", async ({
@@ -49,8 +51,8 @@ test.describe("backoffice shell", () => {
 
         await clickMenuItem(
             page,
-            t("shared", "Session.Menu"),
-            t("shared", "Session.SignOut"),
+            backofficeT("shared", "Session.Menu"),
+            backofficeT("shared", "Session.SignOut"),
         )
 
         await expect(page).toHaveURL(/\/backoffice\/login$/u)

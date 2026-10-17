@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { weekdayDateOf } from "./local-format"
+import { formatLocalDateTime, weekdayDateOf } from "./local-format"
 
 describe("weekdayDateOf", () => {
     // 22:30 UTC on Wednesday the 14th is 00:30 on Thursday the 15th in Rome.
@@ -16,4 +16,11 @@ describe("weekdayDateOf", () => {
             expect(weekdayDateOf(lateEvening, timeZone, language)).toBe(expected)
         },
     )
+})
+
+describe("formatLocalDateTime", () => {
+    it("reads the wall clock of the value, whatever the zone of the machine", () => {
+        expect(formatLocalDateTime("2026-10-24T21:00")).toBe("24.10.26 21:00")
+        expect(formatLocalDateTime("2026-03-29T02:30")).toBe("29.03.26 02:30")
+    })
 })

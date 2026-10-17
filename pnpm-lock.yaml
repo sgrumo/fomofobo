@@ -480,6 +480,9 @@ importers:
       e2e-ui-components:
         specifier: workspace:*
         version: link:../ui-components
+      i18n:
+        specifier: workspace:*
+        version: link:../../packages/i18n
       models:
         specifier: workspace:*
         version: link:../../packages/models

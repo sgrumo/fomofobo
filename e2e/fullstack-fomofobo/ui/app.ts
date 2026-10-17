@@ -1,9 +1,16 @@
 import type { Page } from "@playwright/test"
 import { createI18n, e2eLocale } from "e2e-kit/i18n"
+import { defaultLanguage } from "i18n/i18n"
 
 import { LOCALES_DIR } from "../server"
 
 export const { t } = createI18n(LOCALES_DIR)
+
+/**
+ * @remarks Reads the default language, the one the backoffice serves whatever the E2E
+ * locale
+ */
+export const { t: backofficeT } = createI18n(LOCALES_DIR, defaultLanguage)
 
 /**
  * @description Waits until React has hydrated the page

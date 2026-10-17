@@ -159,6 +159,78 @@
             "InvalidCredentials": "Wrong email or password.",
             "Failed": "The sign-in failed. Try again in a moment.",
             "Blocked": "Your account is blocked. Contact an Admin."
+        },
+        "List": {
+            "Loading": "Loading",
+            "Error": "The list could not be loaded. Reload the page to try again.",
+            "Empty": "Nothing here yet."
+        },
+        "Errors": {
+            "ForbiddenAction": "Your account cannot do this.",
+            "EmailTaken": "Another account already uses this email.",
+            "EventNotFound": "This event no longer exists.",
+            "VenueNotFound": "This venue no longer exists.",
+            "CategoryNotFound": "This category no longer exists.",
+            "OrganizerNotFound": "This organizer no longer exists.",
+            "CategoryInUse": "Events still use this category. Move them to another category first.",
+            "CategoryNameTaken": "Another category already has this name.",
+            "InvalidPhotoUpload": "A photo did not upload. Remove it and add it again.",
+            "InvalidEventReference": "The venue, a category or the organizer no longer exists.",
+            "TooManyOccurrences": "The repetition gives too many dates. Pick an earlier end date."
+        },
+        "Actions": {
+            "Cancel": "Cancel",
+            "Delete": "Delete",
+            "Block": "Block",
+            "Unblock": "Unblock",
+            "Edit": "Edit",
+            "Save": "Save"
+        },
+        "Filters": {
+            "State": "State",
+            "Any": "Any",
+            "blocked": "Blocked",
+            "active": "Active"
+        },
+        "Events": {
+            "Title": "Events",
+            "Search": "Search events by title",
+            "New": "New event",
+            "Organizer": "Organizer",
+            "Single": "Single",
+            "Repeating": "Repeating",
+            "Columns": {
+                "Title": "Title",
+                "Start": "Start",
+                "Venue": "Venue",
+                "Repeat": "Dates",
+                "Organizer": "Organizer",
+                "State": "State",
+                "Actions": "Actions"
+            },
+            "Delete": {
+                "Title": "Delete the event?",
+                "Description": "\"{{title}}\" and all its dates leave the app. This cannot be undone."
+            },
+            "Block": {
+                "Title": "Block the event",
+                "Description": "\"{{title}}\" disappears from the public app until an Admin unblocks it.",
+                "Reason": "Reason",
+                "ReasonHint": "The organizer reads it.",
+                "Submit": "Block"
+            },
+            "Unblock": {
+                "Title": "Unblock the event?",
+                "Description": "\"{{title}}\" shows in the public app again."
+            },
+            "Toast": {
+                "Deleted": "\"{{title}}\" deleted.",
+                "Blocked": "\"{{title}}\" blocked.",
+                "Unblocked": "\"{{title}}\" unblocked.",
+                "CloseWhileDeleting": "Wait until the event is deleted.",
+                "CloseWhileBlocking": "Wait until the event is blocked.",
+                "CloseWhileUnblocking": "Wait until the event is unblocked."
+            }
         }
     }
 }
