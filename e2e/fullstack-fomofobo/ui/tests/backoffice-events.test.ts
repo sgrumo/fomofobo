@@ -13,7 +13,7 @@ import { dismissToast, expectToast } from "e2e-ui-components/toast"
 
 import { signInAs } from "../../api/auth/utils"
 import { seedEvent, seedEventReferences } from "../../api/backoffice-events/utils"
-import { backofficeT, gotoBackofficePage } from "../app"
+import { gotoBackofficePage, t } from "../app"
 import { signInBrowser } from "../backoffice"
 
 test.describe("backoffice events", () => {
@@ -39,11 +39,7 @@ test.describe("backoffice events", () => {
             { title: ownTitle, organizerName: organizer.account.name },
             { title: otherTitle, organizerName: other.account.name },
         ]) {
-            await fillInput(
-                page,
-                backofficeT("shared", "Backoffice.Events.Search"),
-                title,
-            )
+            await fillInput(page, t("shared", "Backoffice.Events.Search"), title)
             await expectTableRow(page, [
                 ["exact", title],
                 ["exact", organizerName],
@@ -60,24 +56,17 @@ test.describe("backoffice events", () => {
         await signInBrowser(page, "admin")
 
         await gotoBackofficePage(page, "/backoffice/events")
-        await fillInput(page, backofficeT("shared", "Backoffice.Events.Search"), title)
+        await fillInput(page, t("shared", "Backoffice.Events.Search"), title)
         await clickTableRowAction(
             page,
             ["exact", title],
-            backofficeT("shared", "Backoffice.Actions.Block"),
+            t("shared", "Backoffice.Actions.Block"),
         )
-        const dialog = getDialog(
-            page,
-            backofficeT("shared", "Backoffice.Events.Block.Title"),
-        )
-        await fillInput(
-            dialog,
-            backofficeT("shared", "Backoffice.Events.Block.Reason"),
-            reason,
-        )
-        await clickButton(dialog, backofficeT("shared", "Backoffice.Events.Block.Submit"))
+        const dialog = getDialog(page, t("shared", "Backoffice.Events.Block.Title"))
+        await fillInput(dialog, t("shared", "Backoffice.Events.Block.Reason"), reason)
+        await clickButton(dialog, t("shared", "Backoffice.Events.Block.Submit"))
 
-        const blockedMessage = backofficeT("shared", "Backoffice.Events.Toast.Blocked", {
+        const blockedMessage = t("shared", "Backoffice.Events.Toast.Blocked", {
             title,
         })
         await expectToast(page, { type: "success" }, blockedMessage)
@@ -85,31 +74,27 @@ test.describe("backoffice events", () => {
         await expect(dialog).toBeHidden()
         await expectTableRow(page, [
             ["exact", title],
-            ["exact", backofficeT("shared", "Backoffice.Filters.blocked")],
+            ["exact", t("shared", "Backoffice.Filters.blocked")],
             ["exact", reason],
         ])
 
         await clickTableRowAction(
             page,
             ["exact", title],
-            backofficeT("shared", "Backoffice.Actions.Unblock"),
+            t("shared", "Backoffice.Actions.Unblock"),
         )
         await confirmAlertDialog(page, {
-            confirmLabel: backofficeT("shared", "Backoffice.Actions.Unblock"),
+            confirmLabel: t("shared", "Backoffice.Actions.Unblock"),
         })
 
-        const unblockedMessage = backofficeT(
-            "shared",
-            "Backoffice.Events.Toast.Unblocked",
-            {
-                title,
-            },
-        )
+        const unblockedMessage = t("shared", "Backoffice.Events.Toast.Unblocked", {
+            title,
+        })
         await expectToast(page, { type: "success" }, unblockedMessage)
         await dismissToast(page, { type: "success" }, unblockedMessage)
         await expectTableRow(page, [
             ["exact", title],
-            ["exact", backofficeT("shared", "Backoffice.Filters.active")],
+            ["exact", t("shared", "Backoffice.Filters.active")],
         ])
     })
 
@@ -123,13 +108,13 @@ test.describe("backoffice events", () => {
         await clickTableRowAction(
             page,
             ["exact", title],
-            backofficeT("shared", "Backoffice.Actions.Delete"),
+            t("shared", "Backoffice.Actions.Delete"),
         )
         await confirmAlertDialog(page, {
-            confirmLabel: backofficeT("shared", "Backoffice.Actions.Delete"),
+            confirmLabel: t("shared", "Backoffice.Actions.Delete"),
         })
 
-        const message = backofficeT("shared", "Backoffice.Events.Toast.Deleted", {
+        const message = t("shared", "Backoffice.Events.Toast.Deleted", {
             title,
         })
         await expectToast(page, { type: "success" }, message)

@@ -60,11 +60,10 @@ const interpolate = (
     }, template)
 
 /**
- * @description Builds the translator over one locale of a locales directory
+ * @description Builds the translator over the E2E locale of a locales directory
  * @param localesDir Directory holding one sub-directory per locale
- * @param locale Locale read, the E2E locale by default
  */
-export const createI18n = (localesDir: string, locale: string = e2eLocale) => {
+export const createI18n = (localesDir: string) => {
     const cache = new Map<string, unknown>()
 
     /**
@@ -77,7 +76,7 @@ export const createI18n = (localesDir: string, locale: string = e2eLocale) => {
             return cached
         }
 
-        const filePath = path.resolve(localesDir, locale, `${namespace}.json`)
+        const filePath = path.resolve(localesDir, e2eLocale, `${namespace}.json`)
         const data: unknown = JSON.parse(readFileSync(filePath, "utf8"))
         cache.set(namespace, data)
         return data

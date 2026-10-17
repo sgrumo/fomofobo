@@ -21,7 +21,7 @@ export interface StaticRoutePageProps {
  * @param props Props Next hands the page and `generateMetadata`, `params` alone
  * @throws When the parameters fail the schema, through the not-found error Next raises
  * @remarks Reads the language from the parsed `lang` parameter, not from the request,
- * and the default language for a backoffice route, which has none
+ * and the backoffice language for a backoffice route, which has none
  * @remarks Reads no request, so the page stays prerendered
  */
 export const getStaticRoute = async <

@@ -19,7 +19,7 @@ Fullstack app: one Next.js process serves the API and the pages. The API mounts 
 │   ├── [lang]/                      # Root layout of the public app. The language is the first URL segment
 │   │   ├── (public)/                # Open pages
 │   │   └── [...rest]/               # Catch-all -> `notFound()`
-│   ├── backoffice/                  # Root layout of the backoffice, default language
+│   ├── backoffice/                  # Root layout of the backoffice, `BACKOFFICE_LANGUAGE`
 │   │   ├── login/                   # The one backoffice page outside the guard
 │   │   ├── (protected)/             # Pages behind `requireSession`, inside the role-aware shell
 │   │   └── [...rest]/               # Catch-all -> `notFound()`
@@ -97,7 +97,7 @@ Client component  -> useMutation     -> api        -> apiAction       -> serverT
 
 - Two variants by `type`. `createStaticRoute`: prerendered, empty query schema, holds `generateStaticParams` with complete parameters, `lang` included. `createDynamicRoute`: per request, holds `querySchema`
 - Every route holds `segments`, a `title` builder, `parametersSchema`, `querySchema`. `segments` uses the Next bracket grammar: `["[lang]", "todos", "[id]"]`
-- **Every** public route opens with `"[lang]"` and holds `lang: languageKeySchema`. The one exception: a backoffice route opens with `"backoffice"`, holds no `lang`, and renders the default language (`routeLanguage`). Route groups such as `(protected)` stay out of the ledger
+- **Every** public route opens with `"[lang]"` and holds `lang: languageKeySchema`. The one exception: a backoffice route opens with `"backoffice"`, holds no `lang`, and renders `BACKOFFICE_LANGUAGE` (`routeLanguage`). Route groups such as `(protected)` stay out of the ledger
 - Parameters schema: `[id]` -> `z.string()`, `[...slug]` -> `z.array(z.string())`, `[[...slug]]` -> that array `.optional()`. No check, no `.catch()` - validate in the page
 - Query schema: every key has `.catch()`, the empty object decodes, the default query encodes, every key survives kebab case
 - `title` receives `t` and `parameters`, never the query

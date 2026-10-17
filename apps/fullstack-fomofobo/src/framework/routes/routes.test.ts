@@ -186,7 +186,7 @@ describe("route objects", () => {
             expect(ledger).toStrictEqual(appFileSegments("page.tsx"))
         })
 
-        it("should open with the `[lang]` segment, or with `backoffice`, which serves the default language", () => {
+        it("should open with the `[lang]` segment, or with `backoffice`, which serves the backoffice language", () => {
             const languageSegments = new Set<string>(["[lang]", "backoffice"])
             const withoutLanguage = Object.entries(routes)
                 .filter(([, route]) => !languageSegments.has(route.segments[0]))

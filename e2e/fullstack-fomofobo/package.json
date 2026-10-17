@@ -20,7 +20,6 @@
         "axios": "catalog:",
         "e2e-kit": "workspace:*",
         "e2e-ui-components": "workspace:*",
-        "i18n": "workspace:*",
         "models": "workspace:*",
         "shared": "workspace:*",
         "zod": "catalog:"

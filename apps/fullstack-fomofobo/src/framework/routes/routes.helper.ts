@@ -1,6 +1,6 @@
 import { camelCase, kebabCase, omitBy } from "es-toolkit"
 import type { LanguageKey } from "i18n/i18n"
-import { defaultLanguage, languageKeySchema } from "i18n/i18n"
+import { languageKeySchema } from "i18n/i18n"
 import { notFound } from "next/navigation"
 import type { UseNamespacedTranslation } from "react-i18n/types"
 import { isDefined } from "shared/values"
@@ -8,17 +8,19 @@ import { match } from "ts-pattern"
 import type { ZodType } from "zod"
 import { z } from "zod"
 
+import { BACKOFFICE_LANGUAGE } from "@/lib/i18n/backoffice-language"
+
 export type RouteSegments = readonly string[]
 
 export type RouteParameters = Record<string, unknown>
 
 /**
- * @description Returns the language of a page: its `lang` parameter, or the default language for a backoffice page
+ * @description Returns the language of a page: its `lang` parameter, or the backoffice language for a backoffice page
  * @param parameters Parameters parsed by the route schema
  */
 export const routeLanguage = (parameters: RouteParameters): LanguageKey => {
     const language = languageKeySchema.safeParse(parameters.lang)
-    return language.success ? language.data : defaultLanguage
+    return language.success ? language.data : BACKOFFICE_LANGUAGE
 }
 
 export type RouteQuery = Record<string, unknown>

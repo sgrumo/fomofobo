@@ -7,7 +7,7 @@ import { fillPasswordInput } from "e2e-ui-components/password-input"
 
 import { buildAccountSeed, seedAccount, signInAs } from "../../api/auth/utils"
 import { blockOrganizer } from "../../api/backoffice-organizers/api"
-import { backofficeT, gotoBackofficePage } from "../app"
+import { gotoBackofficePage, t } from "../app"
 
 test.describe("backoffice login", () => {
     test("signs in and lands on the page it was asked for", async ({ page }) => {
@@ -19,18 +19,18 @@ test.describe("backoffice login", () => {
             /\/backoffice\/login\?return-to=%2Fbackoffice%2Fvenues$/u,
         )
 
-        await fillInput(page, backofficeT("shared", "Backoffice.Login.Email"), seed.email)
+        await fillInput(page, t("shared", "Backoffice.Login.Email"), seed.email)
         await fillPasswordInput(
             page,
-            backofficeT("shared", "Backoffice.Login.Password"),
+            t("shared", "Backoffice.Login.Password"),
             seed.password,
         )
-        await clickButton(page, backofficeT("shared", "Backoffice.Login.Submit"))
+        await clickButton(page, t("shared", "Backoffice.Login.Submit"))
 
         await expect(page).toHaveURL(/\/backoffice\/venues$/u)
         await expect(
             page.getByRole("navigation", {
-                name: backofficeT("shared", "Backoffice.Nav.Label"),
+                name: t("shared", "Backoffice.Nav.Label"),
             }),
         ).toBeVisible()
     })
@@ -55,19 +55,19 @@ test.describe("backoffice login", () => {
             await gotoBackofficePage(page, "/backoffice/login")
             await fillInput(
                 page,
-                backofficeT("shared", "Backoffice.Login.Email"),
+                t("shared", "Backoffice.Login.Email"),
                 credentials.email,
             )
             await fillPasswordInput(
                 page,
-                backofficeT("shared", "Backoffice.Login.Password"),
+                t("shared", "Backoffice.Login.Password"),
                 credentials.password,
             )
-            await clickButton(page, backofficeT("shared", "Backoffice.Login.Submit"))
+            await clickButton(page, t("shared", "Backoffice.Login.Submit"))
 
             await expectAlert(page, {
                 type: "error",
-                text: backofficeT("shared", "Backoffice.Login.InvalidCredentials"),
+                text: t("shared", "Backoffice.Login.InvalidCredentials"),
             })
             await expect(page).toHaveURL(/\/backoffice\/login$/u)
         }
@@ -81,13 +81,13 @@ test.describe("backoffice login", () => {
             page,
             `/backoffice/login?return-to=${encodeURIComponent("https://evil.example.com/backoffice")}`,
         )
-        await fillInput(page, backofficeT("shared", "Backoffice.Login.Email"), seed.email)
+        await fillInput(page, t("shared", "Backoffice.Login.Email"), seed.email)
         await fillPasswordInput(
             page,
-            backofficeT("shared", "Backoffice.Login.Password"),
+            t("shared", "Backoffice.Login.Password"),
             seed.password,
         )
-        await clickButton(page, backofficeT("shared", "Backoffice.Login.Submit"))
+        await clickButton(page, t("shared", "Backoffice.Login.Submit"))
 
         await expect(page).toHaveURL(/\/backoffice\/events$/u)
     })
@@ -97,7 +97,7 @@ test.describe("backoffice login", () => {
 
         await expectAlert(page, {
             type: "error",
-            text: backofficeT("shared", "Backoffice.Login.Blocked"),
+            text: t("shared", "Backoffice.Login.Blocked"),
         })
     })
 })
