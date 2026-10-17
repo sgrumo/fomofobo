@@ -1,10 +1,9 @@
-import { BaseLayout } from "@/components/client/base-layout/base-layout"
 import { NotFoundView } from "@/components/client/not-found-view/not-found-view"
 
 const NotFound = () => (
-    <BaseLayout variant="public">
+    <main className="bg-surface text-fg relative flex h-dvh w-dvw flex-col overflow-auto">
         <NotFoundView />
-    </BaseLayout>
+    </main>
 )
 
 export default NotFound

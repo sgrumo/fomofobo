@@ -10,10 +10,15 @@
         "Dev": "Dev"
     },
     "PageTitle": {
-        "Home": "Home",
+        "Home": "Map",
+        "Event": "Event",
+        "Saved": "Saved events",
         "DevShowcase": "Showcase",
         "DevSamples": "Samples",
         "NotFound": "Page not found"
+    },
+    "Map": {
+        "Label": "Event map"
     },
     "NotFound": {
         "Title": "404: Page Not Found",

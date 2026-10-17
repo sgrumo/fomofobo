@@ -39,7 +39,7 @@ export const eventExternalLinksSchema = z.object({
 })
 export type EventExternalLinks = z.infer<typeof eventExternalLinksSchema>
 
-// PLACEHOLDER(OP-14)
+// `null` means free
 export const eventPriceSchema = z.string().trim().min(1).max(60).nullable()
 
 // PLACEHOLDER(OP-12)

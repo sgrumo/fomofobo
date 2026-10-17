@@ -167,7 +167,7 @@ export const events = sqliteTable(
         recurrence: text("recurrence", { mode: "json" }).$type<Recurrence>(),
         instagramUrl: text("instagram_url"),
         facebookUrl: text("facebook_url"),
-        // PLACEHOLDER(OP-14)
+        // `null` means free
         price: text("price"),
         isBlocked: integer("is_blocked", { mode: "boolean" }).notNull().default(false),
         // PLACEHOLDER(OP-22)

@@ -1,7 +1,5 @@
 import type { ReactNode } from "react"
 
-import { BaseLayout } from "@/components/client/base-layout/base-layout"
-
 interface PublicLayoutProps {
     children?: ReactNode
 }
@@ -11,7 +9,9 @@ interface PublicLayoutProps {
  * keeps its own rendering mode.
  */
 const PublicLayout = (props: PublicLayoutProps) => (
-    <BaseLayout variant="public">{props.children}</BaseLayout>
+    <main className="bg-surface text-fg relative h-dvh w-dvw overflow-auto">
+        {props.children}
+    </main>
 )
 
 export default PublicLayout

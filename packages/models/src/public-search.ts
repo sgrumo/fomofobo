@@ -24,7 +24,6 @@ export const publicSearchQuerySchema = z
         lat: z.coerce.number().min(-90).max(90),
         lng: z.coerce.number().min(-180).max(180),
         q: z.string().trim().min(1).optional(),
-        // PLACEHOLDER(OP-10)
         categoryIds: queryArraySchema(z.uuid(), MAX_SEARCH_CATEGORIES).optional(),
         date: dateFilterKindSchema.default("default"),
         // PLACEHOLDER(OP-09): past dates
