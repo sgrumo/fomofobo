@@ -1,6 +1,5 @@
 "use client"
 
-import type { AccountRole } from "models"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import type { ReactNode } from "react"
@@ -9,9 +8,11 @@ import { useTranslation } from "react-i18next"
 import { SessionMenu } from "@/components/client/session-menu/session-menu"
 import { routes } from "@/framework/routes/routes"
 
+import type { BackofficeAccount } from "./backoffice-shell.context"
+import { BackofficeAccountContext } from "./backoffice-shell.context"
+
 interface BackofficeShellProps {
-    name: string
-    role: AccountRole
+    account: BackofficeAccount
     children?: ReactNode
 }
 
@@ -51,7 +52,7 @@ export const BackofficeShell = (props: BackofficeShellProps) => {
                     className="flex flex-wrap gap-1"
                 >
                     {NAVIGATION.filter(
-                        item => !item.adminOnly || props.role === "admin",
+                        item => !item.adminOnly || props.account.role === "admin",
                     ).map(item => {
                         const current =
                             pathname === item.href || pathname.startsWith(`${item.href}/`)
@@ -67,9 +68,13 @@ export const BackofficeShell = (props: BackofficeShellProps) => {
                         )
                     })}
                 </nav>
-                <SessionMenu name={props.name} />
+                <SessionMenu name={props.account.name} />
             </header>
-            <main className="flex grow flex-col gap-4 p-4">{props.children}</main>
+            <main className="flex grow flex-col gap-4 p-4">
+                <BackofficeAccountContext value={props.account}>
+                    {props.children}
+                </BackofficeAccountContext>
+            </main>
         </div>
     )
 }

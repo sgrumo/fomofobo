@@ -17,7 +17,9 @@ const ProtectedLayout = async (props: ProtectedLayoutProps) => {
     return session === undefined ? (
         props.children
     ) : (
-        <BackofficeShell name={session.name} role={session.role}>
+        <BackofficeShell
+            account={{ id: session.id, name: session.name, role: session.role }}
+        >
             {props.children}
         </BackofficeShell>
     )
