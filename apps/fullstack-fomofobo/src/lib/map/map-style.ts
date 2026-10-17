@@ -2,13 +2,13 @@ import type { StyleSpecification } from "@maplibre/maplibre-gl-style-spec"
 
 /**
  * @description Holds the flat retro MapLibre style of the event map
- * @remarks Points at placeholder tile and glyph URLs in place of OpenFreeMap, PLACEHOLDER(plan 008), and copies the `--palette-map-*` values of `packages/styles`, PLACEHOLDER(TQ-08)
+ * @remarks Labels in Noto Sans, the one family OpenFreeMap serves as glyphs, and copies the `--palette-map-*` values of `packages/styles`, PLACEHOLDER(TQ-08)
  */
 export const mapStyle = {
     version: 8,
     name: "fomofobo-retro",
     metadata: {
-        "fomofobo:placeholders": ["OP-28", "TQ-08"],
+        "fomofobo:placeholders": ["TQ-08"],
         "fomofobo:patterns": {
             "dot-dither": "/map/dot-dither.png",
         },
@@ -16,10 +16,10 @@ export const mapStyle = {
     sources: {
         openmaptiles: {
             type: "vector",
-            url: "https://placeholder.invalid/op-28/tiles.json",
+            url: "https://tiles.openfreemap.org/planet",
         },
     },
-    glyphs: "https://placeholder.invalid/op-28/fonts/{fontstack}/{range}.pbf",
+    glyphs: "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
     layers: [
         {
             id: "ground",
@@ -118,7 +118,7 @@ export const mapStyle = {
             layout: {
                 "symbol-placement": "line",
                 "text-field": ["upcase", ["get", "name"]],
-                "text-font": ["Space Mono Regular"],
+                "text-font": ["Noto Sans Regular"],
                 "text-size": 10,
                 "text-letter-spacing": 0.08,
             },
@@ -138,7 +138,7 @@ export const mapStyle = {
             ],
             layout: {
                 "text-field": ["upcase", ["get", "name"]],
-                "text-font": ["Space Mono Regular"],
+                "text-font": ["Noto Sans Regular"],
                 "text-size": 10,
                 "text-letter-spacing": 0.08,
             },

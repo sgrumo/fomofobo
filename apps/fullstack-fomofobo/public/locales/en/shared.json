@@ -19,6 +19,19 @@
     },
     "Map": {
         "Label": "Event map",
+        "Loading": "Loading events",
+        "Error": "The events could not be loaded. Showing the last results.",
+        "Empty": "No events here on these dates.",
+        "Truncated": "Too many events to show them all. Narrow the search.",
+        "Unsupported": "This browser cannot draw the map.",
+        "LiveBadge": "Live",
+        "Pin": "{{title}}, {{status}}, {{time}}",
+        "Cluster": "{{count}} events, {{live}} live. Zoom in",
+        "Position": "Your position",
+        "StatusBar": {
+            "Live": "{{count}}{{more}} live",
+            "UpcomingToday": "{{count}}{{more}} later today"
+        },
         "Locate": "Center on my position",
         "LocationOff": "Location is off. Search for a place to see the events around it.",
         "LocationBlocked": {
@@ -46,5 +59,10 @@
         "Menu": "Account menu",
         "SignedInAs": "Signed in as {{name}}",
         "SignOut": "Sign out"
+    },
+    "Status": {
+        "live": "Live",
+        "upcoming": "Upcoming",
+        "ended": "Ended"
     }
 }

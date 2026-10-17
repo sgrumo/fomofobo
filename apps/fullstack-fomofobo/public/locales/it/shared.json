@@ -19,6 +19,19 @@
     },
     "Map": {
         "Label": "Mappa degli eventi",
+        "Loading": "Caricamento eventi",
+        "Error": "Non è stato possibile caricare gli eventi. Mostro gli ultimi risultati.",
+        "Empty": "Nessun evento qui in queste date.",
+        "Truncated": "Troppi eventi per mostrarli tutti. Restringi la ricerca.",
+        "Unsupported": "Questo browser non riesce a disegnare la mappa.",
+        "LiveBadge": "Live",
+        "Pin": "{{title}}, {{status}}, {{time}}",
+        "Cluster": "{{count}} eventi, {{live}} in corso. Ingrandisci",
+        "Position": "La tua posizione",
+        "StatusBar": {
+            "Live": "{{count}}{{more}} in corso",
+            "UpcomingToday": "{{count}}{{more}} oggi"
+        },
         "Locate": "Centra sulla mia posizione",
         "LocationOff": "La posizione è disattivata. Cerca un luogo per vedere gli eventi intorno.",
         "LocationBlocked": {
@@ -46,5 +59,10 @@
         "Menu": "Menu account",
         "SignedInAs": "Accesso come {{name}}",
         "SignOut": "Esci"
+    },
+    "Status": {
+        "live": "In corso",
+        "upcoming": "In arrivo",
+        "ended": "Finito"
     }
 }
