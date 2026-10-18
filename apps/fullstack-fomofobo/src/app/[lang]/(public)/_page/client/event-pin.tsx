@@ -58,7 +58,7 @@ export const EventPin = (props: EventPinProps) => {
                         },
                     )}
                 >
-                    <PixelIcon name={props.icon} />
+                    <PixelIcon name={props.icon} centered={true} className="size-5" />
                 </span>
             </span>
         </button>

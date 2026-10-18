@@ -4,6 +4,7 @@ import type { OccurrenceRef } from "models"
 import { useTranslation } from "react-i18next"
 import { IconButton } from "ui-components/icon-button"
 import { PixelIconSave, PixelIconSaved } from "ui-components/pixel-icons"
+import { useToast } from "ui-components/toast"
 
 import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 
@@ -14,6 +15,7 @@ interface SaveToggleProps {
 
 export const SaveToggle = (props: SaveToggleProps) => {
     const { t } = useTranslation("shared")
+    const toast = useToast()
     const [savedEvents, setSavedEvents] = useLocalStorage("saved-events")
     const { eventId, date } = props.occurrence
     const isSame = (entry: OccurrenceRef) =>
@@ -36,6 +38,10 @@ export const SaveToggle = (props: SaveToggleProps) => {
                               ...savedEvents.events,
                               { eventId, date, savedAt: new Date().toISOString() },
                           ],
+                })
+                toast.add({
+                    type: "success",
+                    messages: [saved ? t("Saved.Removed") : t("Saved.Added")],
                 })
             }}
         />

@@ -42,7 +42,7 @@
             "UpcomingToday": "{{count}}{{more}} oggi"
         },
         "Locate": "Centra sulla mia posizione",
-        "LocationOff": "La posizione è disattivata. Cerca un luogo per vedere gli eventi intorno.",
+        "LocationOff": "La posizione è disattivata. Consentila per vedere gli eventi intorno a te, oppure cerca un luogo.",
         "LocationBlocked": {
             "Title": "La posizione è bloccata",
             "Description": "Consenti la posizione per questo sito nelle impostazioni del browser, poi riprova."
@@ -50,7 +50,8 @@
         "LocationUnavailable": {
             "Title": "Posizione non disponibile",
             "Description": "Il dispositivo non riesce a rilevare la posizione. Cerca un luogo."
-        }
+        },
+        "AllowLocation": "Consenti la posizione"
     },
     "NotFound": {
         "Title": "404: Pagina non trovata",
@@ -140,7 +141,9 @@
         "Empty": "Nessun evento salvato. Salvane uno dalla sua anteprima o dalla sua pagina.",
         "NoneVisible": "I tuoi eventi salvati non sono più disponibili.",
         "Loading": "Caricamento eventi salvati",
-        "Error": "Non è stato possibile caricare gli eventi salvati."
+        "Error": "Non è stato possibile caricare gli eventi salvati.",
+        "Added": "Evento salvato. Lo trovi tra gli eventi salvati.",
+        "Removed": "Evento rimosso dagli eventi salvati."
     },
     "Backoffice": {
         "Brand": "fomofobo backoffice",

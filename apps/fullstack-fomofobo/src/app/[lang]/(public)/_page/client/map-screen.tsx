@@ -8,6 +8,7 @@ import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import { match } from "ts-pattern"
 import { Alert } from "ui-components/alert"
+import { Button } from "ui-components/button"
 import { IconButton } from "ui-components/icon-button"
 import { PixelIconLocate, PixelIconSaved } from "ui-components/pixel-icons"
 import { Spinner } from "ui-components/spinner"
@@ -185,7 +186,19 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
 
     const notices = [
         !hasUrlCenter && locationOff ? (
-            <Alert key="location-off" type="info" text={t("Map.LocationOff")} />
+            <Alert key="location-off" type="info" text={t("Map.LocationOff")}>
+                {/* A blocked permission answers at once: the toast of `locate` tells how to lift it */}
+                <Button
+                    variant="secondary"
+                    size="sm"
+                    className="self-start"
+                    onClick={() => {
+                        void locate()
+                    }}
+                >
+                    {t("Map.AllowLocation")}
+                </Button>
+            </Alert>
         ) : undefined,
         search.isError ? (
             <Alert key="error" type="error" text={t("Map.Error")} />

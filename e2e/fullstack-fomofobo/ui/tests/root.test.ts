@@ -6,6 +6,7 @@ import { getChip, pressChip } from "e2e-ui-components/chip"
 import { pickDate } from "e2e-ui-components/date-input"
 import { clickIconButton } from "e2e-ui-components/icon-button"
 import { fillSearchField } from "e2e-ui-components/search-field"
+import { dismissToast, expectToast } from "e2e-ui-components/toast"
 
 import { gotoPage, t } from "../app"
 import {
@@ -272,12 +273,32 @@ test.describe("map", () => {
         await expect(farPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
     })
 
-    test("asks for a place search when location is denied", async ({ page, context }) => {
+    test("asks for a place search when location is denied, and offers to allow it", async ({
+        page,
+        context,
+    }) => {
         await context.grantPermissions([])
 
         await gotoPage(page, "/")
 
         await expectAlert(page, { type: "info", text: t("shared", "Map.LocationOff") })
+        await clickButton(page, t("shared", "Map.AllowLocation"))
+        const blocked = { title: t("shared", "Map.LocationBlocked.Title") }
+        const howTo = t("shared", "Map.LocationBlocked.Description")
+        await expectToast(page, blocked, howTo)
+        await dismissToast(page, blocked, howTo)
+
+        const position = buildArea()
+        await context.grantPermissions(["geolocation"])
+        await context.setGeolocation(position)
+        await clickButton(page, t("shared", "Map.AllowLocation"))
+
+        await expect(page).toHaveURL(
+            new RegExp(
+                `lat=${String(position.latitude)}&lng=${String(position.longitude)}`,
+                "u",
+            ),
+        )
     })
 
     test("centers on the position of the device when location is granted", async ({

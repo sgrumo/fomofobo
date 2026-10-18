@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test"
+import { dismissToast, expectToast } from "e2e-ui-components/toast"
 
 import { gotoPage, reloadPage, t } from "../app"
 import {
@@ -30,6 +31,8 @@ test.describe("saved events", () => {
         const toggle = page.getByRole("button", { name: t("shared", "Saved.Toggle") })
         await toggle.click()
         await expect(toggle).toHaveAttribute("aria-pressed", "true")
+        await expectToast(page, { type: "success" }, t("shared", "Saved.Added"))
+        await dismissToast(page, { type: "success" }, t("shared", "Saved.Added"))
 
         await gotoPage(page, "/saved/")
         const item = page.getByRole("listitem").filter({ hasText: event.title })

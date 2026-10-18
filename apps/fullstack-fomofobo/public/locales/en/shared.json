@@ -42,7 +42,7 @@
             "UpcomingToday": "{{count}}{{more}} later today"
         },
         "Locate": "Center on my position",
-        "LocationOff": "Location is off. Search for a place to see the events around it.",
+        "LocationOff": "Location is off. Allow it to see the events around you, or search for a place.",
         "LocationBlocked": {
             "Title": "Location is blocked",
             "Description": "Allow location for this site in the browser settings, then try again."
@@ -50,7 +50,8 @@
         "LocationUnavailable": {
             "Title": "Location is not available",
             "Description": "This device cannot tell its position right now. Search for a place instead."
-        }
+        },
+        "AllowLocation": "Allow location"
     },
     "NotFound": {
         "Title": "404: Page Not Found",
@@ -140,7 +141,9 @@
         "Empty": "No saved events yet. Save one from its preview or its page.",
         "NoneVisible": "Your saved events are no longer available.",
         "Loading": "Loading saved events",
-        "Error": "The saved events could not be loaded."
+        "Error": "The saved events could not be loaded.",
+        "Added": "Event saved. Find it in your saved events.",
+        "Removed": "Event removed from your saved events."
     },
     "Backoffice": {
         "Brand": "fomofobo backoffice",
