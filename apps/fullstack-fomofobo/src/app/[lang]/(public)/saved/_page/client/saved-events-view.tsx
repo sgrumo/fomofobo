@@ -20,10 +20,13 @@ import { useBackToMap } from "@/lib/hooks/use-back-to-map"
 import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import { useNow } from "@/lib/hooks/use-now"
 import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
+import { readSavedSnapshots } from "@/lib/pwa/saved-snapshots"
+
+import { InstallEntry } from "./install-entry"
 
 const CLOCK_TICK_MS = 60_000
 
-export const SavedEventsView = (_props: RouteClientComponentProps<"saved">) => {
+export const SavedEventsView = (props: RouteClientComponentProps<"saved">) => {
     const { t } = useTranslation("shared")
     const language = useLanguage()
     const goBack = useBackToMap()
@@ -41,18 +44,26 @@ export const SavedEventsView = (_props: RouteClientComponentProps<"saved">) => {
         enabled: newestFirst.length > 0,
         placeholderData: keepPreviousData,
     })
+    // Offline, the list comes from the copies the save toggle keeps on the device.
+    const snapshots = useQuery({
+        queryKey: ["saved-snapshots", newestFirst],
+        queryFn: () => readSavedSnapshots(newestFirst),
+        enabled: lookup.isError,
+    })
+    const fromSnapshots =
+        lookup.isError && snapshots.isSuccess && snapshots.data.length > 0
     // An unsaved event leaves the list at once, before the next lookup answers.
     const savedIds = new Set(newestFirst.map(saved => saved.eventId))
-    const occurrences = (lookup.data ?? []).filter(occurrence =>
-        savedIds.has(occurrence.eventId),
+    const occurrences = ((fromSnapshots ? snapshots.data : lookup.data) ?? []).filter(
+        occurrence => savedIds.has(occurrence.eventId),
     )
 
     const body =
         newestFirst.length === 0 ? (
             <p className="tp-body-md text-fg-muted">{t("Saved.Empty")}</p>
-        ) : lookup.isError ? (
+        ) : lookup.isError && !snapshots.isPending && !fromSnapshots ? (
             <Alert type="error" text={t("Saved.Error")} />
-        ) : lookup.isPending ? (
+        ) : lookup.isPending || (lookup.isError && snapshots.isPending) ? (
             <Spinner title={t("Saved.Loading")} />
         ) : occurrences.length === 0 ? (
             <p className="tp-body-md text-fg-muted">{t("Saved.NoneVisible")}</p>
@@ -114,7 +125,9 @@ export const SavedEventsView = (_props: RouteClientComponentProps<"saved">) => {
                 />
                 <h1 className="tp-pixel-2xl uppercase">{t("PageTitle.Saved")}</h1>
             </header>
+            {fromSnapshots ? <Alert type="info" text={t("Saved.Offline")} /> : undefined}
             {body}
+            <InstallEntry route={props.route} />
         </section>
     )
 }

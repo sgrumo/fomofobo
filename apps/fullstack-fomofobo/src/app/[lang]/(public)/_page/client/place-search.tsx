@@ -13,6 +13,7 @@ import { Spinner } from "ui-components/spinner"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
+import { useOnline } from "@/lib/hooks/use-online"
 
 const MIN_SUGGESTION_TEXT = 2
 const SUGGESTION_DELAY_MS = 300
@@ -27,6 +28,7 @@ interface PlaceSearchProps extends RouteClientComponentProps<"root"> {
 
 export const PlaceSearch = (props: PlaceSearchProps) => {
     const { t } = useTranslation("shared")
+    const online = useOnline()
     const [text, setText] = useState(props.initialText)
     const [open, setOpen] = useState(false)
     const formRef = useRef<HTMLFormElement>(null)
@@ -101,7 +103,14 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                         <Spinner title={t("Search.Loading")} size="xs" />
                     ) : undefined}
                     {suggestions.isError ? (
-                        <Alert type="error" text={t("Search.Unavailable")} />
+                        <Alert
+                            type="error"
+                            text={
+                                online
+                                    ? t("Search.Unavailable")
+                                    : t("Search.NeedsConnection")
+                            }
+                        />
                     ) : undefined}
                     {suggestions.isSuccess &&
                     places.length === 0 &&

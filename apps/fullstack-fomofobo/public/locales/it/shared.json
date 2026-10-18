@@ -57,7 +57,9 @@
             "Title": "Posizione non disponibile",
             "Description": "Il dispositivo non riesce a rilevare la posizione. Cerca un luogo."
         },
-        "AllowLocation": "Consenti la posizione"
+        "AllowLocation": "Consenti la posizione",
+        "Offline": "Sei offline: la mappa mostra gli ultimi risultati caricati.",
+        "NeedsConnection": "Questa ricerca richiede la connessione. Mostro gli ultimi risultati."
     },
     "NotFound": {
         "Title": "404: Pagina non trovata",
@@ -89,7 +91,8 @@
         "Loading": "Ricerca in corso",
         "Empty": "Nessun risultato.",
         "Unavailable": "La ricerca dei luoghi non è disponibile ora.",
-        "PoweredBy": "Powered by Geoapify"
+        "PoweredBy": "Powered by Geoapify",
+        "NeedsConnection": "La ricerca dei luoghi richiede la connessione."
     },
     "Filters": {
         "Categories": "Categorie",
@@ -149,7 +152,8 @@
         "Loading": "Caricamento eventi salvati",
         "Error": "Non è stato possibile caricare gli eventi salvati.",
         "Added": "Evento salvato. Lo trovi tra gli eventi salvati.",
-        "Removed": "Evento rimosso dagli eventi salvati."
+        "Removed": "Evento rimosso dagli eventi salvati.",
+        "Offline": "Sei offline: l'elenco mostra le copie salvate sul dispositivo."
     },
     "Backoffice": {
         "Brand": "fomofobo backoffice",
@@ -435,5 +439,10 @@
         "Description": "Questa pagina non è stata aperta con la connessione, quindi non è salvata sul dispositivo.",
         "BackHome": "Torna alla mappa",
         "OpenSaved": "Apri gli eventi salvati"
+    },
+    "Install": {
+        "Title": "Installa l'app",
+        "Button": "Aggiungi alla schermata Home",
+        "IosGuide": "Tocca Condividi, poi «Aggiungi alla schermata Home»."
     }
 }

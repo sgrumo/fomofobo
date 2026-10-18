@@ -7,6 +7,7 @@ import { Alert } from "ui-components/alert"
 import { Button } from "ui-components/button"
 
 import { routeHandlers } from "@/framework/routes/routes"
+import { listenForInstallPrompt } from "@/lib/pwa/install-prompt"
 import { loadedResourceEntries } from "@/lib/pwa/loaded-resources"
 
 // `next dev` serves no precache manifest, and a worker there would keep stale pages.
@@ -15,6 +16,8 @@ const REGISTER = process.env.NODE_ENV === "production"
 export const ServiceWorkerRegistrar = () => {
     const { t } = useTranslation("shared")
     const [waiting, setWaiting] = useState<Serwist>()
+
+    useEffect(listenForInstallPrompt, [])
 
     useEffect(() => {
         if (!REGISTER || !("serviceWorker" in navigator)) {

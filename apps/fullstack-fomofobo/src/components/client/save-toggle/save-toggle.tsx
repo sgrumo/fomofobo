@@ -1,15 +1,17 @@
 "use client"
 
-import type { OccurrenceRef } from "models"
+import type { OccurrenceRef, OccurrenceSummary } from "models"
+import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { IconButton } from "ui-components/icon-button"
 import { PixelIconSave, PixelIconSaved } from "ui-components/pixel-icons"
 import { useToast } from "ui-components/toast"
 
 import { useLocalStorage } from "@/lib/hooks/use-local-storage"
+import { removeSavedSnapshot, storeSavedSnapshots } from "@/lib/pwa/saved-snapshots"
 
 interface SaveToggleProps {
-    occurrence: OccurrenceRef
+    occurrence: OccurrenceSummary
     size?: "sm" | "md"
 }
 
@@ -22,6 +24,13 @@ export const SaveToggle = (props: SaveToggleProps) => {
         entry.eventId === eventId && entry.date === date
     const saved = savedEvents.events.some(isSame)
 
+    // A saved occurrence on screen refreshes the copy the saved screen lists offline.
+    useEffect(() => {
+        if (saved) {
+            void storeSavedSnapshots([props.occurrence])
+        }
+    }, [saved, props.occurrence])
+
     return (
         <IconButton
             aria-label={t("Saved.Toggle")}
@@ -30,6 +39,9 @@ export const SaveToggle = (props: SaveToggleProps) => {
             tone={saved ? "live" : "surface"}
             size={props.size}
             onClick={() => {
+                if (saved) {
+                    void removeSavedSnapshot(props.occurrence)
+                }
                 setSavedEvents({
                     ...savedEvents,
                     events: saved

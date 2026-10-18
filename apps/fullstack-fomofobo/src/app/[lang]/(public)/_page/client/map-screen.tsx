@@ -23,6 +23,7 @@ import { statusBarCounts } from "@/lib/events/status-bar-counts"
 import { roundCenter } from "@/lib/geo/round-center"
 import { useGeolocation } from "@/lib/hooks/use-geolocation"
 import { useNow } from "@/lib/hooks/use-now"
+import { useOnline } from "@/lib/hooks/use-online"
 import { DEFAULT_CITY, PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 import { CategoryChips } from "./category-chips"
@@ -53,6 +54,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
     const { query, setQuery } = useDynamicRoute(routes[props.route])
     const geolocation = useGeolocation()
     const now = useNow(CLOCK_TICK_MS)
+    const online = useOnline()
 
     const urlCenter =
         query.lat === undefined || query.lng === undefined
@@ -200,8 +202,15 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 </Button>
             </Alert>
         ) : undefined,
+        online ? undefined : (
+            <Alert key="offline" type="warning" text={t("Map.Offline")} />
+        ),
         search.isError ? (
-            <Alert key="error" type="error" text={t("Map.Error")} />
+            <Alert
+                key="error"
+                type="error"
+                text={online ? t("Map.Error") : t("Map.NeedsConnection")}
+            />
         ) : undefined,
         results !== undefined && results.occurrences.length === 0 ? (
             <Alert key="empty" type="info" text={t("Map.Empty")} />

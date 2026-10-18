@@ -57,7 +57,9 @@
             "Title": "Location is not available",
             "Description": "This device cannot tell its position right now. Search for a place instead."
         },
-        "AllowLocation": "Allow location"
+        "AllowLocation": "Allow location",
+        "Offline": "You are offline: the map shows the last loaded results.",
+        "NeedsConnection": "This search needs a connection. Showing the last results."
     },
     "NotFound": {
         "Title": "404: Page Not Found",
@@ -89,7 +91,8 @@
         "Loading": "Searching",
         "Empty": "Nothing found.",
         "Unavailable": "Place search is not available right now.",
-        "PoweredBy": "Powered by Geoapify"
+        "PoweredBy": "Powered by Geoapify",
+        "NeedsConnection": "The place search needs a connection."
     },
     "Filters": {
         "Categories": "Categories",
@@ -149,7 +152,8 @@
         "Loading": "Loading saved events",
         "Error": "The saved events could not be loaded.",
         "Added": "Event saved. Find it in your saved events.",
-        "Removed": "Event removed from your saved events."
+        "Removed": "Event removed from your saved events.",
+        "Offline": "You are offline: the list shows the copies kept on this device."
     },
     "Backoffice": {
         "Brand": "fomofobo backoffice",
@@ -435,5 +439,10 @@
         "Description": "This page was not opened with a connection, so the device holds no copy of it.",
         "BackHome": "Back to the map",
         "OpenSaved": "Open the saved events"
+    },
+    "Install": {
+        "Title": "Install the app",
+        "Button": "Add to the home screen",
+        "IosGuide": "Tap Share, then “Add to Home Screen”."
     }
 }
