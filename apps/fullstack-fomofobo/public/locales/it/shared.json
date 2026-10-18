@@ -1,5 +1,8 @@
 {
     "ClearCache": "Pulisci la cache",
+    "App": {
+        "Description": "Gli eventi intorno a te, su una mappa"
+    },
     "Language": {
         "Label": "Lingua",
         "en": "English",
