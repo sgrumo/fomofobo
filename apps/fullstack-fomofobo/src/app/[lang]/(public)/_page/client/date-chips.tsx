@@ -31,6 +31,7 @@ const QUICK_KINDS = ["today", "tomorrow", "weekend"] as const
 interface DateChipsProps extends RouteClientComponentProps<"root">, DateFilter {
     now: Date
     onChange: (filter: DateFilter) => void
+    className?: string
 }
 
 export const DateChips = (props: DateChipsProps) => {
@@ -60,7 +61,7 @@ export const DateChips = (props: DateChipsProps) => {
 
     return (
         <>
-            <ChipRow label={t("Filters.Dates")}>
+            <ChipRow label={t("Filters.Dates")} className={props.className}>
                 {QUICK_KINDS.map(kind => (
                     <Chip
                         key={kind}

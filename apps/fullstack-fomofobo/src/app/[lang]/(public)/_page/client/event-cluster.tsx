@@ -19,12 +19,16 @@ export const EventCluster = (props: EventClusterProps) => {
             type="button"
             aria-label={t("Map.Cluster", { count: props.count, live: props.liveCount })}
             onClick={props.onExpand}
-            className="border-line shadow-hard-md flex size-12 cursor-pointer items-center justify-center rounded-full border-2 p-1"
-            style={{
-                background: `conic-gradient(var(--color-live) 0 ${liveShare}, var(--color-surface) ${liveShare} 100%)`,
-            }}
+            className="pixel-circle-48 drop-shadow-hard-md relative flex size-12 cursor-pointer items-center justify-center"
         >
-            <span className="bg-surface text-fg tp-pixel-lg flex size-full items-center justify-center rounded-full">
+            <span
+                aria-hidden={true}
+                className="absolute inset-0 [clip-path:var(--pixel-circle-inner-48)]"
+                style={{
+                    background: `conic-gradient(var(--color-live) 0 ${liveShare}, var(--color-surface) ${liveShare} 100%)`,
+                }}
+            />
+            <span className="bg-surface text-fg tp-pixel-lg relative flex size-9 items-center justify-center [clip-path:var(--pixel-circle-outer-36)]">
                 {props.count}
             </span>
         </button>

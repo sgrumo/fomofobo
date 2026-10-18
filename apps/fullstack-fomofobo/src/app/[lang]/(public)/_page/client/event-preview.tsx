@@ -171,7 +171,7 @@ const PreviewBody = (props: PreviewBodyProps) => {
                     }}
                     query={{}}
                     aria-label={t("Preview.Open")}
-                    className="bg-live border-line shadow-hard-sm text-fg flex size-12 items-center justify-center rounded-full border-2 [&>svg]:size-5"
+                    className="pixel-circle-48 drop-shadow-hard-sm text-fg relative flex size-12 items-center justify-center rounded-full [--pixel-fill:var(--color-live)] [&>svg]:size-5"
                 >
                     <PixelIconArrow />
                 </RouteLink>

@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test"
 import { expectAlert } from "e2e-ui-components/alert"
 import { getBottomSheet } from "e2e-ui-components/bottom-sheet"
 import { clickButton } from "e2e-ui-components/button"
-import { getChip, pressChip } from "e2e-ui-components/chip"
+import { getChip, pressChip, unpressChip } from "e2e-ui-components/chip"
 import { pickDate } from "e2e-ui-components/date-input"
 import { clickIconButton } from "e2e-ui-components/icon-button"
 import { fillSearchField } from "e2e-ui-components/search-field"
@@ -27,9 +27,7 @@ test.describe("map", () => {
         await preparePublicPage(page)
     })
 
-    test("shows a pin per result, with the look of its status, and counts them", async ({
-        page,
-    }) => {
+    test("shows a pin per result, with the look of its status", async ({ page }) => {
         const center = buildArea()
         const category = await seedCategory()
         const live = await seedPublicEvent(
@@ -77,18 +75,9 @@ test.describe("map", () => {
                 }),
             ).toBeVisible({ timeout: MAP_TIMEOUT_MS })
         }
-        const statusBar = page.getByRole("status")
-        await expect(statusBar).toContainText(
-            t("shared", "Map.StatusBar.Live", { count: 1, more: "" }),
-            { ignoreCase: true },
-        )
-        await expect(statusBar).toContainText(
-            t("shared", "Map.StatusBar.UpcomingToday", { count: 1, more: "" }),
-            { ignoreCase: true },
-        )
     })
 
-    test("narrows the pins to the pressed category, with the count of each chip", async ({
+    test("narrows the pins to the pressed category, with the count of each chip, and shows every category again once unpressed", async ({
         page,
     }) => {
         const center = buildArea()
@@ -136,9 +125,16 @@ test.describe("map", () => {
         await expect(concertPin).toBeVisible()
         await expect(marketPin).toBeHidden()
         await expect(page).toHaveURL(new RegExp(`category=${concerts.id}`, "u"))
+
+        await unpressChip(page, `${concerts.name} 1`)
+
+        await expect(concertPin).toBeVisible()
+        await expect(marketPin).toBeVisible()
+        await expect(page).not.toHaveURL(/category=/u)
     })
 
-    test("keeps tomorrow's results alone under the tomorrow chip", async ({ page }) => {
+    test("opens the filters from the filter button on a phone", async ({ page }) => {
+        await page.setViewportSize({ width: 375, height: 812 })
         const center = buildArea()
         const category = await seedCategory()
         const today = await seedPublicEvent(
@@ -170,7 +166,62 @@ test.describe("map", () => {
             name: t("shared", "Map.Pin", {
                 title: tomorrow.title,
                 status: t("shared", "Status.upcoming"),
+                time: "25.10 18:00",
+            }),
+        })
+        const tomorrowChip = getChip(page, t("shared", "Filters.tomorrow"))
+
+        await gotoPage(page, mapPath(center))
+        await expect(todayPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+        await expect(tomorrowChip).toBeHidden()
+
+        await clickIconButton(page, t("shared", "Filters.Label"))
+        await pressChip(page, t("shared", "Filters.tomorrow"))
+
+        await expect(tomorrowPin).toBeVisible()
+        await expect(todayPin).toBeHidden()
+
+        await clickIconButton(page, t("shared", "Filters.Label"))
+
+        await expect(tomorrowChip).toBeHidden()
+        await expect(tomorrowPin).toBeVisible()
+    })
+
+    test("keeps tomorrow's results alone under the tomorrow chip, with the date on their pins", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const category = await seedCategory()
+        const today = await seedPublicEvent(
+            {
+                venue: await seedVenue(
+                    offsetPoint(center, { latitude: 0.02, longitude: 0 }),
+                ),
+                category,
+            },
+            { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+        )
+        const tomorrow = await seedPublicEvent(
+            {
+                venue: await seedVenue(
+                    offsetPoint(center, { latitude: -0.02, longitude: 0 }),
+                ),
+                category,
+            },
+            { startsAt: "2026-10-25T18:00", endsAt: "2026-10-25T20:00" },
+        )
+        const todayPin = page.getByRole("button", {
+            name: t("shared", "Map.Pin", {
+                title: today.title,
+                status: t("shared", "Status.upcoming"),
                 time: "18:00",
+            }),
+        })
+        const tomorrowPin = page.getByRole("button", {
+            name: t("shared", "Map.Pin", {
+                title: tomorrow.title,
+                status: t("shared", "Status.upcoming"),
+                time: "25.10 18:00",
             }),
         })
 
@@ -215,7 +266,7 @@ test.describe("map", () => {
             name: t("shared", "Map.Pin", {
                 title: monday.title,
                 status: t("shared", "Status.upcoming"),
-                time: "18:00",
+                time: "26.10 18:00",
             }),
         })
 

@@ -12,6 +12,12 @@ describe("cn", () => {
         expect(cn("shadow-hard-md", "shadow-none")).toBe("shadow-none")
     })
 
+    it("keeps the last hard drop shadow size", () => {
+        expect(cn("drop-shadow-hard-sm", "drop-shadow-hard-lg")).toBe(
+            "drop-shadow-hard-lg",
+        )
+    })
+
     it("keeps the last typography utility", () => {
         expect(cn("tp-body-md", "tp-pixel-md")).toBe("tp-pixel-md")
     })

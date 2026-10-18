@@ -12,20 +12,14 @@ interface CategoryChipsProps extends RouteClientComponentProps<"root"> {
     counts: ReadonlyMap<string, number> | undefined
     selected: string | undefined
     onSelect: (categoryId: string | undefined) => void
+    className?: string
 }
 
 export const CategoryChips = (props: CategoryChipsProps) => {
     const { t } = useTranslation("shared")
 
     return (
-        <ChipRow label={t("Filters.Categories")}>
-            <Chip
-                label={t("Filters.All")}
-                pressed={props.selected === undefined}
-                onPressedChange={() => {
-                    props.onSelect(undefined)
-                }}
-            />
+        <ChipRow label={t("Filters.Categories")} className={props.className}>
             {props.categories.map(category => (
                 <Chip
                     key={category.id}

@@ -43,10 +43,6 @@
         "Pin": "{{title}}, {{status}}, {{time}}",
         "Cluster": "{{count}} eventi, {{live}} in corso. Ingrandisci",
         "Position": "La tua posizione",
-        "StatusBar": {
-            "Live": "{{count}}{{more}} in corso",
-            "UpcomingToday": "{{count}}{{more}} oggi"
-        },
         "Locate": "Centra sulla mia posizione",
         "LocationOff": "La posizione è disattivata. Consentila per vedere gli eventi intorno a te, oppure cerca un luogo.",
         "LocationBlocked": {
@@ -95,8 +91,8 @@
         "NeedsConnection": "La ricerca dei luoghi richiede la connessione."
     },
     "Filters": {
+        "Label": "Filtri",
         "Categories": "Categorie",
-        "All": "Tutti",
         "Dates": "Date",
         "today": "Oggi",
         "tomorrow": "Domani",

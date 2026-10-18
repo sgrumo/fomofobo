@@ -7,12 +7,13 @@ type CSSProperties = Properties<string | number>
 
 /**
  * @description Merges class lists, aware of the hard shadows and the typography utilities of `packages/styles`
- * @remarks Mirrors the `--shadow-*` tokens and the `tp-*` utilities of `packages/styles`, so a new one there needs an entry here
+ * @remarks Mirrors the `--shadow-*` and `--drop-shadow-*` tokens and the `tp-*` utilities of `packages/styles`, so a new one there needs an entry here
  */
 const twMerge = extendTailwindMerge<"typography">({
     extend: {
         theme: {
             shadow: ["hard-sm", "hard-md", "hard-lg"],
+            "drop-shadow": ["hard-sm", "hard-md", "hard-lg"],
         },
         classGroups: {
             typography: [

@@ -2,7 +2,7 @@ import { styles } from "frontend-shared/styles"
 
 export const searchFieldRootStyles = styles(
     () =>
-        "bg-surface outline-line shadow-hard-md has-[input:focus-visible]:outline-focus flex h-11 items-center gap-2.5 rounded-md px-3 outline-2 -outline-offset-2 transition-colors",
+        "pixel-corners drop-shadow-hard-md relative flex h-11 items-center gap-2.5 px-2.5 has-[input:focus-visible]:[--pixel-ink:var(--color-focus)]",
 )
 
 export const searchFieldIconStyles = styles(() => "text-fg flex shrink-0 [&>svg]:size-4")

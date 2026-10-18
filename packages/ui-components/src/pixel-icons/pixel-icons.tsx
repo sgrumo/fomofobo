@@ -80,6 +80,10 @@ export const PixelIconCalendar = (props: PixelIconProps) => (
     <PixelIcon name="calendar" {...props} />
 )
 
+export const PixelIconFilter = (props: PixelIconProps) => (
+    <PixelIcon name="filter" {...props} />
+)
+
 export const PixelIconMusic = (props: PixelIconProps) => (
     <PixelIcon name="music" {...props} />
 )

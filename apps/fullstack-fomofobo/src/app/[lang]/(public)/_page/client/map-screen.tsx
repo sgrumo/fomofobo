@@ -1,16 +1,21 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
+import { cn } from "frontend-shared/styles"
 import type { GeoPoint, OccurrenceRef, OccurrenceSummary } from "models"
 import dynamic from "next/dynamic"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useId, useRef, useState } from "react"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import { match } from "ts-pattern"
 import { Alert } from "ui-components/alert"
 import { Button } from "ui-components/button"
 import { IconButton } from "ui-components/icon-button"
-import { PixelIconLocate, PixelIconSaved } from "ui-components/pixel-icons"
+import {
+    PixelIconFilter,
+    PixelIconLocate,
+    PixelIconSaved,
+} from "ui-components/pixel-icons"
 import { Spinner } from "ui-components/spinner"
 import { useToast } from "ui-components/toast"
 
@@ -19,18 +24,16 @@ import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
-import { statusBarCounts } from "@/lib/events/status-bar-counts"
 import { roundCenter } from "@/lib/geo/round-center"
 import { useGeolocation } from "@/lib/hooks/use-geolocation"
 import { useNow } from "@/lib/hooks/use-now"
 import { useOnline } from "@/lib/hooks/use-online"
-import { DEFAULT_CITY, PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
+import { DEFAULT_CITY } from "@/lib/platform/platform"
 
 import { CategoryChips } from "./category-chips"
 import { DateChips } from "./date-chips"
 import { EventPreview } from "./event-preview"
 import { PlaceSearch } from "./place-search"
-import { StatusBar } from "./status-bar"
 
 const EventMap = dynamic(() => import("./event-map").then(module => module.EventMap), {
     ssr: false,
@@ -55,6 +58,9 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
     const geolocation = useGeolocation()
     const now = useNow(CLOCK_TICK_MS)
     const online = useOnline()
+    const filtersId = useId()
+    const [filtersOpen, setFiltersOpen] = useState(false)
+    const filtersActive = query.category !== undefined || query.date !== undefined
 
     const urlCenter =
         query.lat === undefined || query.lng === undefined
@@ -232,70 +238,91 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 onSelect={openPreview}
             />
             <div className="pointer-events-none absolute inset-x-4 top-4 flex flex-col gap-2 [&>*]:pointer-events-auto">
-                <PlaceSearch
-                    // A new place, or a recenter that clears it, resets the typed text.
-                    key={query.place ?? ""}
-                    route={props.route}
-                    center={center}
-                    initialText={query.place ?? query.q ?? ""}
-                    onPlaceSelect={place => {
-                        setQuery({
-                            ...centerQuery(place.coordinates),
-                            place: place.label,
-                            q: undefined,
-                        })
-                    }}
-                    onEventSelect={openPreview}
-                    onTextSubmit={text => {
-                        setQuery({ q: text, place: undefined })
-                    }}
-                />
-                <CategoryChips
-                    route={props.route}
-                    categories={categories.data ?? []}
-                    counts={
-                        results === undefined
-                            ? undefined
-                            : new Map(
-                                  results.categoryCounts.map(entry => [
-                                      entry.categoryId,
-                                      entry.count,
-                                  ]),
-                              )
-                    }
-                    selected={query.category}
-                    onSelect={category => {
-                        setQuery({ category })
-                    }}
-                />
-                <DateChips
-                    route={props.route}
-                    now={now}
-                    date={query.date}
-                    from={query.from}
-                    to={query.to}
-                    onChange={filter => {
-                        setQuery(filter)
-                    }}
-                />
+                <div className="flex items-center gap-2">
+                    <div className="min-w-0 flex-1">
+                        <PlaceSearch
+                            // A new place, or a recenter that clears it, resets the typed text.
+                            key={query.place ?? ""}
+                            route={props.route}
+                            center={center}
+                            initialText={query.place ?? query.q ?? ""}
+                            onPlaceSelect={place => {
+                                setQuery({
+                                    ...centerQuery(place.coordinates),
+                                    place: place.label,
+                                    q: undefined,
+                                })
+                            }}
+                            onEventSelect={openPreview}
+                            onTextSubmit={text => {
+                                setQuery({ q: text, place: undefined })
+                            }}
+                        />
+                    </div>
+                    <div className="relative md:hidden">
+                        <IconButton
+                            aria-label={t("Filters.Label")}
+                            aria-expanded={filtersOpen}
+                            aria-controls={filtersId}
+                            icon={<PixelIconFilter />}
+                            tone={filtersOpen ? "inverse" : "surface"}
+                            onClick={() => {
+                                setFiltersOpen(open => !open)
+                            }}
+                        />
+                        {filtersActive ? (
+                            <span
+                                aria-hidden={true}
+                                className="bg-live border-line pointer-events-none absolute -top-0.5 -right-0.5 size-3 border-2"
+                            />
+                        ) : undefined}
+                    </div>
+                </div>
+                {/* Below `md` the filters sit in a panel that the filter button opens. */}
+                <div
+                    id={filtersId}
+                    className={cn(
+                        "flex flex-col gap-2",
+                        filtersOpen
+                            ? "max-md:pixel-corners max-md:drop-shadow-hard-md max-md:relative max-md:p-2"
+                            : "max-md:hidden",
+                    )}
+                >
+                    <CategoryChips
+                        route={props.route}
+                        categories={categories.data ?? []}
+                        counts={
+                            results === undefined
+                                ? undefined
+                                : new Map(
+                                      results.categoryCounts.map(entry => [
+                                          entry.categoryId,
+                                          entry.count,
+                                      ]),
+                                  )
+                        }
+                        selected={query.category}
+                        onSelect={category => {
+                            setQuery({ category })
+                        }}
+                        className="max-md:flex-wrap"
+                    />
+                    <DateChips
+                        route={props.route}
+                        now={now}
+                        date={query.date}
+                        from={query.from}
+                        to={query.to}
+                        onChange={filter => {
+                            setQuery(filter)
+                        }}
+                        className="max-md:flex-wrap"
+                    />
+                </div>
                 {notices}
             </div>
             {/* Clears the map attribution, which sits in the bottom corner. */}
-            <div className="absolute inset-x-4 bottom-8 flex items-center gap-2">
-                <StatusBar
-                    route={props.route}
-                    now={now}
-                    counts={
-                        results === undefined
-                            ? undefined
-                            : statusBarCounts(
-                                  results.occurrences,
-                                  now,
-                                  PLATFORM_TIME_ZONE,
-                              )
-                    }
-                    truncated={results?.truncated === true}
-                />
+            <div className="absolute right-4 bottom-8 flex items-center gap-2">
                 {search.isFetching ? (
                     <Spinner title={t("Map.Loading")} size="xs" />
                 ) : undefined}
@@ -304,7 +331,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                     parameters={{ lang: language }}
                     query={{}}
                     aria-label={t("Saved.Open")}
-                    className="bg-surface text-fg border-line shadow-hard-md inline-flex size-10 shrink-0 items-center justify-center rounded-full border-2 [&>svg]:size-4"
+                    className="pixel-circle-40 drop-shadow-hard-md text-fg relative inline-flex size-10 shrink-0 items-center justify-center rounded-full [&>svg]:size-4"
                 >
                     <PixelIconSaved />
                 </RouteLink>

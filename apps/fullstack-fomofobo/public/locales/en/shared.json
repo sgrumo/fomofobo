@@ -43,10 +43,6 @@
         "Pin": "{{title}}, {{status}}, {{time}}",
         "Cluster": "{{count}} events, {{live}} live. Zoom in",
         "Position": "Your position",
-        "StatusBar": {
-            "Live": "{{count}}{{more}} live",
-            "UpcomingToday": "{{count}}{{more}} later today"
-        },
         "Locate": "Center on my position",
         "LocationOff": "Location is off. Allow it to see the events around you, or search for a place.",
         "LocationBlocked": {
@@ -95,8 +91,8 @@
         "NeedsConnection": "The place search needs a connection."
     },
     "Filters": {
+        "Label": "Filters",
         "Categories": "Categories",
-        "All": "All",
         "Dates": "Dates",
         "today": "Today",
         "tomorrow": "Tomorrow",

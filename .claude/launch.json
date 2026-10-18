@@ -1,0 +1,11 @@
+{
+    "version": "0.0.1",
+    "configurations": [
+        {
+            "name": "fomofobo",
+            "runtimeExecutable": "pnpm",
+            "runtimeArgs": ["dev:fomofobo"],
+            "port": 3000
+        }
+    ]
+}

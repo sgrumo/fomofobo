@@ -7,7 +7,8 @@ import { useTranslation } from "react-i18next"
 import { Alert } from "ui-components/alert"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
-import { localTimeOf } from "@/lib/events/local-format"
+import { localDateOf } from "@/lib/events/date-window"
+import { dayMonthOf, localTimeOf } from "@/lib/events/local-format"
 import { occurrenceStatus } from "@/lib/events/occurrence-status"
 import { buildEventClusters, CLUSTER_MAX_ZOOM } from "@/lib/map/event-clusters"
 import type { EventMapFeature } from "@/lib/map/event-clusters"
@@ -140,6 +141,7 @@ export const EventMap = (props: EventMapProps) => {
     )
     const features =
         viewport === undefined ? [] : clusters.getClusters(viewport.bbox, viewport.zoom)
+    const today = localDateOf(props.now, PLATFORM_TIME_ZONE)
 
     if (!supported) {
         return <Alert type="error" text={t("Map.Unsupported")} className="m-4" />
@@ -224,6 +226,7 @@ export const EventMap = (props: EventMapProps) => {
                       if (occurrence === undefined || status === undefined) {
                           return undefined
                       }
+                      const startsAt = new Date(occurrence.startsAt)
 
                       return (
                           <MapMarker
@@ -237,10 +240,12 @@ export const EventMap = (props: EventMapProps) => {
                                   route={props.route}
                                   title={occurrence.title}
                                   status={status}
-                                  startTime={localTimeOf(
-                                      new Date(occurrence.startsAt),
-                                      PLATFORM_TIME_ZONE,
-                                  )}
+                                  startTime={localTimeOf(startsAt, PLATFORM_TIME_ZONE)}
+                                  startDay={
+                                      localDateOf(startsAt, PLATFORM_TIME_ZONE) === today
+                                          ? undefined
+                                          : dayMonthOf(startsAt, PLATFORM_TIME_ZONE)
+                                  }
                                   icon={props.iconOf(occurrence)}
                                   onSelect={() => {
                                       props.onSelect({
