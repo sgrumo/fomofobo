@@ -306,6 +306,118 @@
                 "Title": "Uscire senza salvare?",
                 "Description": "Le modifiche andranno perse.",
                 "Confirm": "Esci"
+            },
+            "MissingVenue": "Il luogo non è nell'elenco?"
+        },
+        "Venues": {
+            "Title": "Luoghi",
+            "Search": "Cerca luoghi per nome",
+            "New": "Nuovo luogo",
+            "Columns": {
+                "Name": "Nome",
+                "Address": "Indirizzo"
+            },
+            "Create": {
+                "Title": "Nuovo luogo",
+                "Submit": "Crea"
+            },
+            "Update": {
+                "Title": "Modifica luogo"
+            },
+            "Toast": {
+                "Created": "\"{{name}}\" creato.",
+                "Updated": "\"{{name}}\" salvato.",
+                "CloseWhileCreating": "Attendi che il luogo sia creato.",
+                "CloseWhileUpdating": "Attendi che il luogo sia salvato."
+            }
+        },
+        "VenueForm": {
+            "Name": "Nome",
+            "Search": "Trova l'indirizzo",
+            "SearchHint": "Scrivi almeno 3 lettere, poi scegli un risultato: compila indirizzo e coordinate.",
+            "Address": "Indirizzo",
+            "Latitude": "Latitudine",
+            "Longitude": "Longitudine",
+            "MapHint": "Clicca sulla mappa o trascina il segnaposto per correggere la posizione.",
+            "MapUnsupported": "Questo browser non disegna la mappa. Scrivi le coordinate."
+        },
+        "CategoryForm": {
+            "Name": "Nome",
+            "Icon": "Icona",
+            "Icons": {
+                "music": "Musica",
+                "comedy": "Comicità",
+                "art": "Arte",
+                "theatre": "Teatro",
+                "cinema": "Cinema",
+                "food": "Cibo",
+                "party": "Festa",
+                "talk": "Incontro",
+                "sport": "Sport",
+                "market": "Mercato",
+                "other": "Altro"
+            }
+        },
+        "Categories": {
+            "Title": "Categorie",
+            "New": "Nuova categoria",
+            "Create": {
+                "Title": "Nuova categoria",
+                "Submit": "Crea"
+            },
+            "Update": {
+                "Title": "Modifica categoria"
+            },
+            "Delete": {
+                "Title": "Eliminare la categoria?",
+                "Description": "\"{{name}}\" esce dai filtri dell'app. Una categoria usata da eventi non si può eliminare."
+            },
+            "Toast": {
+                "Created": "\"{{name}}\" creata.",
+                "Updated": "\"{{name}}\" salvata.",
+                "Deleted": "\"{{name}}\" eliminata.",
+                "CloseWhileCreating": "Attendi che la categoria sia creata.",
+                "CloseWhileUpdating": "Attendi che la categoria sia salvata.",
+                "CloseWhileDeleting": "Attendi che la categoria sia eliminata."
+            }
+        },
+        "OrganizerForm": {
+            "Name": "Nome",
+            "Email": "Email",
+            "Password": "Password temporanea",
+            "NewPassword": "Nuova password",
+            "PasswordHint": "Almeno 12 caratteri. Consegnala tu all'organizzatore: l'app non invia email."
+        },
+        "Organizers": {
+            "Title": "Organizzatori",
+            "Search": "Cerca organizzatori per nome o email",
+            "New": "Nuovo organizzatore",
+            "Create": {
+                "Title": "Nuovo organizzatore",
+                "Submit": "Crea"
+            },
+            "Password": {
+                "Open": "Nuova password",
+                "Title": "Imposta una nuova password",
+                "Description": "Tutte le sessioni aperte di {{name}} si chiudono.",
+                "Submit": "Imposta la password"
+            },
+            "Block": {
+                "Title": "Bloccare l'organizzatore?",
+                "Description": "{{name}} esce subito e non può più accedere. I suoi eventi spariscono dall'app pubblica."
+            },
+            "Unblock": {
+                "Title": "Sbloccare l'organizzatore?",
+                "Description": "{{name}} può accedere di nuovo e i suoi eventi tornano nell'app pubblica."
+            },
+            "Toast": {
+                "Created": "\"{{name}}\" creato.",
+                "PasswordSet": "Nuova password impostata per {{name}}.",
+                "Blocked": "{{name}} bloccato.",
+                "Unblocked": "{{name}} sbloccato.",
+                "CloseWhileCreating": "Attendi che l'organizzatore sia creato.",
+                "CloseWhileSettingPassword": "Attendi che la password sia impostata.",
+                "CloseWhileSaving": "Attendi che la modifica sia salvata."
             }
         }
     }
