@@ -2,17 +2,28 @@ import type { ComponentProps } from "react"
 import type { StrictOmit } from "shared/types"
 
 import type { PixelIconName } from "./pixel-icons.helper"
-import { PIXEL_ICON_GRID, pixelIconBitmaps, pixelIconPath } from "./pixel-icons.helper"
+import {
+    PIXEL_ICON_GRID,
+    pixelIconBitmaps,
+    pixelIconCenteredViewBox,
+    pixelIconPath,
+} from "./pixel-icons.helper"
 
 type PixelIconProps = StrictOmit<ComponentProps<"svg">, "name">
 
 interface PixelIconByNameProps extends PixelIconProps {
     name: PixelIconName
+    // Moves the drawn cells to the middle of the box, for an icon alone in a round frame
+    centered?: boolean
 }
-export const PixelIcon = ({ name, ...props }: PixelIconByNameProps) => (
+export const PixelIcon = ({ name, centered = false, ...props }: PixelIconByNameProps) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
-        viewBox={`0 0 ${String(PIXEL_ICON_GRID)} ${String(PIXEL_ICON_GRID)}`}
+        viewBox={
+            centered
+                ? pixelIconCenteredViewBox(pixelIconBitmaps[name])
+                : `0 0 ${String(PIXEL_ICON_GRID)} ${String(PIXEL_ICON_GRID)}`
+        }
         shapeRendering="crispEdges"
         aria-hidden={true}
         {...props}

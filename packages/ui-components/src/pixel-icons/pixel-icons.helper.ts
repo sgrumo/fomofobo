@@ -370,3 +370,22 @@ export const pixelIconPath = (rows: readonly string[]): string =>
             ),
         )
         .join("")
+
+/**
+ * @description Returns the SVG view box of the grid size that puts the filled cells of the bitmap in its middle
+ * @param rows Bitmap rows, `#` filled and `.` empty
+ * @remarks Returns the plain grid for an empty bitmap
+ */
+export const pixelIconCenteredViewBox = (rows: readonly string[]): string => {
+    const filled = rows.flatMap((row, y) =>
+        [...row.matchAll(/#/gu)].map(cell => ({ x: cell.index, y })),
+    )
+    if (filled.length === 0) {
+        return `0 0 ${String(PIXEL_ICON_GRID)} ${String(PIXEL_ICON_GRID)}`
+    }
+    const xs = filled.map(cell => cell.x)
+    const ys = filled.map(cell => cell.y)
+    const left = (Math.min(...xs) + Math.max(...xs) + 1 - PIXEL_ICON_GRID) / 2
+    const top = (Math.min(...ys) + Math.max(...ys) + 1 - PIXEL_ICON_GRID) / 2
+    return `${String(left)} ${String(top)} ${String(PIXEL_ICON_GRID)} ${String(PIXEL_ICON_GRID)}`
+}

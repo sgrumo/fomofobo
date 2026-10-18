@@ -10,5 +10,5 @@ export const bottomSheetHandleStyles = styles(
 )
 
 export const bottomSheetContentStyles = styles(
-    () => "flex min-h-0 flex-col gap-3 overflow-auto",
+    () => "-mx-1 -mb-1 flex min-h-0 flex-col gap-3 overflow-auto px-1 pb-1",
 )
