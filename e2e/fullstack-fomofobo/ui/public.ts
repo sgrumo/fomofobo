@@ -31,7 +31,15 @@ const EMPTY_TILEJSON = {
 export const preparePublicPage = async (page: Page): Promise<void> => {
     await page.clock.setFixedTime(new Date(SATURDAY_NOON))
     await page.context().setExtraHTTPHeaders({ [TEST_NOW_HEADER]: SATURDAY_NOON })
-    // No test calls an external service: the TileJSON is empty and every tile fails.
+    await keepMapOffline(page)
+}
+
+/**
+ * @description Keeps every map of the page off the tile provider: the TileJSON is empty and every tile fails
+ * @param page Page under test
+ * @remarks Applies to the documents loaded after the call only
+ */
+export const keepMapOffline = async (page: Page): Promise<void> => {
     await page.context().route("https://tiles.openfreemap.org/**", async route => {
         await (route.request().url().endsWith("/planet")
             ? route.fulfill({ json: EMPTY_TILEJSON })

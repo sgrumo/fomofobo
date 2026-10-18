@@ -1,3 +1,4 @@
+import "maplibre-gl/dist/maplibre-gl.css"
 import type { ReactNode } from "react"
 
 import { BackofficeShell } from "@/components/client/backoffice-shell/backoffice-shell"

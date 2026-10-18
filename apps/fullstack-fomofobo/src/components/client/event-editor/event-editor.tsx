@@ -14,6 +14,7 @@ import { Form } from "ui-components/form"
 import { useToast } from "ui-components/toast"
 
 import { useBackofficeAccount } from "@/components/client/backoffice-shell/backoffice-shell.context"
+import { CreateVenueDialog } from "@/components/client/create-venue-dialog/create-venue-dialog"
 import { EventForm } from "@/components/client/event-form/event-form"
 import {
     eventFormReducer,
@@ -133,6 +134,27 @@ export const EventEditor = (props: EventEditorProps) => {
                     }
                 />
             )}
+            {/* PLACEHOLDER(OP-20): outside the form, whose submit a dialog form would reach through the portal */}
+            <div className="flex flex-wrap items-center gap-2">
+                <span className="tp-body-sm">
+                    {t("Backoffice.EventEditor.MissingVenue")}
+                </span>
+                <CreateVenueDialog
+                    trigger={
+                        <Button variant="tertiary" size="sm" disabled={isPending}>
+                            {t("Backoffice.Venues.New")}
+                        </Button>
+                    }
+                    onCreated={venue => {
+                        setForm(previous =>
+                            eventFormReducer(previous, {
+                                type: "venue",
+                                value: { id: venue.id, name: venue.name },
+                            }),
+                        )
+                    }}
+                />
+            </div>
             <Form
                 id={formId}
                 mode="edit"
