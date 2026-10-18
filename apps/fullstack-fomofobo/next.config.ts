@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url"
 
+import { withSerwist } from "@serwist/turbopack"
 import type { NextConfig } from "next"
 
 import { languageRedirects } from "./src/lib/i18n/language-redirects"
@@ -29,4 +30,5 @@ const nextConfig: NextConfig = {
     redirects: () => Promise.resolve(languageRedirects),
 }
 
-export default nextConfig
+// Keeps esbuild, which builds the service worker, out of the server bundle.
+export default withSerwist(nextConfig)

@@ -52,6 +52,8 @@ export const definePlaywrightSuite = (options: PlaywrightSuiteOptions) => {
             trace: "retain-on-failure",
             locale: "it-IT",
             timezoneId: "Europe/Rome",
+            // A worker fetch can bypass `route` and the extra headers. A spec of offline reads sets "allow".
+            serviceWorkers: "block",
             contextOptions: {
                 reducedMotion: "reduce",
             },

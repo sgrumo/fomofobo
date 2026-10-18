@@ -1,7 +1,9 @@
 {
     "ClearCache": "Pulisci la cache",
     "App": {
-        "Description": "Gli eventi intorno a te, su una mappa"
+        "Description": "Gli eventi intorno a te, su una mappa",
+        "UpdateReady": "È pronta una nuova versione di Fomofobo.",
+        "Reload": "Ricarica"
     },
     "Language": {
         "Label": "Lingua",
@@ -16,6 +18,7 @@
         "Home": "Mappa",
         "Event": "Evento",
         "Saved": "Eventi salvati",
+        "Offline": "Offline",
         "DevShowcase": "Showcase",
         "DevSamples": "Esempi",
         "NotFound": "Pagina non trovata",
@@ -426,5 +429,11 @@
                 "CloseWhileSaving": "Attendi che la modifica sia salvata."
             }
         }
+    },
+    "Offline": {
+        "Title": "Sei offline",
+        "Description": "Questa pagina non è stata aperta con la connessione, quindi non è salvata sul dispositivo.",
+        "BackHome": "Torna alla mappa",
+        "OpenSaved": "Apri gli eventi salvati"
     }
 }

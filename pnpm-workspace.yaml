@@ -79,6 +79,7 @@ minimumReleaseAge: 4320
 minimumReleaseAgeExcludePrune: true
 
 allowBuilds:
+  "@swc/core": false
   cpu-features: false
   esbuild: false
   protobufjs: false

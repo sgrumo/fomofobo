@@ -1,7 +1,9 @@
 {
     "ClearCache": "Clear cache",
     "App": {
-        "Description": "The events around you, on a map"
+        "Description": "The events around you, on a map",
+        "UpdateReady": "A new version of Fomofobo is ready.",
+        "Reload": "Reload"
     },
     "Language": {
         "Label": "Language",
@@ -16,6 +18,7 @@
         "Home": "Map",
         "Event": "Event",
         "Saved": "Saved events",
+        "Offline": "Offline",
         "DevShowcase": "Showcase",
         "DevSamples": "Samples",
         "NotFound": "Page not found",
@@ -426,5 +429,11 @@
                 "CloseWhileSaving": "Wait until the change is saved."
             }
         }
+    },
+    "Offline": {
+        "Title": "You are offline",
+        "Description": "This page was not opened with a connection, so the device holds no copy of it.",
+        "BackHome": "Back to the map",
+        "OpenSaved": "Open the saved events"
     }
 }

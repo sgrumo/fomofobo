@@ -65,6 +65,12 @@ export const routes = {
         parametersSchema: z.object({ lang: languageKeySchema }),
         generateStaticParams: () => languageKeys.map(lang => ({ lang })),
     }),
+    offline: createStaticRoute({
+        segments: ["[lang]", "offline"],
+        title: ({ t }) => t("PageTitle.Offline"),
+        parametersSchema: z.object({ lang: languageKeySchema }),
+        generateStaticParams: () => languageKeys.map(lang => ({ lang })),
+    }),
     devShowcase: createDynamicRoute({
         segments: ["[lang]", "dev", "showcase"],
         title: ({ t }) => t("PageTitle.DevShowcase"),
@@ -155,6 +161,7 @@ export const routes = {
 export const routeHandlers = {
     api: createRouteHandler({ segments: ["api", "[[...route]]"] }),
     authLogout: createRouteHandler({ segments: ["auth", "logout"] }),
+    serviceWorker: createRouteHandler({ segments: ["serwist", "[path]"] }),
 } as const
 
 export type RouteKey = keyof typeof routes
