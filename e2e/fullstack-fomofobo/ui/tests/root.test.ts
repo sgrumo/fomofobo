@@ -314,7 +314,6 @@ test.describe("map", () => {
         })
 
         await gotoPage(page, mapPath(center))
-        await expect(page.getByText(t("shared", "Map.Empty"))).toBeVisible()
         await expect(farPin).toBeHidden()
 
         await fillSearchField(page, t("shared", "Search.Label"), text)

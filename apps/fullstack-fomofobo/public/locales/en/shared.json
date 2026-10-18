@@ -36,7 +36,6 @@
         "Label": "Event map",
         "Loading": "Loading events",
         "Error": "The events could not be loaded. Showing the last results.",
-        "Empty": "No events here on these dates.",
         "Truncated": "Too many events to show them all. Narrow the search.",
         "Unsupported": "This browser cannot draw the map.",
         "LiveBadge": "Live",

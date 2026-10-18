@@ -218,9 +218,6 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 text={online ? t("Map.Error") : t("Map.NeedsConnection")}
             />
         ) : undefined,
-        results !== undefined && results.occurrences.length === 0 ? (
-            <Alert key="empty" type="info" text={t("Map.Empty")} />
-        ) : undefined,
         results?.truncated === true ? (
             <Alert key="truncated" type="warning" text={t("Map.Truncated")} />
         ) : undefined,
