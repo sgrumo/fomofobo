@@ -25,7 +25,10 @@ export const { dynamic, dynamicParams, revalidate, generateStaticParams, GET } =
         // A classic script registers in every browser that runs the app.
         esbuildOptions: {
             format: "iife",
-            define: { OFFLINE_PAGES: JSON.stringify(offlinePages) },
+            define: {
+                OFFLINE_PAGES: JSON.stringify(offlinePages),
+                SHELL_PAGES: JSON.stringify(shellPages),
+            },
         },
         additionalPrecacheEntries: shellPages.map(url => ({ url, revision })),
         // The chunks are cached as pages load them: precaching the build would ship the backoffice too.

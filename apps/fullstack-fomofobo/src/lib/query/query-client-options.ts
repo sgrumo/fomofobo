@@ -10,5 +10,7 @@ export const queryClientDefaultOptions: QueryClientConfig["defaultOptions"] = {
         staleTime: Infinity,
         gcTime: Infinity,
         retry: 1,
+        // Offline, the service worker answers from its cache or fails: a paused query would never ask it.
+        networkMode: "always",
     },
 }

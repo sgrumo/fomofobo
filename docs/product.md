@@ -62,7 +62,11 @@ Visitors save events with no account. Saved events stay on the device only, and 
 
 ### Installation and offline use
 
-The app installs on the home screen and opens full-screen. Offline, the events and photos already loaded stay viewable, and new searches, filter changes and new map areas need a connection. The backoffice is not part of the installed app. (not built)
+The app installs on the home screen and opens full-screen on the map. Browsers with an install prompt get an install button on the saved list, and iOS gets the steps of the share sheet.
+
+Offline, the pages, events, photos and map areas that the device already loaded stay viewable. A reopened map shows the last results of the same filters, and a new filter, a place search or an area never loaded needs a connection. A page never opened online shows an offline notice.
+
+The saved list works offline for every saved event that the device showed online at least once. The backoffice is not part of the installed app and always needs a connection.
 
 ### Backoffice access
 
@@ -89,7 +93,8 @@ Admins create organizer accounts with a name and an email, and block or unblock 
 - Turso, a hosted libSQL database (SQLite), holds categories, venues, events, occurrences and accounts. Occurrences are stored as rows, because the map search filters them by time window and by area.
 - Cloudflare R2 holds the event photos in a public bucket, because shared and offline pages need a stable photo URL. The backoffice uploads the photos straight to the bucket.
 - Geoapify: place suggestions of the search field, from all of Italy, with the places nearest to the search center first. Each client gets 30 calls a minute, because the free plan has a daily credit limit.
-- OpenFreeMap: the tiles of the event map.
+- OpenFreeMap: the tiles of the event map. The device keeps at most 500 viewed tiles, because the provider caps an offline download at 3,000 tiles.
+- A service worker of the public app keeps what a visitor loaded and serves it offline. It sends the backoffice, the sign-in and every write straight to the network, because a worker at the root of the site controls the backoffice pages too.
 - The Next data cache holds the shared public reads: the categories, the event pages and the place suggestions. Every backoffice write expires its entries at once, because a block must hide an event on the next request.
 - Authentication runs inside the app with database sessions, because Admins create accounts and a block must end every open session at once. Every backoffice API call reads the session from the database, so a block applies on the next call.
 - Deploy: the app runs on Vercel, in the region of its Turso database. Every service runs on its free plan. The Vercel Hobby plan admits non-commercial use only.

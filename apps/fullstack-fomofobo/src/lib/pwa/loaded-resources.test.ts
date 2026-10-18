@@ -23,7 +23,7 @@ describe("loadedResourceEntries", () => {
             [`${origin}/it?lat=44&lng=11`, { headers: { accept: "text/html" } }],
             `${origin}/_next/static/chunks/a.js`,
             `${origin}/api/public/occurrences?lat=44&lng=11`,
-            "https://photos.fomofobo.test/events/a.jpg",
+            ["https://photos.fomofobo.test/events/a.jpg", { mode: "no-cors" }],
         ])
     })
 
