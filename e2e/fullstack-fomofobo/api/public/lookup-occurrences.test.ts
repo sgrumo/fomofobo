@@ -11,6 +11,7 @@ import {
     uploadPhoto,
 } from "../backoffice-events/utils"
 import { lookupOccurrences } from "./api"
+import { SATURDAY_NOON } from "./utils"
 
 describe("GET /api/public/occurrences/lookup", () => {
     it("answers the visible occurrences in ref order and drops the others", async () => {
@@ -36,6 +37,7 @@ describe("GET /api/public/occurrences/lookup", () => {
         expectStatus(await deleteEvent({ headers, pathParams: { id: deleted.id } }), 204)
 
         const res = await lookupOccurrences({
+            headers: { "x-test-now": SATURDAY_NOON },
             queryParams: {
                 ref: [
                     `${single.id}:2026-10-24`,
@@ -57,6 +59,31 @@ describe("GET /api/public/occurrences/lookup", () => {
         ])
     })
 
+    it("drops a ref once its occurrence ended three days ago", async () => {
+        const { headers } = await signInAs("organizer")
+        const { categoryId, venueId } = await seedEventReferences()
+        const event = await seedEvent(headers, { venueId, categoryId })
+        const queryParams = { ref: [`${event.id}:2026-10-24`] }
+
+        const [lastMinute, expired] = await Promise.all([
+            lookupOccurrences({
+                headers: { "x-test-now": "2026-10-27T21:29:00.000Z" },
+                queryParams,
+            }),
+            lookupOccurrences({
+                headers: { "x-test-now": "2026-10-27T21:30:00.000Z" },
+                queryParams,
+            }),
+        ])
+
+        expectStatus(lastMinute, 200)
+        expectStatus(expired, 200)
+        expect(lastMinute.data.map(occurrence => occurrence.eventId)).toStrictEqual([
+            event.id,
+        ])
+        expect(expired.data).toStrictEqual([])
+    })
+
     it("resolves the saved ref of a single event that moved to another date", async () => {
         const { headers } = await signInAs("organizer")
         const { categoryId, venueId } = await seedEventReferences()
@@ -75,6 +102,7 @@ describe("GET /api/public/occurrences/lookup", () => {
         )
 
         const res = await lookupOccurrences({
+            headers: { "x-test-now": SATURDAY_NOON },
             queryParams: { ref: [`${event.id}:2026-10-24`] },
         })
 

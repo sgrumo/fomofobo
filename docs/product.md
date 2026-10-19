@@ -38,6 +38,12 @@ An occurrence is upcoming before its start, live from its start until its end, a
 
 An event and all its occurrences are visible only when neither the event nor its organizer is blocked. A hidden event is absent from every part of the public app, saved events included, from the next request on. Saving an event in the backoffice publishes it at once.
 
+An occurrence stays visible for three days after its end, then leaves the public app, its page and the saved list included. A repeating event stays visible through its other occurrences.
+
+### Retention
+
+Once every occurrence of an event ended more than three days ago, a daily job deletes the photos of the event from the bucket, to cut the storage cost. The database keeps the event and its occurrences for statistics, and the backoffice still lists the event. A save of such an event needs at least one new photo.
+
 ### Search area
 
 The search center is the position of the device when the visitor grants location, else a default city until the visitor picks a place. Only occurrences at venues inside a fixed radius around the search center are results. Distance on an event is measured from the position of the device to the venue.
@@ -58,7 +64,7 @@ Each event has its own URL, and for a repeating event the URL refers to one occu
 
 ### Saved events
 
-Visitors save events with no account. Saved events stay on the device only, and the saved list shows only the visible ones. A saved event stays in the list after it ends, until the visitor removes it.
+Visitors save events with no account. Saved events stay on the device only, and the saved list shows only the visible ones. A saved event stays in the list until the visitor removes it, or until three days after it ends.
 
 ### Installation and offline use
 
@@ -92,6 +98,7 @@ Admins create organizer accounts with a name and an email, and block or unblock 
 - Server Components and route handlers serve the public reads, and Server Actions carry the backoffice writes.
 - Turso, a hosted libSQL database (SQLite), holds categories, venues, events, occurrences and accounts. Occurrences are stored as rows, because the map search filters them by time window and by area.
 - Cloudflare R2 holds the event photos in a public bucket, because shared and offline pages need a stable photo URL. The backoffice uploads the photos straight to the bucket.
+- A daily GitHub workflow runs the photo purge job against the database and the bucket of each environment, on the branch of that environment. The job is a program of its own, so it lives in its own app and not in the Next.js application.
 - Geoapify: place suggestions of the search field, from all of Italy, with the places nearest to the search center first. Each client gets 30 calls a minute, because the free plan has a daily credit limit.
 - OpenFreeMap: the tiles of the event map. The device keeps at most 500 viewed tiles, because the provider caps an offline download at 3,000 tiles.
 - A service worker of the public app keeps what a visitor loaded and serves it offline. It sends the backoffice, the sign-in and every write straight to the network, because a worker at the root of the site controls the backoffice pages too.

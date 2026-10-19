@@ -2,9 +2,10 @@
 
 ## Structure
 
-- The entry workflows are `ci.yaml` on every pull request and push, `cache-cleanup.yaml` on a closed pull request, and, with the mobile app, `mobile-dev-release.yaml` and `mobile-store-release.yaml` on manual dispatch. Every other workflow is reusable and only `workflow_call` reaches it.
+- The entry workflows are `ci.yaml` on every pull request and push, `cache-cleanup.yaml` on a closed pull request, `purge-photos.yaml` on a daily schedule, and, with the mobile app, `mobile-dev-release.yaml` and `mobile-store-release.yaml` on manual dispatch. Every other workflow is reusable and only `workflow_call` reaches it.
 - A deploy is a job of an entry workflow. In `ci.yaml`, it needs `quality` and `resolve-env`, and runs only when `resolve-env` maps the branch to an environment. A deploy that a project does not use yet stays a commented drop-in.
-- `resolve-env` in `ci.yaml` is the only map from branch to deploy environment. Each deploy takes the result as its `environment` input and as its GitHub environment.
+- `resolve-env` in `ci.yaml` is the map from branch to deploy environment. Each deploy takes the result as its `environment` input and as its GitHub environment.
+- `purge-photos.yaml` repeats that map in its `dispatch` matrix. A schedule runs on the default branch alone, and the `prod` environment admits `main` alone, so the schedule dispatches one run per environment on its branch. If you change `resolve-env`, change the matrix too.
 - `mobile-dev-release.yaml` ships a tester build from any branch, and `mobile-store-release.yaml` ships a store release from `main`. Both ship only a commit that passed quality. `ci-gate.yaml` reads the jobs of the `ci.yaml` run whose names start with `quality / `, so keep the name of the `quality` job in `ci.yaml`. When no `ci.yaml` run checked the commit, the release calls `quality.yaml` itself, so its `permissions` match those of `ci.yaml`.
 - Never trigger a workflow on a tag push. `mobile-store-release.yaml` creates the `v<version>` tag after the stores accept the build.
 - `quality.yaml` takes no inputs. To scope it to a repository, remove the jobs that the repository has no code for. Do not gate them.

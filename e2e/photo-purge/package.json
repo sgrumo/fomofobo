@@ -1,0 +1,30 @@
+{
+    "name": "e2e-photo-purge",
+    "version": "0.0.0",
+    "private": true,
+    "description": "E2E suite of photo-purge: the job against a database file and the object store",
+    "type": "module",
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "e2e": "vitest run --config vitest.config.ts",
+        "e2e:watch": "vitest --config vitest.config.ts"
+    },
+    "dependencies": {
+        "backend-shared": "workspace:*",
+        "drizzle-orm": "catalog:",
+        "e2e-kit": "workspace:*",
+        "models": "workspace:*",
+        "storage": "workspace:*"
+    },
+    "devDependencies": {
+        "@faker-js/faker": "catalog:",
+        "@types/node": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:"
+    }
+}

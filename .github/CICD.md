@@ -12,6 +12,11 @@ A project with the mobile app also has two workflows that run on manual dispatch
 Both reuse the `ci.yaml` run of the commit, so quality does not run a second time.
 [`mobile-release.md`](mobile-release.md) says how to run them.
 
+`purge-photos.yaml` runs every day. It dispatches one run of itself for each
+environment, on the branch of that environment, and each run deletes the photos
+of the ended events. An environment whose config file holds a `PLACEHOLDER` is
+skipped. To run it by hand, dispatch it on the branch of the environment.
+
 Every other workflow is a reusable block that an entry workflow calls. Every job
 runs on a GitHub-hosted `ubuntu-latest` runner.
 

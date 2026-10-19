@@ -57,6 +57,12 @@ jobs:
             suite: fullstack-fomofobo
             browser: true
 
+    e2e-photo-purge:
+        needs: build-and-check
+        uses: ./.github/workflows/quality-e2e.yaml
+        with:
+            suite: photo-purge
+
     test-report:
         name: Test Report
         runs-on: ubuntu-latest
@@ -65,6 +71,7 @@ jobs:
         needs:
             - unit-tests
             - e2e-fomofobo
+            - e2e-photo-purge
         if: ${{ !cancelled() }}
         steps:
             - uses: actions/checkout@v7

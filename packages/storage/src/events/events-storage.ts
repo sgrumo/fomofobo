@@ -1,4 +1,4 @@
-import { and, count, desc, eq, inArray, isNull, sql } from "drizzle-orm"
+import { and, count, desc, eq, gt, inArray, isNull, notExists, sql } from "drizzle-orm"
 import type { BatchItem } from "drizzle-orm/batch"
 import { chunk } from "es-toolkit"
 import type {
@@ -329,6 +329,47 @@ export class EventsStorage {
             .where(and(eq(events.id, id), isNull(events.deletedAt)))
             .returning({ id: events.id })
         return rows.length > 0
+    }
+
+    /**
+     * @description Persists the deletion of the photo rows of the events with no occurrence that ends after an instant, and returns their object keys
+     * @param endedBefore Instant every occurrence of the event ends at or before
+     * @param limit Cap of the photo rows deleted
+     */
+    public async deletePhotosOfEndedEvents(
+        endedBefore: Date,
+        limit: number,
+    ): Promise<string[]> {
+        const rows = await this.db
+            .delete(eventPhotos)
+            .where(
+                inArray(
+                    eventPhotos.id,
+                    this.db
+                        .select({ id: eventPhotos.id })
+                        .from(eventPhotos)
+                        .where(
+                            notExists(
+                                this.db
+                                    .select({ eventId: eventOccurrences.eventId })
+                                    .from(eventOccurrences)
+                                    .where(
+                                        and(
+                                            eq(
+                                                eventOccurrences.eventId,
+                                                eventPhotos.eventId,
+                                            ),
+                                            gt(eventOccurrences.endsAt, endedBefore),
+                                        ),
+                                    ),
+                            ),
+                        )
+                        .orderBy(eventPhotos.id)
+                        .limit(limit),
+                ),
+            )
+            .returning({ objectKey: eventPhotos.objectKey })
+        return rows.map(row => row.objectKey)
     }
 
     /**

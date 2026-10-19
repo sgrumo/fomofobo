@@ -1,9 +1,11 @@
 import "server-only"
 import type { ApiRequest } from "api-client/client"
+import { headers } from "next/headers"
 import { Result } from "shared/result"
 
 import { getApi } from "@/server/api"
 import { getSessionCookieHeader } from "@/server/auth/session"
+import { TEST_NOW_HEADER } from "@/server/clock"
 
 import { buildQueryString } from "../client-transport"
 import { buildTransportError } from "../transport-error"
@@ -19,17 +21,18 @@ export interface ApiDispatcher {
  * @description Sends the request into an application and parses its answer
  * @param api Application the request is dispatched into
  * @param request Method, path, query and body of the call
- * @param options Session cookies forwarded to the API, when the caller holds them
+ * @param options Session cookies and test instant forwarded to the API, when the caller holds them
  * @throws When the application answers outside the `2xx` range
  */
 export const dispatchToApi = async (
     api: ApiDispatcher,
     request: ApiRequest,
-    options?: { cookie?: string },
+    options?: { cookie?: string; testNow?: string },
 ): Promise<unknown> => {
-    const headers = {
+    const requestHeaders = {
         ...(request.body === undefined ? {} : { "Content-Type": "application/json" }),
         ...(options?.cookie === undefined ? {} : { Cookie: options.cookie }),
+        ...(options?.testNow === undefined ? {} : { [TEST_NOW_HEADER]: options.testNow }),
     }
 
     const response = await api.request(
@@ -39,7 +42,7 @@ export const dispatchToApi = async (
         ).toString(),
         {
             method: request.method.toUpperCase(),
-            headers,
+            headers: requestHeaders,
             body: request.body === undefined ? undefined : JSON.stringify(request.body),
         },
     )
@@ -62,6 +65,13 @@ export const dispatchToApi = async (
  * Server Action both reach the API with no network hop and with no base URL to resolve
  * @remarks Forwards the session cookies of the request, so the API identifies the
  * visitor on a prefetch and inside a Server Action exactly as it does over HTTP
+ * @remarks Forwards the test instant header too, which the API reads under `APP_ENV=test`
+ * alone, so a page of the E2E suite runs on the clock of its browser calls
  */
-export const serverTransport = async (request: ApiRequest): Promise<unknown> =>
-    await dispatchToApi(getApi(), request, { cookie: await getSessionCookieHeader() })
+export const serverTransport = async (request: ApiRequest): Promise<unknown> => {
+    const requestHeaders = await headers()
+    return await dispatchToApi(getApi(), request, {
+        cookie: await getSessionCookieHeader(),
+        testNow: requestHeaders.get(TEST_NOW_HEADER) ?? undefined,
+    })
+}

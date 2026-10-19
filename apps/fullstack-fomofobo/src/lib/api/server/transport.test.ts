@@ -90,6 +90,17 @@ describe("serverTransport", () => {
         })
     })
 
+    it("should forward the test instant", async () => {
+        await serverTransport(
+            { method: "get", path: "/api/todos" },
+            { testNow: "2026-10-24T12:00:00+02:00" },
+        )
+
+        expect(request.mock.calls[0]?.[1]?.headers).toStrictEqual({
+            "x-test-now": "2026-10-24T12:00:00+02:00",
+        })
+    })
+
     it("should send no cookie header when the request holds none", async () => {
         await serverTransport(
             { method: "get", path: "/api/todos" },

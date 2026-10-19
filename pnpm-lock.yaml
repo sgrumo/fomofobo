@@ -466,6 +466,46 @@ importers:
         specifier: workspace:*
         version: link:../../scripts/with-env
 
+  apps/photo-purge:
+    dependencies:
+      '@hono/zod-openapi':
+        specifier: 'catalog:'
+        version: 1.6.3(hono@4.13.7)(zod@4.6.6)
+      backend-shared:
+        specifier: workspace:*
+        version: link:../../packages/backend-shared
+      models:
+        specifier: workspace:*
+        version: link:../../packages/models
+      shared:
+        specifier: workspace:*
+        version: link:../../packages/shared
+      storage:
+        specifier: workspace:*
+        version: link:../../packages/storage
+    devDependencies:
+      '@types/node':
+        specifier: ^24.13.1
+        version: 24.19.1
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.87.0(oxlint-tsgolint@7.0.2004)
+      oxlint-tsgolint:
+        specifier: 'catalog:'
+        version: 7.0.2004
+      tsx:
+        specifier: 'catalog:'
+        version: 4.21.0
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.3(@types/node@24.19.1)(jsdom@30.1.2)(vite@8.3.4)
+      with-env:
+        specifier: workspace:*
+        version: link:../../scripts/with-env
+
   configs/oxlint/lint-rules:
     devDependencies:
       oxlint:
@@ -563,6 +603,43 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
+
+  e2e/photo-purge:
+    dependencies:
+      backend-shared:
+        specifier: workspace:*
+        version: link:../../packages/backend-shared
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 0.45.4(@cloudflare/workers-types@5.20261012.1)(@libsql/client@0.18.0)(@types/pg@8.23.1)(kysely@0.29.6)(pg@8.23.1)
+      e2e-kit:
+        specifier: workspace:*
+        version: link:../kit
+      models:
+        specifier: workspace:*
+        version: link:../../packages/models
+      storage:
+        specifier: workspace:*
+        version: link:../../packages/storage
+    devDependencies:
+      '@faker-js/faker':
+        specifier: 'catalog:'
+        version: 10.6.0
+      '@types/node':
+        specifier: ^24.13.1
+        version: 24.19.1
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.87.0(oxlint-tsgolint@7.0.2004)
+      oxlint-tsgolint:
+        specifier: 'catalog:'
+        version: 7.0.2004
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.3(@types/node@24.19.1)(jsdom@30.1.2)(vite@8.3.4)
 
   e2e/ui-components:
     dependencies:

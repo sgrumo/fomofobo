@@ -17,6 +17,10 @@ The app runs on Vercel, the database on Turso, the event photos on Cloudflare R2
 
 The upload leaves the git metadata out, so Vercel runs no check on the commit author. `vercel.json` of the app turns off the Git builds of Vercel.
 
+## Photo purge
+
+`.github/workflows/purge-photos.yaml` runs `apps/photo-purge` every day for each environment. It reads `env/<env>.env` and the secrets `DATABASE_AUTH_TOKEN`, `S3_ACCESS_KEY` and `S3_SECRET_KEY` of the GitHub environment. It deletes the photos of each event whose occurrences all ended more than three days ago: first the rows, then the objects. If an object delete fails, the run fails and its log lists the key, and the object stays in the bucket with no row.
+
 ## Plan limits
 
 - Vercel Hobby is for non-commercial use only. Ads, paid listings or a paying client break its terms. See the [Hobby plan](https://vercel.com/docs/plans/hobby).
@@ -48,7 +52,7 @@ At repository level, set the variable `VERCEL_ORG_ID` and the secret `VERCEL_TOK
     ]
     ```
 
-4. Create an R2 API token with Object Read and Write on the bucket of the environment.
+4. Create an R2 API token with Object Read and Write on the bucket of the environment. The app and the photo purge job share it, and the job deletes objects with it.
 5. Create a Geoapify project for the environment at myprojects.geoapify.com, and copy its API key. The free plan gives 3,000 credits a day and needs no card. The public app shows the "Powered by Geoapify" link that the free plan asks for.
 6. In Vercel, create an empty project `fomofobo-<env>` with Root Directory `apps/fullstack-fomofobo`, and connect no Git repository. Write its production domain into `APP_BASE_URL` of `env/<env>.env`. The auth library accepts a sign-in only from this origin.
 7. In GitHub, create the environment `<env>`. Give it the variable `VERCEL_PROJECT_ID`, the id of the project, and the secrets of "Runtime values".

@@ -1,0 +1,95 @@
+name: Purge photos
+
+# Deletes the photos of the events that left the public app. See apps/photo-purge.
+
+on:
+    schedule:
+        - cron: "30 3 * * *"
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: "Deploy environment. Dispatch it on the branch that `resolve-env` of ci.yaml maps to it"
+                required: true
+                type: choice
+                options:
+                    - dev
+                    - prod
+
+permissions:
+    contents: read
+
+jobs:
+    # A schedule runs on the default branch alone, and the `prod` environment admits
+    # `main` alone. So the schedule dispatches one run per environment, on its branch.
+    dispatch:
+        name: Dispatch purge (${{ matrix.environment }})
+        if: github.event_name == 'schedule'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            actions: write
+        strategy:
+            fail-fast: false
+            matrix:
+                # Mirrors `resolve-env` of ci.yaml.
+                include:
+                    - environment: dev
+                      branch: dev
+                    - environment: prod
+                      branch: main
+        steps:
+            - name: Dispatch the purge on the branch of the environment
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  ENVIRONMENT: ${{ matrix.environment }}
+                  BRANCH: ${{ matrix.branch }}
+              run: |
+                  if ! gh api "repos/$GITHUB_REPOSITORY/contents/.github/workflows/purge-photos.yaml?ref=$BRANCH" --silent; then
+                      echo "::notice::$BRANCH holds no purge workflow yet, $ENVIRONMENT skipped"
+                      exit 0
+                  fi
+                  gh workflow run purge-photos.yaml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH" \
+                      -f environment="$ENVIRONMENT"
+
+    purge:
+        name: Purge photos (${{ inputs.environment }})
+        if: github.event_name == 'workflow_dispatch'
+        environment: ${{ inputs.environment }}
+        runs-on: ubuntu-latest
+        container:
+            image: node:24.19.0-bookworm
+        env:
+            DATABASE_AUTH_TOKEN: ${{ secrets.DATABASE_AUTH_TOKEN }}
+            S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+            S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+            CONFIG_FILE: infra/vercel/env/${{ inputs.environment }}.env
+        steps:
+            - uses: actions/checkout@v7
+
+            # An environment with a PLACEHOLDER has not deployed yet, so it holds no photo.
+            - name: Check the environment
+              id: check
+              run: |
+                  if grep -q "PLACEHOLDER" "$CONFIG_FILE"; then
+                      echo "::notice file=$CONFIG_FILE::${{ inputs.environment }} is not set up yet, nothing to purge"
+                      echo "ready=false" >> "$GITHUB_OUTPUT"
+                      exit 0
+                  fi
+                  missing=""
+                  for name in DATABASE_AUTH_TOKEN S3_ACCESS_KEY S3_SECRET_KEY; do
+                      if [ -z "${!name}" ]; then missing="$missing $name"; fi
+                  done
+                  if [ -n "$missing" ]; then
+                      echo "::error::Set these secrets for the ${{ inputs.environment }} environment:$missing"
+                      exit 1
+                  fi
+                  grep -E '^[A-Z0-9_]+=' "$CONFIG_FILE" >> "$GITHUB_ENV"
+                  echo "ready=true" >> "$GITHUB_OUTPUT"
+              shell: bash
+
+            - uses: ./.github/actions/setup-monorepo
+              if: steps.check.outputs.ready == 'true'
+
+            - name: Purge the photos of the ended events
+              if: steps.check.outputs.ready == 'true'
+              run: pnpm -C apps/photo-purge purge

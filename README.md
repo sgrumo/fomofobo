@@ -15,6 +15,7 @@ Deployable applications.
 | App                  | Description                                                                                                                                                    |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `fullstack-fomofobo` | Next.js fullstack app - App Router with Hono + OpenAPI API routes, Server Component prefetch, Server Action mutations, Tailwind, TanStack Query, react-i18next |
+| `photo-purge`        | Daily job that deletes from the bucket the photos of the events that left the public app. `.github/workflows/purge-photos.yaml` runs it                        |
 
 ### Packages
 
@@ -58,6 +59,7 @@ The CLI runs inside `scripts/admin-accounts`, so a `file:` URL is relative to th
 | `e2e-kit`                | Harness the E2E suites share: containers, servers, lifecycle, Playwright config                              |
 | `e2e-ui-components`      | E2E helpers of every `ui-components` primitive, and the tests that drive them                                |
 | `e2e-fullstack-fomofobo` | E2E suites of the fullstack app: the API (Vitest) and the pages (Playwright)                                 |
+| `e2e-photo-purge`        | E2E suite of the photo purge job, on a database file and the object store                                    |
 
 ## Commands
 
@@ -70,6 +72,7 @@ The CLI runs inside `scripts/admin-accounts`, so a `file:` URL is relative to th
 | `pnpm test`                | Run unit tests across all packages                     |
 | `pnpm e2e`                 | Run every E2E suite, one after the other               |
 | `pnpm e2e:fomofobo`        | Run the E2E suites of the fomofobo app, API then pages |
+| `pnpm e2e:photo-purge`     | Run the E2E suite of the photo purge job               |
 | `pnpm build`               | Build all packages                                     |
 | `pnpm db:gen-migration`    | Generate migration SQL from schema changes             |
 | `pnpm db:custom-migration` | Generate an empty migration for a data change          |

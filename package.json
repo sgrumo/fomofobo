@@ -16,6 +16,7 @@
         "test": "pnpm -r --if-present run test",
         "e2e": "pnpm -r --workspace-concurrency=1 --filter \"./e2e/*\" --if-present run e2e",
         "e2e:fomofobo": "pnpm -C e2e/fullstack-fomofobo e2e",
+        "e2e:photo-purge": "pnpm -C e2e/photo-purge e2e",
         "build": "pnpm -r --if-present run build",
         "db:gen-migration": "pnpm -C packages/storage db:gen-migration",
         "db:custom-migration": "pnpm -C packages/storage db:custom-migration",

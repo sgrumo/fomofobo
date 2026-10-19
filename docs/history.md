@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-10-19 · Ended events hidden, their photos purged
+
+### Changed
+
+An ended occurrence leaves the public app three days after its end. A daily job then deletes the photos of each event with no visible occurrence left, and the database keeps the rows for statistics.
+
+### Why
+
+A decision. The owner wants to cut the storage cost of R2 and keep the data for later statistics.
+
+### Check next time
+
+Agree on how long past events and their media stay online before the estimate.
+
 ## 2026-10-16 · Hosting moved to Vercel, Turso and R2
 
 ### Changed

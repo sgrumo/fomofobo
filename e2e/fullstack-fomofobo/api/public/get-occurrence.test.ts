@@ -11,6 +11,7 @@ import {
     uploadPhoto,
 } from "../backoffice-events/utils"
 import { getOccurrence } from "./api"
+import { SATURDAY_NOON } from "./utils"
 
 describe("GET /api/public/occurrences/{eventId}/{date}", () => {
     it("answers the occurrence with its venue address, photos and links", async () => {
@@ -19,6 +20,7 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
         const event = await seedEvent(headers, { venueId, categoryId })
 
         const res = await getOccurrence({
+            headers: { "x-test-now": SATURDAY_NOON },
             pathParams: { eventId: event.id, date: "2026-10-24" },
         })
 
@@ -55,8 +57,14 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
         )
 
         const [saturday, sunday] = await Promise.all([
-            getOccurrence({ pathParams: { eventId: event.id, date: "2026-10-31" } }),
-            getOccurrence({ pathParams: { eventId: event.id, date: "2026-11-01" } }),
+            getOccurrence({
+                headers: { "x-test-now": SATURDAY_NOON },
+                pathParams: { eventId: event.id, date: "2026-10-31" },
+            }),
+            getOccurrence({
+                headers: { "x-test-now": SATURDAY_NOON },
+                pathParams: { eventId: event.id, date: "2026-11-01" },
+            }),
         ])
 
         expectStatus(saturday, 200)
@@ -84,6 +92,7 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
         )
 
         const res = await getOccurrence({
+            headers: { "x-test-now": SATURDAY_NOON },
             pathParams: { eventId: event.id, date: "2026-10-24" },
         })
 
@@ -94,13 +103,40 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
         })
     })
 
+    it("answers 404 once the occurrence ended three days ago", async () => {
+        const { headers } = await signInAs("organizer")
+        const { categoryId, venueId } = await seedEventReferences()
+        const event = await seedEvent(headers, { venueId, categoryId })
+        const ref = { eventId: event.id, date: "2026-10-24" }
+
+        const [lastMinute, expired] = await Promise.all([
+            getOccurrence({
+                headers: { "x-test-now": "2026-10-27T21:29:00.000Z" },
+                pathParams: ref,
+            }),
+            getOccurrence({
+                headers: { "x-test-now": "2026-10-27T21:30:00.000Z" },
+                pathParams: ref,
+            }),
+        ])
+
+        expectStatus(lastMinute, 200)
+        expectApiError(expired, 404, { code: "OccurrenceNotFound" })
+    })
+
     it("answers 404 on the next request once an Admin blocks the event", async () => {
         const { headers } = await signInAs("organizer")
         const admin = await signInAs("admin")
         const { categoryId, venueId } = await seedEventReferences()
         const event = await seedEvent(headers, { venueId, categoryId })
         const ref = { eventId: event.id, date: "2026-10-24" }
-        expectStatus(await getOccurrence({ pathParams: ref }), 200)
+        expectStatus(
+            await getOccurrence({
+                headers: { "x-test-now": SATURDAY_NOON },
+                pathParams: ref,
+            }),
+            200,
+        )
         expectStatus(
             await blockEvent({
                 headers: admin.headers,
@@ -110,7 +146,10 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
             200,
         )
 
-        const res = await getOccurrence({ pathParams: ref })
+        const res = await getOccurrence({
+            headers: { "x-test-now": SATURDAY_NOON },
+            pathParams: ref,
+        })
 
         expectApiError(res, 404, { code: "OccurrenceNotFound" })
     })
@@ -124,7 +163,13 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
             { recurrence: buildWeeklyRecurrence("2026-11-28") },
         )
         const removed = { eventId: event.id, date: "2026-11-07" }
-        expectStatus(await getOccurrence({ pathParams: removed }), 200)
+        expectStatus(
+            await getOccurrence({
+                headers: { "x-test-now": SATURDAY_NOON },
+                pathParams: removed,
+            }),
+            200,
+        )
         const photo = await uploadPhoto(headers)
 
         expectStatus(
@@ -146,8 +191,14 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
         )
 
         const [gone, added] = await Promise.all([
-            getOccurrence({ pathParams: removed }),
-            getOccurrence({ pathParams: { eventId: event.id, date: "2026-11-11" } }),
+            getOccurrence({
+                headers: { "x-test-now": SATURDAY_NOON },
+                pathParams: removed,
+            }),
+            getOccurrence({
+                headers: { "x-test-now": SATURDAY_NOON },
+                pathParams: { eventId: event.id, date: "2026-11-11" },
+            }),
         ])
         expectApiError(gone, 404, { code: "OccurrenceNotFound" })
         expectStatus(added, 200)

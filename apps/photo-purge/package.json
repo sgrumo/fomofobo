@@ -1,0 +1,33 @@
+{
+    "name": "photo-purge",
+    "version": "0.0.0",
+    "private": true,
+    "description": "Daily job that deletes from the bucket the photos of the events that left the public app",
+    "type": "module",
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "test": "vitest --run",
+        "test:watch": "vitest",
+        "dev": "with-env tsx --env-file-if-exists=.env.local src/index.ts",
+        "purge": "DISABLE_DRIZZLE_LOGS=true tsx src/index.ts"
+    },
+    "dependencies": {
+        "@hono/zod-openapi": "catalog:",
+        "backend-shared": "workspace:*",
+        "models": "workspace:*",
+        "shared": "workspace:*",
+        "storage": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/node": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "tsx": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:",
+        "with-env": "workspace:*"
+    }
+}

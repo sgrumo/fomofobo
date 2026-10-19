@@ -43,7 +43,10 @@ export const buildPublicRouter = (services: {
 
     router.openapi(PublicRoutes.lookupOccurrences, async c => {
         try {
-            const occurrences = await services.occurrences.lookup(c.req.valid("query"))
+            const occurrences = await services.occurrences.lookup(
+                c.req.valid("query"),
+                c.var.now,
+            )
             return respond(c, PublicRoutes.lookupOccurrences, HttpStatus.Ok, occurrences)
         } catch (error) {
             throw toApplicationError(error, "Error looking up the occurrences")
@@ -52,7 +55,10 @@ export const buildPublicRouter = (services: {
 
     router.openapi(PublicRoutes.getOccurrence, async c => {
         try {
-            const occurrence = await services.occurrences.find(c.req.valid("param"))
+            const occurrence = await services.occurrences.find(
+                c.req.valid("param"),
+                c.var.now,
+            )
             return respond(c, PublicRoutes.getOccurrence, HttpStatus.Ok, occurrence)
         } catch (error) {
             throw toApplicationError(error, "Error reading the occurrence")

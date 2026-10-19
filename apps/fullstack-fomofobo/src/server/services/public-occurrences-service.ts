@@ -1,4 +1,5 @@
 import "server-only"
+import { ENDED_OCCURRENCE_VISIBLE_MS } from "models"
 import type {
     OccurrenceDetail,
     OccurrenceLookupQuery,
@@ -21,6 +22,13 @@ import {
 import { eventTag, PUBLIC_TAG } from "../cache"
 import { appError } from "../errors"
 import { photoUrl } from "./photos-service"
+
+/**
+ * @description Returns the instant an ended occurrence must end after to stay visible
+ * @param now Current instant
+ */
+const endedVisibleSince = (now: Date): Date =>
+    new Date(now.getTime() - ENDED_OCCURRENCE_VISIBLE_MS)
 
 export class PublicOccurrencesService {
     private readonly occurrencesStorage: PublicOccurrencesStorage
@@ -75,8 +83,9 @@ export class PublicOccurrencesService {
     /**
      * @description Fetches one visible occurrence with its photos and links, from the cache of public reads
      * @param ref Event and local start date, any date for a single event
+     * @param now Instant that hides an occurrence ended too long ago
      */
-    public async find(ref: OccurrenceRef): Promise<OccurrenceDetail> {
+    public async find(ref: OccurrenceRef, now: Date): Promise<OccurrenceDetail> {
         const detail = await unstable_cache(
             async () => {
                 const stored = await this.occurrencesStorage.findDetail(ref)
@@ -96,7 +105,10 @@ export class PublicOccurrencesService {
             ["occurrence-detail", ref.eventId, ref.date],
             { tags: [PUBLIC_TAG, eventTag(ref.eventId)] },
         )()
-        if (detail === null) {
+        if (
+            detail === null ||
+            Date.parse(detail.endsAt) <= endedVisibleSince(now).getTime()
+        ) {
             throw appError(
                 "OccurrenceNotFound",
                 `Occurrence ${ref.eventId} ${ref.date} not found`,
@@ -108,13 +120,20 @@ export class PublicOccurrencesService {
     /**
      * @description Fetches the visible occurrences of saved refs, in ref order, without the refs that are not visible
      * @param query Refs as `<eventId>:<date>` keys
+     * @param now Instant that hides an occurrence ended too long ago
      */
-    public async lookup(query: OccurrenceLookupQuery): Promise<OccurrenceSummary[]> {
+    public async lookup(
+        query: OccurrenceLookupQuery,
+        now: Date,
+    ): Promise<OccurrenceSummary[]> {
         const refs = query.ref.map(key => {
             const separator = key.indexOf(":")
             return { eventId: key.slice(0, separator), date: key.slice(separator + 1) }
         })
-        const occurrences = await this.occurrencesStorage.lookup(refs)
+        const occurrences = await this.occurrencesStorage.lookup(
+            refs,
+            endedVisibleSince(now),
+        )
         return occurrences.map(occurrence => this.toSummary(occurrence))
     }
 

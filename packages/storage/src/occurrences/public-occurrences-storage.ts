@@ -259,14 +259,24 @@ export class PublicOccurrencesStorage {
     }
 
     /**
-     * @description Fetches the visible occurrences of the refs, in ref order
+     * @description Fetches the visible occurrences of the refs that end after an instant, in ref order
      * @param refs Event and local start date of each occurrence
+     * @param endedAfter Instant each occurrence ends after
      * @remarks Ignores the date of a ref to a single event
      */
-    public async lookup(refs: OccurrenceRef[]): Promise<StoredOccurrenceSummary[]> {
+    public async lookup(
+        refs: OccurrenceRef[],
+        endedAfter: Date,
+    ): Promise<StoredOccurrenceSummary[]> {
         const [first, ...rest] = refs.map(ref =>
             selectSummaryRows(this.db)
-                .where(and(visibleEvent, matchesRef(ref)))
+                .where(
+                    and(
+                        visibleEvent,
+                        matchesRef(ref),
+                        gt(eventOccurrences.endsAt, endedAfter),
+                    ),
+                )
                 .limit(1),
         )
         if (first === undefined) {
