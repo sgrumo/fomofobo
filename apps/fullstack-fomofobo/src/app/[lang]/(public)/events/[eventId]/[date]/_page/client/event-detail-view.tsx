@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 import type { OccurrenceDetail } from "models"
+import type { ReactNode } from "react"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import { Badge } from "ui-components/badge"
@@ -11,7 +12,11 @@ import {
     PixelIconDirections,
     PixelIconFacebook,
     PixelIconInstagram,
+    PixelIconLink,
     PixelIconShare,
+    PixelIconTelegram,
+    PixelIconWhatsApp,
+    PixelIconX,
 } from "ui-components/pixel-icons"
 import { StatGrid } from "ui-components/stat-grid"
 import { Timeline } from "ui-components/timeline"
@@ -29,15 +34,32 @@ import { directionsUrl, mapsProviderOf } from "@/lib/geo/directions-url"
 import { useBackToMap } from "@/lib/hooks/use-back-to-map"
 import { useNow } from "@/lib/hooks/use-now"
 import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
+import { shareSummaryOf } from "@/lib/share/share-summary"
+import { shareUrlOf } from "@/lib/share/share-urls"
+import type { ShareTarget } from "@/lib/share/share-urls"
 
 import { PhotoGallery } from "./photo-gallery"
 
 const CLOCK_TICK_MS = 60_000
 
+const shareTargets: ReadonlyArray<{ target: ShareTarget; icon: ReactNode }> = [
+    { target: "whatsapp", icon: <PixelIconWhatsApp /> },
+    { target: "telegram", icon: <PixelIconTelegram /> },
+    { target: "facebook", icon: <PixelIconFacebook /> },
+    { target: "x", icon: <PixelIconX /> },
+]
+
+const shareLinkClassName =
+    "pixel-circle-40 drop-shadow-hard-md text-fg focus-visible:outline-focus relative inline-flex size-10 shrink-0 items-center justify-center rounded-full hover:[--pixel-fill:var(--color-surface-muted)] focus-visible:outline-2 focus-visible:outline-offset-2 [&>svg]:size-4"
+
 const actionClassName =
     "border-line shadow-hard-md tp-pixel-md flex flex-1 items-center justify-center gap-2 rounded-md border-2 px-4 py-3 uppercase [&>svg]:size-4"
 
-export const EventDetailView = (props: RouteClientComponentProps<"eventDetail">) => {
+interface EventDetailViewProps extends RouteClientComponentProps<"eventDetail"> {
+    url: string
+}
+
+export const EventDetailView = (props: EventDetailViewProps) => {
     const { t } = useTranslation("shared")
     const language = useLanguage()
     const goBack = useBackToMap()
@@ -104,6 +126,13 @@ export const EventDetailView = (props: RouteClientComponentProps<"eventDetail">)
                 }
             />
             <OccurrenceBody occurrence={occurrence} now={now} language={language} />
+            <ShareRow
+                url={props.url}
+                text={`${occurrence.title} · ${shareSummaryOf(occurrence, language)}`}
+                onCopy={() => {
+                    void copyLink(props.url)
+                }}
+            />
             <nav
                 aria-label={t("Detail.Actions")}
                 className="bg-surface border-line fixed inset-x-0 bottom-0 flex gap-3 border-t-2 p-4"
@@ -222,5 +251,42 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                 <p className="tp-body-md text-fg-muted">{occurrence.venue.address}</p>
             </section>
         </>
+    )
+}
+
+interface ShareRowProps {
+    url: string
+    text: string
+    onCopy: () => void
+}
+
+const ShareRow = (props: ShareRowProps) => {
+    const { t } = useTranslation("shared")
+
+    return (
+        <section aria-label={t("Detail.ShareOn.Label")} className="flex flex-col gap-2">
+            <h2 className="tp-pixel-sm text-fg-muted uppercase">
+                {t("Detail.ShareOn.Label")}
+            </h2>
+            <div className="flex flex-wrap gap-3">
+                {shareTargets.map(({ target, icon }) => (
+                    <a
+                        key={target}
+                        href={shareUrlOf(target, { url: props.url, text: props.text })}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={t(`Detail.ShareOn.${target}`)}
+                        className={shareLinkClassName}
+                    >
+                        {icon}
+                    </a>
+                ))}
+                <IconButton
+                    aria-label={t("Detail.ShareOn.Copy")}
+                    icon={<PixelIconLink />}
+                    onClick={props.onCopy}
+                />
+            </div>
+        </section>
     )
 }

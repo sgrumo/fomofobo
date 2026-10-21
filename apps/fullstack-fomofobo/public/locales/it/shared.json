@@ -125,7 +125,15 @@
         "Now": "ora {{time}}",
         "Venue": "Luogo",
         "Instagram": "Instagram",
-        "Facebook": "Facebook"
+        "Facebook": "Facebook",
+        "ShareOn": {
+            "Label": "Condividi su",
+            "whatsapp": "Condividi su WhatsApp",
+            "telegram": "Condividi su Telegram",
+            "facebook": "Condividi su Facebook",
+            "x": "Condividi su X",
+            "Copy": "Copia il link"
+        }
     },
     "Saved": {
         "Toggle": "Salva",

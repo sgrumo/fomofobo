@@ -52,7 +52,7 @@ export const generateMetadata = async (
 }
 
 const Page = async (props: PageProps<"/[lang]/events/[eventId]/[date]">) => {
-    const { parameters } = await getDynamicRoute(route, props)
+    const { parameters, path } = await getDynamicRoute(route, props)
     const occurrence = await readOccurrence(parameters.eventId, parameters.date)
 
     const dehydratedState = await prefetchQueries(queryClient =>
@@ -69,7 +69,7 @@ const Page = async (props: PageProps<"/[lang]/events/[eventId]/[date]">) => {
 
     return (
         <HydrationBoundary state={dehydratedState}>
-            <EventDetailView route="eventDetail" />
+            <EventDetailView route="eventDetail" url={new URL(path, appBaseUrl()).href} />
         </HydrationBoundary>
     )
 }

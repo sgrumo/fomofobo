@@ -64,6 +64,20 @@ export const PixelIconFacebook = (props: PixelIconProps) => (
     <PixelIcon name="facebook" {...props} />
 )
 
+export const PixelIconWhatsApp = (props: PixelIconProps) => (
+    <PixelIcon name="whatsapp" {...props} />
+)
+
+export const PixelIconTelegram = (props: PixelIconProps) => (
+    <PixelIcon name="telegram" {...props} />
+)
+
+export const PixelIconX = (props: PixelIconProps) => <PixelIcon name="x" {...props} />
+
+export const PixelIconLink = (props: PixelIconProps) => (
+    <PixelIcon name="link" {...props} />
+)
+
 export const PixelIconSave = (props: PixelIconProps) => (
     <PixelIcon name="save" {...props} />
 )
