@@ -23,7 +23,6 @@ import { SaveToggle } from "@/components/client/save-toggle/save-toggle"
 import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
-import { countdownParts } from "@/lib/events/countdown"
 import { localTimeOf } from "@/lib/events/local-format"
 import { occurrenceProgress } from "@/lib/events/occurrence-progress"
 import { occurrenceStatus } from "@/lib/events/occurrence-status"
@@ -65,12 +64,7 @@ const PreviewBody = (props: PreviewBodyProps) => {
         endsAt: new Date(occurrence.endsAt),
     }
     const status = occurrenceStatus(span, props.now)
-    const progress = occurrenceProgress(span, props.now)
-    const remaining = countdownParts(progress.remainingMs)
-    const remainingText =
-        remaining.hours > 0
-            ? t("Countdown.HoursMinutes", { ...remaining })
-            : t("Countdown.Minutes", { ...remaining })
+    const elapsedFraction = occurrenceProgress(span, props.now)
     const details = [
         ...occurrence.categoryIds.map(id => props.categories.get(id)?.name),
         occurrence.price ?? t("Preview.Free"),
@@ -83,11 +77,6 @@ const PreviewBody = (props: PreviewBodyProps) => {
                     {t(`Status.${status}`)}
                 </Badge>
                 <div className="flex items-center gap-2">
-                    {status === "live" ? (
-                        <span className="tp-pixel-sm uppercase">
-                            {t("Preview.Remaining", { time: remainingText })}
-                        </span>
-                    ) : undefined}
                     <SaveToggle occurrence={occurrence} size="sm" />
                     {props.closeButton}
                 </div>
@@ -141,7 +130,7 @@ const PreviewBody = (props: PreviewBodyProps) => {
             {status === "live" ? (
                 <TickProgress
                     label={t("Preview.Elapsed")}
-                    value={progress.elapsedFraction * 100}
+                    value={elapsedFraction * 100}
                     min={0}
                     max={100}
                     tone="live"

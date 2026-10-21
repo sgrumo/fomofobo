@@ -22,7 +22,6 @@ import { useDynamicRoute } from "@/framework/routes/route-hooks/use-dynamic-rout
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
-import { countdownParts } from "@/lib/events/countdown"
 import { localTimeOf, weekdayDateOf } from "@/lib/events/local-format"
 import { occurrenceProgress } from "@/lib/events/occurrence-progress"
 import { occurrenceStatus } from "@/lib/events/occurrence-status"
@@ -172,8 +171,7 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
         endsAt: new Date(occurrence.endsAt),
     }
     const status = occurrenceStatus(span, props.now)
-    const progress = occurrenceProgress(span, props.now)
-    const remaining = countdownParts(progress.remainingMs)
+    const elapsedFraction = occurrenceProgress(span, props.now)
     const startTime = localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)
     const endTime = localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)
 
@@ -193,21 +191,11 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                     <Badge tone={status} dot={true}>
                         {t(`Status.${status}`)}
                     </Badge>
-                    {status === "live" ? (
-                        <span className="text-live-strong tp-pixel-2xl">
-                            {t("Detail.Remaining", {
-                                time:
-                                    remaining.hours > 0
-                                        ? t("Countdown.HoursMinutes", { ...remaining })
-                                        : t("Countdown.Minutes", { ...remaining }),
-                            })}
-                        </span>
-                    ) : undefined}
                 </div>
                 {status === "live" ? (
                     <Timeline
                         label={t("Preview.Elapsed")}
-                        value={progress.elapsedFraction * 100}
+                        value={elapsedFraction * 100}
                         min={0}
                         max={100}
                         start={startTime}

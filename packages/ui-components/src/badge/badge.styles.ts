@@ -18,5 +18,6 @@ export const badgeDotStyles = styles((tone: BadgeTone) => [
     {
         "bg-live": tone === "neutral",
         "bg-current": tone !== "neutral",
+        "animate-pulse motion-reduce:animate-none": tone === "live",
     },
 ])

@@ -103,17 +103,12 @@
         "Close": "Chiudi",
         "Loading": "Caricamento evento",
         "Unavailable": "Questo evento non è più disponibile.",
-        "Remaining": "ancora {{time}}",
         "Elapsed": "Tempo trascorso",
         "Free": "Gratis",
         "Open": "Apri l'evento",
         "Previous": "Evento precedente qui",
         "Next": "Evento successivo qui",
         "Position": "{{index}}/{{total}} qui"
-    },
-    "Countdown": {
-        "HoursMinutes": "{{hours}}h{{minutes}}m",
-        "Minutes": "{{minutes}}m"
     },
     "Detail": {
         "Gallery": "Foto di {{title}}",
@@ -130,8 +125,7 @@
         "Now": "ora {{time}}",
         "Venue": "Luogo",
         "Instagram": "Instagram",
-        "Facebook": "Facebook",
-        "Remaining": "-{{time}}"
+        "Facebook": "Facebook"
     },
     "Saved": {
         "Toggle": "Salva",

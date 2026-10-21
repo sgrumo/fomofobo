@@ -8,22 +8,14 @@ const occurrence = {
 }
 
 describe("occurrenceProgress", () => {
-    it("returns the elapsed fraction and the remaining time of a live occurrence", () => {
-        expect(
-            occurrenceProgress(occurrence, new Date("2026-10-17T20:45:00Z")),
-        ).toStrictEqual({
-            elapsedFraction: 0.5,
-            remainingMs: 105 * 60 * 1000,
-        })
+    it("returns the elapsed fraction of a live occurrence", () => {
+        expect(occurrenceProgress(occurrence, new Date("2026-10-17T20:45:00Z"))).toBe(0.5)
     })
 
     it("clamps before the start and after the end", () => {
         expect([
             occurrenceProgress(occurrence, new Date("2026-10-17T18:00:00Z")),
             occurrenceProgress(occurrence, new Date("2026-10-18T00:00:00Z")),
-        ]).toStrictEqual([
-            { elapsedFraction: 0, remainingMs: 210 * 60 * 1000 },
-            { elapsedFraction: 1, remainingMs: 0 },
-        ])
+        ]).toStrictEqual([0, 1])
     })
 })
