@@ -300,7 +300,26 @@
             "Instagram": "Pagina Instagram",
             "Facebook": "Pagina Facebook"
         },
+        "EventWizard": {
+            "Steps": {
+                "basics": "Informazioni",
+                "place-and-time": "Luogo e orario",
+                "photos": "Foto",
+                "details": "Dettagli",
+                "review": "Riepilogo"
+            },
+            "Back": "Indietro",
+            "Next": "Avanti",
+            "Start": "Inizio",
+            "End": "Fine",
+            "PhotoCount": "Foto: {{count}}"
+        },
         "EventEditor": {
+            "Mode": {
+                "Label": "Modalità",
+                "wizard": "Passo passo",
+                "form": "Modulo completo"
+            },
             "NewTitle": "Nuovo evento",
             "EditTitle": "Modifica evento",
             "Saved": "\"{{title}}\" salvato.",

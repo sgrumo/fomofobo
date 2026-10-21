@@ -1,7 +1,7 @@
 import type { FormErrors } from "frontend-shared/types"
 import type { StepCompletion } from "ui-components/stepper"
 
-import type { EventFormState } from "./event-form.state"
+import type { EventFormState } from "@/components/client/event-form/event-form.state"
 
 export const eventFormSteps = [
     "basics",

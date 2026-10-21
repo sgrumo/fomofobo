@@ -17,6 +17,7 @@ export const localStorageSchema = {
         jitter: z.number().min(0),
     }),
     "saved-events": savedEventsStorageSchema,
+    "event-form-mode": z.enum(["wizard", "form"]),
 }
 export type LocalStorageKey = keyof typeof localStorageSchema
 export type LocalStorageItem<K extends LocalStorageKey> = z.output<
@@ -29,6 +30,7 @@ export const localStorageDefaults: {
     "api-delay": { base: 250, jitter: 50 },
     "dev-quadrant": { position: "bottom-right", minimized: true },
     "saved-events": { version: 1, events: [] },
+    "event-form-mode": "wizard",
 }
 
 export const localStorage = createWebStorage(

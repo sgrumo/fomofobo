@@ -599,7 +599,8 @@ export const EventDetailsSection = (props: EventSectionProps) => {
     )
 }
 
-interface EventFormProps extends EventBasicsSectionProps, EventScheduleSectionProps {
+export interface EventFormProps
+    extends EventBasicsSectionProps, EventScheduleSectionProps {
     onPhotosChange: EventPhotosSectionProps["onPhotosChange"]
 }
 

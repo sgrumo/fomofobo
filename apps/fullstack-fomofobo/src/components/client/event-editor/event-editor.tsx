@@ -1,6 +1,7 @@
 "use client"
 
 import { useMutation, useQuery } from "@tanstack/react-query"
+import { cn } from "frontend-shared/styles"
 import type { Event } from "models"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -9,12 +10,16 @@ import { useForm } from "react-shared"
 import { Alert } from "ui-components/alert"
 import { AlertConfirmationDialog } from "ui-components/alert-dialog"
 import { Button } from "ui-components/button"
+import { Field } from "ui-components/field"
 import { Form } from "ui-components/form"
 import { useToast } from "ui-components/toast"
+import { ToggleGroup } from "ui-components/toggle"
 
 import { useBackofficeAccount } from "@/components/client/backoffice-shell/backoffice-shell.context"
 import { CreateVenueDialog } from "@/components/client/create-venue-dialog/create-venue-dialog"
+import { EventFormWizard } from "@/components/client/event-form-wizard/event-form-wizard"
 import { EventForm } from "@/components/client/event-form/event-form"
+import type { EventFormPhoto } from "@/components/client/event-form/event-form.state"
 import {
     eventFormReducer,
     eventFormStateFromEvent,
@@ -24,7 +29,9 @@ import {
 import { routes } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
 import { ORGANIZER_PICKER_SIZE } from "@/lib/backoffice/lists"
+import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import { useMutationFeedback } from "@/lib/hooks/use-mutation-feedback"
+import { localStorageSchema } from "@/lib/storage/local-storage"
 
 const VENUE_PICKER_SIZE = 100
 const EVENTS_PATH = routes.backofficeEvents.path({ parameters: {}, query: {} })
@@ -50,6 +57,7 @@ export const EventEditor = (props: EventEditorProps) => {
         i18n,
         { isAdmin },
     )
+    const [mode, setMode] = useLocalStorage("event-form-mode")
     const [saved, setSaved] = useState(false)
     const [leaving, setLeaving] = useState(false)
     const dirty = !saved && JSON.stringify(form) !== JSON.stringify(initial)
@@ -87,6 +95,25 @@ export const EventEditor = (props: EventEditorProps) => {
         enabled: isAdmin,
     })
 
+    const venueOptions = (venues.data?.items ?? []).map(venue => ({
+        id: venue.id,
+        name: venue.name,
+    }))
+    const organizerOptions = isAdmin
+        ? (organizers.data?.items ?? []).map(organizer => ({
+              id: organizer.id,
+              name: organizer.name,
+          }))
+        : undefined
+    const onPhotosChange = (change: (photos: EventFormPhoto[]) => EventFormPhoto[]) => {
+        setForm(previous =>
+            eventFormReducer(previous, {
+                type: "photos",
+                value: change(previous.photos ?? []),
+            }),
+        )
+    }
+
     const create = useMutation(api.createEventMutation)
     const update = useMutation(api.updateEventMutation)
     const isPending = create.isPending || update.isPending
@@ -119,6 +146,34 @@ export const EventEditor = (props: EventEditorProps) => {
                     ? t("Backoffice.EventEditor.NewTitle")
                     : t("Backoffice.EventEditor.EditTitle")}
             </h1>
+            <Field label={t("Backoffice.EventEditor.Mode.Label")} required={false}>
+                <ToggleGroup
+                    multiple={false}
+                    itemSchema={localStorageSchema["event-form-mode"]}
+                    items={localStorageSchema["event-form-mode"].options}
+                    getItemLabel={item => t(`Backoffice.EventEditor.Mode.${item}`)}
+                    value={mode}
+                    onValueChange={next => {
+                        // A press on the current mode untoggles it, and the mode stays
+                        if (next !== undefined) {
+                            setMode(next)
+                        }
+                    }}
+                    className="flex w-fit items-center gap-2"
+                    renderItem={({ item, toggled }) => (
+                        <span
+                            className={cn(
+                                "tp-pixel-md rounded-full border px-3 py-1 transition-colors",
+                                toggled
+                                    ? "border-line bg-surface-inverse text-fg-inverse"
+                                    : "border-line-muted bg-surface text-fg hover:bg-surface-muted",
+                            )}
+                        >
+                            {t(`Backoffice.EventEditor.Mode.${item}`)}
+                        </span>
+                    )}
+                />
+            </Field>
             {/* PLACEHOLDER(OP-22): an edit keeps the block */}
             {props.event?.isBlocked === true && (
                 <Alert
@@ -153,51 +208,51 @@ export const EventEditor = (props: EventEditorProps) => {
                     }}
                 />
             </div>
-            <Form
-                id={formId}
-                mode="edit"
-                noValidate={true}
-                onSubmit={handleSubmit}
-                className="flex flex-col gap-4"
-            >
-                <EventForm
+            {mode === "wizard" ? (
+                <EventFormWizard
                     value={form}
                     onValueChange={setForm}
                     errors={errors}
                     categories={categories.data ?? []}
-                    venues={(venues.data?.items ?? []).map(venue => ({
-                        id: venue.id,
-                        name: venue.name,
-                    }))}
-                    organizers={
-                        isAdmin
-                            ? (organizers.data?.items ?? []).map(organizer => ({
-                                  id: organizer.id,
-                                  name: organizer.name,
-                              }))
-                            : undefined
-                    }
-                    onPhotosChange={change => {
-                        setForm(previous =>
-                            eventFormReducer(previous, {
-                                type: "photos",
-                                value: change(previous.photos ?? []),
-                            }),
-                        )
-                    }}
+                    venues={venueOptions}
+                    organizers={organizerOptions}
+                    onPhotosChange={onPhotosChange}
                     disabled={isPending}
+                    saving={isPending}
+                    onSave={handleSubmit}
                 />
-            </Form>
-            <div className="flex flex-wrap gap-2">
-                <Button
-                    variant="primary"
-                    size="md"
-                    type="submit"
-                    form={formId}
-                    loading={isPending}
+            ) : (
+                <Form
+                    id={formId}
+                    mode="edit"
+                    noValidate={true}
+                    onSubmit={handleSubmit}
+                    className="flex flex-col gap-4"
                 >
-                    {t("Backoffice.Actions.Save")}
-                </Button>
+                    <EventForm
+                        value={form}
+                        onValueChange={setForm}
+                        errors={errors}
+                        categories={categories.data ?? []}
+                        venues={venueOptions}
+                        organizers={organizerOptions}
+                        onPhotosChange={onPhotosChange}
+                        disabled={isPending}
+                    />
+                </Form>
+            )}
+            <div className="flex flex-wrap gap-2">
+                {mode === "form" ? (
+                    <Button
+                        variant="primary"
+                        size="md"
+                        type="submit"
+                        form={formId}
+                        loading={isPending}
+                    >
+                        {t("Backoffice.Actions.Save")}
+                    </Button>
+                ) : undefined}
                 {dirty ? (
                     <AlertConfirmationDialog
                         type="controlled"

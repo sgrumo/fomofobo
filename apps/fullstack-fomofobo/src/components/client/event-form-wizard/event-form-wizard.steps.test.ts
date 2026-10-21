@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest"
 
-import { initialEventFormState } from "./event-form.state"
+import { initialEventFormState } from "@/components/client/event-form/event-form.state"
+
 import {
     EVENT_FORM_STEP_FIELDS,
     eventFormStepCompletion,
     eventFormSteps,
     isEventFormStepEnabled,
-} from "./event-form.steps"
+} from "./event-form-wizard.steps"
 
 describe("EVENT_FORM_STEP_FIELDS", () => {
     it("puts each field of the form in one step", () => {
