@@ -16,6 +16,6 @@ The package holds two suites that share `server.ts` and `lifecycle.ts`. Each glo
 - A variable that one runner needs of its own, such as `DATABASE_URL`, goes in the `env` of `appServer`.
 - The server runs with `APP_ENV=test`, so the production build serves the dev pages and CI runs the UI samples.
 - `api/` cannot test a route with the `QUERY` method. The Next App Router answers `400` to it before Hono sees it.
-- In `ui/`, open a page with `gotoPage(page, "/<path>/")` and reload it with `reloadPage(page)` from `ui/app.ts`, never with a bare `page.goto`. Both wait for React to hydrate the server HTML. Input before hydration reaches no handler and is lost.
+- In `ui/`, open a page with `gotoPage(page, "/<path>/")` and reload it with `reloadPage(page)` from `ui/app.ts`, never with a bare `page.goto`. Both wait for React to hydrate the server HTML. Input before hydration reaches no handler and is lost. A path with no E2E locale, such as an old `/en/` link, opens with `gotoPath`, which waits too.
 - The language is the first URL segment, so `gotoPage` prefixes the E2E locale. The backoffice has no language segment: open it with `gotoBackofficePage`, and sign the browser in with `signInBrowser` from `ui/backoffice.ts`.
 - `t()` for the app strings comes from `ui/app.ts`.

@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test"
 import { clickIconButton } from "e2e-ui-components/icon-button"
 import { dismissToast, expectToast } from "e2e-ui-components/toast"
 
-import { gotoPage, reloadPage, t } from "../app"
+import { gotoPage, gotoPath, reloadPage, t } from "../app"
 import {
     blockPublicEvent,
     buildArea,
@@ -44,6 +44,20 @@ test.describe("event detail", () => {
         await reloadPage(page)
 
         await expect(page.getByText(t("shared", "NotFound.Title"))).toBeVisible()
+    })
+
+    test("opens an old English link in Italian", async ({ page }) => {
+        const event = await seedPublicEvent(
+            { venue: await seedVenue(buildArea()), category: await seedCategory() },
+            {},
+        )
+
+        await gotoPath(page, `/en/events/${event.id}/2026-10-24/`)
+
+        await expect(page).toHaveURL(`/it/events/${event.id}/2026-10-24`)
+        await expect(
+            page.getByRole("heading", { level: 1, name: event.title }),
+        ).toBeVisible()
     })
 
     test("copies the link where the browser has no share sheet", async ({

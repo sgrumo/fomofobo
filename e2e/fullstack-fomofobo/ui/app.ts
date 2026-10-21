@@ -16,14 +16,23 @@ const waitForHydration = async (page: Page): Promise<void> => {
 }
 
 /**
+ * @description Opens a path as written and waits until it hydrates
+ * @param page Page under test
+ * @param path Path of the request, an old `/en/...` link for instance
+ */
+export const gotoPath = async (page: Page, path: string): Promise<void> => {
+    await page.goto(path)
+    await waitForHydration(page)
+}
+
+/**
  * @description Opens a page of the app in the E2E locale and waits until it hydrates
  * @param page Page under test
  * @param pagePath Path of the page with no language, `/todos/` for instance
  * @remarks The language is the first URL segment, so the path carries the E2E locale
  */
 export const gotoPage = async (page: Page, pagePath: string): Promise<void> => {
-    await page.goto(`/${e2eLocale}${pagePath}`)
-    await waitForHydration(page)
+    await gotoPath(page, `/${e2eLocale}${pagePath}`)
 }
 
 /**
