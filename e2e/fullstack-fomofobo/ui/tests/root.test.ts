@@ -77,6 +77,36 @@ test.describe("map", () => {
         }
     })
 
+    test("merges the results of one venue into a cluster that counts them per status", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const venue = await seedVenue(
+            offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+        )
+        const category = await seedCategory()
+        for (const times of [
+            { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
+            { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+            { startsAt: "2026-10-24T08:00", endsAt: "2026-10-24T09:00" },
+        ]) {
+            await seedPublicEvent({ venue, category }, times)
+        }
+
+        await gotoPage(page, mapPath(center))
+
+        await expect(
+            page.getByRole("button", {
+                name: t("shared", "Map.Cluster", {
+                    count: 3,
+                    live: 1,
+                    upcoming: 1,
+                    ended: 1,
+                }),
+            }),
+        ).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+    })
+
     test("narrows the pins to the pressed category, with the count of each chip, and shows every category again once unpressed", async ({
         page,
     }) => {
@@ -287,7 +317,7 @@ test.describe("map", () => {
         })
         await clickButton(sheet, t("shared", "Filters.Apply"))
 
-        await expect(getChip(page, "25.10–26.10")).toHaveAttribute("aria-pressed", "true")
+        await expect(getChip(page, "25/10–26/10")).toHaveAttribute("aria-pressed", "true")
         await expect(mondayPin).toBeVisible()
         await expect(todayPin).toBeHidden()
     })
