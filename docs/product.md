@@ -46,13 +46,13 @@ Once every occurrence of an event ended more than three days ago, a daily job de
 
 ### Search area
 
-The search center is the position of the device when the visitor grants location, else a default city until the visitor picks a place. Only occurrences at venues inside a fixed radius around the search center are results. Distance on an event is measured from the position of the device to the venue.
+The search center is the position of the device when the visitor grants location, else a default city until the visitor picks a place. Only occurrences at venues inside a fixed radius around the search center are results. The app shows no distance to an event.
 
 ### Map
 
-Each result is a pin at its venue with the icon of its category, and its look follows the status. A tag above the pin reads live for a live result, the start time for an upcoming result of today, and the date for an upcoming result of another day. Pins too close to tell apart merge into a cluster with a count.
+Each result is a pin at its venue with the icon of its category, and its look follows the status. A tag above the pin reads live for a live result, the start time for an upcoming result of today, and the date for an upcoming result of another day. Pins too close to tell apart merge into a cluster with a count, and its ring shows the share of live, upcoming and ended results.
 
-A tap on a pin opens a preview of the occurrence. The preview shows status, remaining time when live, venue, categories, distance, price and times, with a link to the event page. When several results share one venue, the preview pages through them.
+A tap on a pin opens a preview of the occurrence. The preview shows status, venue, categories, price and times, with the elapsed time when live and a link to the event page. When several results share one venue, the preview pages through them.
 
 ### Search and filters
 
