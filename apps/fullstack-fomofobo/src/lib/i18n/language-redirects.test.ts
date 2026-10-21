@@ -60,6 +60,6 @@ describe("languageRedirects", () => {
         expect(redirectOf("/backoffice/login")).toBeUndefined()
         expect(redirectOf("/_next/static/chunk.js")).toBeUndefined()
         expect(redirectOf("/favicon.ico")).toBeUndefined()
-        expect(redirectOf("/locales/en/shared.json")).toBeUndefined()
+        expect(redirectOf("/locales/it/shared.json")).toBeUndefined()
     })
 })

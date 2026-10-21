@@ -21,7 +21,6 @@ export type CategoryIcon = z.infer<typeof categoryIconSchema>
 
 export const categorySchema = z.object({
     id: z.uuid(),
-    // PLACEHOLDER(OP-29): one name per language if the app is multilingual
     name: z.string().trim().min(1).max(60),
     icon: categoryIconSchema,
 })

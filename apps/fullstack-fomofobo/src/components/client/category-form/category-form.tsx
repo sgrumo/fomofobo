@@ -28,7 +28,6 @@ export const CategoryForm = (props: CategoryFormProps) => {
 
     return (
         <>
-            {/* PLACEHOLDER(OP-29): one name per language if the app is multilingual */}
             <Field
                 label={t("Backoffice.CategoryForm.Name")}
                 required={true}
