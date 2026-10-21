@@ -60,7 +60,9 @@ Results match every active filter. One search field matches event titles and set
 
 ### Event page
 
-Each event has its own URL, and for a repeating event the URL refers to one occurrence. The page offers directions to the venue, the external link of the event and a save action. Share opens the share sheet of the device, or copies the link where none exists. Directions open Apple Maps on iOS and iPadOS, and Google Maps elsewhere.
+Each event has its own URL, and for a repeating event the URL refers to one occurrence. The page offers directions to the venue, the external link of the event and a save action. Directions open Apple Maps on iOS and iPadOS, and Google Maps elsewhere.
+
+Share opens the share sheet of the device, or copies the link where none exists. A row of links shares the page on WhatsApp, Telegram, Facebook and X with its title, date, time and venue, and a button copies the link. A shared link shows a card with the title, the cover, and the description of the event or else its date, time and venue.
 
 ### Saved events
 
