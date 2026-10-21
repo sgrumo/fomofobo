@@ -3,8 +3,10 @@ import { expectStatus } from "e2e-kit/assertions"
 import { expectAlert } from "e2e-ui-components/alert"
 import { clickButton } from "e2e-ui-components/button"
 import { fillInput } from "e2e-ui-components/input"
+import { expectCurrentStep } from "e2e-ui-components/stepper"
 import { expectTableRow } from "e2e-ui-components/table"
 import { dismissToast, expectToast } from "e2e-ui-components/toast"
+import { pressToggle } from "e2e-ui-components/toggle"
 
 import { signInAs } from "../../api/auth/utils"
 import { blockEvent } from "../../api/backoffice-events/api"
@@ -21,6 +23,7 @@ test.describe("backoffice event", () => {
         const event = await seedEvent(headers, refs, { title })
 
         await gotoBackofficePage(page, `/backoffice/events/${event.id}`)
+        await pressToggle(page, t("shared", "Backoffice.EventEditor.Mode.form"))
         await fillInput(page, t("shared", "Backoffice.EventForm.Title"), newTitle)
         await clickButton(page, t("shared", "Backoffice.Actions.Save"))
 
@@ -51,6 +54,7 @@ test.describe("backoffice event", () => {
             type: "warning",
             text: t("shared", "Backoffice.EventEditor.BlockedWithReason", { reason }),
         })
+        await expectCurrentStep(page, t("shared", "Backoffice.EventWizard.Steps.basics"))
         await expect(
             page.getByRole("textbox", {
                 name: t("shared", "Backoffice.EventForm.Title"),

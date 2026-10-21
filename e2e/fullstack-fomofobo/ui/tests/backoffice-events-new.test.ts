@@ -7,11 +7,17 @@ import { selectComboboxItem, selectComboboxItems } from "e2e-ui-components/combo
 import { fillNativeDateInput } from "e2e-ui-components/date-input"
 import { fillInput } from "e2e-ui-components/input"
 import { selectSelectItem } from "e2e-ui-components/select"
+import {
+    expectCurrentStep,
+    expectStepDisabled,
+    goToStep,
+} from "e2e-ui-components/stepper"
 import { expectTableRow } from "e2e-ui-components/table"
 import { dismissToast, expectToast } from "e2e-ui-components/toast"
+import { expectTogglePressed, pressToggle } from "e2e-ui-components/toggle"
 
 import { getEvent, listEvents } from "../../api/backoffice-events/api"
-import { gotoBackofficePage, t } from "../app"
+import { gotoBackofficePage, reloadPage, t } from "../app"
 import { signInBrowser } from "../backoffice"
 import { buildArea, seedCategory, seedVenue } from "../public"
 
@@ -61,6 +67,7 @@ test.describe("backoffice new event", () => {
         await signInBrowser(page, "organizer")
 
         await gotoBackofficePage(page, "/backoffice/events/new")
+        await pressToggle(page, t("shared", "Backoffice.EventEditor.Mode.form"))
         await fillEventEssentials(page, {
             title,
             categoryName: category.name,
@@ -87,6 +94,7 @@ test.describe("backoffice new event", () => {
         const { headers } = await signInBrowser(page, "organizer")
 
         await gotoBackofficePage(page, "/backoffice/events/new")
+        await pressToggle(page, t("shared", "Backoffice.EventEditor.Mode.form"))
         await fillEventEssentials(page, {
             title,
             categoryName: category.name,
@@ -135,5 +143,115 @@ test.describe("backoffice new event", () => {
             addedDates: [],
             removedDates: ["2026-11-21"],
         })
+    })
+
+    test("creates an event through the wizard, step by step", async ({ page }) => {
+        const category = await seedCategory()
+        const venue = await seedVenue(buildArea())
+        const title = `Wizard ${crypto.randomUUID()}`
+        const next = t("shared", "Backoffice.EventWizard.Next")
+        await signInBrowser(page, "organizer")
+
+        await gotoBackofficePage(page, "/backoffice/events/new")
+        await expectTogglePressed(page, t("shared", "Backoffice.EventEditor.Mode.wizard"))
+        await fillInput(page, t("shared", "Backoffice.EventForm.Title"), title)
+        await selectComboboxItems(page, t("shared", "Backoffice.EventForm.Categories"), [
+            ["exact", category.name],
+        ])
+        await clickButton(page, next)
+        await expectCurrentStep(
+            page,
+            t("shared", "Backoffice.EventWizard.Steps.place-and-time"),
+        )
+        await selectComboboxItem(page, t("shared", "Backoffice.EventForm.Venue"), [
+            "exact",
+            venue.name,
+        ])
+        await fillNativeDateInput(
+            page,
+            t("shared", "Backoffice.EventForm.StartDate"),
+            "2026-11-14",
+        )
+        await fillInput(page, t("shared", "Backoffice.EventForm.StartTime"), "21:00")
+        await fillInput(page, t("shared", "Backoffice.EventForm.EndTime"), "23:30")
+        await clickButton(page, next)
+        await expectCurrentStep(page, t("shared", "Backoffice.EventWizard.Steps.photos"))
+        await page
+            .getByLabel(t("shared", "Backoffice.Photos.Label"), { exact: true })
+            .setInputFiles({
+                name: "cover.png",
+                mimeType: "image/png",
+                buffer: Buffer.from(crypto.getRandomValues(new Uint8Array(2048))),
+            })
+        await expect(
+            page.getByRole("img", {
+                name: t("shared", "Backoffice.Photos.Photo", { index: 1 }),
+            }),
+        ).toBeVisible()
+        await clickButton(page, next)
+        await expectCurrentStep(page, t("shared", "Backoffice.EventWizard.Steps.details"))
+        await clickButton(page, next)
+        await expectCurrentStep(page, t("shared", "Backoffice.EventWizard.Steps.review"))
+        const summary = page.getByRole("region", {
+            name: t("shared", "Backoffice.EventWizard.Steps.review"),
+        })
+        await expect(summary).toContainText(title)
+        await expect(summary).toContainText(venue.name)
+        await clickButton(page, t("shared", "Backoffice.Actions.Save"))
+
+        const message = t("shared", "Backoffice.EventEditor.Saved", { title })
+        await expectToast(page, { type: "success" }, message)
+        await dismissToast(page, { type: "success" }, message)
+        await expectTableRow(page, [
+            ["exact", title],
+            ["exact", venue.name],
+            ["exact", t("shared", "Backoffice.Events.Single")],
+        ])
+    })
+
+    test("holds the wizard on a step until it is complete, and keeps the values across steps and modes", async ({
+        page,
+    }) => {
+        const category = await seedCategory()
+        const title = `Kept ${crypto.randomUUID()}`
+        const basics = t("shared", "Backoffice.EventWizard.Steps.basics")
+        await signInBrowser(page, "organizer")
+
+        await gotoBackofficePage(page, "/backoffice/events/new")
+        await expectStepDisabled(page, t("shared", "Backoffice.EventWizard.Steps.photos"))
+        await clickButton(page, t("shared", "Backoffice.EventWizard.Next"))
+        await expectCurrentStep(page, basics)
+        await expect(page.getByText(t("ui", "FormErrors.Required"))).not.toHaveCount(0)
+
+        await fillInput(page, t("shared", "Backoffice.EventForm.Title"), title)
+        await selectComboboxItems(page, t("shared", "Backoffice.EventForm.Categories"), [
+            ["exact", category.name],
+        ])
+        await clickButton(page, t("shared", "Backoffice.EventWizard.Next"))
+        await expectCurrentStep(
+            page,
+            t("shared", "Backoffice.EventWizard.Steps.place-and-time"),
+        )
+        await expectStepDisabled(page, t("shared", "Backoffice.EventWizard.Steps.photos"))
+        await goToStep(page, basics)
+        const titleInput = page.getByRole("textbox", {
+            name: t("shared", "Backoffice.EventForm.Title"),
+        })
+        await expect(titleInput).toHaveValue(title)
+
+        await pressToggle(page, t("shared", "Backoffice.EventEditor.Mode.form"))
+        await expect(titleInput).toHaveValue(title)
+        await pressToggle(page, t("shared", "Backoffice.EventEditor.Mode.wizard"))
+        await expect(titleInput).toHaveValue(title)
+    })
+
+    test("remembers the picked mode on the device", async ({ page }) => {
+        await signInBrowser(page, "organizer")
+
+        await gotoBackofficePage(page, "/backoffice/events/new")
+        await pressToggle(page, t("shared", "Backoffice.EventEditor.Mode.form"))
+        await reloadPage(page)
+
+        await expectTogglePressed(page, t("shared", "Backoffice.EventEditor.Mode.form"))
     })
 })
