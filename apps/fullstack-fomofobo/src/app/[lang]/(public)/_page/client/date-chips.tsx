@@ -42,7 +42,7 @@ export const DateChips = (props: DateChipsProps) => {
 
     const rangeLabel =
         props.date === "range" && props.from !== undefined && props.to !== undefined
-            ? `${format(parseISO(props.from), "dd.MM")}–${format(parseISO(props.to), "dd.MM")}`
+            ? `${format(parseISO(props.from), "dd/MM")}–${format(parseISO(props.to), "dd/MM")}`
             : t("Filters.Range")
     // PLACEHOLDER(OP-09): a range starts today at the earliest
     // The range holds days of the platform zone, shown as midnights of the device.

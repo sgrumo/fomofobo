@@ -166,7 +166,7 @@ test.describe("map", () => {
             name: t("shared", "Map.Pin", {
                 title: tomorrow.title,
                 status: t("shared", "Status.upcoming"),
-                time: "25.10 18:00",
+                time: "25/10 18:00",
             }),
         })
         const tomorrowChip = getChip(page, t("shared", "Filters.tomorrow"))
@@ -221,7 +221,7 @@ test.describe("map", () => {
             name: t("shared", "Map.Pin", {
                 title: tomorrow.title,
                 status: t("shared", "Status.upcoming"),
-                time: "25.10 18:00",
+                time: "25/10 18:00",
             }),
         })
 
@@ -266,7 +266,7 @@ test.describe("map", () => {
             name: t("shared", "Map.Pin", {
                 title: monday.title,
                 status: t("shared", "Status.upcoming"),
-                time: "26.10 18:00",
+                time: "26/10 18:00",
             }),
         })
 

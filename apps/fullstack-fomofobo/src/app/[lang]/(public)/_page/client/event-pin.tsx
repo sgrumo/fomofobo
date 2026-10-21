@@ -13,7 +13,7 @@ interface EventPinProps extends RouteClientComponentProps<"root"> {
     title: string
     status: OccurrenceStatus
     startTime: string
-    // `dd.MM` of a start on another day than today, undefined for today
+    // `dd/MM` of a start on another day than today, undefined for today
     startDay: string | undefined
     icon: CategoryIcon
     onSelect: () => void
