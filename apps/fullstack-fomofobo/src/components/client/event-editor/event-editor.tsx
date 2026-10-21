@@ -9,7 +9,6 @@ import { useForm } from "react-shared"
 import { Alert } from "ui-components/alert"
 import { AlertConfirmationDialog } from "ui-components/alert-dialog"
 import { Button } from "ui-components/button"
-import { Field } from "ui-components/field"
 import { Form } from "ui-components/form"
 import { useToast } from "ui-components/toast"
 
@@ -22,7 +21,6 @@ import {
     eventFormStateToUpsert,
     initialEventFormState,
 } from "@/components/client/event-form/event-form.state"
-import { PhotoGalleryEditor } from "@/components/client/photo-gallery-editor/photo-gallery-editor"
 import { routes } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
 import { ORGANIZER_PICKER_SIZE } from "@/lib/backoffice/lists"
@@ -179,28 +177,16 @@ export const EventEditor = (props: EventEditorProps) => {
                               }))
                             : undefined
                     }
+                    onPhotosChange={change => {
+                        setForm(previous =>
+                            eventFormReducer(previous, {
+                                type: "photos",
+                                value: change(previous.photos ?? []),
+                            }),
+                        )
+                    }}
                     disabled={isPending}
                 />
-                {/* PLACEHOLDER(OP-13): 1 to `MAX_EVENT_PHOTOS` photos */}
-                <Field
-                    label={t("Backoffice.Photos.Label")}
-                    description={t("Backoffice.Photos.Hint")}
-                    required={true}
-                    errors={errors?.photos?.errors}
-                >
-                    <PhotoGalleryEditor
-                        value={form.photos ?? []}
-                        onValueChange={change => {
-                            setForm(previous =>
-                                eventFormReducer(previous, {
-                                    type: "photos",
-                                    value: change(previous.photos ?? []),
-                                }),
-                            )
-                        }}
-                        disabled={isPending}
-                    />
-                </Field>
             </Form>
             <div className="flex flex-wrap gap-2">
                 <Button

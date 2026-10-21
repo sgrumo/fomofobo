@@ -19,12 +19,14 @@ import { StringInput } from "ui-components/string-input"
 import { Textarea } from "ui-components/textarea"
 import { TimeInput } from "ui-components/time-input"
 
+import { PhotoGalleryEditor } from "@/components/client/photo-gallery-editor/photo-gallery-editor"
 import { expandOccurrences } from "@/lib/events/expand-occurrences"
 import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 import type {
     EventFormAction,
     EventFormOption,
+    EventFormPhoto,
     EventFormState,
     EventMonthlyMode,
     EventRepeat,
@@ -36,21 +38,21 @@ const MONTHLY_MODES: EventMonthlyMode[] = ["day-of-month", "weekday-position"]
 // Monday first, the Italian week
 const WEEK: WeekDay[] = [...weekDays.slice(1), "sunday"]
 
-interface EventFormProps {
+interface EventSectionProps {
     value: EventFormState
     onValueChange: (value: EventFormState) => void
     errors: FormErrors<EventFormState> | undefined
-    categories: Category[]
-    venues: EventFormOption[]
-    organizers: EventFormOption[] | undefined
     disabled?: boolean
 }
 
-export const EventForm = (props: EventFormProps) => {
+interface EventBasicsSectionProps extends EventSectionProps {
+    categories: Category[]
+    organizers: EventFormOption[] | undefined
+}
+
+export const EventBasicsSection = (props: EventBasicsSectionProps) => {
     const { t } = useTranslation("shared")
-    const [addedDate, setAddedDate] = useState<Date | undefined>(undefined)
     const value = props.value
-    const repeat = value.repeat ?? "single"
 
     const onAction = (action: EventFormAction) => {
         props.onValueChange(eventFormReducer(value, action))
@@ -59,46 +61,6 @@ export const EventForm = (props: EventFormProps) => {
     const selectedCategories = props.categories.filter(category =>
         (value.categoryIds ?? []).includes(category.id),
     )
-    const startsAt = localDateTimeOf(value.startDate, value.startTime)
-    const endsAt = localDateTimeOf(value.endDate, value.endTime)
-    const until = value.until === undefined ? undefined : isoDate(value.until)
-    const removedDates = value.removedDates ?? []
-    const addedDates = value.addedDates ?? []
-    // The removed dates stay in the preview, so a removal can be undone
-    const preview =
-        startsAt === undefined || endsAt === undefined
-            ? undefined
-            : expandOccurrences(
-                  {
-                      startsAt,
-                      endsAt,
-                      recurrence:
-                          repeat === "single" || until === undefined
-                              ? null
-                              : {
-                                    rule:
-                                        repeat === "weekly"
-                                            ? {
-                                                  frequency: "weekly",
-                                                  weekdays: value.weekdays ?? [],
-                                                  until,
-                                              }
-                                            : {
-                                                  frequency: "monthly",
-                                                  mode:
-                                                      value.monthlyMode ?? "day-of-month",
-                                                  until,
-                                              },
-                                    addedDates,
-                                    removedDates: [],
-                                },
-                  },
-                  PLATFORM_TIME_ZONE,
-              )
-    const previewDates = preview?.success === true ? preview.value : []
-    const activeCount = previewDates.filter(
-        occurrence => !removedDates.includes(occurrence.localDate),
-    ).length
 
     return (
         <>
@@ -181,28 +143,6 @@ export const EventForm = (props: EventFormProps) => {
                     disabled={props.disabled}
                 />
             </Field>
-            <Field
-                label={t("Backoffice.EventForm.Venue")}
-                required={true}
-                errors={props.errors?.venue?.errors}
-            >
-                <Combobox
-                    type="standard"
-                    async={false}
-                    multiple={false}
-                    resettable={false}
-                    items={props.venues}
-                    value={value.venue}
-                    onValueChange={venue => {
-                        onAction({ type: "venue", value: venue })
-                    }}
-                    getItemId={venue => venue.id}
-                    getItemLabel={venue => venue.name}
-                    renderItem={({ item }) => item.name}
-                    disabled={props.disabled}
-                    className="w-full"
-                />
-            </Field>
             {/* PLACEHOLDER(OP-21, TQ-18): an Admin picks an organizer account */}
             {props.organizers !== undefined && (
                 <Field
@@ -228,6 +168,89 @@ export const EventForm = (props: EventFormProps) => {
                     />
                 </Field>
             )}
+        </>
+    )
+}
+
+interface EventScheduleSectionProps extends EventSectionProps {
+    venues: EventFormOption[]
+}
+
+export const EventScheduleSection = (props: EventScheduleSectionProps) => {
+    const { t } = useTranslation("shared")
+    const [addedDate, setAddedDate] = useState<Date | undefined>(undefined)
+    const value = props.value
+    const repeat = value.repeat ?? "single"
+
+    const onAction = (action: EventFormAction) => {
+        props.onValueChange(eventFormReducer(value, action))
+    }
+
+    const startsAt = localDateTimeOf(value.startDate, value.startTime)
+    const endsAt = localDateTimeOf(value.endDate, value.endTime)
+    const until = value.until === undefined ? undefined : isoDate(value.until)
+    const removedDates = value.removedDates ?? []
+    const addedDates = value.addedDates ?? []
+    // The removed dates stay in the preview, so a removal can be undone
+    const preview =
+        startsAt === undefined || endsAt === undefined
+            ? undefined
+            : expandOccurrences(
+                  {
+                      startsAt,
+                      endsAt,
+                      recurrence:
+                          repeat === "single" || until === undefined
+                              ? null
+                              : {
+                                    rule:
+                                        repeat === "weekly"
+                                            ? {
+                                                  frequency: "weekly",
+                                                  weekdays: value.weekdays ?? [],
+                                                  until,
+                                              }
+                                            : {
+                                                  frequency: "monthly",
+                                                  mode:
+                                                      value.monthlyMode ?? "day-of-month",
+                                                  until,
+                                              },
+                                    addedDates,
+                                    removedDates: [],
+                                },
+                  },
+                  PLATFORM_TIME_ZONE,
+              )
+    const previewDates = preview?.success === true ? preview.value : []
+    const activeCount = previewDates.filter(
+        occurrence => !removedDates.includes(occurrence.localDate),
+    ).length
+
+    return (
+        <>
+            <Field
+                label={t("Backoffice.EventForm.Venue")}
+                required={true}
+                errors={props.errors?.venue?.errors}
+            >
+                <Combobox
+                    type="standard"
+                    async={false}
+                    multiple={false}
+                    resettable={false}
+                    items={props.venues}
+                    value={value.venue}
+                    onValueChange={venue => {
+                        onAction({ type: "venue", value: venue })
+                    }}
+                    getItemId={venue => venue.id}
+                    getItemLabel={venue => venue.name}
+                    renderItem={({ item }) => item.name}
+                    disabled={props.disabled}
+                    className="w-full"
+                />
+            </Field>
             <div className="grid grid-cols-2 gap-3">
                 <Field
                     label={t("Backoffice.EventForm.StartDate")}
@@ -488,6 +511,47 @@ export const EventForm = (props: EventFormProps) => {
                     </>
                 )}
             </section>
+        </>
+    )
+}
+
+interface EventPhotosSectionProps {
+    photos: EventFormPhoto[] | undefined
+    onPhotosChange: (update: (photos: EventFormPhoto[]) => EventFormPhoto[]) => void
+    errors: FormErrors<EventFormState> | undefined
+    disabled?: boolean
+}
+
+export const EventPhotosSection = (props: EventPhotosSectionProps) => {
+    const { t } = useTranslation("shared")
+
+    // PLACEHOLDER(OP-13): 1 to `MAX_EVENT_PHOTOS` photos
+    return (
+        <Field
+            label={t("Backoffice.Photos.Label")}
+            description={t("Backoffice.Photos.Hint")}
+            required={true}
+            errors={props.errors?.photos?.errors}
+        >
+            <PhotoGalleryEditor
+                value={props.photos ?? []}
+                onValueChange={props.onPhotosChange}
+                disabled={props.disabled}
+            />
+        </Field>
+    )
+}
+
+export const EventDetailsSection = (props: EventSectionProps) => {
+    const { t } = useTranslation("shared")
+    const value = props.value
+
+    const onAction = (action: EventFormAction) => {
+        props.onValueChange(eventFormReducer(value, action))
+    }
+
+    return (
+        <>
             {/* OP-14: an empty price reads "Gratis" in the public app */}
             <Field
                 label={t("Backoffice.EventForm.Price")}
@@ -534,3 +598,39 @@ export const EventForm = (props: EventFormProps) => {
         </>
     )
 }
+
+interface EventFormProps extends EventBasicsSectionProps, EventScheduleSectionProps {
+    onPhotosChange: EventPhotosSectionProps["onPhotosChange"]
+}
+
+export const EventForm = (props: EventFormProps) => (
+    <>
+        <EventBasicsSection
+            value={props.value}
+            onValueChange={props.onValueChange}
+            errors={props.errors}
+            categories={props.categories}
+            organizers={props.organizers}
+            disabled={props.disabled}
+        />
+        <EventScheduleSection
+            value={props.value}
+            onValueChange={props.onValueChange}
+            errors={props.errors}
+            venues={props.venues}
+            disabled={props.disabled}
+        />
+        <EventPhotosSection
+            photos={props.value.photos}
+            onPhotosChange={props.onPhotosChange}
+            errors={props.errors}
+            disabled={props.disabled}
+        />
+        <EventDetailsSection
+            value={props.value}
+            onValueChange={props.onValueChange}
+            errors={props.errors}
+            disabled={props.disabled}
+        />
+    </>
+)
