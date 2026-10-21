@@ -90,6 +90,8 @@ Organizers see, create, edit and delete only their own events, and the event of 
 
 A deleted event leaves the app and the backoffice, and its photos leave the public bucket.
 
+The event form opens as a wizard of five steps: basics, place and time, photos, details, and a review that saves. A later step opens only once every step before it is complete, and the user can always go back. The user can switch to the full form at any time, and the device remembers the choice.
+
 ### Organizer management
 
 Admins create organizer accounts with a name and an email, and block or unblock them. Admins see every event, organizer, venue and category of the platform, with the blocked state of events and organizers. The backoffice shows no statistics.
