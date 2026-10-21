@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-10-21 · English dropped, the app speaks Italian
+
+### Changed
+
+The app serves Italian alone, and an old link to an English page opens the Italian page. The English copy of every screen left the app.
+
+### Why
+
+A client request. The owner wants the app in one language.
+
+### Check next time
+
+Agree on the languages of the app before the team writes the copy of the first screen.
+
 ## 2026-10-19 · Ended events hidden, their photos purged
 
 ### Changed
