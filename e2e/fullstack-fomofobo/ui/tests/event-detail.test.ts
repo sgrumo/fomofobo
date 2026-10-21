@@ -46,6 +46,35 @@ test.describe("event detail", () => {
         await expect(page.getByText(t("shared", "NotFound.Title"))).toBeVisible()
     })
 
+    test("describes the occurrence for a shared link", async ({ page, baseURL }) => {
+        const venue = await seedVenue(buildArea())
+        const event = await seedPublicEvent(
+            { venue, category: await seedCategory() },
+            { description: null },
+        )
+
+        await gotoPage(page, `/events/${event.id}/2026-10-24/`)
+
+        const meta = (key: string) => page.locator(`head meta[${key}]`)
+        await expect(meta('property="og:title"')).toHaveAttribute("content", event.title)
+        await expect(meta('property="og:description"')).toHaveAttribute(
+            "content",
+            `sab 24/10 · 21:00 · ${venue.name}`,
+        )
+        await expect(meta('property="og:url"')).toHaveAttribute(
+            "content",
+            `${String(baseURL)}/it/events/${event.id}/2026-10-24`,
+        )
+        await expect(meta('property="og:image"')).toHaveAttribute(
+            "content",
+            /^https?:\/\//u,
+        )
+        await expect(meta('name="twitter:card"')).toHaveAttribute(
+            "content",
+            "summary_large_image",
+        )
+    })
+
     test("opens an old English link in Italian", async ({ page }) => {
         const event = await seedPublicEvent(
             { venue: await seedVenue(buildArea()), category: await seedCategory() },
