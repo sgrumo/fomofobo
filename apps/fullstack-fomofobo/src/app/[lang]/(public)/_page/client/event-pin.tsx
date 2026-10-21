@@ -54,10 +54,7 @@ export const EventPin = (props: EventPinProps) => {
                         : `${props.startDay} ${props.startTime}`,
             })}
             onClick={props.onSelect}
-            className={cn(
-                "flex cursor-pointer flex-col items-center gap-1",
-                props.status === "ended" && "opacity-60",
-            )}
+            className="flex cursor-pointer flex-col items-center gap-1"
         >
             {badge}
             <span className="relative flex size-9 items-center justify-center">

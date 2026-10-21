@@ -10,12 +10,12 @@
     --palette-paper: #f0eade;
     --palette-paper-muted: #e4ddcc;
     --palette-line-muted: #c6c0ae;
+    --palette-gray-light: #cbcbc6;
     --palette-red: #f6481e;
     --palette-red-strong: #b8300f;
     --palette-red-pale: #f9d5c8;
     --palette-yellow: #f6d242;
     --palette-yellow-pale: #f8e7a8;
-    --palette-green-faded: #6c9654;
     --palette-green-strong: #276b33;
     --palette-green-pale: #d6ead0;
     --palette-lilac: #f0b4fc;
@@ -62,7 +62,7 @@
     --color-live: var(--palette-red);
     --color-live-strong: var(--palette-red-strong);
     --color-upcoming: var(--palette-yellow);
-    --color-ended: var(--palette-green-faded);
+    --color-ended: var(--palette-gray-light);
     --color-social: var(--palette-lilac);
     --color-position: var(--palette-lilac);
 
