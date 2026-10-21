@@ -75,6 +75,41 @@ test.describe("event detail", () => {
         )
     })
 
+    test("links each share target to the page, and copies the link", async ({
+        page,
+        context,
+        baseURL,
+    }) => {
+        const event = await seedPublicEvent(
+            { venue: await seedVenue(buildArea()), category: await seedCategory() },
+            {},
+        )
+        const pageUrl = `${String(baseURL)}/it/events/${event.id}/2026-10-24`
+        await context.grantPermissions(["clipboard-read", "clipboard-write"])
+
+        await gotoPage(page, `/events/${event.id}/2026-10-24/`)
+
+        for (const [target, host] of [
+            ["whatsapp", "https://wa.me/"],
+            ["telegram", "https://t.me/share/url"],
+            ["facebook", "https://www.facebook.com/sharer/sharer.php"],
+            ["x", "https://x.com/intent/tweet"],
+        ] as const) {
+            const link = page.getByRole("link", {
+                name: t("shared", `Detail.ShareOn.${target}`),
+            })
+            await expect(link).toHaveAttribute("href", new RegExp(`^${host}`, "u"))
+            expect(await link.getAttribute("href")).toContain(encodeURIComponent(pageUrl))
+        }
+
+        await clickIconButton(page, t("shared", "Detail.ShareOn.Copy"))
+
+        await expectToast(page, { type: "success" }, t("shared", "Detail.LinkCopied"))
+        await dismissToast(page, { type: "success" }, t("shared", "Detail.LinkCopied"))
+        // A string expression: the suite compiles without the DOM types of the browser.
+        expect(await page.evaluate("navigator.clipboard.readText()")).toBe(pageUrl)
+    })
+
     test("opens an old English link in Italian", async ({ page }) => {
         const event = await seedPublicEvent(
             { venue: await seedVenue(buildArea()), category: await seedCategory() },
