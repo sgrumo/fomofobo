@@ -124,19 +124,16 @@ export const EventMap = (props: EventMapProps) => {
         map?.flyTo({ center: [longitude, latitude] })
     }, [map, latitude, longitude])
 
-    const statuses = props.occurrences.map(occurrence =>
-        occurrenceStatus(
-            {
-                startsAt: new Date(occurrence.startsAt),
-                endsAt: new Date(occurrence.endsAt),
-            },
-            props.now,
-        ),
-    )
     const clusters = buildEventClusters(
-        props.occurrences.map((occurrence, index) => ({
+        props.occurrences.map(occurrence => ({
             coordinates: occurrence.venue.coordinates,
-            live: statuses[index] === "live",
+            status: occurrenceStatus(
+                {
+                    startsAt: new Date(occurrence.startsAt),
+                    endsAt: new Date(occurrence.endsAt),
+                },
+                props.now,
+            ),
         })),
     )
     const features =
@@ -190,6 +187,8 @@ export const EventMap = (props: EventMapProps) => {
                                       route={props.route}
                                       count={feature.properties.point_count}
                                       liveCount={feature.properties.liveCount}
+                                      upcomingCount={feature.properties.upcomingCount}
+                                      endedCount={feature.properties.endedCount}
                                       onExpand={() => {
                                           const zoom =
                                               clusters.getClusterExpansionZoom(clusterId)
@@ -222,8 +221,7 @@ export const EventMap = (props: EventMapProps) => {
                       }
 
                       const occurrence = props.occurrences.at(feature.properties.index)
-                      const status = statuses.at(feature.properties.index)
-                      if (occurrence === undefined || status === undefined) {
+                      if (occurrence === undefined) {
                           return undefined
                       }
                       const startsAt = new Date(occurrence.startsAt)
@@ -239,7 +237,7 @@ export const EventMap = (props: EventMapProps) => {
                               <EventPin
                                   route={props.route}
                                   title={occurrence.title}
-                                  status={status}
+                                  status={feature.properties.status}
                                   startTime={localTimeOf(startsAt, PLATFORM_TIME_ZONE)}
                                   startDay={
                                       localDateOf(startsAt, PLATFORM_TIME_ZONE) === today

@@ -35,7 +35,7 @@
         "Unsupported": "Questo browser non riesce a disegnare la mappa.",
         "LiveBadge": "Live",
         "Pin": "{{title}}, {{status}}, {{time}}",
-        "Cluster": "{{count}} eventi, {{live}} in corso. Ingrandisci",
+        "Cluster": "{{count}} eventi: {{live}} in corso, {{upcoming}} in arrivo, {{ended}} finiti. Ingrandisci",
         "Position": "La tua posizione",
         "Locate": "Centra sulla mia posizione",
         "LocationOff": "La posizione è disattivata. Consentila per vedere gli eventi intorno a te, oppure cerca un luogo.",

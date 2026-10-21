@@ -8,12 +8,13 @@ describe("buildEventClusters", () => {
     const farAway = { latitude: 44.5, longitude: 11.9 }
     const world: [number, number, number, number] = [-180, -85, 180, 85]
 
-    it("merges close points into one cluster that counts its live points", () => {
+    it("merges close points into one cluster that counts its points per status", () => {
         const index = buildEventClusters([
-            { coordinates: venue, live: true },
-            { coordinates: nextDoor, live: false },
-            { coordinates: venue, live: true },
-            { coordinates: farAway, live: true },
+            { coordinates: venue, status: "live" },
+            { coordinates: nextDoor, status: "upcoming" },
+            { coordinates: venue, status: "live" },
+            { coordinates: nextDoor, status: "ended" },
+            { coordinates: farAway, status: "live" },
         ])
 
         const properties = index.getClusters(world, 12).map(feature => feature.properties)
@@ -21,16 +22,22 @@ describe("buildEventClusters", () => {
         expect(properties).toHaveLength(2)
         expect(properties).toStrictEqual(
             expect.arrayContaining([
-                expect.objectContaining({ cluster: true, point_count: 3, liveCount: 2 }),
-                { index: 3, live: true },
+                expect.objectContaining({
+                    cluster: true,
+                    point_count: 4,
+                    liveCount: 2,
+                    upcomingCount: 1,
+                    endedCount: 1,
+                }),
+                { index: 4, status: "live" },
             ]),
         )
     })
 
     it("keeps the result index of each single point", () => {
         const index = buildEventClusters([
-            { coordinates: venue, live: false },
-            { coordinates: farAway, live: true },
+            { coordinates: venue, status: "ended" },
+            { coordinates: farAway, status: "live" },
         ])
 
         const properties = index.getClusters(world, 17).map(feature => feature.properties)
@@ -38,8 +45,8 @@ describe("buildEventClusters", () => {
         expect(properties).toHaveLength(2)
         expect(properties).toStrictEqual(
             expect.arrayContaining([
-                { index: 0, live: false },
-                { index: 1, live: true },
+                { index: 0, status: "ended" },
+                { index: 1, status: "live" },
             ]),
         )
     })
