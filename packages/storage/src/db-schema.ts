@@ -115,6 +115,21 @@ export const rateLimits = sqliteTable("rate_limits", {
     count: integer("count").notNull(),
 })
 
+// One row at id 1. With no row, the defaults of `models` apply: a reset deletes it
+export const platformSettings = sqliteTable(
+    "platform_settings",
+    {
+        id: integer("id").primaryKey(),
+        endedVisibleDays: integer("ended_visible_days").notNull(),
+        participantThreshold: integer("participant_threshold").notNull(),
+        updatedBy: text("updated_by").references(() => accounts.id, {
+            onDelete: "set null",
+        }),
+        updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+    },
+    table => [check("platform_settings_single_row", sql`${table.id} = 1`)],
+)
+
 export const categories = sqliteTable(
     "categories",
     {

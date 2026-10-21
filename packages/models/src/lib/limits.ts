@@ -6,6 +6,10 @@ export const MAX_PASSWORD_LENGTH = 128
 export const MAX_EVENT_PHOTOS = 10
 
 export const ENDED_OCCURRENCE_VISIBLE_MS = 3 * 24 * 60 * 60 * 1000
+export const DEFAULT_ENDED_VISIBLE_DAYS = 3
+export const MAX_ENDED_VISIBLE_DAYS = 90
+export const DEFAULT_PARTICIPANT_THRESHOLD = 20
+export const MAX_PARTICIPANT_THRESHOLD = 1000
 
 // PLACEHOLDER(TQ-04): every limit below
 export const MAX_EVENT_DURATION_HOURS = 24
