@@ -1,6 +1,8 @@
 "use client"
 
 import "./globals.css"
+import { defaultLanguage } from "i18n/i18n"
+
 import { ErrorView } from "@/components/client/error-view/error-view"
 
 interface GlobalErrorProps {
@@ -9,7 +11,7 @@ interface GlobalErrorProps {
 
 // Catches a failure of the root layout itself, so it renders its own document.
 const GlobalError = (props: GlobalErrorProps) => (
-    <html lang="en">
+    <html lang={defaultLanguage}>
         <body>
             <ErrorView
                 error={props.error}

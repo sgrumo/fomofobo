@@ -2,13 +2,10 @@ import "server-only"
 import type { LanguageKey } from "i18n/i18n"
 import type { FlatNamespace, ResourceLanguage } from "i18next"
 
-import enShared from "../../../../public/locales/en/shared.json"
-import enUi from "../../../../public/locales/en/ui.json"
 import itShared from "../../../../public/locales/it/shared.json"
 import itUi from "../../../../public/locales/it/ui.json"
 
 const resources = {
-    en: { shared: enShared, ui: enUi },
     it: { shared: itShared, ui: itUi },
 } satisfies Record<LanguageKey, Record<FlatNamespace, unknown>>
 

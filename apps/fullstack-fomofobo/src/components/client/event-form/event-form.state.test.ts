@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest"
 
 import { createI18nInstance } from "@/lib/i18n/instance"
 
-import shared from "../../../../public/locales/en/shared.json"
-import ui from "../../../../public/locales/en/ui.json"
+import shared from "../../../../public/locales/it/shared.json"
+import ui from "../../../../public/locales/it/ui.json"
 import {
     eventFormReducer,
     eventFormStateFromEvent,
@@ -13,7 +13,7 @@ import {
     localDateTimeOf,
 } from "./event-form.state"
 
-const i18n = createI18nInstance("en", { shared, ui })
+const i18n = createI18nInstance("it", { shared, ui })
 
 const MUSIC_ID = "0d3c9e1a-55f4-4a3e-9d0c-6f1b2a3c4d5e"
 const JAZZ_ID = "8a7b6c5d-4e3f-4a1b-9c8d-7e6f5a4b3c2d"

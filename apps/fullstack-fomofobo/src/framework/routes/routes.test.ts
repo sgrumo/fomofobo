@@ -300,7 +300,7 @@ describe("route objects", () => {
             const otherSchemas = [
                 z.string(),
                 z.enum(["en", "it"]),
-                languageKeySchema.catch("en"),
+                languageKeySchema.catch("it"),
                 languageKeySchema.optional(),
             ]
             expect(

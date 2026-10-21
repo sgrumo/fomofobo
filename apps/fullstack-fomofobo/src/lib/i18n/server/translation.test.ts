@@ -3,8 +3,7 @@ import { describe, expect, it } from "vitest"
 import { getTranslation } from "./translation"
 
 describe("getTranslation", () => {
-    it("should translate a shared key in each language", () => {
-        expect(getTranslation("en")("PageTitle.NotFound")).toBe("Page not found")
+    it("should translate a shared key in Italian", () => {
         expect(getTranslation("it")("PageTitle.NotFound")).toBe("Pagina non trovata")
     })
 

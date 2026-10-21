@@ -153,7 +153,7 @@ backoffice/login              -> signInWithEmail      -> POST /api/auth/sign-in/
 - The server reads the language from the parsed `lang` parameter of `getStaticRoute` / `getDynamicRoute`. The page passes it to its frame as a prop. A route handler passes `defaultLanguage`
 - Locale files are imported in one server-only module, `src/lib/i18n/server/resources.ts`. The root layout passes the resources of the URL language to `I18nProvider` as a prop. No fetch, no detector
 - One instance from context: `useTranslation()` in components, its `i18n` for `parseFormState`. **NEVER** build a second instance in a component. Server titles go through `getTranslation`
-- The language switcher is a row of links to the current pathname with the first segment replaced (`replaceLanguage`), inside a `Suspense` because `useSearchParams` suspends a prerendered page
+- `languageKeys` holds `it` alone, so the app has no language switcher. The `[lang]` segment stays, so a language can come back without moving a route
 - Translations: `public/locales/${locale}/${namespace}.json`. `instance.ts` lists the namespaces by hand, the locale test checks the list
 - `[lang]/[...rest]/page.tsx` catches every unmatched path -> `notFound()` -> `[lang]/not-found.tsx` in the URL language, status `404`
 

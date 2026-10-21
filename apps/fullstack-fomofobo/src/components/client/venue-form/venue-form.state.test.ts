@@ -2,15 +2,15 @@ import { describe, expect, it } from "vitest"
 
 import { createI18nInstance } from "@/lib/i18n/instance"
 
-import shared from "../../../../public/locales/en/shared.json"
-import ui from "../../../../public/locales/en/ui.json"
+import shared from "../../../../public/locales/it/shared.json"
+import ui from "../../../../public/locales/it/ui.json"
 import {
     initialVenueFormState,
     venueFormReducer,
     venueFormStateToCreation,
 } from "./venue-form.state"
 
-const i18n = createI18nInstance("en", { shared, ui })
+const i18n = createI18nInstance("it", { shared, ui })
 
 describe("venueFormReducer", () => {
     it("fills the address and the coordinates from a picked place", () => {

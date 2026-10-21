@@ -29,29 +29,29 @@ const redirectOf = (pathname: string): string | undefined => {
 
 describe("languageRedirects", () => {
     it("should send the bare root to the default language", () => {
-        expect(redirectOf("/")).toBe("/en")
+        expect(redirectOf("/")).toBe("/it")
     })
 
     it("should prefix a path with no language", () => {
-        expect(redirectOf("/todos")).toBe("/en/todos")
-        expect(redirectOf("/todos/search")).toBe("/en/todos/search")
-        expect(redirectOf("/dev/showcase")).toBe("/en/dev/showcase")
+        expect(redirectOf("/saved")).toBe("/it/saved")
+        expect(redirectOf("/events/a/2026-10-24")).toBe("/it/events/a/2026-10-24")
+        expect(redirectOf("/dev/showcase")).toBe("/it/dev/showcase")
     })
 
     it("should replace an unsupported two-letter language", () => {
-        expect(redirectOf("/de")).toBe("/en")
-        expect(redirectOf("/de/todos/search")).toBe("/en/todos/search")
+        expect(redirectOf("/en")).toBe("/it")
+        expect(redirectOf("/en/events/a/2026-10-24")).toBe("/it/events/a/2026-10-24")
+        expect(redirectOf("/de/saved")).toBe("/it/saved")
     })
 
     it("should leave a supported language alone", () => {
-        expect(redirectOf("/en")).toBeUndefined()
-        expect(redirectOf("/en/todos")).toBeUndefined()
-        expect(redirectOf("/it/todos/search")).toBeUndefined()
+        expect(redirectOf("/it")).toBeUndefined()
+        expect(redirectOf("/it/events/a/2026-10-24")).toBeUndefined()
     })
 
     it("should read the language as a whole segment", () => {
-        expect(redirectOf("/entries")).toBe("/en/entries")
-        expect(redirectOf("/italy/todos")).toBe("/en/italy/todos")
+        expect(redirectOf("/entries")).toBe("/it/entries")
+        expect(redirectOf("/italy/saved")).toBe("/it/italy/saved")
     })
 
     it("should leave the route handlers, the Next assets and the public files alone", () => {

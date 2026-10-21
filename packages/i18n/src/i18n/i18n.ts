@@ -7,16 +7,15 @@ import type {
 import { Result } from "shared/result"
 import { z } from "zod"
 
-export const languageKeys = ["en", "it"] as const
+export const languageKeys = ["it"] as const
 export const languageKeySchema = z.enum(languageKeys)
 export type LanguageKey = z.infer<typeof languageKeySchema>
 
-export const defaultLanguage: LanguageKey = "en"
+export const defaultLanguage: LanguageKey = "it"
 export const fallbackLanguage: LanguageKey = defaultLanguage
 export const defaultNS = "shared"
 
 const zodLocales: Record<LanguageKey, () => Partial<z.core.$ZodConfig>> = {
-    en: z.locales.en,
     it: z.locales.it,
 }
 

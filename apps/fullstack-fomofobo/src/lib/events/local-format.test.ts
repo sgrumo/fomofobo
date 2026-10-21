@@ -17,8 +17,7 @@ describe("weekdayDateOf", () => {
 
     it.each([
         { language: "it", timeZone: "Europe/Rome", expected: "gio 15.10" },
-        { language: "en", timeZone: "Europe/Rome", expected: "Thu 15.10" },
-        { language: "en", timeZone: "UTC", expected: "Wed 14.10" },
+        { language: "it", timeZone: "UTC", expected: "mer 14.10" },
     ])(
         "reads $expected in $language and $timeZone",
         ({ language, timeZone, expected }) => {

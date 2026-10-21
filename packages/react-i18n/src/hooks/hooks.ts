@@ -1,4 +1,4 @@
-import { enUS, it } from "date-fns/locale"
+import { it } from "date-fns/locale"
 import type { Locale } from "date-fns/locale"
 import { pipe } from "es-toolkit/fp"
 import type { LanguageKey } from "i18n/i18n"
@@ -19,7 +19,6 @@ export const useLanguage = (): LanguageKey => {
 }
 
 const dateFnsLocales: Record<LanguageKey, Locale> = {
-    en: enUS,
     it,
 }
 

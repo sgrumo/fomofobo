@@ -5,11 +5,6 @@
         "UpdateReady": "A new version of Fomofobo is ready.",
         "Reload": "Reload"
     },
-    "Language": {
-        "Label": "Language",
-        "en": "English",
-        "it": "Italiano"
-    },
     "Routes": {
         "Home": "Home",
         "Dev": "Dev"

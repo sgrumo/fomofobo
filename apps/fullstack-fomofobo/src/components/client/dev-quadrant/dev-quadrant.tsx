@@ -7,7 +7,6 @@ import { Field } from "ui-components/field"
 import { IconChevronRight, IconHorizontalLine } from "ui-components/icons"
 import { NumberInput } from "ui-components/number-input"
 
-import { LanguageSwitcher } from "@/components/client/language-switcher/language-switcher"
 import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import { localStorageSchema } from "@/lib/storage/local-storage"
 import type { LocalStorageItem } from "@/lib/storage/local-storage"
@@ -100,9 +99,6 @@ export const DevQuadrant = () => {
                             </button>
                         </div>
                     </div>
-                    <Field label="Language" required={false}>
-                        <LanguageSwitcher />
-                    </Field>
                     <DevApiDelay />
                     <DevQueryActions />
                 </div>

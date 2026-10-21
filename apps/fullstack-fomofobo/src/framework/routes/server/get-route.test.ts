@@ -14,14 +14,14 @@ const catalogRoute = createStaticRoute({
     title: ({ t }) => t("PageTitle.NotFound"),
     parametersSchema: regionSchema,
     generateStaticParams: () => [
-        { lang: "en", region: "eu" },
-        { lang: "en", region: "us" },
+        { lang: "it", region: "eu" },
+        { lang: "it", region: "us" },
     ],
 })
 
 const shelvesRoute = createDynamicRoute({
     segments: ["[lang]", "[region]", "shelves"],
-    title: ({ t }) => t("Language.Label"),
+    title: ({ t }) => t("Routes.Home"),
     parametersSchema: regionSchema,
     querySchema: z.object({}),
 })
@@ -50,7 +50,7 @@ const chapterStaticRoute = createStaticRoute({
         isbn: z.string(),
         chapter: z.string(),
     }),
-    generateStaticParams: () => [{ lang: "en", isbn: "978-0", chapter: "1" }],
+    generateStaticParams: () => [{ lang: "it", isbn: "978-0", chapter: "1" }],
 })
 
 const chapterDynamicRoute = createDynamicRoute({
@@ -67,12 +67,12 @@ const chapterDynamicRoute = createDynamicRoute({
 describe("getStaticRoute", () => {
     it("should parse the parameters and build the path and the title", async () => {
         const values = await getStaticRoute(catalogRoute, {
-            params: Promise.resolve({ lang: "en", region: "eu" }),
+            params: Promise.resolve({ lang: "it", region: "eu" }),
         })
         expect(values).toStrictEqual({
-            parameters: { lang: "en", region: "eu" },
-            path: "/en/eu/catalog",
-            title: "Page not found",
+            parameters: { lang: "it", region: "eu" },
+            path: "/it/eu/catalog",
+            title: "Pagina non trovata",
         })
     })
 
@@ -87,11 +87,11 @@ describe("getStaticRoute", () => {
     it("should accept only a static route", () => {
         const check = () => [
             getStaticRoute(chapterStaticRoute, {
-                params: Promise.resolve({ lang: "en", isbn: "978-0", chapter: "1" }),
+                params: Promise.resolve({ lang: "it", isbn: "978-0", chapter: "1" }),
             }),
             // @ts-expect-error the route is dynamic, with or without query keys
             getStaticRoute(shelvesRoute, {
-                params: Promise.resolve({ lang: "en", region: "eu" }),
+                params: Promise.resolve({ lang: "it", region: "eu" }),
             }),
         ]
         expect(check).toBeTypeOf("function")
@@ -101,7 +101,7 @@ describe("getStaticRoute", () => {
 describe("getDynamicRoute", () => {
     it("should parse the parameters, decode the query, and build the path", async () => {
         const values = await getDynamicRoute(bookSearchRoute, {
-            params: Promise.resolve({ lang: "en", region: "us" }),
+            params: Promise.resolve({ lang: "it", region: "us" }),
             searchParams: Promise.resolve({
                 author: "Calvino",
                 sort: "year",
@@ -111,9 +111,9 @@ describe("getDynamicRoute", () => {
         })
 
         expect(values).toStrictEqual({
-            parameters: { lang: "en", region: "us" },
+            parameters: { lang: "it", region: "us" },
             query: { author: "Calvino", sort: "year", available: true },
-            path: "/en/us/books?author=Calvino&sort=year&available=yes",
+            path: "/it/us/books?author=Calvino&sort=year&available=yes",
             title: "Dev",
         })
     })
@@ -130,18 +130,18 @@ describe("getDynamicRoute", () => {
             params: Promise.resolve({ lang: "it", region: "eu" }),
             searchParams: Promise.resolve({}),
         })
-        expect(shelves.title).toBe("Lingua")
+        expect(shelves.title).toBe("Home")
     })
 
     it("should accept only a dynamic route", () => {
         const check = () => [
             getDynamicRoute(chapterDynamicRoute, {
-                params: Promise.resolve({ lang: "en", isbn: "978-0", chapter: "1" }),
+                params: Promise.resolve({ lang: "it", isbn: "978-0", chapter: "1" }),
                 searchParams: Promise.resolve({}),
             }),
             // @ts-expect-error the route is static
             getDynamicRoute(catalogRoute, {
-                params: Promise.resolve({ lang: "en", region: "eu" }),
+                params: Promise.resolve({ lang: "it", region: "eu" }),
                 searchParams: Promise.resolve({}),
             }),
         ]
@@ -151,7 +151,7 @@ describe("getDynamicRoute", () => {
     it("should type the values from the route", () => {
         const check = async () => {
             const values = await getDynamicRoute(chapterDynamicRoute, {
-                params: Promise.resolve({ lang: "en", isbn: "978-0", chapter: "1" }),
+                params: Promise.resolve({ lang: "it", isbn: "978-0", chapter: "1" }),
                 searchParams: Promise.resolve({}),
             })
             expectTypeOf(values).toEqualTypeOf<{
