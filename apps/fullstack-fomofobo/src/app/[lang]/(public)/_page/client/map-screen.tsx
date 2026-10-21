@@ -346,7 +346,6 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 occurrence={selected}
                 loadFailed={detail.isError}
                 categories={categoriesById}
-                position={position}
                 now={now}
                 paging={
                     sameSpot.length > 1 && spotIndex !== -1

@@ -1,10 +1,9 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import type { GeoPoint, OccurrenceDetail } from "models"
+import type { OccurrenceDetail } from "models"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
-import { isDefined } from "shared/values"
 import { Badge } from "ui-components/badge"
 import { IconButton } from "ui-components/icon-button"
 import {
@@ -28,10 +27,7 @@ import { localTimeOf, weekdayDateOf } from "@/lib/events/local-format"
 import { occurrenceProgress } from "@/lib/events/occurrence-progress"
 import { occurrenceStatus } from "@/lib/events/occurrence-status"
 import { directionsUrl, mapsProviderOf } from "@/lib/geo/directions-url"
-import { formatDistance } from "@/lib/geo/format-distance"
-import { haversineDistance } from "@/lib/geo/haversine-distance"
 import { useBackToMap } from "@/lib/hooks/use-back-to-map"
-import { useGeolocation } from "@/lib/hooks/use-geolocation"
 import { useNow } from "@/lib/hooks/use-now"
 import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
@@ -48,7 +44,6 @@ export const EventDetailView = (props: RouteClientComponentProps<"eventDetail">)
     const goBack = useBackToMap()
     const toast = useToast()
     const now = useNow(CLOCK_TICK_MS)
-    const geolocation = useGeolocation()
     const { parameters } = useDynamicRoute(routes[props.route])
     // The page renders only after the server read the occurrence, so the cache holds it.
     const { data: occurrence } = useQuery(
@@ -109,16 +104,7 @@ export const EventDetailView = (props: RouteClientComponentProps<"eventDetail">)
                     </>
                 }
             />
-            <OccurrenceBody
-                occurrence={occurrence}
-                now={now}
-                position={
-                    geolocation.state.status === "granted"
-                        ? geolocation.state.position
-                        : undefined
-                }
-                language={language}
-            />
+            <OccurrenceBody occurrence={occurrence} now={now} language={language} />
             <nav
                 aria-label={t("Detail.Actions")}
                 className="bg-surface border-line fixed inset-x-0 bottom-0 flex gap-3 border-t-2 p-4"
@@ -175,7 +161,6 @@ export const EventDetailView = (props: RouteClientComponentProps<"eventDetail">)
 interface OccurrenceBodyProps {
     occurrence: OccurrenceDetail
     now: Date
-    position: GeoPoint | undefined
     language: string
 }
 
@@ -199,17 +184,7 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
         },
         { label: t("Detail.Time"), value: `${startTime}→${endTime}` },
         { label: t("Detail.Entry"), value: occurrence.price ?? t("Preview.Free") },
-        // PLACEHOLDER(OP-19): no distance without the position of the device
-        props.position === undefined
-            ? undefined
-            : {
-                  label: t("Detail.Distance"),
-                  value: formatDistance(
-                      haversineDistance(props.position, occurrence.venue.coordinates),
-                      props.language,
-                  ),
-              },
-    ].filter(isDefined)
+    ]
 
     return (
         <>

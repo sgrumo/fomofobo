@@ -1,6 +1,6 @@
 "use client"
 
-import type { Category, GeoPoint, OccurrenceSummary } from "models"
+import type { Category, OccurrenceSummary } from "models"
 import type { ReactNode } from "react"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
@@ -27,8 +27,6 @@ import { countdownParts } from "@/lib/events/countdown"
 import { localTimeOf } from "@/lib/events/local-format"
 import { occurrenceProgress } from "@/lib/events/occurrence-progress"
 import { occurrenceStatus } from "@/lib/events/occurrence-status"
-import { formatDistance } from "@/lib/geo/format-distance"
-import { haversineDistance } from "@/lib/geo/haversine-distance"
 import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 interface PreviewPaging {
@@ -43,7 +41,6 @@ interface EventPreviewProps extends RouteClientComponentProps<"root"> {
     occurrence: OccurrenceSummary | undefined
     loadFailed: boolean
     categories: ReadonlyMap<string, Category>
-    position: GeoPoint | undefined
     now: Date
     paging: PreviewPaging | undefined
     onClose: () => void
@@ -76,13 +73,6 @@ const PreviewBody = (props: PreviewBodyProps) => {
             : t("Countdown.Minutes", { ...remaining })
     const details = [
         ...occurrence.categoryIds.map(id => props.categories.get(id)?.name),
-        // PLACEHOLDER(OP-19): no distance without the position of the device
-        props.position === undefined
-            ? undefined
-            : formatDistance(
-                  haversineDistance(props.position, occurrence.venue.coordinates),
-                  language,
-              ),
         occurrence.price ?? t("Preview.Free"),
     ].filter(isDefined)
 
@@ -219,7 +209,6 @@ export const EventPreview = (props: EventPreviewProps) => {
                         route={props.route}
                         occurrence={props.occurrence}
                         categories={props.categories}
-                        position={props.position}
                         now={props.now}
                         paging={props.paging}
                         closeButton={closeButton}
