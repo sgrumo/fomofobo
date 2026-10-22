@@ -7,6 +7,7 @@
         "./debug": "./src/debug.ts",
         "./env": "./src/env.ts",
         "./function": "./src/function.ts",
+        "./image": "./src/image.ts",
         "./result": "./src/result.ts",
         "./semver": "./src/semver.ts",
         "./temporal": "./src/temporal.ts",
