@@ -16,7 +16,6 @@ import { ContextMenuSamples } from "./context-menu-samples"
 import { DateInputSamples } from "./date-input-samples"
 import { DayPickerSamples } from "./day-picker-samples"
 import { DialogSamples } from "./dialog-samples"
-import { DitheredImageSamples } from "./dithered-image-samples"
 import { DrawerSamples } from "./drawer-samples"
 import { FallbackBoxSamples } from "./fallback-box-samples"
 import { FormSamples } from "./form-samples"
@@ -160,9 +159,6 @@ export const ComponentsSamples = () => (
         </SamplesSection>
         <SamplesSection title="Chip Samples">
             <ChipSamples />
-        </SamplesSection>
-        <SamplesSection title="Dithered Image Samples">
-            <DitheredImageSamples />
         </SamplesSection>
         <SamplesSection title="Icon Button Samples">
             <IconButtonSamples />

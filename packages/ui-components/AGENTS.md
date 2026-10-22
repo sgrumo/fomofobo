@@ -66,7 +66,6 @@ Headless, app-agnostic React UI primitives built on `@base-ui/react`. Consumed b
 - `avatar` - user avatar
 - `badge` - filled tag with an optional leading square dot
 - `stat-grid` - outlined grid of label and value cells
-- `dithered-image` - image drawn as a two-color ordered dither, the plain image as fallback
 - `pagination` - page navigation
 - `icons` - SVG icon component set
 - `pixel-icons` - pixel icon set on a 12 x 12 grid, one component per icon, plus `PixelIcon`, which takes the icon name

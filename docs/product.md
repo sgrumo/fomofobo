@@ -20,7 +20,7 @@ A venue is a reusable place with a name, an address and coordinates. Every event
 
 ### Events
 
-An event has a title, one or more categories, one venue, a start and an end, an ordered photo gallery whose first photo is the cover, optional Instagram and Facebook links, an optional price in free text and an owning organizer. The public app shows an event with no price as free. The end is later than the start and can fall on the next day. An event holds one to ten photos, and the account that writes the event uploads them.
+An event has a title, one or more categories, one venue, a start and an end, an ordered photo gallery whose first photo is the cover, optional Instagram and Facebook links, an optional price in free text and an owning organizer. The public app shows an event with no price as free. The end is later than the start and can fall on the next day. An event holds one to ten photos, and the account that writes the event uploads them. Each photo is stored as a two-color dither, at most 1200 pixels wide.
 
 ### Recurrence and occurrences
 
@@ -107,7 +107,7 @@ The participant threshold gates a count of saves on the event (not built).
 - One Next.js application serves the public app, the event pages and the backoffice, because the analysis keeps them in one program. The app speaks Italian alone. The public app keeps the language segment `/it/` in its URLs, so a second language needs no route move, and the backoffice lives under `/backoffice`.
 - Server Components and route handlers serve the public reads, and Server Actions carry the backoffice writes.
 - Turso, a hosted libSQL database (SQLite), holds categories, venues, events, occurrences and accounts. Occurrences are stored as rows, because the map search filters them by time window and by area.
-- Cloudflare R2 holds the event photos in a public bucket, because shared and offline pages need a stable photo URL. The backoffice uploads the photos straight to the bucket.
+- Cloudflare R2 holds the event photos in a public bucket, because shared and offline pages need a stable photo URL. The backoffice resizes and dithers each photo in the browser, then uploads the 1-bit PNG straight to the bucket, because a dither on the server would spend the CPU budget of the free plan.
 - A daily GitHub workflow runs the photo purge job against the database and the bucket of each environment, on the branch of that environment. The job is a program of its own, so it lives in its own app and not in the Next.js application.
 - Geoapify: place suggestions of the search field, from all of Italy, with the places nearest to the search center first. Each client gets 30 calls a minute, because the free plan has a daily credit limit.
 - OpenFreeMap: the tiles of the event map. The device keeps at most 500 viewed tiles, because the provider caps an offline download at 3,000 tiles.

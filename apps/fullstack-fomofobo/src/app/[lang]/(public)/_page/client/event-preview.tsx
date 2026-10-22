@@ -1,6 +1,7 @@
 "use client"
 
 import type { Category, OccurrenceSummary } from "models"
+import Image from "next/image"
 import type { ReactNode } from "react"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
@@ -13,7 +14,6 @@ import {
     BottomSheetRoot,
     BottomSheetTitle,
 } from "ui-components/bottom-sheet"
-import { DitheredImage } from "ui-components/dithered-image"
 import { IconButton } from "ui-components/icon-button"
 import { PixelIconArrow, PixelIconBack, PixelIconClose } from "ui-components/pixel-icons"
 import { Spinner } from "ui-components/spinner"
@@ -111,10 +111,13 @@ const PreviewBody = (props: PreviewBodyProps) => {
             )}
             <div className="border-line flex gap-3 border-t-2 pt-3">
                 {occurrence.coverPhotoUrl === null ? undefined : (
-                    <DitheredImage
+                    <Image
                         src={occurrence.coverPhotoUrl}
+                        width={96}
+                        height={96}
+                        unoptimized={true}
                         alt=""
-                        className="size-24 shrink-0 rounded-sm"
+                        className="size-24 shrink-0 rounded-sm object-cover"
                     />
                 )}
                 <div className="flex min-w-0 flex-col gap-1">

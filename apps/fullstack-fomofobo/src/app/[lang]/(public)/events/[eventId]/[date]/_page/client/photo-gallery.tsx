@@ -1,11 +1,11 @@
 "use client"
 
 import type { EventPhoto } from "models"
+import Image from "next/image"
 import type { ReactNode } from "react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Badge } from "ui-components/badge"
-import { DitheredImage } from "ui-components/dithered-image"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
@@ -31,14 +31,18 @@ export const PhotoGallery = (props: PhotoGalleryProps) => {
                 }}
             >
                 {props.photos.map((photo, position) => (
-                    <DitheredImage
+                    <Image
                         key={photo.id}
                         src={photo.url}
+                        width={1200}
+                        height={900}
+                        unoptimized={true}
+                        loading={position === 0 ? "eager" : "lazy"}
                         alt={t("Detail.Photo", {
                             index: position + 1,
                             total: props.photos.length,
                         })}
-                        className="size-full shrink-0 snap-center object-cover"
+                        className="size-full shrink-0 snap-center object-cover [image-rendering:pixelated]"
                     />
                 ))}
             </div>

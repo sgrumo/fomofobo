@@ -22,7 +22,6 @@ import { ContextMenuShowcase } from "./context-menu-showcase"
 import { DateInputShowcase } from "./date-input-showcase"
 import { DayPickerShowcase } from "./day-picker-showcase"
 import { DialogShowcase } from "./dialog-showcase"
-import { DitheredImageShowcase } from "./dithered-image-showcase"
 import { DrawerShowcase } from "./drawer-showcase"
 import { ErrorBoundaryShowcase } from "./error-boundary-showcase"
 import { FallbackBoxShowcase } from "./fallback-box-showcase"
@@ -99,11 +98,6 @@ export const ComponentsShowcase = (props: ComponentsShowcaseProps) => (
             cols={2}
             title="Pixel Icons"
             component={<PixelIconsShowcase />}
-        />
-        <ShowcaseSection
-            cols={2}
-            title="Dithered Image"
-            component={<DitheredImageShowcase />}
         />
         <ShowcaseSection
             cols={2}

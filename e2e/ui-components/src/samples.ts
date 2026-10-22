@@ -81,7 +81,6 @@ import {
     pickDayPickerDay,
 } from "./day-picker"
 import { closeDialog, expectDialogClosed, expectDialogOpen, openDialog } from "./dialog"
-import { expectDitheredImage } from "./dithered-image"
 import { closeDrawer, expectDrawerClosed, expectDrawerOpen, openDrawer } from "./drawer"
 import { expectEmptyFallback, expectErrorFallback } from "./fallback-box"
 import {
@@ -491,11 +490,6 @@ export const defineUiSamplesTests = (app: UiSamplesApp) => {
             await expectDialogClosed(page)
             await expectToast(page, { type: "success" }, "Toast success description")
             await dismissToast(page, { type: "success" }, "Toast success description")
-        })
-
-        test("dithered image", async ({ page }) => {
-            const scope = section(page, "Dithered Image Samples")
-            await expectDitheredImage(scope, "Sample dithered image")
         })
 
         test("drawer", async ({ page }) => {

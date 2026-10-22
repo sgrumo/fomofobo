@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-10-22 · Photos stored as a two-color dither
+
+### Changed
+
+The backoffice dithers each photo in two colors, at most 1200 pixels wide, before it uploads it, and a one-off tool dithers the photos stored before. The dither effect the public app drew on each photo was thrown away.
+
+### Why
+
+A client request. The owner wants the dithered look baked into every photo, link previews included.
+
+### Check next time
+
+Agree on the image treatment and the stored size before the upload flow is built: changing it later means a migration of the photos in the bucket.
+
 ## 2026-10-22 · Ended events stay for a number of days an Admin sets
 
 ### Changed
