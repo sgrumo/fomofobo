@@ -27,6 +27,7 @@
         "i18n:download": "pnpm -C scripts/i18n-sheets download-translations",
         "i18n:export": "pnpm -C scripts/i18n-sheets export-translations",
         "admin-accounts": "pnpm -C scripts/admin-accounts admin-accounts",
+        "dither-photos": "pnpm -C scripts/dither-photos dither-photos",
         "obfuscate": "pnpm -C scripts/obfuscate obfuscate"
     },
     "devDependencies": {

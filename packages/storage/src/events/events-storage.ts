@@ -373,6 +373,35 @@ export class EventsStorage {
     }
 
     /**
+     * @description Fetches the id and the object key of every stored event photo, ordered by id
+     */
+    public async listPhotos(): Promise<Array<{ id: string; objectKey: string }>> {
+        return await this.db
+            .select({ id: eventPhotos.id, objectKey: eventPhotos.objectKey })
+            .from(eventPhotos)
+            .orderBy(eventPhotos.id)
+    }
+
+    /**
+     * @description Persists a new object key of one photo, and returns false when the row no longer holds the key read
+     * @param id Photo changed
+     * @param currentKey Key the row held when it was read
+     * @param nextKey Key written
+     */
+    public async replacePhotoKey(
+        id: string,
+        currentKey: string,
+        nextKey: string,
+    ): Promise<boolean> {
+        const rows = await this.db
+            .update(eventPhotos)
+            .set({ objectKey: nextKey })
+            .where(and(eq(eventPhotos.id, id), eq(eventPhotos.objectKey, currentKey)))
+            .returning({ id: eventPhotos.id })
+        return rows.length > 0
+    }
+
+    /**
      * @description Builds the inserts of the categories, photos and occurrences of one event
      * @param event Event whose children are inserted
      * @param at Instant of the write
