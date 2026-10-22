@@ -25,7 +25,7 @@ import { buildPhotoFile, signInBrowser } from "../backoffice"
 import { buildArea, seedCategory, seedVenue } from "../public"
 
 /**
- * @description Fills the fields every event needs: title, category, venue, times and one photo
+ * @description Fills the fields every event needs, title, category, venue and times, and adds one photo
  * @param page Page of the event form
  * @param event Title, category, venue and start date of the event
  */

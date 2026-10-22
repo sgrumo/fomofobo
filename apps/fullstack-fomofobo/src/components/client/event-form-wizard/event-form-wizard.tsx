@@ -169,6 +169,7 @@ const EventReview = (props: EventReviewProps) => {
     const priceScheme = priceSchemeSchema.safeParse(priceSchemeOf(value))
     const startsAt = localDateTimeOf(value.startDate, value.startTime)
     const endsAt = localDateTimeOf(value.endDate, value.endTime)
+    const photoCount = value.photos?.length ?? 0
 
     const items = [
         { label: t("Backoffice.EventForm.Title"), value: value.title },
@@ -198,9 +199,10 @@ const EventReview = (props: EventReviewProps) => {
         },
         {
             label: t("Backoffice.Photos.Label"),
-            value: t("Backoffice.EventWizard.PhotoCount", {
-                count: value.photos?.length ?? 0,
-            }),
+            value:
+                photoCount === 0
+                    ? t("Backoffice.EventWizard.NoPhotos")
+                    : t("Backoffice.EventWizard.PhotoCount", { count: photoCount }),
         },
         {
             label: t("Backoffice.EventForm.Price"),

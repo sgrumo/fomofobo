@@ -222,7 +222,6 @@ describe("eventFormStateToUpsert", () => {
                 categoryIds: { errors: [expect.any(String)] },
                 venue: { errors: [expect.any(String)] },
                 startDate: { errors: [expect.any(String)] },
-                photos: { errors: [expect.any(String)] },
             },
         })
     })

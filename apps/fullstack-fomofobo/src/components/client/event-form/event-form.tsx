@@ -3,7 +3,7 @@
 import { identity } from "es-toolkit"
 import type { FormErrors } from "frontend-shared/types"
 import type { Category } from "models"
-import { MAX_REDUCED_PRICES } from "models"
+import { MAX_EVENT_PHOTOS, MAX_REDUCED_PRICES } from "models"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import type { WeekDay } from "shared/temporal"
@@ -534,12 +534,11 @@ interface EventPhotosSectionProps {
 export const EventPhotosSection = (props: EventPhotosSectionProps) => {
     const { t } = useTranslation("shared")
 
-    // PLACEHOLDER(OP-13): 1 to `MAX_EVENT_PHOTOS` photos
     return (
         <Field
             label={t("Backoffice.Photos.Label")}
-            description={t("Backoffice.Photos.Hint")}
-            required={true}
+            description={t("Backoffice.Photos.Hint", { max: MAX_EVENT_PHOTOS })}
+            required={false}
             errors={props.errors?.photos?.errors}
         >
             <PhotoGalleryEditor

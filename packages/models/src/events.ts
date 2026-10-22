@@ -92,8 +92,7 @@ export const eventUpsertSchema = withTimeRange(
         startsAt: localDateTimeSchema,
         endsAt: localDateTimeSchema,
         recurrence: recurrenceSchema.nullable(),
-        // PLACEHOLDER(OP-13)
-        photoKeys: z.array(z.string().min(1)).min(1).max(MAX_EVENT_PHOTOS),
+        photoKeys: z.array(z.string().min(1)).max(MAX_EVENT_PHOTOS),
         externalLinks: eventExternalLinksSchema,
         priceScheme: priceSchemeSchema,
         capacity: eventCapacitySchema,

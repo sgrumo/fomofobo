@@ -483,7 +483,7 @@ export const eventFormStateToUpsert = (
             startsAt: localDateTimeOf(state.startDate, state.startTime),
             endsAt: localDateTimeOf(state.endDate, state.endTime),
             recurrence: recurrenceOf(state),
-            photoKeys: state.photos?.map(photo => photo.key),
+            photoKeys: (state.photos ?? []).map(photo => photo.key),
             externalLinks: {
                 instagramUrl: state.instagramUrl ?? null,
                 facebookUrl: state.facebookUrl ?? null,

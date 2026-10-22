@@ -96,10 +96,10 @@ describe("eventUpsertSchema", () => {
         ).toBe(true)
     })
 
-    it("rejects an event with no photo", () => {
+    it("accepts an event with no photo", () => {
         expect(
             eventUpsertSchema.safeParse(buildEventUpsert({ photoKeys: [] })).success,
-        ).toBe(false)
+        ).toBe(true)
     })
 })
 

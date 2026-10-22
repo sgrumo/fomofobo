@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-10-22 · Event photos become optional
+
+### Changed
+
+An event saves with no photo, and an event whose photos the daily job deleted saves with no new one.
+
+### Why
+
+A client request. Organizers publish events before they have a photo.
+
+### Check next time
+
+Ask whether every event has a photo at publication time before the form requires one.
+
 ## 2026-10-22 · Free-text prices become a price scheme
 
 ### Changed

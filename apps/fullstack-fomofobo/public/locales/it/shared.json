@@ -286,7 +286,7 @@
         },
         "Photos": {
             "Label": "Foto",
-            "Hint": "JPEG, PNG o WebP, fino a 10 MB ciascuna. La prima foto è la copertina.",
+            "Hint": "Facoltative, fino a {{max}}. JPEG, PNG o WebP, fino a 10 MB ciascuna. La prima foto è la copertina.",
             "Cover": "Copertina",
             "Photo": "Foto {{index}}",
             "MoveEarlier": "Sposta prima la foto {{index}}",
@@ -375,7 +375,8 @@
             "Next": "Avanti",
             "Start": "Inizio",
             "End": "Fine",
-            "PhotoCount": "Foto: {{count}}"
+            "PhotoCount": "Foto: {{count}}",
+            "NoPhotos": "Nessuna foto"
         },
         "EventEditor": {
             "Mode": {

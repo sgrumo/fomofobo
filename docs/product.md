@@ -28,7 +28,7 @@ An Admin blocks a venue with a reason. A blocked venue can no longer be picked f
 
 An event has a title, one or more categories, one venue, a start and an end, an ordered photo gallery whose first photo is the cover, optional Instagram and Facebook links, a price scheme, an optional capacity and an owning organizer.
 
-The price scheme says whether the event is free or paid. A paid event has a full price, reduced prices with a label each, or notes alone. Free or paid, an event can require a membership card with an optional cost, and a minimum age. Amounts are in euro. The public app sums the scheme up in one line, such as "da 5 €" or "Gratis · Tessera richiesta · 18+", and a paid event with no amount shows its notes. The capacity is the number of places, shown and never enforced. The end is later than the start and can fall on the next day. An event holds one to ten photos, and the account that writes the event uploads them. Each photo is stored as a two-color dither, at most 1200 pixels wide.
+The price scheme says whether the event is free or paid. A paid event has a full price, reduced prices with a label each, or notes alone. Free or paid, an event can require a membership card with an optional cost, and a minimum age. Amounts are in euro. The public app sums the scheme up in one line, such as "da 5 €" or "Gratis · Tessera richiesta · 18+", and a paid event with no amount shows its notes. The capacity is the number of places, shown and never enforced. The end is later than the start and can fall on the next day. An event holds up to ten photos, none at all included, and the account that writes the event uploads them. Each photo is stored as a two-color dither, at most 1200 pixels wide.
 
 ### Recurrence and occurrences
 
@@ -50,7 +50,7 @@ An occurrence stays visible for the retention days of the platform settings afte
 
 ### Retention
 
-Once every occurrence of an event ended more than the retention days ago, a daily job deletes the photos of the event from the bucket, to cut the storage cost. The database keeps the event and its occurrences for statistics, and the backoffice still lists the event. A save of such an event needs at least one new photo.
+Once every occurrence of an event ended more than the retention days ago, a daily job deletes the photos of the event from the bucket, to cut the storage cost. The database keeps the event and its occurrences for statistics, and the backoffice still lists the event.
 
 ### Search area
 

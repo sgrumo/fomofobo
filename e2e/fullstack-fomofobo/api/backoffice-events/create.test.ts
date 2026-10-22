@@ -68,6 +68,21 @@ describe("POST /api/backoffice/events", () => {
         )
     })
 
+    it("creates an event with no photo", async () => {
+        const { headers } = await signInAs("organizer")
+        const { categoryId, venueId } = await seedEventReferences()
+
+        const res = await createEvent({
+            headers,
+            body: buildEventUpsert({ venueId, categoryId, photoKeys: [] }),
+        })
+
+        expectStatus(res, 201)
+        const read = await getEvent({ headers, pathParams: { id: res.data.id } })
+        expectStatus(read, 200)
+        expect(read.data.photos).toStrictEqual([])
+    })
+
     it("keeps the whole price scheme and the capacity of a free event that needs a card", async () => {
         const { headers } = await signInAs("organizer")
         const { categoryId, venueId } = await seedEventReferences()
