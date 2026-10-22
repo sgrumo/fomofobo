@@ -5,6 +5,8 @@ import { dismissToast, expectToast } from "e2e-ui-components/toast"
 
 import { signInAs } from "../../api/auth/utils"
 import { blockVenue } from "../../api/backoffice-venues/api"
+import { saveOccurrence } from "../../api/public/api"
+import { SATURDAY_NOON } from "../../api/public/utils"
 import { gotoPage, gotoPath, reloadPage, t } from "../app"
 import {
     blockPublicEvent,
@@ -53,6 +55,39 @@ test.describe("event detail", () => {
         await reloadPage(page)
 
         await expect(page.getByText(t("shared", "NotFound.Title"))).toBeVisible()
+    })
+
+    test("shows the count of interested visitors once it reaches the threshold", async ({
+        page,
+    }) => {
+        const event = await seedPublicEvent(
+            { venue: await seedVenue(buildArea()), category: await seedCategory() },
+            {},
+        )
+        // Above both thresholds the suite holds: the default, and the one the settings spec saves
+        const saveCount = 40
+        const client = {
+            "x-test-now": SATURDAY_NOON,
+            "x-forwarded-for": crypto.randomUUID(),
+        }
+        const responses = await Promise.all(
+            Array.from({ length: saveCount }, () =>
+                saveOccurrence({
+                    headers: client,
+                    pathParams: { eventId: event.id, date: "2026-10-24" },
+                    body: { deviceId: crypto.randomUUID() },
+                }),
+            ),
+        )
+        for (const res of responses) {
+            expectStatus(res, 204)
+        }
+
+        await gotoPage(page, `/events/${event.id}/2026-10-24/`)
+
+        await expect(
+            page.getByText(t("shared", "Detail.Interested_other", { count: saveCount })),
+        ).toBeVisible()
     })
 
     test("lists the prices, the card and the age of the event", async ({ page }) => {

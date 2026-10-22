@@ -9,6 +9,7 @@ import { useToast } from "ui-components/toast"
 
 import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import { removeSavedSnapshot, storeSavedSnapshots } from "@/lib/pwa/saved-snapshots"
+import { syncSaveChange } from "@/lib/saves/save-sync"
 
 interface SaveToggleProps {
     occurrence: OccurrenceSummary
@@ -51,6 +52,7 @@ export const SaveToggle = (props: SaveToggleProps) => {
                               { eventId, date, savedAt: new Date().toISOString() },
                           ],
                 })
+                void syncSaveChange({ eventId, date, action: saved ? "unsave" : "save" })
                 toast.add({
                     type: "success",
                     messages: [saved ? t("Saved.Removed") : t("Saved.Added")],

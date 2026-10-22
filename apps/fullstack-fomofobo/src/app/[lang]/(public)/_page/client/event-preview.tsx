@@ -116,6 +116,9 @@ const PreviewBody = (props: PreviewBodyProps) => {
     const details = [
         ...occurrence.categoryIds.map(id => props.categories.get(id)?.name),
         priceSummary(occurrence.priceScheme),
+        occurrence.interestedCount === null
+            ? undefined
+            : t("Detail.Interested", { count: occurrence.interestedCount }),
     ].filter(isDefined)
 
     return (

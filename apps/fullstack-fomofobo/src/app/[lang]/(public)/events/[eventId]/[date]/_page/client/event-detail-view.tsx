@@ -185,6 +185,16 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                       value: t("Detail.Places", { count: occurrence.capacity }),
                   },
               ]),
+        ...(occurrence.interestedCount === null
+            ? []
+            : [
+                  {
+                      label: t("Detail.Interest"),
+                      value: t("Detail.Interested", {
+                          count: occurrence.interestedCount,
+                      }),
+                  },
+              ]),
     ]
 
     return (

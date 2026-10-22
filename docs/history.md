@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-10-22 · Saves reach the server to count interest
+
+### Changed
+
+Saved events no longer stay on the device alone. Each save and unsave reaches the server under a random id of the device, and the app shows the count of an occurrence once it reaches the participant threshold of the Admin.
+
+### Why
+
+A client request. Organizers and visitors want to see the interest in an event, which a list on the device cannot count.
+
+### Check next time
+
+Ask whether the product counts interest across visitors before saves stay on the device alone. The privacy text of the launch must name the device id.
+
 ## 2026-10-22 · Event photos become optional
 
 ### Changed

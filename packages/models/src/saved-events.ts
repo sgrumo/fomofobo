@@ -16,6 +16,21 @@ export const savedEventsStorageSchema = z.object({
 })
 export type SavedEventsStorage = z.infer<typeof savedEventsStorageSchema>
 
+export const saveChangeSchema = occurrenceRefSchema.extend({
+    action: z.enum(["save", "unsave"]),
+})
+export type SaveChange = z.infer<typeof saveChangeSchema>
+
+/**
+ * @remarks Needs a `version` bump on each change of the shape
+ */
+export const saveSyncStorageSchema = z.object({
+    version: z.literal(1),
+    queuedStoredSaves: z.boolean(),
+    pending: z.array(saveChangeSchema),
+})
+export type SaveSyncStorage = z.infer<typeof saveSyncStorageSchema>
+
 export const occurrenceSaveSchema = z.object({ deviceId: z.uuid() })
 export type OccurrenceSave = z.infer<typeof occurrenceSaveSchema>
 

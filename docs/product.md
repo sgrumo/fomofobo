@@ -70,7 +70,7 @@ Results match every active filter. A permanent venue ignores the date filter, an
 
 ### Event page
 
-Each event has its own URL, and for a repeating event the URL refers to one occurrence. The page offers directions to the venue, the external link of the event and a save action. It shows the price summary and the capacity, and lists every price, the membership card, the minimum age and the notes when the scheme holds more than one price line. Directions open Apple Maps on iOS and iPadOS, and Google Maps elsewhere.
+Each event has its own URL, and for a repeating event the URL refers to one occurrence. The page offers directions to the venue, the external link of the event and a save action. It shows the price summary, the capacity and the count of interested visitors, and lists every price, the membership card, the minimum age and the notes when the scheme holds more than one price line. Directions open Apple Maps on iOS and iPadOS, and Google Maps elsewhere.
 
 Share opens the share sheet of the device, or copies the link where none exists. A row of links shares the page on WhatsApp, Telegram, Facebook and X with its title, date, time and venue, and a button copies the link. A shared link shows a card with the title, the cover, and the description of the event or else its date, time and venue.
 
@@ -82,7 +82,11 @@ The page lists the upcoming events of the venue, one row for each event at its n
 
 ### Saved events
 
-Visitors save events with no account. Saved events stay on the device only, and the saved list shows only the visible ones. A saved event stays in the list until the visitor removes it, or until the retention days after it ends.
+Visitors save events with no account. The saved list lives on the device and shows only the visible events. A saved event stays in the list until the visitor removes it, or until the retention days after it ends.
+
+Each save and unsave also reaches the server under a random id of the device, which names no one. The server counts each device once for each occurrence. A change made offline waits on the device and leaves once the connection is back. On its first visit after the counts started, a device sends the saves that it already held.
+
+Each IP sends 60 save changes every 10 minutes at most. Past that limit, the change waits on the device for a later send.
 
 ### Installation and offline use
 
@@ -116,7 +120,7 @@ Admins create organizer accounts with a name and an email, and block or unblock 
 
 An Admin sets the retention days of ended events, from 0 to 90, and the participant threshold, from 1 to 1000. The backoffice shows who saved them last and when. Until an Admin saves them, the defaults apply: three days and a threshold of 20. A larger value brings back events that ended before it, without the photos already deleted.
 
-The participant threshold gates a count of saves on the event (not built).
+The event page and the map preview show the count of saves of an occurrence once it reaches the participant threshold. Under the threshold the public app shows no count.
 
 ## Architecture and integrations
 
@@ -128,6 +132,6 @@ The participant threshold gates a count of saves on the event (not built).
 - Geoapify: place suggestions of the search field, from all of Italy, with the places nearest to the search center first. Each client gets 30 calls a minute, because the free plan has a daily credit limit.
 - OpenFreeMap: the tiles of the event map. The device keeps at most 500 viewed tiles, because the provider caps an offline download at 3,000 tiles.
 - A service worker of the public app keeps what a visitor loaded and serves it offline. It sends the backoffice, the sign-in and every write straight to the network, because a worker at the root of the site controls the backoffice pages too.
-- The Next data cache holds the shared public reads: the categories, the event pages and the place suggestions. Every backoffice write expires its entries at once, because a block must hide an event on the next request.
+- The Next data cache holds the shared public reads: the categories, the event pages and the place suggestions. Every backoffice write expires its entries at once, because a block must hide an event on the next request. The save counts stay out of it, because each save would expire the event page.
 - Authentication runs inside the app with database sessions, because Admins create accounts and a block must end every open session at once. Every backoffice API call reads the session from the database, so a block applies on the next call.
 - Deploy: the app runs on Vercel, in the region of its Turso database. Every service runs on its free plan. The Vercel Hobby plan admits non-commercial use only.

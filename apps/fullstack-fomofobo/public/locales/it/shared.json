@@ -140,6 +140,9 @@
         "Capacity": "Capienza",
         "Places_one": "{{count}} posto",
         "Places_other": "{{count}} posti",
+        "Interest": "Interesse",
+        "Interested_one": "{{count}} interessato",
+        "Interested_other": "{{count}} interessati",
         "Prices": {
             "Label": "Prezzi e accesso",
             "Entry": "Ingresso",

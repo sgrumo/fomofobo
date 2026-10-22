@@ -4,7 +4,7 @@ import {
     createWebStorage,
     storagePrefix,
 } from "frontend-shared/storage"
-import { savedEventsStorageSchema } from "models"
+import { savedEventsStorageSchema, saveSyncStorageSchema } from "models"
 import { z } from "zod"
 
 export const localStorageSchema = {
@@ -17,6 +17,8 @@ export const localStorageSchema = {
         jitter: z.number().min(0),
     }),
     "saved-events": savedEventsStorageSchema,
+    "save-sync": saveSyncStorageSchema,
+    "device-id": z.uuid().nullable(),
     "event-form-mode": z.enum(["wizard", "form"]),
 }
 export type LocalStorageKey = keyof typeof localStorageSchema
@@ -30,6 +32,8 @@ export const localStorageDefaults: {
     "api-delay": { base: 250, jitter: 50 },
     "dev-quadrant": { position: "bottom-right", minimized: true },
     "saved-events": { version: 1, events: [] },
+    "save-sync": { version: 1, queuedStoredSaves: false, pending: [] },
+    "device-id": null,
     "event-form-mode": "wizard",
 }
 
