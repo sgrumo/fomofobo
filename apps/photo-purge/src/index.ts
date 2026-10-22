@@ -1,5 +1,6 @@
 import { logger, S3ObjectStorage } from "backend-shared"
-import { buildDbInstance, EventsStorage } from "storage"
+import { DEFAULT_ENDED_VISIBLE_DAYS } from "models"
+import { buildDbInstance, EventsStorage, SettingsStorage } from "storage"
 
 import { parseEnv } from "./env"
 import { purgeEndedEventPhotos } from "./purge-photos"
@@ -10,9 +11,12 @@ import { purgeEndedEventPhotos } from "./purge-photos"
  */
 const main = async (): Promise<void> => {
     const env = parseEnv(process.env)
-    const eventsStorage = new EventsStorage(
-        buildDbInstance({ url: env.DATABASE_URL, authToken: env.DATABASE_AUTH_TOKEN }),
-    )
+    const db = buildDbInstance({
+        url: env.DATABASE_URL,
+        authToken: env.DATABASE_AUTH_TOKEN,
+    })
+    const eventsStorage = new EventsStorage(db)
+    const settings = await new SettingsStorage(db).get()
     const photoStorage = new S3ObjectStorage({
         bucket: env.S3_BUCKET,
         region: env.S3_REGION,
@@ -30,6 +34,7 @@ const main = async (): Promise<void> => {
             },
         },
         new Date(),
+        settings?.endedVisibleDays ?? DEFAULT_ENDED_VISIBLE_DAYS,
     )
     logger.info("Photos of the ended events purged", {
         deletedCount: result.deletedCount,

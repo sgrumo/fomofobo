@@ -1,5 +1,3 @@
-import { ENDED_OCCURRENCE_VISIBLE_MS } from "models"
-
 const PURGE_BATCH_SIZE = 100
 
 export interface PurgeDependencies {
@@ -46,14 +44,16 @@ const purgeBatches = async (
  * @description Deletes the photos of every event that no longer shows in the public app: the rows first, then their objects in the bucket
  * @param dependencies Row and object deletes
  * @param now Instant of the run
+ * @param endedVisibleDays Days an ended event stays in the public app, from the platform settings
  * @remarks Leaves an object whose delete fails in the bucket with no row: the result lists its key
  */
 export const purgeEndedEventPhotos = async (
     dependencies: PurgeDependencies,
     now: Date,
+    endedVisibleDays: number,
 ): Promise<PurgeResult> =>
     await purgeBatches(
         dependencies,
-        new Date(now.getTime() - ENDED_OCCURRENCE_VISIBLE_MS),
+        new Date(now.getTime() - endedVisibleDays * 24 * 60 * 60 * 1000),
         { deletedCount: 0, failedKeys: [] },
     )

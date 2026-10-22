@@ -5,6 +5,7 @@ import {
     eventOccurrences,
     eventPhotos,
     events,
+    platformSettings,
 } from "storage"
 import { beforeEach, describe, expect, it } from "vitest"
 
@@ -68,5 +69,30 @@ describe("photo-purge", () => {
             false,
             false,
         ])
+    })
+
+    it("follows the retention days an Admin saved", async () => {
+        await testDb.insert(platformSettings).values({
+            id: 1,
+            endedVisibleDays: 10,
+            participantThreshold: 20,
+            updatedAt: new Date(),
+        })
+        const kept = await seedEventWithPhotos([daysFromNow(-5)])
+        const purged = await seedEventWithPhotos([daysFromNow(-12)])
+
+        runPurge()
+
+        const photoRows = await testDb
+            .select({ objectKey: eventPhotos.objectKey })
+            .from(eventPhotos)
+            .orderBy(eventPhotos.objectKey)
+        expect(photoRows.map(row => row.objectKey)).toStrictEqual(
+            kept.photoKeys.toSorted(),
+        )
+        const heads = await Promise.all(
+            purged.photoKeys.map(key => photoStorage.headObject(key)),
+        )
+        expect(heads).toStrictEqual([null, null])
     })
 })
