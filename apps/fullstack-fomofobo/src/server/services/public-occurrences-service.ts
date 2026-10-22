@@ -33,14 +33,17 @@ export class PublicOccurrencesService {
     private readonly occurrencesStorage: PublicOccurrencesStorage
     private readonly settings: SettingsService
     private readonly photosPublicBaseUrl: string
+    private readonly fallbackImagesBaseUrl: string
     public constructor(
         occurrencesStorage: PublicOccurrencesStorage,
         settings: SettingsService,
         photosPublicBaseUrl: string,
+        fallbackImagesBaseUrl: string,
     ) {
         this.occurrencesStorage = occurrencesStorage
         this.settings = settings
         this.photosPublicBaseUrl = photosPublicBaseUrl
+        this.fallbackImagesBaseUrl = fallbackImagesBaseUrl
     }
 
     /**
@@ -116,7 +119,7 @@ export class PublicOccurrencesService {
                           capacity: stored.capacity,
                       }
             },
-            ["occurrence-detail-v2", ref.eventId, ref.date],
+            ["occurrence-detail-v3", ref.eventId, ref.date],
             { tags: [PUBLIC_TAG, eventTag(ref.eventId)] },
         )()
         const endedVisibleSince = await this.settings.endedVisibleSince(now)
@@ -164,10 +167,7 @@ export class PublicOccurrencesService {
             venue: occurrence.venue,
             categoryIds: occurrence.categoryIds,
             primaryCategoryId: occurrence.primaryCategoryId,
-            coverPhotoUrl:
-                occurrence.coverObjectKey === null
-                    ? null
-                    : photoUrl(this.photosPublicBaseUrl, occurrence.coverObjectKey),
+            coverPhotoUrl: this.coverUrlOf(occurrence),
             priceScheme: occurrence.priceScheme,
         }
     }
@@ -185,5 +185,19 @@ export class PublicOccurrencesService {
                     ? null
                     : photoUrl(this.photosPublicBaseUrl, coverObjectKey),
         }
+    }
+
+    /**
+     * @description Returns the URL of the cover of an occurrence: the first photo, else the venue cover, else the primary category image, else the generated image of the category icon
+     * @param occurrence Stored occurrence
+     */
+    private coverUrlOf(occurrence: StoredOccurrenceSummary): string {
+        const key =
+            occurrence.coverObjectKey ??
+            occurrence.fallback.venueCoverObjectKey ??
+            occurrence.fallback.categoryImageObjectKey
+        return key === null
+            ? `${this.fallbackImagesBaseUrl}${occurrence.fallback.categoryIcon}.png`
+            : photoUrl(this.photosPublicBaseUrl, key)
     }
 }

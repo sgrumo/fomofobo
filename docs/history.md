@@ -7,7 +7,7 @@ title: fomofobo
 
 ### Changed
 
-An event saves with no photo, and an event whose photos the daily job deleted saves with no new one.
+An event saves with no photo, and an event whose photos the daily job deleted saves with no new one. The venue cover, the image an Admin uploads for the primary category, or a generated image of the category icon takes the place of a missing cover.
 
 ### Why
 

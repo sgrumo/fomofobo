@@ -82,6 +82,7 @@ const buildContainer = (): Container => {
         occurrencesStorage,
         settings,
         env.PHOTOS_PUBLIC_BASE_URL,
+        new URL("/fallbacks/", env.APP_BASE_URL).href,
     )
 
     return {

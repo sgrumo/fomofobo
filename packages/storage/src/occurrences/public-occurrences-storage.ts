@@ -2,6 +2,7 @@ import type { SQL } from "drizzle-orm"
 import { and, count, desc, eq, gt, inArray, isNull, lt, ne, or, sql } from "drizzle-orm"
 import { unionAll } from "drizzle-orm/sqlite-core"
 import type {
+    CategoryIcon,
     GeoPoint,
     OccurrenceRef,
     PermanentVenueSummary,
@@ -16,6 +17,7 @@ import type { StrictOmit } from "shared/types"
 import type { DbInstanceFromSchema, DbSelect } from "../db-config"
 import {
     accounts,
+    categories,
     eventCategories,
     eventOccurrences,
     eventPhotos,
@@ -60,6 +62,11 @@ export interface StoredOccurrenceSummary {
     categoryIds: string[]
     primaryCategoryId: string
     coverObjectKey: string | null
+    fallback: {
+        venueCoverObjectKey: string | null
+        categoryImageObjectKey: string | null
+        categoryIcon: CategoryIcon
+    }
     priceScheme: PriceScheme
 }
 
@@ -105,6 +112,8 @@ const insideArea = (
         sql`${distanceFrom(area.center)} <= ${area.radiusMeters}`,
     )
 
+const primaryCategoryOfEvent = sql<string>`(select ${eventCategories.categoryId} from ${eventCategories} where ${eventCategories.eventId} = ${events.id} and ${eventCategories.isPrimary} = 1)`
+
 const summaryColumns = {
     eventId: eventOccurrences.eventId,
     localDate: eventOccurrences.localDate,
@@ -126,10 +135,15 @@ const summaryColumns = {
     longitude: venues.longitude,
     // UUIDs hold no comma, so the list splits back without loss
     categoryIds: sql<string>`(select group_concat(${eventCategories.categoryId}) from ${eventCategories} where ${eventCategories.eventId} = ${events.id})`,
-    primaryCategoryId: sql<string>`(select ${eventCategories.categoryId} from ${eventCategories} where ${eventCategories.eventId} = ${events.id} and ${eventCategories.isPrimary} = 1)`,
+    primaryCategoryId: primaryCategoryOfEvent,
     coverObjectKey: sql<
         string | null
     >`(select ${eventPhotos.objectKey} from ${eventPhotos} where ${eventPhotos.eventId} = ${events.id} order by ${eventPhotos.position} limit 1)`,
+    venueCoverObjectKey: venues.coverObjectKey,
+    categoryImageObjectKey: sql<
+        string | null
+    >`(select ${categories.imageObjectKey} from ${categories} where ${categories.id} = ${primaryCategoryOfEvent})`,
+    categoryIcon: sql<CategoryIcon>`(select ${categories.icon} from ${categories} where ${categories.id} = ${primaryCategoryOfEvent})`,
 }
 
 /**
@@ -166,6 +180,11 @@ const toSummary = (row: SummaryRow): StoredOccurrenceSummary => ({
     categoryIds: row.categoryIds.split(","),
     primaryCategoryId: row.primaryCategoryId,
     coverObjectKey: row.coverObjectKey,
+    fallback: {
+        venueCoverObjectKey: row.venueCoverObjectKey,
+        categoryImageObjectKey: row.categoryImageObjectKey,
+        categoryIcon: row.categoryIcon,
+    },
     priceScheme: toPriceScheme(row),
 })
 

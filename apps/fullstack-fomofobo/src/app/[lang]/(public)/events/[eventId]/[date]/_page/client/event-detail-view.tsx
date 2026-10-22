@@ -89,6 +89,7 @@ export const EventDetailView = (props: EventDetailViewProps) => {
                 route={props.route}
                 title={occurrence.title}
                 photos={occurrence.photos}
+                coverPhotoUrl={occurrence.coverPhotoUrl}
                 controls={
                     <>
                         <IconButton

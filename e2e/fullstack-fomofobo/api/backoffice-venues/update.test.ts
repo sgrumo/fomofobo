@@ -1,16 +1,11 @@
-import {
-    expectApiError,
-    expectRawStatus,
-    expectStatus,
-    expectToBeDefined,
-} from "e2e-kit/assertions"
+import { expectApiError, expectStatus, expectToBeDefined } from "e2e-kit/assertions"
 import { anyHttpUrl } from "e2e-kit/matchers"
 import { describe, expect, it } from "vitest"
 
 import { signInAs } from "../auth/utils"
 import { downloadPhoto, uploadPhoto } from "../backoffice-events/utils"
-import { createVenue, createVenueCoverUploadTicket, getVenue, updateVenue } from "./api"
-import { buildVenueCreation } from "./utils"
+import { createVenue, getVenue, updateVenue } from "./api"
+import { buildVenueCreation, uploadVenueCover } from "./utils"
 
 describe("PATCH /api/backoffice/venues/{id}", () => {
     it("changes the fields that an Admin sends", async () => {
@@ -60,31 +55,19 @@ describe("PATCH /api/backoffice/venues/{id}", () => {
         const { headers } = await signInAs("organizer")
         const created = await createVenue({ headers, body: buildVenueCreation() })
         expectStatus(created, 201)
-        const bytes = crypto.getRandomValues(new Uint8Array(256))
-        const ticket = await createVenueCoverUploadTicket({
-            headers,
-            pathParams: { id: created.data.id },
-            body: { fileName: "cover.png", contentType: "image/png", sizeBytes: 256 },
-        })
-        expectStatus(ticket, 200)
-        const upload = await fetch(ticket.data.url, {
-            method: "PUT",
-            headers: ticket.data.headers,
-            body: bytes,
-        })
-        expectRawStatus(upload, 200)
+        const cover = await uploadVenueCover(headers, created.data.id)
 
         const withCover = await updateVenue({
             headers,
             pathParams: { id: created.data.id },
-            body: { coverPhotoKey: ticket.data.key },
+            body: { coverPhotoKey: cover.key },
         })
 
         expectStatus(withCover, 200)
         const coverUrl = withCover.data.coverPhotoUrl
         expectToBeDefined(coverUrl)
         expect(coverUrl).toStrictEqual(anyHttpUrl)
-        expect(await downloadPhoto(coverUrl)).toStrictEqual(bytes)
+        expect(await downloadPhoto(coverUrl)).toStrictEqual(cover.bytes)
         const withoutCover = await updateVenue({
             headers,
             pathParams: { id: created.data.id },

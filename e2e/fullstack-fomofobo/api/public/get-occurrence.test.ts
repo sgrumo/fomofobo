@@ -1,7 +1,12 @@
-import { expectApiError, expectStatus } from "e2e-kit/assertions"
+import { expectApiError, expectStatus, expectToBeDefined } from "e2e-kit/assertions"
 import { describe, expect, it } from "vitest"
 
 import { signInAs } from "../auth/utils"
+import { createCategory, updateCategory } from "../backoffice-categories/api"
+import {
+    buildCategoryCreation,
+    uploadCategoryImage,
+} from "../backoffice-categories/utils"
 import { blockEvent, updateEvent } from "../backoffice-events/api"
 import {
     buildEventUpsert,
@@ -11,7 +16,8 @@ import {
     uploadPhoto,
 } from "../backoffice-events/utils"
 import { updateSettings } from "../backoffice-settings/api"
-import { blockVenue } from "../backoffice-venues/api"
+import { blockVenue, createVenue, updateVenue } from "../backoffice-venues/api"
+import { buildVenueCreation, uploadVenueCover } from "../backoffice-venues/utils"
 import { getOccurrence } from "./api"
 import { SATURDAY_NOON } from "./utils"
 
@@ -49,6 +55,72 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
             externalLinks: event.externalLinks,
             capacity: event.capacity,
         })
+    })
+
+    it("covers an event with no photo by the venue cover, else the category image, else the icon image", async () => {
+        const organizer = await signInAs("organizer")
+        const admin = await signInAs("admin")
+        const [music, art, coveredVenue, bareVenue] = await Promise.all([
+            createCategory({
+                headers: admin.headers,
+                body: { ...buildCategoryCreation(), icon: "music" },
+            }),
+            createCategory({
+                headers: admin.headers,
+                body: { ...buildCategoryCreation(), icon: "art" },
+            }),
+            createVenue({ headers: admin.headers, body: buildVenueCreation() }),
+            createVenue({ headers: admin.headers, body: buildVenueCreation() }),
+        ])
+        expectStatus(music, 201)
+        expectStatus(art, 201)
+        expectStatus(coveredVenue, 201)
+        expectStatus(bareVenue, 201)
+        const image = await uploadCategoryImage(art.data.id)
+        const withImage = await updateCategory({
+            headers: admin.headers,
+            pathParams: { id: art.data.id },
+            body: { imageKey: image.key },
+        })
+        expectStatus(withImage, 200)
+        const cover = await uploadVenueCover(admin.headers, coveredVenue.data.id)
+        const withCover = await updateVenue({
+            headers: admin.headers,
+            pathParams: { id: coveredVenue.data.id },
+            body: { coverPhotoKey: cover.key },
+        })
+        expectStatus(withCover, 200)
+        const events = await Promise.all(
+            [
+                { venueId: coveredVenue.data.id, categoryId: art.data.id },
+                { venueId: bareVenue.data.id, categoryId: art.data.id },
+                { venueId: bareVenue.data.id, categoryId: music.data.id },
+            ].map(refs => seedEvent(organizer.headers, refs, { photoKeys: [] })),
+        )
+
+        const covers = await Promise.all(
+            events.map(async event => {
+                const res = await getOccurrence({
+                    headers: { "x-test-now": SATURDAY_NOON },
+                    pathParams: { eventId: event.id, date: "2026-10-24" },
+                })
+                expectStatus(res, 200)
+                return res.data.coverPhotoUrl
+            }),
+        )
+
+        expect(covers).toStrictEqual([
+            withCover.data.coverPhotoUrl,
+            withImage.data.imageUrl,
+            expect.stringMatching(/\/fallbacks\/music\.png$/u),
+        ])
+        const iconUrl = covers.at(-1)
+        expectToBeDefined(iconUrl)
+        const iconImage = await fetch(iconUrl)
+        expect([iconImage.status, iconImage.headers.get("content-type")]).toStrictEqual([
+            200,
+            "image/png",
+        ])
     })
 
     it("answers 404 for a date that the rule of a repeating event does not produce", async () => {

@@ -12,6 +12,7 @@ import type { RouteClientComponentProps } from "@/framework/routes/routes"
 interface PhotoGalleryProps extends RouteClientComponentProps<"eventDetail"> {
     title: string
     photos: EventPhoto[]
+    coverPhotoUrl: string
     controls: ReactNode
 }
 
@@ -30,6 +31,17 @@ export const PhotoGallery = (props: PhotoGalleryProps) => {
                     setIndex(Math.round(strip.scrollLeft / strip.clientWidth))
                 }}
             >
+                {props.photos.length === 0 ? (
+                    <Image
+                        src={props.coverPhotoUrl}
+                        width={1200}
+                        height={900}
+                        unoptimized={true}
+                        loading="eager"
+                        alt={t("Detail.Cover", { title: props.title })}
+                        className="size-full shrink-0 object-cover [image-rendering:pixelated]"
+                    />
+                ) : undefined}
                 {props.photos.map((photo, position) => (
                     <Image
                         key={photo.id}

@@ -23,10 +23,7 @@ export const generateMetadata = async (
     const occurrence = await readOccurrence(parameters.eventId, parameters.date)
     const description =
         occurrence.description ?? shareSummaryOf(occurrence, parameters.lang)
-    const images =
-        occurrence.coverPhotoUrl === null
-            ? undefined
-            : [{ url: occurrence.coverPhotoUrl }]
+    const images = [{ url: occurrence.coverPhotoUrl }]
 
     // The event title names a shared link, so it replaces the title of the route.
     return {
@@ -43,7 +40,7 @@ export const generateMetadata = async (
             images,
         },
         twitter: {
-            card: images === undefined ? "summary" : "summary_large_image",
+            card: "summary_large_image",
             title: occurrence.title,
             description,
             images,

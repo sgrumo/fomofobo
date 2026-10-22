@@ -27,7 +27,7 @@ export const occurrenceSummarySchema = occurrenceRefSchema.extend({
     venue: venueSchema.pick({ id: true, name: true, coordinates: true, isBlocked: true }),
     categoryIds: eventSchema.shape.categoryIds,
     primaryCategoryId: eventSchema.shape.primaryCategoryId,
-    coverPhotoUrl: z.url().nullable(),
+    coverPhotoUrl: z.url(),
     priceScheme: eventSchema.shape.priceScheme,
 })
 export type OccurrenceSummary = z.infer<typeof occurrenceSummarySchema>

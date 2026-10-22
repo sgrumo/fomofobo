@@ -116,6 +116,29 @@ test.describe("event detail", () => {
         await expect(page.getByRole("link", { name: venue.name })).toHaveCount(0)
     })
 
+    test("shows the icon image of its category in place of the photos of an event with none", async ({
+        page,
+    }) => {
+        const category = await seedCategory()
+        const event = await seedPublicEvent(
+            { venue: await seedVenue(buildArea()), category },
+            { photoKeys: [] },
+        )
+        const iconImage = new RegExp(`/fallbacks/${category.icon}\\.png$`, "u")
+
+        await gotoPage(page, `/events/${event.id}/2026-10-24/`)
+
+        await expect(
+            page.getByRole("img", {
+                name: t("shared", "Detail.Cover", { title: event.title }),
+            }),
+        ).toHaveAttribute("src", iconImage)
+        await expect(page.locator('head meta[property="og:image"]')).toHaveAttribute(
+            "content",
+            iconImage,
+        )
+    })
+
     test("describes the occurrence for a shared link", async ({ page, baseURL }) => {
         const venue = await seedVenue(buildArea())
         const event = await seedPublicEvent(

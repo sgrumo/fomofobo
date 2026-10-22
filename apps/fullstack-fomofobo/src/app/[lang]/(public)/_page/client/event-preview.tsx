@@ -133,16 +133,14 @@ const PreviewBody = (props: PreviewBodyProps) => {
                 <PagingControls paging={props.paging} />
             )}
             <div className="border-line flex gap-3 border-t-2 pt-3">
-                {occurrence.coverPhotoUrl === null ? undefined : (
-                    <Image
-                        src={occurrence.coverPhotoUrl}
-                        width={96}
-                        height={96}
-                        unoptimized={true}
-                        alt=""
-                        className="size-24 shrink-0 rounded-sm object-cover"
-                    />
-                )}
+                <Image
+                    src={occurrence.coverPhotoUrl}
+                    width={96}
+                    height={96}
+                    unoptimized={true}
+                    alt=""
+                    className="size-24 shrink-0 rounded-sm object-cover"
+                />
                 <div className="flex min-w-0 flex-col gap-1">
                     <BottomSheetTitle className="tp-pixel-xl uppercase">
                         {occurrence.title}
