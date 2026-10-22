@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { identity } from "es-toolkit"
+import { identity, partition } from "es-toolkit"
 import type { GeoPoint, OccurrenceRef, PlaceSuggestion } from "models"
 import { useRef, useState } from "react"
 import type { FocusEvent, MouseEvent } from "react"
@@ -53,7 +53,10 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
 
     const places = suggestions.data?.places ?? []
     const events = suggestions.data?.events ?? []
-    const venues = suggestions.data?.venues ?? []
+    const [regularVenues, permanentVenues] = partition(
+        suggestions.data?.venues ?? [],
+        venue => venue.kind === "regular",
+    )
     const closeWhenFocusLeaves = (event: FocusEvent) => {
         if (
             !(event.relatedTarget instanceof Node) ||
@@ -120,7 +123,8 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                     {suggestions.isSuccess &&
                     places.length === 0 &&
                     events.length === 0 &&
-                    venues.length === 0 ? (
+                    regularVenues.length === 0 &&
+                    permanentVenues.length === 0 ? (
                         <p className="tp-body-md text-fg-muted px-2">
                             {t("Search.Empty")}
                         </p>
@@ -179,35 +183,41 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                             ))}
                         </section>
                     ) : undefined}
-                    {venues.length > 0 ? (
-                        <section
-                            aria-label={t("Search.Venues")}
-                            className="flex flex-col"
-                        >
-                            <h2 className="tp-pixel-sm text-fg-muted px-2 uppercase">
-                                {t("Search.Venues")}
-                            </h2>
-                            {venues.map(venue => (
-                                <RouteLink
-                                    key={venue.venueId}
-                                    route={routes.venueDetail}
-                                    parameters={{
-                                        lang: language,
-                                        venueId: venue.venueId,
-                                    }}
-                                    query={{}}
-                                    className={itemClassName}
-                                    onBlur={closeWhenFocusLeaves}
-                                    onMouseDown={keepFocus}
-                                >
-                                    {venue.name}
-                                    <span className="tp-body-sm text-fg-muted block">
-                                        {venue.address}
-                                    </span>
-                                </RouteLink>
-                            ))}
-                        </section>
-                    ) : undefined}
+                    {[
+                        { label: t("Search.Venues"), venues: regularVenues },
+                        { label: t("Search.PermanentVenues"), venues: permanentVenues },
+                    ].map(group =>
+                        group.venues.length === 0 ? undefined : (
+                            <section
+                                key={group.label}
+                                aria-label={group.label}
+                                className="flex flex-col"
+                            >
+                                <h2 className="tp-pixel-sm text-fg-muted px-2 uppercase">
+                                    {group.label}
+                                </h2>
+                                {group.venues.map(venue => (
+                                    <RouteLink
+                                        key={venue.venueId}
+                                        route={routes.venueDetail}
+                                        parameters={{
+                                            lang: language,
+                                            venueId: venue.venueId,
+                                        }}
+                                        query={{}}
+                                        className={itemClassName}
+                                        onBlur={closeWhenFocusLeaves}
+                                        onMouseDown={keepFocus}
+                                    >
+                                        {venue.name}
+                                        <span className="tp-body-sm text-fg-muted block">
+                                            {venue.address}
+                                        </span>
+                                    </RouteLink>
+                                ))}
+                            </section>
+                        ),
+                    )}
                     {places.length > 0 ? (
                         <a
                             href="https://www.geoapify.com/"

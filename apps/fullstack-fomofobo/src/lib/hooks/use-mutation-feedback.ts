@@ -20,6 +20,8 @@ const EXPLAINED_ERROR_CODES = [
     "VenueLimitReached",
     "VenueOwnerTaken",
     "InvalidVenueOwner",
+    "PermanentVenueOwner",
+    "InvalidVenueCategory",
 ] as const satisfies readonly AppErrorCode[]
 
 type ExplainedErrorCode = (typeof EXPLAINED_ERROR_CODES)[number]

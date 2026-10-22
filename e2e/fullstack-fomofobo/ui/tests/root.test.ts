@@ -433,23 +433,30 @@ test.describe("map", () => {
         await expect(farPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
     })
 
-    test("opens the page of a venue of the area that the search names", async ({
+    test("opens the page of a venue of the area that the search names, in the group of its kind", async ({
         page,
     }) => {
         const center = buildArea()
-        const venue = await seedVenue(center)
+        const category = await seedCategory()
+        for (const [venue, group] of [
+            [await seedVenue(center), t("shared", "Search.Venues")],
+            [
+                await seedPublicCinema(center, category),
+                t("shared", "Search.PermanentVenues"),
+            ],
+        ] as const) {
+            await gotoPage(page, mapPath(center))
+            await fillSearchField(page, t("shared", "Search.Label"), venue.name)
+            await page
+                .getByRole("region", { name: group })
+                .getByRole("link", { name: venue.name })
+                .click()
 
-        await gotoPage(page, mapPath(center))
-        await fillSearchField(page, t("shared", "Search.Label"), venue.name)
-        await page
-            .getByRole("region", { name: t("shared", "Search.Venues") })
-            .getByRole("link", { name: venue.name })
-            .click()
-
-        await expect(page).toHaveURL(`/it/venues/${venue.id}`)
-        await expect(
-            page.getByRole("heading", { level: 1, name: venue.name }),
-        ).toBeVisible()
+            await expect(page).toHaveURL(`/it/venues/${venue.id}`)
+            await expect(
+                page.getByRole("heading", { level: 1, name: venue.name }),
+            ).toBeVisible()
+        }
     })
 
     test("asks for a place search when location is denied, and offers to allow it", async ({

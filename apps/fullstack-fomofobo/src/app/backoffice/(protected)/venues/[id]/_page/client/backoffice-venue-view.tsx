@@ -22,6 +22,11 @@ import {
     venueFormStateFromVenue,
     venueFormStateToUpdate,
 } from "@/components/client/venue-form/venue-form.state"
+import { VenueKindForm } from "@/components/client/venue-kind-form/venue-kind-form"
+import {
+    venueKindFormStateFromVenue,
+    venueKindFormStateToChange,
+} from "@/components/client/venue-kind-form/venue-kind-form.state"
 import { useDynamicRoute } from "@/framework/routes/route-hooks/use-dynamic-route"
 import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
@@ -171,14 +176,24 @@ const VenueAdminPanel = (props: VenueAdminPanelProps) => {
     )
     const setOwner = useMutation(api.setVenueOwnerMutation)
     const ownerOptions = organizers.data?.items ?? []
+    const isPermanent = props.venue.kind !== "regular"
 
     return (
         <div className="border-line flex flex-col gap-3 border-2 p-3">
             <h2 className="tp-pixel-md">{t("Backoffice.Venue.Admin")}</h2>
+            {props.venue.owner === null ? (
+                <VenueKindEditor key={props.venue.id} venue={props.venue} />
+            ) : (
+                <Alert type="info" text={t("Backoffice.Venue.OwnedKind")} />
+            )}
             <div className="flex flex-wrap items-end gap-2">
                 <Field
                     label={t("Backoffice.Venue.Owner")}
-                    description={t("Backoffice.Venue.OwnerHint")}
+                    description={
+                        isPermanent
+                            ? t("Backoffice.Venue.PermanentOwnerHint")
+                            : t("Backoffice.Venue.OwnerHint")
+                    }
                     required={false}
                     className="w-64"
                 >
@@ -193,14 +208,14 @@ const VenueAdminPanel = (props: VenueAdminPanelProps) => {
                         onValueChange={organizer => {
                             setOwnerId(organizer?.id)
                         }}
-                        disabled={setOwner.isPending}
+                        disabled={isPermanent || setOwner.isPending}
                     />
                 </Field>
                 <Button
                     variant="secondary"
                     size="md"
                     loading={setOwner.isPending}
-                    disabled={ownerId === props.venue.owner?.id}
+                    disabled={isPermanent || ownerId === props.venue.owner?.id}
                     onClick={() => {
                         setOwner.mutate(
                             { id: props.venue.id, body: { ownerId: ownerId ?? null } },
@@ -260,5 +275,69 @@ const VenueAdminPanel = (props: VenueAdminPanelProps) => {
                 )}
             </div>
         </div>
+    )
+}
+
+interface VenueKindEditorProps {
+    venue: Venue
+}
+
+const VenueKindEditor = (props: VenueKindEditorProps) => {
+    const { t, i18n } = useTranslation("shared")
+    const toast = useToast()
+    const feedback = useMutationFeedback()
+    const categories = useQuery(api.listCategoriesQuery({ params: {}, query: {} }))
+    const { formId, form, setForm, errors, convert } = useForm(
+        () => venueKindFormStateFromVenue(props.venue),
+        venueKindFormStateToChange,
+        i18n,
+    )
+    const { mutate, isPending } = useMutation(api.setVenueKindMutation)
+
+    const handleSubmit = () => {
+        const result = convert(form)
+        if (!result.success) {
+            toast.add("form-validation-error")
+            return
+        }
+        mutate(
+            { id: props.venue.id, body: result.value },
+            {
+                onSuccess: venue => {
+                    feedback.succeeded(
+                        t("Backoffice.Venues.Toast.Updated", { name: venue.name }),
+                    )
+                },
+                onError: feedback.failed,
+            },
+        )
+    }
+
+    return (
+        <Form
+            id={formId}
+            mode="edit"
+            noValidate={true}
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-3"
+        >
+            <VenueKindForm
+                value={form}
+                onValueChange={setForm}
+                errors={errors}
+                categories={categories.data ?? []}
+                disabled={isPending}
+            />
+            <Button
+                variant="secondary"
+                size="md"
+                type="submit"
+                form={formId}
+                loading={isPending}
+                className="self-start"
+            >
+                {t("Backoffice.VenueKindForm.Save")}
+            </Button>
+        </Form>
     )
 }

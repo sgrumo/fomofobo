@@ -64,7 +64,7 @@ A tap on a pin opens a preview of the occurrence. The preview shows status, venu
 
 ### Search and filters
 
-Results match every active filter, and a permanent venue matches every filter but the date. One search field matches event titles and the names of the venues in the area, and sets a place as the search center. A venue result opens the page of the venue. Category chips select one category at a time and show the result count of each category under the other filters, permanent venues included. With no category chip pressed, the results hold every category. The date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days. On a phone, the category and date chips sit in a panel that a filter button opens.
+Results match every active filter, and a permanent venue matches every filter but the date. One search field matches event titles and the names of the venues in the area, and sets a place as the search center. A venue result opens the page of the venue, and permanent venues come in a group of their own. Category chips select one category at a time and show the result count of each category under the other filters, permanent venues included. With no category chip pressed, the results hold every category. The date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days. On a phone, the category and date chips sit in a panel that a filter button opens.
 
 ### Event page
 
@@ -74,7 +74,7 @@ Share opens the share sheet of the device, or copies the link where none exists.
 
 ### Venue page
 
-Each venue has its own URL, and the event page and the map preview link to it. The page shows the profile of the venue, directions to it and its links, with the share row of the event page.
+Each venue has its own URL, and the event page and the map preview link to it. The page shows the profile of the venue, directions to it and its links, with the share row of the event page. The page of a permanent venue also shows its kind and the link to its programme.
 
 The page lists the upcoming events of the venue, one row for each event at its next occurrence, live events first. A row opens the event page. Below, the past events of the venue list their title and their first and last date, with no photo, newest first and in numbered pages.
 

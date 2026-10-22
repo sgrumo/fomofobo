@@ -78,6 +78,7 @@
         "ended": "Finito"
     },
     "VenueKind": {
+        "regular": "Locale",
         "cinema": "Cinema",
         "museum": "Museo",
         "theatre": "Teatro",
@@ -89,6 +90,7 @@
         "Places": "Luoghi",
         "Events": "Eventi",
         "Venues": "Locali",
+        "PermanentVenues": "Cinema e musei",
         "Loading": "Ricerca in corso",
         "Empty": "Nessun risultato.",
         "Unavailable": "La ricerca dei luoghi non è disponibile ora.",
@@ -200,14 +202,16 @@
             "VenueNotFound": "Questo luogo non esiste più.",
             "CategoryNotFound": "Questa categoria non esiste più.",
             "OrganizerNotFound": "Questo organizzatore non esiste più.",
-            "CategoryInUse": "Alcuni eventi usano ancora questa categoria. Spostali prima in un'altra categoria.",
+            "CategoryInUse": "Alcuni eventi o luoghi permanenti usano ancora questa categoria. Spostali prima in un'altra categoria.",
             "CategoryNameTaken": "Un'altra categoria ha già questo nome.",
             "InvalidPhotoUpload": "Una foto non è stata caricata. Rimuovila e aggiungila di nuovo.",
             "InvalidEventReference": "Il luogo è bloccato o non esiste più, oppure una categoria o l'organizzatore non esiste più.",
             "TooManyOccurrences": "La ripetizione genera troppe date. Scegli una data di fine precedente.",
             "VenueLimitReached": "Hai già un luogo. Per un altro luogo chiedi a un Admin.",
             "VenueOwnerTaken": "Questo organizzatore gestisce già un altro luogo.",
-            "InvalidVenueOwner": "Scegli un organizzatore."
+            "InvalidVenueOwner": "Scegli un organizzatore.",
+            "PermanentVenueOwner": "Un luogo permanente non ha un gestore, e un luogo con un gestore non diventa permanente.",
+            "InvalidVenueCategory": "Scegli una categoria."
         },
         "Actions": {
             "Cancel": "Annulla",
@@ -406,6 +410,14 @@
             "Instagram": "Instagram",
             "Facebook": "Facebook"
         },
+        "VenueKindForm": {
+            "Kind": "Tipo",
+            "KindHint": "Cinema, musei, teatri e gallerie restano sulla mappa con qualunque data, con un link alla loro programmazione.",
+            "ProgrammeUrl": "Link alla programmazione",
+            "Category": "Categoria",
+            "CategoryHint": "La categoria filtra il luogo sulla mappa e ne sceglie l'icona.",
+            "Save": "Salva tipo"
+        },
         "CategoryForm": {
             "Name": "Nome",
             "Icon": "Icona",
@@ -509,6 +521,8 @@
             "Admin": "Gestione Admin",
             "Owner": "Gestito da",
             "OwnerHint": "Un organizzatore gestisce al massimo un luogo.",
+            "PermanentOwnerHint": "Un luogo permanente non ha un gestore: lo modificano solo gli Admin.",
+            "OwnedKind": "Un organizzatore gestisce questo luogo, quindi resta un locale. Togli il gestore per renderlo un cinema, un museo, un teatro o una galleria.",
             "NoOwner": "Nessun organizzatore",
             "SaveOwner": "Salva gestore"
         },

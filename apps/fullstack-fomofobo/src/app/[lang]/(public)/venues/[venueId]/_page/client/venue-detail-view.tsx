@@ -102,6 +102,11 @@ export const VenueDetailView = (props: VenueDetailViewProps) => {
                 />
             )}
             <div className="flex flex-col gap-2">
+                {venue.kind === "regular" ? undefined : (
+                    <Badge tone="permanent" className="self-start">
+                        {t(`VenueKind.${venue.kind}`)}
+                    </Badge>
+                )}
                 <h1 className="tp-pixel-2xl uppercase">{venue.name}</h1>
                 <p className="tp-body-md text-fg-muted">{venue.address}</p>
                 {venue.description === null ? undefined : (
@@ -109,6 +114,16 @@ export const VenueDetailView = (props: VenueDetailViewProps) => {
                 )}
             </div>
             <div className="flex flex-wrap gap-3">
+                {venue.programmeUrl === null ? undefined : (
+                    <a
+                        href={venue.programmeUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={`${linkClassName} bg-permanent text-fg`}
+                    >
+                        {t("Preview.Programme")}
+                    </a>
+                )}
                 <DirectionsLink
                     coordinates={venue.coordinates}
                     className={`${linkClassName} bg-surface-inverse text-fg-inverse`}

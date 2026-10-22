@@ -8,7 +8,7 @@ import { dismissToast, expectToast } from "e2e-ui-components/toast"
 import { signInAs } from "../../api/auth/utils"
 import { gotoBackofficePage, reloadPage, t } from "../app"
 import { signInBrowser } from "../backoffice"
-import { buildArea, keepMapOffline, seedVenue } from "../public"
+import { buildArea, keepMapOffline, seedCategory, seedVenue } from "../public"
 
 test.describe("backoffice venue", () => {
     test.beforeEach(async ({ page }) => {
@@ -81,6 +81,51 @@ test.describe("backoffice venue", () => {
             page,
             t("shared", "Backoffice.Venue.Owner"),
             organizer.account.name,
+        )
+    })
+
+    test("lets an Admin make a venue a cinema with its programme link and category", async ({
+        page,
+    }) => {
+        const venue = await seedVenue(buildArea())
+        const category = await seedCategory()
+        const programmeUrl = `https://www.cinema-imola.it/programmazione/${crypto.randomUUID()}`
+        await signInBrowser(page, "admin")
+
+        await gotoBackofficePage(page, `/backoffice/venues/${venue.id}`)
+        await selectSelectItem(page, t("shared", "Backoffice.VenueKindForm.Kind"), [
+            "exact",
+            t("shared", "VenueKind.cinema"),
+        ])
+        await fillInput(
+            page,
+            t("shared", "Backoffice.VenueKindForm.ProgrammeUrl"),
+            programmeUrl,
+        )
+        await selectSelectItem(page, t("shared", "Backoffice.VenueKindForm.Category"), [
+            "exact",
+            category.name,
+        ])
+        await clickButton(page, t("shared", "Backoffice.VenueKindForm.Save"))
+
+        const saved = t("shared", "Backoffice.Venues.Toast.Updated", { name: venue.name })
+        await expectToast(page, { type: "success" }, saved)
+        await dismissToast(page, { type: "success" }, saved)
+        await reloadPage(page)
+        await expectSelectValue(
+            page,
+            t("shared", "Backoffice.VenueKindForm.Kind"),
+            t("shared", "VenueKind.cinema"),
+        )
+        await expectInputValue(
+            page,
+            t("shared", "Backoffice.VenueKindForm.ProgrammeUrl"),
+            programmeUrl,
+        )
+        await expectSelectValue(
+            page,
+            t("shared", "Backoffice.VenueKindForm.Category"),
+            category.name,
         )
     })
 

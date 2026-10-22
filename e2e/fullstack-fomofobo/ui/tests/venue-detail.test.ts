@@ -8,6 +8,7 @@ import {
     buildArea,
     preparePublicPage,
     seedCategory,
+    seedPublicCinema,
     seedPublicEvent,
     seedVenue,
 } from "../public"
@@ -107,6 +108,20 @@ test.describe("venue page", () => {
         await reloadPage(page)
 
         await expect(history.getByText(oldest.title)).toBeVisible()
+    })
+
+    test("shows the kind of a cinema and links its programme", async ({ page }) => {
+        const cinema = await seedPublicCinema(buildArea(), await seedCategory())
+        expectToBeDefined(cinema.programmeUrl)
+
+        await gotoPage(page, `/venues/${cinema.id}/`)
+
+        await expect(
+            page.getByText(t("shared", "VenueKind.cinema"), { exact: true }),
+        ).toBeVisible()
+        await expect(
+            page.getByRole("link", { name: t("shared", "Preview.Programme") }),
+        ).toHaveAttribute("href", cinema.programmeUrl)
     })
 
     test("answers not found once the venue is blocked", async ({ page }) => {
