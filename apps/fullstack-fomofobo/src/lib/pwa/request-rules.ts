@@ -6,6 +6,7 @@ const NETWORK_ONLY_PREFIXES = [
     "/auth",
 ]
 const NEXT_STATIC_PREFIX = "/_next/static/"
+const FALLBACK_IMAGES_PREFIX = "/fallbacks/"
 const PUBLIC_DATA_PREFIX = "/api/public/"
 const PLACES_PATH = "/api/public/places"
 const SEARCH_PATH = "/api/public/occurrences"
@@ -27,6 +28,13 @@ const isUnder = (pathname: string, prefix: string): boolean =>
  */
 export const isNetworkOnlyPath = (pathname: string): boolean =>
     NETWORK_ONLY_PREFIXES.some(prefix => isUnder(pathname, prefix))
+
+/**
+ * @description True when the path is a generated fallback image of an event with no photo
+ * @param pathname Path of the request
+ */
+export const isFallbackImagePath = (pathname: string): boolean =>
+    pathname.startsWith(FALLBACK_IMAGES_PREFIX)
 
 /**
  * @description True when the path is a hashed build file of Next

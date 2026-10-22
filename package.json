@@ -28,6 +28,7 @@
         "i18n:export": "pnpm -C scripts/i18n-sheets export-translations",
         "admin-accounts": "pnpm -C scripts/admin-accounts admin-accounts",
         "dither-photos": "pnpm -C scripts/dither-photos dither-photos",
+        "fallback-images": "pnpm -C scripts/fallback-images fallback-images",
         "obfuscate": "pnpm -C scripts/obfuscate obfuscate"
     },
     "devDependencies": {

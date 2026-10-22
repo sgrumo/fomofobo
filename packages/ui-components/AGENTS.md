@@ -68,7 +68,7 @@ Headless, app-agnostic React UI primitives built on `@base-ui/react`. Consumed b
 - `stat-grid` - outlined grid of label and value cells
 - `pagination` - page navigation
 - `icons` - SVG icon component set
-- `pixel-icons` - pixel icon set on a 12 x 12 grid, one component per icon, plus `PixelIcon`, which takes the icon name
+- `pixel-icons` - pixel icon set on a 12 x 12 grid, one component per icon, plus `PixelIcon`, which takes the icon name. `pixel-icons/bitmaps` exports the bitmaps alone, for a Node script that loads no React
 
 **Infrastructure (non-component exports)**
 

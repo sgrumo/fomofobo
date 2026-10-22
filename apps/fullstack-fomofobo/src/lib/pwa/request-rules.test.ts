@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import {
+    isFallbackImagePath,
     isMapTileUrl,
     isNetworkOnlyPath,
     isPublicDataPath,
@@ -29,6 +30,16 @@ describe("isNetworkOnlyPath", () => {
         "/backoffices",
     ])("lets the worker handle %s", pathname => {
         expect(isNetworkOnlyPath(pathname)).toBe(false)
+    })
+})
+
+describe("isFallbackImagePath", () => {
+    it.each([
+        ["/fallbacks/music.png", true],
+        ["/it/fallbacks", false],
+        ["/api/public/occurrences", false],
+    ])("reads %s as a fallback image: %s", (pathname, expected) => {
+        expect(isFallbackImagePath(pathname)).toBe(expected)
     })
 })
 

@@ -13,6 +13,7 @@ import {
 } from "serwist"
 
 import {
+    isFallbackImagePath,
     isMapTileUrl,
     isNetworkOnlyPath,
     isNextStaticPath,
@@ -114,6 +115,17 @@ const runtimeCaching: RuntimeCaching[] = [
             plugins: [
                 new CacheableResponsePlugin({ statuses: [200] }),
                 expiration(300, 30),
+            ],
+        }),
+    },
+    // One small image per category icon, changed only by a deploy of new artwork.
+    {
+        matcher: ({ sameOrigin, url }) => sameOrigin && isFallbackImagePath(url.pathname),
+        handler: new CacheFirst({
+            cacheName: "fallback-images",
+            plugins: [
+                new CacheableResponsePlugin({ statuses: [200] }),
+                expiration(20, 30),
             ],
         }),
     },

@@ -1,0 +1,26 @@
+import { defineConfig } from "oxlint"
+
+import nodeConfig from "../../configs/oxlint/oxlint.config.node.ts"
+import {
+    productionFiles,
+    restrictedZodImport,
+    testFiles,
+} from "../../configs/oxlint/shared.ts"
+
+export default defineConfig({
+    extends: [nodeConfig],
+    ignorePatterns: ["oxlint.config.ts", "vitest.config.ts"],
+    rules: {
+        "eslint/no-restricted-imports": ["error", { paths: [restrictedZodImport] }],
+    },
+    overrides: [
+        {
+            // Production files only override
+            files: productionFiles,
+            excludeFiles: testFiles,
+            rules: {
+                "eslint/no-console": "off",
+            },
+        },
+    ],
+})

@@ -35,6 +35,7 @@
         "./pagination": "./src/pagination/index.ts",
         "./password-input": "./src/password-input/index.ts",
         "./pixel-icons": "./src/pixel-icons/index.ts",
+        "./pixel-icons/bitmaps": "./src/pixel-icons/pixel-icons.helper.ts",
         "./popover": "./src/popover/index.ts",
         "./progress": "./src/progress/index.ts",
         "./provider": "./src/provider/index.ts",

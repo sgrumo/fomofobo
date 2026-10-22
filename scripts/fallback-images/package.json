@@ -1,0 +1,26 @@
+{
+    "name": "fallback-images",
+    "description": "CLI that draws the fallback image of each category icon into the public folder of the app",
+    "type": "module",
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "test": "vitest --run",
+        "fallback-images": "tsx src/index.ts"
+    },
+    "dependencies": {
+        "models": "workspace:*",
+        "shared": "workspace:*",
+        "ui-components": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/node": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "tsx": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:"
+    }
+}

@@ -55,6 +55,8 @@ The CLI runs inside `scripts/admin-accounts`, so a `file:` URL is relative to th
 | `i18n-sheets`            | Google Sheets translation download/export tooling                                                            |
 | `admin-accounts`         | CLI that creates an Admin, or sets a new password of any account. See [Database](#database)                  |
 | `obfuscate`              | CLI that obfuscates a string via the `obfuscation` package                                                   |
+| `dither-photos`          | CLI that replaces every stored event photo with its dithered PNG, once per environment                       |
+| `fallback-images`        | CLI that draws the fallback image of each category icon into `public/fallbacks/` of the app                  |
 | `with-env`               | Bin that loads the env file of a Next or Expo dev script, then runs its command. See [Env files](#env-files) |
 | `e2e-kit`                | Harness the E2E suites share: containers, servers, lifecycle, Playwright config                              |
 | `e2e-ui-components`      | E2E helpers of every `ui-components` primitive, and the tests that drive them                                |
