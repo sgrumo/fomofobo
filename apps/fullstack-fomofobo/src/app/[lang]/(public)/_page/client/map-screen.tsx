@@ -111,7 +111,8 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
     const online = useOnline()
     const filtersId = useId()
     const [filtersOpen, setFiltersOpen] = useState(false)
-    const filtersActive = query.category !== undefined || query.date !== undefined
+    const filtersActive =
+        query.category !== undefined || query.date !== undefined || query.free === true
 
     const urlCenter =
         query.lat === undefined || query.lng === undefined
@@ -404,8 +405,12 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                         date={query.date}
                         from={query.from}
                         to={query.to}
+                        free={query.free === true}
                         onChange={filter => {
                             setQuery(filter)
+                        }}
+                        onFreeChange={free => {
+                            setQuery({ free: free ? true : undefined })
                         }}
                         className="max-md:flex-wrap"
                     />

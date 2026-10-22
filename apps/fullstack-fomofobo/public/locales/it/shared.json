@@ -100,7 +100,7 @@
     "Filters": {
         "Label": "Filtri",
         "Categories": "Categorie",
-        "Dates": "Date",
+        "DatesAndPrice": "Date e prezzo",
         "today": "Oggi",
         "tomorrow": "Domani",
         "weekend": "Weekend",
@@ -139,6 +139,14 @@
         "Capacity": "Capienza",
         "Places_one": "{{count}} posto",
         "Places_other": "{{count}} posti",
+        "Prices": {
+            "Label": "Prezzi e accesso",
+            "Entry": "Ingresso",
+            "Full": "Intero",
+            "Membership": "Tessera richiesta",
+            "MinimumAge": "Età minima",
+            "Notes": "Note"
+        },
         "Now": "ora {{time}}",
         "Venue": "Luogo",
         "Instagram": "Instagram",

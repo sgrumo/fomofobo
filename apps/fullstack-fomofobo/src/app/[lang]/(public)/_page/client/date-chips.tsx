@@ -30,7 +30,9 @@ const QUICK_KINDS = ["today", "tomorrow", "weekend"] as const
 
 interface DateChipsProps extends RouteClientComponentProps<"root">, DateFilter {
     now: Date
+    free: boolean
     onChange: (filter: DateFilter) => void
+    onFreeChange: (free: boolean) => void
     className?: string
 }
 
@@ -61,7 +63,8 @@ export const DateChips = (props: DateChipsProps) => {
 
     return (
         <>
-            <ChipRow label={t("Filters.Dates")} className={props.className}>
+            {/* The free chip shares the row: one more row covers more of the map. */}
+            <ChipRow label={t("Filters.DatesAndPrice")} className={props.className}>
                 {QUICK_KINDS.map(kind => (
                     <Chip
                         key={kind}
@@ -80,6 +83,11 @@ export const DateChips = (props: DateChipsProps) => {
                     label={rangeLabel}
                     pressed={props.date === "range"}
                     onPressedChange={openSheet}
+                />
+                <Chip
+                    label={t("Price.Free")}
+                    pressed={props.free}
+                    onPressedChange={props.onFreeChange}
                 />
             </ChipRow>
             <BottomSheetRoot open={sheetOpen} onOpenChange={setSheetOpen}>

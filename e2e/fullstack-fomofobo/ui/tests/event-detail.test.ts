@@ -55,6 +55,38 @@ test.describe("event detail", () => {
         await expect(page.getByText(t("shared", "NotFound.Title"))).toBeVisible()
     })
 
+    test("lists the prices, the card and the age of the event", async ({ page }) => {
+        const reducedLabel = `Under 18 ${crypto.randomUUID().slice(0, 8)}`
+        const membershipName = `Tessera ${crypto.randomUUID()}`
+        const event = await seedPublicEvent(
+            { venue: await seedVenue(buildArea()), category: await seedCategory() },
+            {
+                priceScheme: {
+                    isFree: false,
+                    fullPriceCents: 1500,
+                    reducedPrices: [{ label: reducedLabel, amountCents: 800 }],
+                    membership: { name: membershipName, costCents: null },
+                    minimumAge: 16,
+                    notes: null,
+                },
+            },
+        )
+
+        await gotoPage(page, `/events/${event.id}/2026-10-24/`)
+
+        const prices = page.getByRole("region", {
+            name: t("shared", "Detail.Prices.Label"),
+        })
+        await expect(prices).toContainText(reducedLabel)
+        await expect(prices).toContainText(membershipName)
+        await expect(prices).toContainText(t("shared", "Price.MinimumAge", { age: 16 }))
+        await expect(
+            page.getByText(
+                `${t("shared", "Price.From", { price: "8 €" })} · ${t("shared", "Price.Membership")} · ${t("shared", "Price.MinimumAge", { age: 16 })}`,
+            ),
+        ).toBeVisible()
+    })
+
     test("links the venue to its page, and names it alone once the venue is blocked", async ({
         page,
     }) => {

@@ -2,9 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query"
 import type { LanguageKey } from "i18n/i18n"
-import type { OccurrenceDetail } from "models"
+import type { OccurrenceDetail, PriceScheme } from "models"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
+import { isDefined } from "shared/values"
 import { Badge } from "ui-components/badge"
 import { IconButton } from "ui-components/icon-button"
 import {
@@ -29,6 +30,7 @@ import { api } from "@/lib/api/client-api"
 import { localTimeOf, weekdayDateOf } from "@/lib/events/local-format"
 import { occurrenceProgress } from "@/lib/events/occurrence-progress"
 import { occurrenceStatus } from "@/lib/events/occurrence-status"
+import { formatEuroCents } from "@/lib/events/price-summary"
 import { useBackToMap } from "@/lib/hooks/use-back-to-map"
 import { useCopyLink } from "@/lib/hooks/use-copy-link"
 import { useNow } from "@/lib/hooks/use-now"
@@ -214,6 +216,7 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                 )}
             </div>
             <StatGrid items={facts} />
+            <PriceDetails priceScheme={occurrence.priceScheme} />
             <section aria-label={t("Detail.Venue")} className="flex flex-col gap-1">
                 <h2 className="tp-pixel-sm text-fg-muted uppercase">
                     {t("Detail.Venue")}
@@ -236,5 +239,72 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                 <p className="tp-body-md text-fg-muted">{occurrence.venue.address}</p>
             </section>
         </>
+    )
+}
+
+interface PriceDetailsProps {
+    priceScheme: PriceScheme
+}
+
+const PriceDetails = (props: PriceDetailsProps) => {
+    const { t } = useTranslation("shared")
+    const scheme = props.priceScheme
+    const membership = scheme.membership
+    const rows = [
+        scheme.isFree
+            ? { key: "entry", label: t("Detail.Prices.Entry"), value: t("Price.Free") }
+            : undefined,
+        scheme.fullPriceCents === null
+            ? undefined
+            : {
+                  key: "full",
+                  label: t("Detail.Prices.Full"),
+                  value: formatEuroCents(scheme.fullPriceCents),
+              },
+        ...scheme.reducedPrices.map((reduced, index) => ({
+            key: `reduced-${String(index)}`,
+            label: reduced.label,
+            value: formatEuroCents(reduced.amountCents),
+        })),
+        membership === null
+            ? undefined
+            : {
+                  key: "membership",
+                  label: t("Detail.Prices.Membership"),
+                  value:
+                      membership.costCents === null
+                          ? membership.name
+                          : `${membership.name} · ${formatEuroCents(membership.costCents)}`,
+              },
+        scheme.minimumAge === null
+            ? undefined
+            : {
+                  key: "minimum-age",
+                  label: t("Detail.Prices.MinimumAge"),
+                  value: t("Price.MinimumAge", { age: scheme.minimumAge }),
+              },
+        scheme.notes === null
+            ? undefined
+            : { key: "notes", label: t("Detail.Prices.Notes"), value: scheme.notes },
+    ].filter(isDefined)
+
+    // One row says no more than the summary of the facts above.
+    return rows.length <= 1 ? undefined : (
+        <section aria-label={t("Detail.Prices.Label")} className="flex flex-col gap-2">
+            <h2 className="tp-pixel-sm text-fg-muted uppercase">
+                {t("Detail.Prices.Label")}
+            </h2>
+            <dl className="border-line divide-line-muted flex flex-col divide-y-2 border-2">
+                {rows.map(row => (
+                    <div
+                        key={row.key}
+                        className="flex items-baseline justify-between gap-3 px-3 py-2"
+                    >
+                        <dt className="tp-body-md">{row.label}</dt>
+                        <dd className="tp-pixel-md text-right">{row.value}</dd>
+                    </div>
+                ))}
+            </dl>
+        </section>
     )
 }

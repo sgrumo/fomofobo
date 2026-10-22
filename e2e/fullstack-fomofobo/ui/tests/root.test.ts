@@ -112,6 +112,54 @@ test.describe("map", () => {
         ).toBeVisible({ timeout: MAP_TIMEOUT_MS })
     })
 
+    test("keeps the free events alone under the free chip, and every event again once unpressed", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const category = await seedCategory()
+        const times = { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" }
+        const [free, paid] = await Promise.all([
+            seedPublicEvent(
+                {
+                    venue: await seedVenue(
+                        offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+                    ),
+                    category,
+                },
+                { ...times, priceScheme: buildFreePriceScheme() },
+            ),
+            seedPublicEvent(
+                {
+                    venue: await seedVenue(
+                        offsetPoint(center, { latitude: -0.01, longitude: 0 }),
+                    ),
+                    category,
+                },
+                times,
+            ),
+        ])
+        const pinOf = (title: string) =>
+            page.getByRole("button", {
+                name: t("shared", "Map.Pin", {
+                    title,
+                    status: t("shared", "Status.upcoming"),
+                    time: "18:00",
+                }),
+            })
+
+        await gotoPage(page, mapPath(center))
+        await expect(pinOf(paid.title)).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+        await pressChip(page, t("shared", "Price.Free"))
+
+        await expect(page).toHaveURL(/free=true/u)
+        await expect(pinOf(free.title)).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+        await expect(pinOf(paid.title)).toBeHidden()
+
+        await unpressChip(page, t("shared", "Price.Free"))
+
+        await expect(pinOf(paid.title)).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+    })
+
     test("shows a cinema under any date filter, and opens its programme and its page from the preview", async ({
         page,
     }) => {
