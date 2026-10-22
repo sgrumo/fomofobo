@@ -121,6 +121,75 @@ describe("eventFormStateToUpsert", () => {
         })
     })
 
+    it("maps a paid scheme with reduced prices and a card back to the write that saved it", () => {
+        const priceScheme = {
+            isFree: false,
+            fullPriceCents: 1500,
+            reducedPrices: [{ label: "Under 18", amountCents: 800 }],
+            membership: { name: "Tessera ARCI", costCents: null },
+            minimumAge: 16,
+            notes: "Prevendita online",
+        }
+
+        const result = eventFormStateToUpsert(
+            eventFormStateFromEvent({ ...buildEvent(), priceScheme, capacity: 90 }),
+            i18n,
+            { isAdmin: false },
+        )
+
+        expect(result).toMatchObject({
+            success: true,
+            value: { priceScheme, capacity: 90 },
+        })
+    })
+
+    it("drops the prices of a free event and the card once its switch is off", () => {
+        const state = eventFormStateFromEvent({
+            ...buildEvent(),
+            priceScheme: {
+                isFree: false,
+                fullPriceCents: 1500,
+                reducedPrices: [{ label: "Under 18", amountCents: 800 }],
+                membership: { name: "Tessera ARCI", costCents: 500 },
+                minimumAge: null,
+                notes: null,
+            },
+        })
+
+        const result = eventFormStateToUpsert(
+            { ...state, isFree: true, hasMembership: false },
+            i18n,
+            { isAdmin: false },
+        )
+
+        expect(result).toMatchObject({
+            success: true,
+            value: {
+                priceScheme: {
+                    isFree: true,
+                    fullPriceCents: null,
+                    reducedPrices: [],
+                    membership: null,
+                },
+            },
+        })
+    })
+
+    it("puts the error of a paid event with no price on the full price", () => {
+        const state = eventFormStateFromEvent(buildEvent())
+
+        const result = eventFormStateToUpsert({ ...state, isFree: false }, i18n, {
+            isAdmin: false,
+        })
+
+        expect(result).toMatchObject({
+            success: false,
+            error: {
+                fullPriceCents: { errors: [ui.FormErrors.Custom["paid-without-price"]] },
+            },
+        })
+    })
+
     it("sends the organizer for an Admin, and requires it", () => {
         const state = eventFormStateFromEvent(buildEvent())
 

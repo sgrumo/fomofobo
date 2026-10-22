@@ -3,6 +3,7 @@
 import { identity } from "es-toolkit"
 import type { FormErrors } from "frontend-shared/types"
 import type { Category } from "models"
+import { MAX_REDUCED_PRICES } from "models"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import type { WeekDay } from "shared/temporal"
@@ -13,25 +14,33 @@ import { Checkbox } from "ui-components/checkbox"
 import { Combobox } from "ui-components/combobox"
 import { DateInput } from "ui-components/date-input"
 import { Field } from "ui-components/field"
-import { PixelIcon } from "ui-components/pixel-icons"
+import { IconButton } from "ui-components/icon-button"
+import { NumberInput } from "ui-components/number-input"
+import { PixelIcon, PixelIconClose } from "ui-components/pixel-icons"
 import { Select } from "ui-components/select"
 import { StringInput } from "ui-components/string-input"
+import { Switch } from "ui-components/switch"
 import { Textarea } from "ui-components/textarea"
 import { TimeInput } from "ui-components/time-input"
 
 import { PhotoGalleryEditor } from "@/components/client/photo-gallery-editor/photo-gallery-editor"
 import { expandOccurrences } from "@/lib/events/expand-occurrences"
+import { EURO_LOCALE } from "@/lib/events/price-summary"
 import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 import type {
     EventFormAction,
     EventFormOption,
     EventFormPhoto,
+    EventFormReducedPrice,
     EventFormState,
     EventMonthlyMode,
     EventRepeat,
 } from "./event-form.state"
 import { eventFormReducer, localDateTimeOf } from "./event-form.state"
+
+// Max of `euroCentsSchema`, in euro
+const MAX_EURO_AMOUNT = 100_000
 
 const REPEATS: EventRepeat[] = ["single", "weekly", "monthly"]
 const MONTHLY_MODES: EventMonthlyMode[] = ["day-of-month", "weekday-position"]
@@ -542,9 +551,143 @@ export const EventPhotosSection = (props: EventPhotosSectionProps) => {
     )
 }
 
+interface EuroInputProps {
+    value: number | undefined
+    onValueChange: (cents: number | undefined) => void
+    disabled: boolean | undefined
+}
+
+const EuroInput = (props: EuroInputProps) => (
+    <NumberInput
+        size="md"
+        controls={false}
+        min={0}
+        max={MAX_EURO_AMOUNT}
+        step={0.5}
+        locale={EURO_LOCALE}
+        format={{ style: "currency", currency: "EUR" }}
+        value={props.value === undefined ? undefined : props.value / 100}
+        onValueChange={euros => {
+            props.onValueChange(euros === undefined ? undefined : Math.round(euros * 100))
+        }}
+        disabled={props.disabled}
+    />
+)
+
+interface ReducedPricesEditorProps {
+    value: EventFormReducedPrice[]
+    onValueChange: (value: EventFormReducedPrice[]) => void
+    errors: FormErrors<EventFormState>["reducedPrices"]
+    disabled: boolean | undefined
+}
+
+const ReducedPricesEditor = (props: ReducedPricesEditorProps) => {
+    const { t } = useTranslation("shared")
+    const rowsErrors =
+        props.errors !== undefined && "items" in props.errors
+            ? props.errors.items
+            : undefined
+    const replace = (id: string, change: Partial<EventFormReducedPrice>) => {
+        props.onValueChange(
+            props.value.map(reduced =>
+                reduced.id === id ? { ...reduced, ...change } : reduced,
+            ),
+        )
+    }
+
+    return (
+        <Field
+            label={t("Backoffice.EventForm.ReducedPrices")}
+            description={t("Backoffice.EventForm.ReducedPricesHint")}
+            required={false}
+            errors={props.errors?.errors}
+        >
+            <div className="flex flex-col gap-2">
+                {props.value.map((reduced, index) => {
+                    const rowErrors = rowsErrors?.[index]?.properties
+                    return (
+                        <div key={reduced.id} className="flex items-start gap-2">
+                            <Field
+                                label={t("Backoffice.EventForm.ReducedLabel", {
+                                    index: index + 1,
+                                })}
+                                srOnly={true}
+                                required={true}
+                                errors={rowErrors?.label?.errors}
+                                className="flex-1"
+                            >
+                                <StringInput
+                                    value={reduced.label}
+                                    onValueChange={label => {
+                                        replace(reduced.id, { label })
+                                    }}
+                                    disabled={props.disabled}
+                                />
+                            </Field>
+                            <Field
+                                label={t("Backoffice.EventForm.ReducedAmount", {
+                                    index: index + 1,
+                                })}
+                                srOnly={true}
+                                required={true}
+                                errors={rowErrors?.amountCents?.errors}
+                                className="w-32"
+                            >
+                                <EuroInput
+                                    value={reduced.amountCents}
+                                    onValueChange={amountCents => {
+                                        replace(reduced.id, { amountCents })
+                                    }}
+                                    disabled={props.disabled}
+                                />
+                            </Field>
+                            <IconButton
+                                aria-label={t("Backoffice.EventForm.RemoveReduced", {
+                                    index: index + 1,
+                                })}
+                                icon={<PixelIconClose />}
+                                size="sm"
+                                disabled={props.disabled}
+                                onClick={() => {
+                                    props.onValueChange(
+                                        props.value.filter(
+                                            other => other.id !== reduced.id,
+                                        ),
+                                    )
+                                }}
+                            />
+                        </div>
+                    )
+                })}
+                {props.value.length < MAX_REDUCED_PRICES && (
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        className="self-start"
+                        disabled={props.disabled}
+                        onClick={() => {
+                            props.onValueChange([
+                                ...props.value,
+                                {
+                                    id: crypto.randomUUID(),
+                                    label: undefined,
+                                    amountCents: undefined,
+                                },
+                            ])
+                        }}
+                    >
+                        {t("Backoffice.EventForm.AddReduced")}
+                    </Button>
+                )}
+            </div>
+        </Field>
+    )
+}
+
 export const EventDetailsSection = (props: EventSectionProps) => {
     const { t } = useTranslation("shared")
     const value = props.value
+    const isFree = value.isFree ?? true
 
     const onAction = (action: EventFormAction) => {
         props.onValueChange(eventFormReducer(value, action))
@@ -552,6 +695,142 @@ export const EventDetailsSection = (props: EventSectionProps) => {
 
     return (
         <>
+            <Field
+                label={t("Backoffice.EventForm.Free")}
+                labelSide="right"
+                required={false}
+            >
+                <Switch
+                    value={isFree}
+                    onValueChange={free => {
+                        onAction({ type: "is-free", value: free })
+                    }}
+                    disabled={props.disabled}
+                />
+            </Field>
+            {!isFree && (
+                <>
+                    <Field
+                        label={t("Backoffice.EventForm.FullPrice")}
+                        required={false}
+                        errors={props.errors?.fullPriceCents?.errors}
+                    >
+                        <EuroInput
+                            value={value.fullPriceCents}
+                            onValueChange={cents => {
+                                onAction({ type: "full-price-cents", value: cents })
+                            }}
+                            disabled={props.disabled}
+                        />
+                    </Field>
+                    <ReducedPricesEditor
+                        value={value.reducedPrices ?? []}
+                        onValueChange={reducedPrices => {
+                            onAction({ type: "reduced-prices", value: reducedPrices })
+                        }}
+                        errors={props.errors?.reducedPrices}
+                        disabled={props.disabled}
+                    />
+                </>
+            )}
+            <Field
+                label={t("Backoffice.EventForm.Membership")}
+                labelSide="right"
+                required={false}
+            >
+                <Switch
+                    value={value.hasMembership ?? false}
+                    onValueChange={hasMembership => {
+                        onAction({ type: "has-membership", value: hasMembership })
+                    }}
+                    disabled={props.disabled}
+                />
+            </Field>
+            {value.hasMembership === true && (
+                <div className="flex flex-wrap gap-3">
+                    <Field
+                        label={t("Backoffice.EventForm.MembershipName")}
+                        required={true}
+                        errors={props.errors?.membershipName?.errors}
+                        className="flex-1"
+                    >
+                        <StringInput
+                            value={value.membershipName}
+                            onValueChange={name => {
+                                onAction({ type: "membership-name", value: name })
+                            }}
+                            disabled={props.disabled}
+                        />
+                    </Field>
+                    <Field
+                        label={t("Backoffice.EventForm.MembershipCost")}
+                        required={false}
+                        errors={props.errors?.membershipCostCents?.errors}
+                        className="w-40"
+                    >
+                        <EuroInput
+                            value={value.membershipCostCents}
+                            onValueChange={cents => {
+                                onAction({ type: "membership-cost-cents", value: cents })
+                            }}
+                            disabled={props.disabled}
+                        />
+                    </Field>
+                </div>
+            )}
+            <div className="flex flex-wrap gap-3">
+                <Field
+                    label={t("Backoffice.EventForm.MinimumAge")}
+                    required={false}
+                    errors={props.errors?.minimumAge?.errors}
+                    className="w-40"
+                >
+                    <NumberInput
+                        size="md"
+                        min={1}
+                        max={21}
+                        step={1}
+                        value={value.minimumAge}
+                        onValueChange={age => {
+                            onAction({ type: "minimum-age", value: age })
+                        }}
+                        disabled={props.disabled}
+                    />
+                </Field>
+                <Field
+                    label={t("Backoffice.EventForm.Capacity")}
+                    description={t("Backoffice.EventForm.CapacityHint")}
+                    required={false}
+                    errors={props.errors?.capacity?.errors}
+                    className="w-56"
+                >
+                    <NumberInput
+                        size="md"
+                        min={1}
+                        max={100_000}
+                        step={1}
+                        value={value.capacity}
+                        onValueChange={capacity => {
+                            onAction({ type: "capacity", value: capacity })
+                        }}
+                        disabled={props.disabled}
+                    />
+                </Field>
+            </div>
+            <Field
+                label={t("Backoffice.EventForm.PriceNotes")}
+                description={t("Backoffice.EventForm.PriceNotesHint")}
+                required={false}
+                errors={props.errors?.priceNotes?.errors}
+            >
+                <StringInput
+                    value={value.priceNotes}
+                    onValueChange={notes => {
+                        onAction({ type: "price-notes", value: notes })
+                    }}
+                    disabled={props.disabled}
+                />
+            </Field>
             <Field
                 label={t("Backoffice.EventForm.Instagram")}
                 required={false}

@@ -9,16 +9,7 @@ export type PriceSummaryPart =
     | { type: "membership" }
     | { type: "minimum-age"; age: number }
 
-const EURO_LOCALE = "it-IT"
-
-export const FREE_PRICE_SCHEME: PriceScheme = {
-    isFree: true,
-    fullPriceCents: null,
-    reducedPrices: [],
-    membership: null,
-    minimumAge: null,
-    notes: null,
-}
+export const EURO_LOCALE = "it-IT"
 
 /**
  * @description Returns the euro text of an amount in cents, with no decimals for a whole amount

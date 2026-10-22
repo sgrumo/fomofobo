@@ -6,12 +6,14 @@ import { checkCheckbox } from "e2e-ui-components/checkbox"
 import { selectComboboxItem, selectComboboxItems } from "e2e-ui-components/combobox"
 import { fillNativeDateInput } from "e2e-ui-components/date-input"
 import { fillInput } from "e2e-ui-components/input"
+import { fillNumberInput } from "e2e-ui-components/number-input"
 import { selectSelectItem } from "e2e-ui-components/select"
 import {
     expectCurrentStep,
     expectStepDisabled,
     goToStep,
 } from "e2e-ui-components/stepper"
+import { switchOff, switchOn } from "e2e-ui-components/switch"
 import { expectTableRow } from "e2e-ui-components/table"
 import { dismissToast, expectToast } from "e2e-ui-components/toast"
 import { expectTogglePressed, pressToggle } from "e2e-ui-components/toggle"
@@ -100,6 +102,72 @@ test.describe("backoffice new event", () => {
             header.getUint8(8),
             header.getUint8(9),
         ]).toStrictEqual([1200, 801, 1, 3])
+    })
+
+    test("creates a paid event with a reduced price, a membership card and a capacity", async ({
+        page,
+    }) => {
+        const category = await seedCategory()
+        const venue = await seedVenue(buildArea())
+        const title = `Paid ${crypto.randomUUID()}`
+        const reducedLabel = "Under 18"
+        const membershipName = "Tessera ARCI"
+        const { headers } = await signInBrowser(page, "organizer")
+
+        await gotoBackofficePage(page, "/backoffice/events/new")
+        await pressToggle(page, t("shared", "Backoffice.EventEditor.Mode.form"))
+        await fillEventEssentials(page, {
+            title,
+            categoryName: category.name,
+            venueName: venue.name,
+            date: "2026-11-14",
+        })
+        await switchOff(page, t("shared", "Backoffice.EventForm.Free"))
+        await fillNumberInput(page, t("shared", "Backoffice.EventForm.FullPrice"), 15)
+        await clickButton(page, t("shared", "Backoffice.EventForm.AddReduced"))
+        await fillInput(
+            page,
+            t("shared", "Backoffice.EventForm.ReducedLabel", { index: 1 }),
+            reducedLabel,
+        )
+        await fillNumberInput(
+            page,
+            t("shared", "Backoffice.EventForm.ReducedAmount", { index: 1 }),
+            9,
+        )
+        await switchOn(page, t("shared", "Backoffice.EventForm.Membership"))
+        await fillInput(
+            page,
+            t("shared", "Backoffice.EventForm.MembershipName"),
+            membershipName,
+        )
+        await fillNumberInput(page, t("shared", "Backoffice.EventForm.Capacity"), 90)
+        await clickButton(page, t("shared", "Backoffice.Actions.Save"))
+
+        const message = t("shared", "Backoffice.EventEditor.Saved", { title })
+        await expectToast(page, { type: "success" }, message)
+        await dismissToast(page, { type: "success" }, message)
+        await expectTableRow(page, [
+            ["exact", title],
+            ["exact", venue.name],
+        ])
+        const list = await listEvents({ headers, queryParams: { q: title } })
+        expectStatus(list, 200)
+        const [listed] = list.data.items
+        expectToBeDefined(listed)
+        const stored = await getEvent({ headers, pathParams: { id: listed.id } })
+        expectStatus(stored, 200)
+        expect([stored.data.priceScheme, stored.data.capacity]).toStrictEqual([
+            {
+                isFree: false,
+                fullPriceCents: 1500,
+                reducedPrices: [{ label: reducedLabel, amountCents: 900 }],
+                membership: { name: membershipName, costCents: null },
+                minimumAge: null,
+                notes: null,
+            },
+            90,
+        ])
     })
 
     test("creates a weekly event without one of its dates", async ({ page }) => {

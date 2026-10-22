@@ -9,7 +9,6 @@ import type { Partial, Specified } from "shared/types"
 import { match } from "ts-pattern"
 import { z } from "zod"
 
-import { FREE_PRICE_SCHEME } from "@/lib/events/price-summary"
 import { parseFormState } from "@/lib/forms/forms"
 
 //#region Types
@@ -26,6 +25,13 @@ export interface EventFormOption {
 export interface EventFormPhoto {
     key: string
     url: string
+}
+
+export interface EventFormReducedPrice {
+    // Keys the row in the list, never sent
+    id: string
+    label: string | undefined
+    amountCents: number | undefined
 }
 
 export interface EventFormState {
@@ -46,7 +52,14 @@ export interface EventFormState {
     addedDates: string[] | undefined
     removedDates: string[] | undefined
     photos: EventFormPhoto[] | undefined
-    priceScheme: PriceScheme | undefined
+    isFree: boolean | undefined
+    fullPriceCents: number | undefined
+    reducedPrices: EventFormReducedPrice[] | undefined
+    hasMembership: boolean | undefined
+    membershipName: string | undefined
+    membershipCostCents: number | undefined
+    minimumAge: number | undefined
+    priceNotes: string | undefined
     capacity: number | undefined
     instagramUrl: string | undefined
     facebookUrl: string | undefined
@@ -70,6 +83,15 @@ export type EventFormAction =
     | { type: "added-dates"; value: string[] | undefined }
     | { type: "removed-dates"; value: string[] | undefined }
     | { type: "photos"; value: EventFormPhoto[] | undefined }
+    | { type: "is-free"; value: boolean | undefined }
+    | { type: "full-price-cents"; value: number | undefined }
+    | { type: "reduced-prices"; value: EventFormReducedPrice[] | undefined }
+    | { type: "has-membership"; value: boolean | undefined }
+    | { type: "membership-name"; value: string | undefined }
+    | { type: "membership-cost-cents"; value: number | undefined }
+    | { type: "minimum-age"; value: number | undefined }
+    | { type: "price-notes"; value: string | undefined }
+    | { type: "capacity"; value: number | undefined }
     | { type: "instagram-url"; value: string | undefined }
     | { type: "facebook-url"; value: string | undefined }
 
@@ -95,7 +117,14 @@ export const initialEventFormState = (): EventFormState => ({
     addedDates: undefined,
     removedDates: undefined,
     photos: undefined,
-    priceScheme: undefined,
+    isFree: undefined,
+    fullPriceCents: undefined,
+    reducedPrices: undefined,
+    hasMembership: undefined,
+    membershipName: undefined,
+    membershipCostCents: undefined,
+    minimumAge: undefined,
+    priceNotes: undefined,
     capacity: undefined,
     instagramUrl: undefined,
     facebookUrl: undefined,
@@ -125,7 +154,17 @@ export const eventFormStateFromEvent = (event: Event): EventFormState => {
         addedDates: event.recurrence?.addedDates,
         removedDates: event.recurrence?.removedDates,
         photos: event.photos.map(photo => ({ key: photo.key, url: photo.url })),
-        priceScheme: event.priceScheme,
+        isFree: event.priceScheme.isFree,
+        fullPriceCents: event.priceScheme.fullPriceCents ?? undefined,
+        reducedPrices: event.priceScheme.reducedPrices.map(reduced => ({
+            id: crypto.randomUUID(),
+            ...reduced,
+        })),
+        hasMembership: event.priceScheme.membership !== null,
+        membershipName: event.priceScheme.membership?.name,
+        membershipCostCents: event.priceScheme.membership?.costCents ?? undefined,
+        minimumAge: event.priceScheme.minimumAge ?? undefined,
+        priceNotes: event.priceScheme.notes ?? undefined,
         capacity: event.capacity ?? undefined,
         instagramUrl: event.externalLinks.instagramUrl ?? undefined,
         facebookUrl: event.externalLinks.facebookUrl ?? undefined,
@@ -245,6 +284,61 @@ const photosAction =
         photos: action.value,
     })
 
+const isFreeAction =
+    (state: EventFormState) => (action: Action<EventFormAction, "is-free">) => ({
+        ...state,
+        isFree: action.value,
+    })
+
+const fullPriceCentsAction =
+    (state: EventFormState) => (action: Action<EventFormAction, "full-price-cents">) => ({
+        ...state,
+        fullPriceCents: action.value,
+    })
+
+const reducedPricesAction =
+    (state: EventFormState) => (action: Action<EventFormAction, "reduced-prices">) => ({
+        ...state,
+        reducedPrices: action.value,
+    })
+
+const hasMembershipAction =
+    (state: EventFormState) => (action: Action<EventFormAction, "has-membership">) => ({
+        ...state,
+        hasMembership: action.value,
+    })
+
+const membershipNameAction =
+    (state: EventFormState) => (action: Action<EventFormAction, "membership-name">) => ({
+        ...state,
+        membershipName: action.value,
+    })
+
+const membershipCostCentsAction =
+    (state: EventFormState) =>
+    (action: Action<EventFormAction, "membership-cost-cents">) => ({
+        ...state,
+        membershipCostCents: action.value,
+    })
+
+const minimumAgeAction =
+    (state: EventFormState) => (action: Action<EventFormAction, "minimum-age">) => ({
+        ...state,
+        minimumAge: action.value,
+    })
+
+const priceNotesAction =
+    (state: EventFormState) => (action: Action<EventFormAction, "price-notes">) => ({
+        ...state,
+        priceNotes: action.value,
+    })
+
+const capacityAction =
+    (state: EventFormState) => (action: Action<EventFormAction, "capacity">) => ({
+        ...state,
+        capacity: action.value,
+    })
+
 const instagramUrlAction =
     (state: EventFormState) => (action: Action<EventFormAction, "instagram-url">) => ({
         ...state,
@@ -283,6 +377,15 @@ export const eventFormReducer = (
         .with({ type: "added-dates" }, addedDatesAction(state))
         .with({ type: "removed-dates" }, removedDatesAction(state))
         .with({ type: "photos" }, photosAction(state))
+        .with({ type: "is-free" }, isFreeAction(state))
+        .with({ type: "full-price-cents" }, fullPriceCentsAction(state))
+        .with({ type: "reduced-prices" }, reducedPricesAction(state))
+        .with({ type: "has-membership" }, hasMembershipAction(state))
+        .with({ type: "membership-name" }, membershipNameAction(state))
+        .with({ type: "membership-cost-cents" }, membershipCostCentsAction(state))
+        .with({ type: "minimum-age" }, minimumAgeAction(state))
+        .with({ type: "price-notes" }, priceNotesAction(state))
+        .with({ type: "capacity" }, capacityAction(state))
         .with({ type: "instagram-url" }, instagramUrlAction(state))
         .with({ type: "facebook-url" }, facebookUrlAction(state))
         .exhaustive()
@@ -332,6 +435,33 @@ const recurrenceOf = (state: EventFormState) =>
         .exhaustive()
 
 /**
+ * @description Builds the price scheme of the form: a free event drops the full and the reduced prices, an event with no card drops the card
+ * @param state Event form state
+ */
+export const priceSchemeOf = (state: EventFormState) => {
+    const isFree = state.isFree ?? true
+    return {
+        isFree,
+        fullPriceCents: isFree ? null : (state.fullPriceCents ?? null),
+        reducedPrices: isFree
+            ? []
+            : (state.reducedPrices ?? []).map(reduced => ({
+                  label: reduced.label,
+                  amountCents: reduced.amountCents,
+              })),
+        membership:
+            state.hasMembership === true
+                ? {
+                      name: state.membershipName,
+                      costCents: state.membershipCostCents ?? null,
+                  }
+                : null,
+        minimumAge: state.minimumAge ?? null,
+        notes: state.priceNotes ?? null,
+    } satisfies Specified<Partial<PriceScheme>>
+}
+
+/**
  * @description Maps the event form to the event write
  * @param state Event form state
  * @param i18n Instance translating the field errors
@@ -358,7 +488,7 @@ export const eventFormStateToUpsert = (
                 instagramUrl: state.instagramUrl ?? null,
                 facebookUrl: state.facebookUrl ?? null,
             },
-            priceScheme: state.priceScheme ?? FREE_PRICE_SCHEME,
+            priceScheme: priceSchemeOf(state),
             capacity: state.capacity ?? null,
             organizerId: context.isAdmin ? state.organizer?.id : undefined,
         } satisfies Specified<Partial<EventUpsert>, { exclude: "recurrence" }>,
@@ -371,6 +501,12 @@ export const eventFormStateToUpsert = (
         ? undefined
         : (z.treeifyError(parsed.error).properties ?? {})
     const recurrenceTree = tree?.recurrence
+    const priceSchemeTree = tree?.priceScheme?.properties
+    const membershipTree = priceSchemeTree?.membership
+    const membershipProperties =
+        membershipTree !== undefined && "properties" in membershipTree
+            ? membershipTree.properties
+            : undefined
     const ruleTree =
         recurrenceTree !== undefined && "properties" in recurrenceTree
             ? recurrenceTree.properties?.rule
@@ -397,7 +533,14 @@ export const eventFormStateToUpsert = (
             recurrenceTree === undefined ? undefined : { errors: recurrenceTree.errors },
         removedDates: undefined,
         photos: tree?.photoKeys,
-        priceScheme: undefined,
+        isFree: undefined,
+        fullPriceCents: priceSchemeTree?.fullPriceCents,
+        reducedPrices: priceSchemeTree?.reducedPrices,
+        hasMembership: undefined,
+        membershipName: membershipProperties?.name,
+        membershipCostCents: membershipProperties?.costCents,
+        minimumAge: priceSchemeTree?.minimumAge,
+        priceNotes: priceSchemeTree?.notes,
         capacity: tree?.capacity,
         instagramUrl: tree?.externalLinks?.properties?.instagramUrl,
         facebookUrl: tree?.externalLinks?.properties?.facebookUrl,

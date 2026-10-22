@@ -1,6 +1,7 @@
 "use client"
 
 import type { Category } from "models"
+import { priceSchemeSchema } from "models"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { match } from "ts-pattern"
@@ -17,9 +18,11 @@ import {
     EventScheduleSection,
 } from "@/components/client/event-form/event-form"
 import type { EventFormState } from "@/components/client/event-form/event-form.state"
-import { localDateTimeOf } from "@/components/client/event-form/event-form.state"
+import {
+    localDateTimeOf,
+    priceSchemeOf,
+} from "@/components/client/event-form/event-form.state"
 import { formatLocalDateTime } from "@/lib/events/local-format"
-import { FREE_PRICE_SCHEME } from "@/lib/events/price-summary"
 import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 
 import type { EventFormStep } from "./event-form-wizard.steps"
@@ -162,6 +165,8 @@ const EventReview = (props: EventReviewProps) => {
     const { t } = useTranslation("shared")
     const priceSummary = usePriceSummary()
     const value = props.value
+    // An invalid scheme shows no summary: its fields hold the errors
+    const priceScheme = priceSchemeSchema.safeParse(priceSchemeOf(value))
     const startsAt = localDateTimeOf(value.startDate, value.startTime)
     const endsAt = localDateTimeOf(value.endDate, value.endTime)
 
@@ -199,7 +204,11 @@ const EventReview = (props: EventReviewProps) => {
         },
         {
             label: t("Backoffice.EventForm.Price"),
-            value: priceSummary(value.priceScheme ?? FREE_PRICE_SCHEME),
+            value: priceScheme.success ? priceSummary(priceScheme.data) : undefined,
+        },
+        {
+            label: t("Backoffice.EventForm.Capacity"),
+            value: value.capacity?.toString(),
         },
         { label: t("Backoffice.EventForm.Instagram"), value: value.instagramUrl },
         { label: t("Backoffice.EventForm.Facebook"), value: value.facebookUrl },
