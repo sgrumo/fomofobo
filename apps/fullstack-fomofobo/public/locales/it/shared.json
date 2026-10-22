@@ -25,7 +25,8 @@
             "Venues": "Luoghi",
             "Categories": "Categorie",
             "Organizers": "Organizzatori",
-            "Settings": "Impostazioni"
+            "Settings": "Impostazioni",
+            "Venue": "Luogo"
         }
     },
     "Map": {
@@ -181,8 +182,11 @@
             "CategoryInUse": "Alcuni eventi usano ancora questa categoria. Spostali prima in un'altra categoria.",
             "CategoryNameTaken": "Un'altra categoria ha già questo nome.",
             "InvalidPhotoUpload": "Una foto non è stata caricata. Rimuovila e aggiungila di nuovo.",
-            "InvalidEventReference": "Il luogo, una categoria o l'organizzatore non esiste più.",
-            "TooManyOccurrences": "La ripetizione genera troppe date. Scegli una data di fine precedente."
+            "InvalidEventReference": "Il luogo è bloccato o non esiste più, oppure una categoria o l'organizzatore non esiste più.",
+            "TooManyOccurrences": "La ripetizione genera troppe date. Scegli una data di fine precedente.",
+            "VenueLimitReached": "Hai già un luogo. Per un altro luogo chiedi a un Admin.",
+            "VenueOwnerTaken": "Questo organizzatore gestisce già un altro luogo.",
+            "InvalidVenueOwner": "Scegli un organizzatore."
         },
         "Actions": {
             "Cancel": "Annulla",
@@ -340,20 +344,31 @@
             "New": "Nuovo luogo",
             "Columns": {
                 "Name": "Nome",
-                "Address": "Indirizzo"
+                "Address": "Indirizzo",
+                "Owner": "Gestito da"
             },
             "Create": {
                 "Title": "Nuovo luogo",
                 "Submit": "Crea"
             },
-            "Update": {
-                "Title": "Modifica luogo"
-            },
             "Toast": {
                 "Created": "\"{{name}}\" creato.",
                 "Updated": "\"{{name}}\" salvato.",
                 "CloseWhileCreating": "Attendi che il luogo sia creato.",
-                "CloseWhileUpdating": "Attendi che il luogo sia salvato."
+                "CloseWhileUpdating": "Attendi che il luogo sia salvato.",
+                "Blocked": "\"{{name}}\" bloccato.",
+                "Unblocked": "\"{{name}}\" sbloccato.",
+                "CloseWhileBlocking": "Attendi che il luogo sia bloccato.",
+                "CloseWhileUnblocking": "Attendi che il luogo sia sbloccato."
+            },
+            "Block": {
+                "Title": "Blocca il luogo",
+                "Description": "\"{{name}}\" sparisce dall'app pubblica finché un Admin non lo sblocca. I suoi eventi restano visibili.",
+                "Submit": "Blocca"
+            },
+            "Unblock": {
+                "Title": "Sbloccare il luogo?",
+                "Description": "\"{{name}}\" torna visibile nell'app pubblica."
             }
         },
         "VenueForm": {
@@ -364,7 +379,11 @@
             "Latitude": "Latitudine",
             "Longitude": "Longitudine",
             "MapHint": "Clicca sulla mappa o trascina il segnaposto per correggere la posizione.",
-            "MapUnsupported": "Questo browser non disegna la mappa. Scrivi le coordinate."
+            "MapUnsupported": "Questo browser non disegna la mappa. Scrivi le coordinate.",
+            "Description": "Descrizione",
+            "Website": "Sito web",
+            "Instagram": "Instagram",
+            "Facebook": "Facebook"
         },
         "CategoryForm": {
             "Name": "Nome",
@@ -460,6 +479,25 @@
             "EndedVisibleDaysHint": "Per quanti giorni un evento finito resta nell'app. Poi esce dall'app e le sue foto vengono cancellate. Da 0 a {{max}}.",
             "ParticipantThreshold": "Soglia degli interessati",
             "ParticipantThresholdHint": "Un evento mostra il numero di interessati solo da questa soglia in su. Da 1 a {{max}}."
+        },
+        "Venue": {
+            "Back": "Torna ai luoghi",
+            "Blocked": "Questo luogo è bloccato: non appare nell'app pubblica.",
+            "BlockedWithReason": "Questo luogo è bloccato: non appare nell'app pubblica. Motivo: {{reason}}",
+            "ReadOnly": "Solo l'organizzatore che lo gestisce o un Admin modifica questo luogo.",
+            "Admin": "Gestione Admin",
+            "Owner": "Gestito da",
+            "OwnerHint": "Un organizzatore gestisce al massimo un luogo.",
+            "NoOwner": "Nessun organizzatore",
+            "SaveOwner": "Salva gestore"
+        },
+        "VenueCover": {
+            "Label": "Copertina",
+            "Hint": "JPEG, PNG o WebP, fino a 10 MB. La salviamo in due colori, larga al massimo 1200 pixel.",
+            "None": "Nessuna copertina.",
+            "Upload": "Carica la copertina",
+            "Remove": "Rimuovi la copertina",
+            "Saving": "Salvataggio della copertina"
         }
     },
     "Offline": {

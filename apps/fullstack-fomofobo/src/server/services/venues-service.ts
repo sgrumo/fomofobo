@@ -65,19 +65,21 @@ export class VenuesService {
      * @param account Account of the session
      */
     public async create(creation: VenueCreation, account: Account): Promise<Venue> {
-        const isOrganizer = account.role === "organizer"
-        if (isOrganizer && (await this.venuesStorage.findOwnedBy(account.id)) !== null) {
+        const id = crypto.randomUUID()
+        const inserted = await this.venuesStorage.insert(
+            { id, ...creation },
+            {
+                createdBy: account.id,
+                ownerId: account.role === "organizer" ? account.id : null,
+            },
+            new Date(),
+        )
+        if (!inserted) {
             throw appError(
                 "VenueLimitReached",
                 `Account ${account.id} already owns a venue`,
             )
         }
-        const id = crypto.randomUUID()
-        await this.venuesStorage.insert(
-            { id, ...creation },
-            { createdBy: account.id, ownerId: isOrganizer ? account.id : null },
-            new Date(),
-        )
         return await this.getById(id)
     }
 

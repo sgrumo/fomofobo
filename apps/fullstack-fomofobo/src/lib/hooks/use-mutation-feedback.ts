@@ -17,6 +17,9 @@ const EXPLAINED_ERROR_CODES = [
     "InvalidPhotoUpload",
     "InvalidEventReference",
     "TooManyOccurrences",
+    "VenueLimitReached",
+    "VenueOwnerTaken",
+    "InvalidVenueOwner",
 ] as const satisfies readonly AppErrorCode[]
 
 type ExplainedErrorCode = (typeof EXPLAINED_ERROR_CODES)[number]

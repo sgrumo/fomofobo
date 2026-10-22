@@ -121,6 +121,7 @@ const CreateVenueDialogContent = (props: CreateVenueDialogContentProps) => {
                         value={form}
                         onValueChange={setForm}
                         errors={errors}
+                        intent="create"
                         disabled={isPending}
                     />
                 </Form>

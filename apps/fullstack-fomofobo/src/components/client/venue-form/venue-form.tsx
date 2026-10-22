@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next"
 import { Combobox } from "ui-components/combobox"
 import { Field } from "ui-components/field"
 import { StringInput } from "ui-components/string-input"
+import { Textarea } from "ui-components/textarea"
 
 import { api } from "@/lib/api/client-api"
 import { DEFAULT_CITY } from "@/lib/platform/platform"
@@ -29,6 +30,7 @@ interface VenueFormProps {
     value: VenueFormState
     onValueChange: (value: VenueFormState) => void
     errors: FormErrors<VenueFormState> | undefined
+    intent: "create" | "update"
     disabled?: boolean
 }
 
@@ -159,6 +161,65 @@ export const VenueForm = (props: VenueFormProps) => {
                 }}
                 disabled={props.disabled}
             />
+            {props.intent === "update" && (
+                <>
+                    <Field
+                        label={t("Backoffice.VenueForm.Description")}
+                        required={false}
+                        errors={props.errors?.description?.errors}
+                    >
+                        <Textarea
+                            value={props.value.description}
+                            onValueChange={description => {
+                                onAction({ type: "description", value: description })
+                            }}
+                            disabled={props.disabled}
+                        />
+                    </Field>
+                    <Field
+                        label={t("Backoffice.VenueForm.Website")}
+                        required={false}
+                        errors={props.errors?.websiteUrl?.errors}
+                    >
+                        <StringInput
+                            inputMode="url"
+                            value={props.value.websiteUrl}
+                            onValueChange={url => {
+                                onAction({ type: "website-url", value: url })
+                            }}
+                            disabled={props.disabled}
+                        />
+                    </Field>
+                    <Field
+                        label={t("Backoffice.VenueForm.Instagram")}
+                        required={false}
+                        errors={props.errors?.instagramUrl?.errors}
+                    >
+                        <StringInput
+                            inputMode="url"
+                            value={props.value.instagramUrl}
+                            onValueChange={url => {
+                                onAction({ type: "instagram-url", value: url })
+                            }}
+                            disabled={props.disabled}
+                        />
+                    </Field>
+                    <Field
+                        label={t("Backoffice.VenueForm.Facebook")}
+                        required={false}
+                        errors={props.errors?.facebookUrl?.errors}
+                    >
+                        <StringInput
+                            inputMode="url"
+                            value={props.value.facebookUrl}
+                            onValueChange={url => {
+                                onAction({ type: "facebook-url", value: url })
+                            }}
+                            disabled={props.disabled}
+                        />
+                    </Field>
+                </>
+            )}
         </>
     )
 }

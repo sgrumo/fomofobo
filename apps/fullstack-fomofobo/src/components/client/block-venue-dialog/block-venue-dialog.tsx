@@ -1,7 +1,6 @@
 "use client"
 
 import { useMutation } from "@tanstack/react-query"
-import type { Venue } from "models"
 import type { ReactElement } from "react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -11,6 +10,7 @@ import {
     DialogBody,
     DialogClose,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogRoot,
@@ -20,20 +20,20 @@ import {
 import { Form } from "ui-components/form"
 import { useToast } from "ui-components/toast"
 
-import { VenueForm } from "@/components/client/venue-form/venue-form"
+import { BlockEventForm } from "@/components/client/block-event-form/block-event-form"
 import {
-    venueFormStateFromVenue,
-    venueFormStateToCreation,
-} from "@/components/client/venue-form/venue-form.state"
+    blockEventFormStateToBlock,
+    initialBlockEventFormState,
+} from "@/components/client/block-event-form/block-event-form.state"
 import { api } from "@/lib/api/client-api"
 import { useMutationFeedback } from "@/lib/hooks/use-mutation-feedback"
 
-interface UpdateVenueDialogProps {
+interface BlockVenueDialogProps {
     trigger: ReactElement
-    venue: Venue
+    venue: { id: string; name: string }
 }
 
-export const UpdateVenueDialog = (props: UpdateVenueDialogProps) => {
+export const BlockVenueDialog = (props: BlockVenueDialogProps) => {
     const { t } = useTranslation("shared")
     const toast = useToast()
     const [open, setOpen] = useState(false)
@@ -41,7 +41,7 @@ export const UpdateVenueDialog = (props: UpdateVenueDialogProps) => {
 
     const onOpenChange = (nextOpen: boolean) => {
         if (!nextOpen && pending) {
-            toast.addPlain("warning", t("Backoffice.Venues.Toast.CloseWhileUpdating"))
+            toast.addPlain("warning", t("Backoffice.Venues.Toast.CloseWhileBlocking"))
             return
         }
         setOpen(nextOpen)
@@ -50,8 +50,8 @@ export const UpdateVenueDialog = (props: UpdateVenueDialogProps) => {
     return (
         <DialogRoot open={open} onOpenChange={onOpenChange}>
             <DialogTrigger render={props.trigger} />
-            <DialogContent className="max-h-[calc(min(48rem,90dvh))] w-[calc(min(40rem,90dvw))]">
-                <UpdateVenueDialogContent
+            <DialogContent className="max-h-[calc(min(30rem,90dvh))] w-[calc(min(30rem,90dvw))]">
+                <BlockVenueDialogContent
                     venue={props.venue}
                     onMutate={() => {
                         setPending(true)
@@ -68,23 +68,23 @@ export const UpdateVenueDialog = (props: UpdateVenueDialogProps) => {
     )
 }
 
-interface UpdateVenueDialogContentProps {
-    venue: Venue
+interface BlockVenueDialogContentProps {
+    venue: { id: string; name: string }
     onMutate: () => void
     onSettled: () => void
     onSuccess: () => void
 }
 
-const UpdateVenueDialogContent = (props: UpdateVenueDialogContentProps) => {
+const BlockVenueDialogContent = (props: BlockVenueDialogContentProps) => {
     const { t, i18n } = useTranslation("shared")
     const toast = useToast()
     const feedback = useMutationFeedback()
     const { formId, form, setForm, errors, convert } = useForm(
-        () => venueFormStateFromVenue(props.venue),
-        venueFormStateToCreation,
+        initialBlockEventFormState,
+        blockEventFormStateToBlock,
         i18n,
     )
-    const { mutate, isPending } = useMutation(api.updateVenueMutation)
+    const { mutate, isPending } = useMutation(api.blockVenueMutation)
 
     const handleSubmit = () => {
         const result = convert(form)
@@ -97,9 +97,11 @@ const UpdateVenueDialogContent = (props: UpdateVenueDialogContentProps) => {
             { id: props.venue.id, body: result.value },
             {
                 onSettled: props.onSettled,
-                onSuccess: venue => {
+                onSuccess: () => {
                     feedback.succeeded(
-                        t("Backoffice.Venues.Toast.Updated", { name: venue.name }),
+                        t("Backoffice.Venues.Toast.Blocked", {
+                            name: props.venue.name,
+                        }),
                     )
                     props.onSuccess()
                 },
@@ -111,17 +113,22 @@ const UpdateVenueDialogContent = (props: UpdateVenueDialogContentProps) => {
     return (
         <>
             <DialogHeader>
-                <DialogTitle>{t("Backoffice.Venues.Update.Title")}</DialogTitle>
+                <DialogTitle>{t("Backoffice.Venues.Block.Title")}</DialogTitle>
             </DialogHeader>
             <DialogBody>
+                <DialogDescription>
+                    {t("Backoffice.Venues.Block.Description", {
+                        name: props.venue.name,
+                    })}
+                </DialogDescription>
                 <Form
                     id={formId}
                     mode="edit"
                     noValidate={true}
                     onSubmit={handleSubmit}
-                    className="flex flex-col gap-4"
+                    className="mt-4 flex flex-col gap-4"
                 >
-                    <VenueForm
+                    <BlockEventForm
                         value={form}
                         onValueChange={setForm}
                         errors={errors}
@@ -149,7 +156,7 @@ const UpdateVenueDialogContent = (props: UpdateVenueDialogContentProps) => {
                     form={formId}
                     loading={isPending}
                 >
-                    {t("Backoffice.Actions.Save")}
+                    {t("Backoffice.Venues.Block.Submit")}
                 </Button>
             </DialogFooter>
         </>

@@ -108,28 +108,32 @@ export class VenuesStorage {
     }
 
     /**
-     * @description Persists one venue
+     * @description Persists one venue, and returns false when its owner already owns one
      * @param venue Venue inserted, carrying its id
      * @param people Account that creates it, and its owner, `null` for no owner
      * @param createdAt Instant of the creation
-     * @remarks Fails on the unique owner index when the owner already owns a venue
      */
     public async insert(
         venue: VenueCreation & { id: string },
         people: { createdBy: string; ownerId: string | null },
         createdAt: Date,
-    ): Promise<void> {
-        await this.db.insert(venues).values({
-            id: venue.id,
-            name: venue.name,
-            address: venue.address,
-            latitude: venue.coordinates.latitude,
-            longitude: venue.coordinates.longitude,
-            createdBy: people.createdBy,
-            ownerId: people.ownerId,
-            createdAt,
-            updatedAt: createdAt,
-        })
+    ): Promise<boolean> {
+        const rows = await this.db
+            .insert(venues)
+            .values({
+                id: venue.id,
+                name: venue.name,
+                address: venue.address,
+                latitude: venue.coordinates.latitude,
+                longitude: venue.coordinates.longitude,
+                createdBy: people.createdBy,
+                ownerId: people.ownerId,
+                createdAt,
+                updatedAt: createdAt,
+            })
+            .onConflictDoNothing()
+            .returning({ id: venues.id })
+        return rows.length > 0
     }
 
     /**

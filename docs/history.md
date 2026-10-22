@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-10-22 · Venues get owners, profiles and blocks
+
+### Changed
+
+An Organizer now creates and edits one venue of its own, and an Admin assigns the owner and blocks a venue without blocking its events. Venues gained a description, a cover and social links.
+
+### Why
+
+A client request. The client wants each place to present itself, and organizers to keep their own venue up to date.
+
+### Check next time
+
+Ask who maintains the shared records, such as venues, before the backoffice gives the edit right to one role.
+
 ## 2026-10-22 · Photos stored as a two-color dither
 
 ### Changed

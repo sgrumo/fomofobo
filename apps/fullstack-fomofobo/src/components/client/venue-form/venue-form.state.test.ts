@@ -8,6 +8,7 @@ import {
     initialVenueFormState,
     venueFormReducer,
     venueFormStateToCreation,
+    venueFormStateToUpdate,
 } from "./venue-form.state"
 
 const i18n = createI18nInstance("it", { shared, ui })
@@ -23,7 +24,7 @@ describe("venueFormReducer", () => {
         })
 
         expect(state).toStrictEqual({
-            name: undefined,
+            ...initialVenueFormState(),
             address: "Via Emilia 1, Imola, Italy",
             latitude: "44.3533",
             longitude: "11.7147",
@@ -45,6 +46,7 @@ describe("venueFormStateToCreation", () => {
         expect(
             venueFormStateToCreation(
                 {
+                    ...initialVenueFormState(),
                     name: "Chiostro",
                     address: "Via Emilia 1, Imola",
                     latitude: "44.3533",
@@ -65,6 +67,7 @@ describe("venueFormStateToCreation", () => {
     it("puts the coordinate errors on the coordinate fields", () => {
         const result = venueFormStateToCreation(
             {
+                ...initialVenueFormState(),
                 name: "Chiostro",
                 address: "Via Emilia 1, Imola",
                 latitude: "120",
@@ -79,6 +82,59 @@ describe("venueFormStateToCreation", () => {
                 latitude: { errors: [expect.any(String)] },
                 longitude: { errors: [expect.any(String)] },
             },
+        })
+    })
+})
+
+describe("venueFormStateToUpdate", () => {
+    it("maps the profile fields, an emptied link to null", () => {
+        expect(
+            venueFormStateToUpdate(
+                {
+                    name: "Chiostro",
+                    address: "Via Emilia 1, Imola",
+                    latitude: "44.3533",
+                    longitude: "11.7147",
+                    description: "Concerts in the cloister.",
+                    websiteUrl: "https://www.chiostro.it",
+                    instagramUrl: undefined,
+                    facebookUrl: undefined,
+                },
+                i18n,
+            ),
+        ).toStrictEqual({
+            success: true,
+            value: {
+                name: "Chiostro",
+                address: "Via Emilia 1, Imola",
+                coordinates: { latitude: 44.3533, longitude: 11.7147 },
+                coverPhotoKey: undefined,
+                description: "Concerts in the cloister.",
+                links: {
+                    websiteUrl: "https://www.chiostro.it",
+                    instagramUrl: null,
+                    facebookUrl: null,
+                },
+            },
+        })
+    })
+
+    it("puts a link error on its field", () => {
+        const result = venueFormStateToUpdate(
+            {
+                ...initialVenueFormState(),
+                name: "Chiostro",
+                address: "Via Emilia 1, Imola",
+                latitude: "44.3533",
+                longitude: "11.7147",
+                instagramUrl: "https://example.com/chiostro",
+            },
+            i18n,
+        )
+
+        expect(result).toMatchObject({
+            success: false,
+            error: { instagramUrl: { errors: [expect.any(String)] } },
         })
     })
 })

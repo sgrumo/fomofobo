@@ -124,7 +124,16 @@ export const routes = {
         segments: ["backoffice", "venues"],
         title: ({ t }) => t("PageTitle.Backoffice.Venues"),
         parametersSchema: z.object({}),
-        querySchema: z.object(backofficeListQuery),
+        querySchema: z.object({
+            ...backofficeListQuery,
+            state: blockedFilterSchema.optional().catch(undefined),
+        }),
+    }),
+    backofficeVenue: createDynamicRoute({
+        segments: ["backoffice", "venues", "[id]"],
+        title: ({ t }) => t("PageTitle.Backoffice.Venue"),
+        parametersSchema: z.object({ id: z.string() }),
+        querySchema: z.object({}),
     }),
     backofficeCategories: createDynamicRoute({
         segments: ["backoffice", "categories"],

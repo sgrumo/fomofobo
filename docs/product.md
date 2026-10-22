@@ -16,7 +16,11 @@ A category groups events by type and carries a unique name and an icon. The icon
 
 ### Venues
 
-A venue is a reusable place with a name, an address and coordinates. Every event takes place at exactly one venue, and events share venues. Organizers and Admins create venues, and only Admins edit them. The backoffice takes the address and the coordinates of a venue from the place search, and a pin on the map corrects the position.
+A venue is a reusable place with a name, an address and coordinates, and an optional description, cover and website, Instagram and Facebook links. Every event takes place at exactly one venue, and events share venues. The backoffice takes the address and the coordinates of a venue from the place search, and a pin on the map corrects the position.
+
+An Organizer owns one venue at most, and creates and edits only that venue. An Admin creates every other venue, edits every venue, and gives a venue to an Organizer or takes it back. Any Organizer holds events at any venue.
+
+An Admin blocks a venue with a reason. A blocked venue can no longer be picked for an event, and the events already held there keep it and stay visible.
 
 ### Events
 
@@ -94,7 +98,7 @@ The event form opens as a wizard of five steps: basics, place and time, photos, 
 
 ### Organizer management
 
-Admins create organizer accounts with a name and an email, and block or unblock them. Admins see every event, organizer, venue and category of the platform, with the blocked state of events and organizers. The backoffice shows no statistics.
+Admins create organizer accounts with a name and an email, and block or unblock them. Admins see every event, organizer, venue and category of the platform, with the blocked state of events, organizers and venues. The backoffice shows no statistics.
 
 ### Platform settings
 
