@@ -41,6 +41,7 @@ export const routes = {
             place: z.string().trim().min(1).optional().catch(undefined),
             q: z.string().trim().min(1).optional().catch(undefined),
             category: z.uuid().optional().catch(undefined),
+            free: z.stringbool().optional().catch(undefined),
             date: dateFilterKindSchema.optional().catch(undefined),
             from: localDateSchema.optional().catch(undefined),
             to: localDateSchema.optional().catch(undefined),

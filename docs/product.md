@@ -66,7 +66,7 @@ A tap on a pin opens a preview of the occurrence. The preview shows status, venu
 
 ### Search and filters
 
-Results match every active filter, and a permanent venue matches every filter but the date. One search field matches event titles and the names of the venues in the area, and sets a place as the search center. A venue result opens the page of the venue, and permanent venues come in a group of their own. Category chips select one category at a time and show the result count of each category under the other filters, permanent venues included. With no category chip pressed, the results hold every category. The date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days. On a phone, the category and date chips sit in a panel that a filter button opens.
+Results match every active filter. A permanent venue ignores the date filter, and the free filter leaves it out, since it has no price. One search field matches event titles and the names of the venues in the area, and sets a place as the search center. A venue result opens the page of the venue, and permanent venues come in a group of their own. Category chips select one category at a time and show the result count of each category under the other filters, permanent venues included. With no category chip pressed, the results hold every category. The date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days. On a phone, the category and date chips sit in a panel that a filter button opens.
 
 ### Event page
 

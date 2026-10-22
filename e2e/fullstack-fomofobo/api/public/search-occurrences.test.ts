@@ -5,7 +5,11 @@ import { signInAs } from "../auth/utils"
 import { createCategory } from "../backoffice-categories/api"
 import { buildCategoryCreation } from "../backoffice-categories/utils"
 import { blockEvent, deleteEvent } from "../backoffice-events/api"
-import { seedEvent, seedEventReferences } from "../backoffice-events/utils"
+import {
+    buildFreePriceScheme,
+    seedEvent,
+    seedEventReferences,
+} from "../backoffice-events/utils"
 import { blockOrganizer } from "../backoffice-organizers/api"
 import { updateSettings } from "../backoffice-settings/api"
 import { blockVenue, createVenue } from "../backoffice-venues/api"
@@ -127,6 +131,34 @@ describe("GET /api/public/occurrences", () => {
             ],
             [{ categoryId, count: 1 }],
         ])
+    })
+
+    it("keeps the free events alone under the free filter, and counts them", async () => {
+        const { headers } = await signInAs("organizer")
+        const { categoryId, venue, venueId } = await seedEventReferences()
+        await seedCinema(categoryId, { coordinates: venue.coordinates })
+        const free = await seedEvent(
+            headers,
+            { venueId, categoryId },
+            { priceScheme: buildFreePriceScheme() },
+        )
+        await seedEvent(headers, { venueId, categoryId })
+
+        const res = await searchOccurrences({
+            headers: { "x-test-now": SATURDAY_NOON },
+            queryParams: {
+                lat: venue.coordinates.latitude,
+                lng: venue.coordinates.longitude,
+                free: "true",
+            },
+        })
+
+        expectStatus(res, 200)
+        expect([
+            res.data.occurrences.map(occurrence => occurrence.eventId),
+            res.data.permanentVenues,
+            res.data.categoryCounts,
+        ]).toStrictEqual([[free.id], [], [{ categoryId, count: 1 }]])
     })
 
     it("filters the permanent venues by name and by category, and counts them under the other filters", async () => {

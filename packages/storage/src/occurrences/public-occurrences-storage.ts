@@ -41,6 +41,7 @@ export interface PublicOccurrenceSearch {
     }
     q?: string
     categoryIds?: string[]
+    free?: boolean
     now: Date
     limit: number
     permanentVenueLimit: number
@@ -203,11 +204,14 @@ export class PublicOccurrencesStorage {
             lt(eventOccurrences.startsAt, search.window.to),
             insideArea(search),
             search.q === undefined ? undefined : likeContains(events.title, search.q),
+            search.free === true ? eq(events.isFree, true) : undefined,
         )
         const firstInWindow = search.onePerEvent
             ? sql`${eventOccurrences.startsAt} = (select min(inner_occurrence.starts_at) from ${eventOccurrences} as inner_occurrence where inner_occurrence.event_id = ${eventOccurrences.eventId} and inner_occurrence.ends_at > ${search.window.from.getTime()} and inner_occurrence.starts_at < ${search.window.to.getTime()})`
             : undefined
         const permanentVenueFilter = and(
+            // A permanent venue has no price, so the free filter keeps events alone.
+            search.free === true ? sql`0` : undefined,
             sql`${venues.isBlocked} = 0`,
             ne(venues.kind, "regular"),
             insideArea(search),

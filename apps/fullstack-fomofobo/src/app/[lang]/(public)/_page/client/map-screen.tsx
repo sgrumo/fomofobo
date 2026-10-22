@@ -141,6 +141,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 lng: center.longitude,
                 q: query.q,
                 categoryIds: query.category === undefined ? undefined : [query.category],
+                free: query.free,
                 date: query.date ?? "default",
                 from: query.from,
                 to: query.to,

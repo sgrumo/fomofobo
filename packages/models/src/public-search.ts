@@ -26,6 +26,7 @@ export const publicSearchQuerySchema = z
         lng: z.coerce.number().min(-180).max(180),
         q: z.string().trim().min(1).optional(),
         categoryIds: queryArraySchema(z.uuid(), MAX_SEARCH_CATEGORIES).optional(),
+        free: z.stringbool().optional(),
         date: dateFilterKindSchema.default("default"),
         // PLACEHOLDER(OP-09): past dates
         from: localDateSchema.optional(),

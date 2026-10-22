@@ -76,6 +76,7 @@ export class PublicOccurrencesService {
             box: boundingBox(center, SEARCH_RADIUS_METERS),
             q: query.q,
             categoryIds: query.categoryIds,
+            free: query.free,
             now,
             limit: MAX_SEARCH_RESULTS,
             permanentVenueLimit: MAX_PERMANENT_VENUE_RESULTS,
