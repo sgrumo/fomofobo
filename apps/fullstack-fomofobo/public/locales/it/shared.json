@@ -382,6 +382,16 @@
             "PhotoCount": "Foto: {{count}}",
             "NoPhotos": "Nessuna foto"
         },
+        "EventSaves": {
+            "Title": "Interessati per data",
+            "Loading": "Caricamento interessati",
+            "Error": "Non è stato possibile caricare gli interessati.",
+            "Empty": "Nessuna data in programma.",
+            "Columns": {
+                "Date": "Data",
+                "Saves": "Interessati"
+            }
+        },
         "EventEditor": {
             "Mode": {
                 "Label": "Modalità",

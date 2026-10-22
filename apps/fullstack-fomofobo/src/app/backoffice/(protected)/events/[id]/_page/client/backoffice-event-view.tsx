@@ -6,6 +6,7 @@ import { Alert } from "ui-components/alert"
 import { Spinner } from "ui-components/spinner"
 
 import { EventEditor } from "@/components/client/event-editor/event-editor"
+import { EventSaveCounts } from "@/components/client/event-save-counts/event-save-counts"
 import { useDynamicRoute } from "@/framework/routes/route-hooks/use-dynamic-route"
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
@@ -26,5 +27,10 @@ export const BackofficeEventView = (
     if (event.isError) {
         return <Alert type="error" text={t("Backoffice.Errors.EventNotFound")} />
     }
-    return <EventEditor event={event.data} />
+    return (
+        <div className="flex flex-col gap-8">
+            <EventEditor event={event.data} />
+            <EventSaveCounts eventId={event.data.id} />
+        </div>
+    )
 }

@@ -4,6 +4,7 @@ import { dismissToast, expectToast } from "e2e-ui-components/toast"
 
 import { signInAs } from "../../api/auth/utils"
 import { listEventSaveCounts } from "../../api/backoffice-events/api"
+import { SATURDAY_NOON } from "../../api/public/utils"
 import { gotoPage, reloadPage, t } from "../app"
 import {
     blockPublicEvent,
@@ -61,7 +62,7 @@ test.describe("saved events", () => {
         const admin = await signInAs("admin")
         const countOfSaturday = async () => {
             const res = await listEventSaveCounts({
-                headers: admin.headers,
+                headers: { ...admin.headers, "x-test-now": SATURDAY_NOON },
                 pathParams: { id: event.id },
             })
             expectStatus(res, 200)

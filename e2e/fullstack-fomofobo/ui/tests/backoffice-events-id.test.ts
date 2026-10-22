@@ -11,6 +11,8 @@ import { pressToggle } from "e2e-ui-components/toggle"
 import { signInAs } from "../../api/auth/utils"
 import { blockEvent } from "../../api/backoffice-events/api"
 import { seedEvent, seedEventReferences } from "../../api/backoffice-events/utils"
+import { saveOccurrence } from "../../api/public/api"
+import { SATURDAY_NOON } from "../../api/public/utils"
 import { gotoBackofficePage, t } from "../app"
 import { signInBrowser } from "../backoffice"
 
@@ -60,5 +62,38 @@ test.describe("backoffice event", () => {
                 name: t("shared", "Backoffice.EventForm.Title"),
             }),
         ).toHaveValue(event.title)
+    })
+
+    test("lists each upcoming date with its saves, under the threshold too", async ({
+        page,
+    }) => {
+        const refs = await seedEventReferences()
+        const { headers } = await signInBrowser(page, "organizer")
+        const event = await seedEvent(headers, refs)
+        const client = {
+            "x-test-now": SATURDAY_NOON,
+            "x-forwarded-for": crypto.randomUUID(),
+        }
+        for (const deviceId of [crypto.randomUUID(), crypto.randomUUID()]) {
+            expectStatus(
+                await saveOccurrence({
+                    headers: client,
+                    pathParams: { eventId: event.id, date: "2026-10-24" },
+                    body: { deviceId },
+                }),
+                204,
+            )
+        }
+        await page.context().setExtraHTTPHeaders({ "x-test-now": SATURDAY_NOON })
+
+        await gotoBackofficePage(page, `/backoffice/events/${event.id}`)
+
+        const saves = page.getByRole("region", {
+            name: t("shared", "Backoffice.EventSaves.Title"),
+        })
+        await expectTableRow(saves, [
+            ["exact", "24/10/2026 21:00"],
+            ["exact", t("shared", "Detail.Interested_other", { count: 2 })],
+        ])
     })
 })
