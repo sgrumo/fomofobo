@@ -16,7 +16,7 @@ test.describe("backoffice organizers", () => {
         page,
     }) => {
         const name = `Organizer ${crypto.randomUUID().slice(0, 8)}`
-        const email = faker.internet.email().toLowerCase()
+        const email = `${crypto.randomUUID()}@${faker.internet.domainName()}`
         const password = faker.internet.password({ length: 16 })
         await signInBrowser(page, "admin")
 

@@ -13,7 +13,8 @@ export type AccountSeed = OrganizerCreation & { role: AccountRole }
  */
 export const buildAccountSeed = (role: AccountRole): AccountSeed => ({
     name: faker.company.name(),
-    email: faker.internet.email().toLowerCase(),
+    // A random email collides over a suite that never resets its database
+    email: `${crypto.randomUUID()}@${faker.internet.domainName()}`,
     password: faker.internet.password({ length: 16 }),
     role,
 })
