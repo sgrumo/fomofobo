@@ -1060,10 +1060,18 @@
     --animate-backdrop-blur-out: backdrop-blur-out var(--tw-duration, 150ms) ease-out;
     --animate-cursor-blink: cursor-blink 1s steps(1) infinite;
     --animate-radar: radar 2s steps(8) infinite;
+    --animate-live-pulse: live-pulse 1s ease-in-out infinite;
 
     @keyframes cursor-blink {
         50% {
             opacity: 0;
+        }
+    }
+
+    @keyframes live-pulse {
+        50% {
+            opacity: 0.1;
+            scale: 0.6;
         }
     }
 

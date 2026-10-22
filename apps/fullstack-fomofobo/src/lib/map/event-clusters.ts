@@ -1,4 +1,5 @@
 import type { GeoPoint, OccurrenceStatus } from "models"
+import { isDefined } from "shared/values"
 import Supercluster from "supercluster"
 import type { ClusterFeature, PointFeature } from "supercluster"
 
@@ -9,6 +10,11 @@ export type MapPointKind = OccurrenceStatus | "permanent"
 export interface EventPointProperties {
     index: number
     kind: MapPointKind
+    moreCount: number
+}
+
+export interface MapSpot extends EventPointProperties {
+    coordinates: GeoPoint
 }
 
 export interface EventClusterProperties {
@@ -26,13 +32,50 @@ export type EventMapFeature =
 const LAYER_ORDER: readonly MapPointKind[] = ["permanent", "ended", "upcoming", "live"]
 
 /**
- * @description Builds the cluster index of the map points, each cluster counting its points
- * per kind
- * @param points Venue and kind of each result, in result order: occurrences first, then
+ * @description Returns the stacking layer of a marker of the kind, higher on top
+ * @param kind Kind of the point
+ */
+export const markerLayer = (kind: MapPointKind): number => LAYER_ORDER.indexOf(kind)
+
+/**
+ * @description Groups the results into one spot per venue, marked by its result of the highest
+ * layer, the first in result order among equals
+ * @param results Venue and kind of each result, in result order: occurrences first, then
  * permanent venues
  */
+export const venueSpots = (
+    results: ReadonlyArray<{
+        venueId: string
+        coordinates: GeoPoint
+        kind: MapPointKind
+    }>,
+): MapSpot[] =>
+    Object.values(
+        Object.groupBy(
+            results.map((result, index) => ({ ...result, index })),
+            result => result.venueId,
+        ),
+    )
+        .filter(isDefined)
+        .map(group => {
+            const top = group.reduce((best, result) =>
+                markerLayer(result.kind) > markerLayer(best.kind) ? result : best,
+            )
+            return {
+                coordinates: top.coordinates,
+                kind: top.kind,
+                index: top.index,
+                moreCount: group.length - 1,
+            }
+        })
+
+/**
+ * @description Builds the cluster index of the venue spots, each cluster counting its spots
+ * per kind
+ * @param spots One spot per venue
+ */
 export const buildEventClusters = (
-    points: ReadonlyArray<{ coordinates: GeoPoint; kind: MapPointKind }>,
+    spots: readonly MapSpot[],
 ): Supercluster<EventPointProperties, EventClusterProperties> =>
     new Supercluster<EventPointProperties, EventClusterProperties>({
         radius: 48,
@@ -50,21 +93,15 @@ export const buildEventClusters = (
             accumulated.permanentCount += properties.permanentCount
         },
     }).load(
-        points.map((point, index) => ({
+        spots.map(spot => ({
             type: "Feature",
             geometry: {
                 type: "Point",
-                coordinates: [point.coordinates.longitude, point.coordinates.latitude],
+                coordinates: [spot.coordinates.longitude, spot.coordinates.latitude],
             },
-            properties: { index, kind: point.kind },
+            properties: { index: spot.index, kind: spot.kind, moreCount: spot.moreCount },
         })),
     )
-
-/**
- * @description Returns the stacking layer of a marker of the kind, higher on top
- * @param kind Kind of the point
- */
-export const markerLayer = (kind: MapPointKind): number => LAYER_ORDER.indexOf(kind)
 
 /**
  * @description Returns the stacking layer of a cluster: the layer of the highest kind it holds

@@ -58,11 +58,13 @@ The search center is the position of the device when the visitor grants location
 
 ### Map
 
-Each result is a pin at its venue with the icon of its category, and its look follows the status. A tag above the pin reads live for a live result, the start time for an upcoming result of today, and the date for an upcoming result of another day. Pins too close to tell apart merge into a cluster with a count, and its ring shows the share of live, upcoming, ended and permanent results. Live pins draw above every other pin, and permanent venues below every event.
+Each venue with results is one pin. The pin shows the result of the venue with the highest status, in the order live, upcoming, ended, permanent. It takes the icon of that category and the look of that status. A tag above the pin reads live for a live result, the start time for an upcoming result of today, and the date for an upcoming result of another day. When the venue holds more results, the tag adds their count as "+N".
+
+Venues too close to tell apart merge into a cluster that counts the venues. Its ring shows the share of venues whose pin is live, upcoming, ended or permanent. Live pins draw above every other pin, and permanent venues below every event. The position of the visitor draws above every pin and cluster.
 
 Every permanent venue inside the search area is a pin of its own color, whatever the date filter, with the icon of its category and its kind as the tag. Its preview shows the kind, the cover, the name and the address, with a link to the programme and one to the venue page. When a permanent venue also holds events, the preview pages through the events first and the venue last.
 
-A tap on a pin opens a preview of the occurrence. The preview shows status, venue, categories, price and times, with the elapsed time when live and a link to the event page. When several results share one venue, the preview pages through them.
+A tap on a pin opens a preview of the occurrence. The preview shows status, venue, categories, price and times, with the elapsed time when live and a link to the event page. The pin of a venue with more results opens the preview of its result, which pages through every result of the venue.
 
 ### Search and filters
 

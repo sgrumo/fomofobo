@@ -22,6 +22,7 @@ import {
     clusterLayer,
     firstLeafIndex,
     markerLayer,
+    venueSpots,
 } from "@/lib/map/event-clusters"
 import type { EventMapFeature, MapPointKind } from "@/lib/map/event-clusters"
 import { mapStyle } from "@/lib/map/map-style"
@@ -139,25 +140,31 @@ export const EventMap = (props: EventMapProps) => {
         map?.flyTo({ center: [longitude, latitude] })
     }, [map, latitude, longitude])
 
-    // The cluster index of a permanent venue follows every occurrence.
-    const clusters = buildEventClusters([
-        ...props.occurrences.map(occurrence => ({
-            coordinates: occurrence.venue.coordinates,
-            kind: occurrenceStatus(
-                {
-                    startsAt: new Date(occurrence.startsAt),
-                    endsAt: new Date(occurrence.endsAt),
-                },
-                props.now,
+    // The result index of a permanent venue follows every occurrence.
+    const clusters = buildEventClusters(
+        venueSpots([
+            ...props.occurrences.map(occurrence => ({
+                venueId: occurrence.venue.id,
+                coordinates: occurrence.venue.coordinates,
+                kind: occurrenceStatus(
+                    {
+                        startsAt: new Date(occurrence.startsAt),
+                        endsAt: new Date(occurrence.endsAt),
+                    },
+                    props.now,
+                ),
+            })),
+            ...props.permanentVenues.map(
+                (
+                    venue,
+                ): { venueId: string; coordinates: GeoPoint; kind: MapPointKind } => ({
+                    venueId: venue.id,
+                    coordinates: venue.coordinates,
+                    kind: "permanent",
+                }),
             ),
-        })),
-        ...props.permanentVenues.map(
-            (venue): { coordinates: GeoPoint; kind: MapPointKind } => ({
-                coordinates: venue.coordinates,
-                kind: "permanent",
-            }),
-        ),
-    ])
+        ]),
+    )
     const selectIndex = (index: number) => {
         const occurrence = props.occurrences.at(index)
         if (occurrence !== undefined) {
@@ -251,7 +258,7 @@ export const EventMap = (props: EventMapProps) => {
                           )
                       }
 
-                      const { index, kind } = feature.properties
+                      const { index, kind, moreCount } = feature.properties
                       if (kind === "permanent") {
                           const venue = props.permanentVenues.at(
                               index - props.occurrences.length,
@@ -304,6 +311,7 @@ export const EventMap = (props: EventMapProps) => {
                                           : dayMonthOf(startsAt, PLATFORM_TIME_ZONE)
                                   }
                                   icon={props.iconOf(occurrence.primaryCategoryId)}
+                                  moreCount={moreCount}
                                   onSelect={() => {
                                       props.onSelect({
                                           eventId: occurrence.eventId,

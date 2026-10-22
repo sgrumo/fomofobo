@@ -3,6 +3,7 @@
 import { cn } from "frontend-shared/styles"
 import type { CategoryIcon, OccurrenceStatus } from "models"
 import { useTranslation } from "react-i18next"
+import { isDefined } from "shared/values"
 import { match } from "ts-pattern"
 import { Badge } from "ui-components/badge"
 import { PixelIcon } from "ui-components/pixel-icons"
@@ -16,6 +17,8 @@ interface EventPinProps extends RouteClientComponentProps<"root"> {
     // `dd/MM` of a start on another day than today, undefined for today
     startDay: string | undefined
     icon: CategoryIcon
+    // Other results at the same venue
+    moreCount: number
     onSelect: () => void
 }
 
@@ -45,18 +48,32 @@ export const EventPin = (props: EventPinProps) => {
     return (
         <button
             type="button"
-            aria-label={t("Map.Pin", {
-                title: props.title,
-                status: t(`Status.${props.status}`),
-                time:
-                    props.startDay === undefined
-                        ? props.startTime
-                        : `${props.startDay} ${props.startTime}`,
-            })}
+            aria-label={[
+                t("Map.Pin", {
+                    title: props.title,
+                    status: t(`Status.${props.status}`),
+                    time:
+                        props.startDay === undefined
+                            ? props.startTime
+                            : `${props.startDay} ${props.startTime}`,
+                }),
+                props.moreCount === 0
+                    ? undefined
+                    : t("Map.MoreHere", { count: props.moreCount }),
+            ]
+                .filter(isDefined)
+                .join(", ")}
             onClick={props.onSelect}
             className="flex cursor-pointer flex-col items-center gap-1"
         >
-            {badge}
+            <span className="flex items-center">
+                {badge}
+                {props.moreCount === 0 ? undefined : (
+                    <Badge tone="inverse" className="rounded-none">
+                        +{props.moreCount}
+                    </Badge>
+                )}
+            </span>
             <span className="relative flex size-9 items-center justify-center">
                 {props.status === "live" ? (
                     <>

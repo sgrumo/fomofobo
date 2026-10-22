@@ -80,7 +80,7 @@ test.describe("map", () => {
         }
     })
 
-    test("merges the results of one venue into a cluster that counts them per status", async ({
+    test("draws one pin per venue, its live event with the count of the other results", async ({
         page,
     }) => {
         const center = buildArea()
@@ -88,25 +88,63 @@ test.describe("map", () => {
             offsetPoint(center, { latitude: 0.01, longitude: 0 }),
         )
         const category = await seedCategory()
-        for (const times of [
-            { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
-            { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
-            { startsAt: "2026-10-24T08:00", endsAt: "2026-10-24T09:00" },
-        ]) {
-            await seedPublicEvent({ venue, category }, times)
-        }
-        await seedPublicCinema(venue.coordinates, category)
+        const [, live] = await Promise.all(
+            [
+                { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+                { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
+                { startsAt: "2026-10-24T08:00", endsAt: "2026-10-24T09:00" },
+            ].map(times => seedPublicEvent({ venue, category }, times)),
+        )
+
+        await gotoPage(page, mapPath(center))
+
+        expectToBeDefined(live)
+        await expect(
+            page.getByRole("button", {
+                name: `${t("shared", "Map.Pin", {
+                    title: live.title,
+                    status: t("shared", "Status.live"),
+                    time: "11:00",
+                })}, ${t("shared", "Map.MoreHere_other", { count: 2 })}`,
+                exact: true,
+            }),
+        ).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+    })
+
+    test("merges close venues into a cluster that counts them by the top status of each", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const category = await seedCategory()
+        const [busy, quiet] = await Promise.all([
+            seedVenue(offsetPoint(center, { latitude: 0.01, longitude: 0 })),
+            seedVenue(offsetPoint(center, { latitude: 0.0105, longitude: 0 })),
+        ])
+        await Promise.all([
+            seedPublicEvent(
+                { venue: busy, category },
+                { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
+            ),
+            seedPublicEvent(
+                { venue: busy, category },
+                { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+            ),
+            seedPublicEvent(
+                { venue: quiet, category },
+                { startsAt: "2026-10-24T08:00", endsAt: "2026-10-24T09:00" },
+            ),
+        ])
 
         await gotoPage(page, mapPath(center))
 
         await expect(
             page.getByRole("button", {
                 name: t("shared", "Map.Cluster", {
-                    count: 4,
+                    count: 2,
                     live: 1,
-                    upcoming: 1,
+                    upcoming: 0,
                     ended: 1,
-                    permanent: 1,
+                    permanent: 0,
                 }),
             }),
         ).toBeVisible({ timeout: MAP_TIMEOUT_MS })
@@ -212,13 +250,12 @@ test.describe("map", () => {
         await gotoPage(page, mapPath(center))
         await page
             .getByRole("button", {
-                name: t("shared", "Map.Cluster", {
-                    count: 2,
-                    live: 1,
-                    upcoming: 0,
-                    ended: 0,
-                    permanent: 1,
-                }),
+                name: `${t("shared", "Map.Pin", {
+                    title: screening.title,
+                    status: t("shared", "Status.live"),
+                    time: "11:00",
+                })}, ${t("shared", "Map.MoreHere_one", { count: 1 })}`,
+                exact: true,
             })
             .click({ timeout: MAP_TIMEOUT_MS })
 
