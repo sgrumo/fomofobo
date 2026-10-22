@@ -2,6 +2,7 @@ import { expectApiError, expectStatus } from "e2e-kit/assertions"
 import { describe, expect, it } from "vitest"
 
 import { signInAs } from "../auth/utils"
+import { blockVenue } from "../backoffice-venues/api"
 import { blockEvent, createEvent, getEvent, updateEvent } from "./api"
 import {
     buildEventUpsert,
@@ -131,6 +132,41 @@ describe("PUT /api/backoffice/events/{id}", () => {
         expect(res.data).toMatchObject({
             isBlocked: true,
             blockReason: "Foto non pertinenti",
+        })
+    })
+
+    it("keeps the venue of an event after an Admin blocks it", async () => {
+        const organizer = await signInAs("organizer")
+        const admin = await signInAs("admin")
+        const { categoryId, venueId } = await seedEventReferences()
+        const photo = await uploadPhoto(organizer.headers)
+        const created = await createEvent({
+            headers: organizer.headers,
+            body: buildEventUpsert({ venueId, categoryId, photoKeys: [photo.key] }),
+        })
+        expectStatus(created, 201)
+        expectStatus(
+            await blockVenue({
+                headers: admin.headers,
+                pathParams: { id: venueId },
+                body: { reason: "Closed for works" },
+            }),
+            200,
+        )
+
+        const res = await updateEvent({
+            headers: organizer.headers,
+            pathParams: { id: created.data.id },
+            body: buildEventUpsert(
+                { venueId, categoryId, photoKeys: [photo.key] },
+                { title: "Concerto spostato" },
+            ),
+        })
+
+        expectStatus(res, 200)
+        expect(res.data).toMatchObject({
+            title: "Concerto spostato",
+            venue: { id: venueId },
         })
     })
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { useMutation, useQuery } from "@tanstack/react-query"
+import { uniqBy } from "es-toolkit"
 import { cn } from "frontend-shared/styles"
 import type { Event } from "models"
 import { useRouter } from "next/navigation"
@@ -79,7 +80,12 @@ export const EventEditor = (props: EventEditorProps) => {
     const venues = useQuery(
         api.listVenuesQuery({
             params: {},
-            query: { page: 1, pageSize: VENUE_PICKER_SIZE, q: undefined },
+            query: {
+                page: 1,
+                pageSize: VENUE_PICKER_SIZE,
+                q: undefined,
+                isBlocked: false,
+            },
         }),
     )
     const organizers = useQuery({
@@ -95,10 +101,14 @@ export const EventEditor = (props: EventEditorProps) => {
         enabled: isAdmin,
     })
 
-    const venueOptions = (venues.data?.items ?? []).map(venue => ({
-        id: venue.id,
-        name: venue.name,
-    }))
+    // The current venue of the event stays an option after a block
+    const venueOptions = uniqBy(
+        [
+            ...(venues.data?.items ?? []),
+            ...(props.event === undefined ? [] : [props.event.venue]),
+        ].map(venue => ({ id: venue.id, name: venue.name })),
+        venue => venue.id,
+    )
     const organizerOptions = isAdmin
         ? (organizers.data?.items ?? []).map(organizer => ({
               id: organizer.id,

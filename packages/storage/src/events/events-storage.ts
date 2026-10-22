@@ -142,7 +142,7 @@ export class EventsStorage {
     }
 
     /**
-     * @description Fetches what an event write refers to: its venue, its categories, the role of its organizer, and whether an event holds one of its photo keys
+     * @description Fetches what an event write refers to: its venue and whether it is blocked, its categories, the role of its organizer, and whether an event holds one of its photo keys
      * @param refs Ids and photo keys of the write
      */
     public async findWriteReferences(refs: {
@@ -152,13 +152,14 @@ export class EventsStorage {
         photoKeys: string[]
     }): Promise<{
         venueExists: boolean
+        venueBlocked: boolean
         categoryIds: string[]
         organizerRole: AccountRole | null
         photoKeyTaken: boolean
     }> {
         const [venueRows, categoryRows, organizerRows, photoRows] = await this.db.batch([
             this.db
-                .select({ id: venues.id })
+                .select({ isBlocked: venues.isBlocked })
                 .from(venues)
                 .where(eq(venues.id, refs.venueId)),
             this.db
@@ -177,6 +178,7 @@ export class EventsStorage {
         ])
         return {
             venueExists: venueRows.length > 0,
+            venueBlocked: venueRows[0]?.isBlocked ?? false,
             categoryIds: categoryRows.map(row => row.id),
             organizerRole: organizerRows[0]?.role ?? null,
             photoKeyTaken: photoRows.length > 0,

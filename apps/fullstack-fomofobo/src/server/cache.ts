@@ -14,6 +14,12 @@ export const SETTINGS_TAG = "settings"
 export const eventTag = (eventId: string): string => `event:${eventId}`
 
 /**
+ * @description Returns the cache tag of the public reads of one venue
+ * @param venueId Venue tagged
+ */
+export const venueTag = (venueId: string): string => `venue:${venueId}`
+
+/**
  * @description Expires the cached reads of the tags, so the next read misses
  * @param tags Tags expired
  */

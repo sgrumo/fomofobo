@@ -11,6 +11,12 @@ const venue: Venue = {
     name: "Rocca Sforzesca",
     address: "Piazzale Giovanni dalle Bande Nere, Imola",
     coordinates: { latitude: 44.3521, longitude: 11.7096 },
+    description: null,
+    coverPhotoUrl: null,
+    links: { websiteUrl: null, instagramUrl: null, facebookUrl: null },
+    owner: null,
+    isBlocked: false,
+    blockReason: null,
 }
 
 const category: Category = {

@@ -154,14 +154,26 @@ export const venues = sqliteTable(
         address: text("address").notNull(),
         latitude: real("latitude").notNull(),
         longitude: real("longitude").notNull(),
-        // PLACEHOLDER(OP-20)
+        description: text("description"),
+        coverObjectKey: text("cover_object_key").unique(),
+        websiteUrl: text("website_url"),
+        instagramUrl: text("instagram_url"),
+        facebookUrl: text("facebook_url"),
         createdBy: text("created_by").references(() => accounts.id, {
             onDelete: "set null",
         }),
+        ownerId: text("owner_id").references(() => accounts.id, { onDelete: "set null" }),
+        isBlocked: integer("is_blocked", { mode: "boolean" }).notNull().default(false),
+        blockReason: text("block_reason"),
         createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
         updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
     },
-    table => [index("venues_coordinates_idx").on(table.latitude, table.longitude)],
+    table => [
+        index("venues_coordinates_idx").on(table.latitude, table.longitude),
+        uniqueIndex("venues_owner_idx")
+            .on(table.ownerId)
+            .where(sql`${table.ownerId} is not null`),
+    ],
 )
 
 export const events = sqliteTable(

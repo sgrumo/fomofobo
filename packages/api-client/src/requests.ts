@@ -20,7 +20,9 @@ import type {
     OrganizerCreation,
     OrganizerPassword,
     PlatformSettingsUpdate,
+    VenueBlock,
     VenueCreation,
+    VenueOwner,
     VenueUpdate,
 } from "models"
 
@@ -212,6 +214,35 @@ export const createApi = (options: ApiClientOptions) => {
         onSuccess: invalidateAfter("venue"),
     })
 
+    const setVenueOwner = responsefulMutationEndpoint(
+        BackofficeVenuesRoutes.setOwner,
+        200,
+    )
+    const setVenueOwnerMutation = mutationOptions({
+        mutationFn: (arg: { id: string; body: VenueOwner }) =>
+            setVenueOwner({ params: { id: arg.id }, body: arg.body }),
+        onSuccess: invalidateAfter("venue"),
+    })
+
+    const blockVenue = responsefulMutationEndpoint(BackofficeVenuesRoutes.block, 200)
+    const blockVenueMutation = mutationOptions({
+        mutationFn: (arg: { id: string; body: VenueBlock }) =>
+            blockVenue({ params: { id: arg.id }, body: arg.body }),
+        onSuccess: invalidateAfter("venue"),
+    })
+
+    const unblockVenue = responselessMutationEndpoint(BackofficeVenuesRoutes.unblock)
+    const unblockVenueMutation = mutationOptions({
+        mutationFn: (arg: { id: string }) =>
+            unblockVenue({ params: { id: arg.id }, body: undefined }),
+        onSuccess: invalidateAfter("venue"),
+    })
+
+    const createVenueCoverUploadTicket = responsefulMutationEndpoint(
+        BackofficeVenuesRoutes.createCoverUploadTicket,
+        200,
+    )
+
     const createCategory = responsefulMutationEndpoint(
         BackofficeCategoriesRoutes.create,
         201,
@@ -360,6 +391,13 @@ export const createApi = (options: ApiClientOptions) => {
         createVenueMutation,
         updateVenue,
         updateVenueMutation,
+        setVenueOwner,
+        setVenueOwnerMutation,
+        blockVenue,
+        blockVenueMutation,
+        unblockVenue,
+        unblockVenueMutation,
+        createVenueCoverUploadTicket,
         createCategory,
         createCategoryMutation,
         updateCategory,

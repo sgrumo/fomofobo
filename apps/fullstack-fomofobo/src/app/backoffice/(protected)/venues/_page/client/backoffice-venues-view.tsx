@@ -34,7 +34,12 @@ export const BackofficeVenuesView = (
     const venues = useQuery(
         api.listVenuesQuery({
             params: {},
-            query: { page, pageSize: BACKOFFICE_PAGE_SIZE, q: query.q },
+            query: {
+                page,
+                pageSize: BACKOFFICE_PAGE_SIZE,
+                q: query.q,
+                isBlocked: undefined,
+            },
         }),
     )
 

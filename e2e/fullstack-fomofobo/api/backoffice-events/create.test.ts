@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest"
 import { signInAs } from "../auth/utils"
 import { createCategory } from "../backoffice-categories/api"
 import { buildCategoryCreation } from "../backoffice-categories/utils"
+import { blockVenue } from "../backoffice-venues/api"
 import { createEvent, getEvent } from "./api"
 import {
     buildEventUpsert,
@@ -39,7 +40,12 @@ describe("POST /api/backoffice/events", () => {
             description: upsert.description,
             categoryIds: expect.arrayContaining([categoryId, second.data.id]),
             primaryCategoryId: categoryId,
-            venue,
+            venue: {
+                id: venue.id,
+                name: venue.name,
+                address: venue.address,
+                coordinates: venue.coordinates,
+            },
             startsAt: upsert.startsAt,
             endsAt: upsert.endsAt,
             recurrence: null,
@@ -138,6 +144,28 @@ describe("POST /api/backoffice/events", () => {
 
         expectApiError(venue, 400, { code: "InvalidEventReference" })
         expectApiError(category, 400, { code: "InvalidEventReference" })
+    })
+
+    it("answers 400 for a blocked venue", async () => {
+        const { headers } = await signInAs("organizer")
+        const admin = await signInAs("admin")
+        const { categoryId, venueId } = await seedEventReferences()
+        expectStatus(
+            await blockVenue({
+                headers: admin.headers,
+                pathParams: { id: venueId },
+                body: { reason: "Closed for works" },
+            }),
+            200,
+        )
+        const photo = await uploadPhoto(headers)
+
+        const res = await createEvent({
+            headers,
+            body: buildEventUpsert({ venueId, categoryId, photoKeys: [photo.key] }),
+        })
+
+        expectApiError(res, 400, { code: "InvalidEventReference" })
     })
 
     it("answers 400 for a photo key of another account or a key never uploaded", async () => {

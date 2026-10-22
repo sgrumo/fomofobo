@@ -73,6 +73,7 @@ const buildContainer = (): Container => {
     })
     const authAccounts = new AuthAccountsService(auth, accountsStorage)
     const occurrencesStorage = new PublicOccurrencesStorage(db)
+    const photos = new PhotosService(photoStorage)
     const settings = new SettingsService(new SettingsStorage(db))
 
     return {
@@ -82,13 +83,19 @@ const buildContainer = (): Container => {
         authAccounts,
         organizers: new OrganizersService(authAccounts, accountsStorage),
         categories: new CategoriesService(new CategoriesStorage(db)),
-        venues: new VenuesService(new VenuesStorage(db)),
+        venues: new VenuesService(
+            new VenuesStorage(db),
+            accountsStorage,
+            photos,
+            photoStorage,
+            env.PHOTOS_PUBLIC_BASE_URL,
+        ),
         events: new EventsService(
             new EventsStorage(db),
             photoStorage,
             env.PHOTOS_PUBLIC_BASE_URL,
         ),
-        photos: new PhotosService(photoStorage),
+        photos,
         occurrences: new PublicOccurrencesService(
             occurrencesStorage,
             settings,

@@ -24,6 +24,9 @@ export type AppErrorCode =
     | "PastDateRange"
     | "TooManyRequests"
     | "GeocodingUnavailable"
+    | "VenueLimitReached"
+    | "VenueOwnerTaken"
+    | "InvalidVenueOwner"
 
 export const { appError, toApplicationError, handleRouteNotFound } =
     createErrorUtils<AppErrorCode>({

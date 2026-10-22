@@ -2,7 +2,6 @@ import "server-only"
 import type { S3ObjectStorage } from "backend-shared"
 import { logger } from "backend-shared"
 import type { Account, Event, EventListItem, EventListQuery, EventUpsert } from "models"
-import { ditheredPhotoContentTypeSchema, MAX_UPLOAD_SIZE_BYTES } from "models"
 import type { EventsStorage, StoredEvent } from "storage"
 
 import { expandOccurrences } from "@/lib/events/expand-occurrences"
@@ -10,7 +9,7 @@ import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 import { eventTag, expireTags } from "../cache"
 import { appError } from "../errors"
-import { photoKeyPrefix, photoUrl } from "./photos-service"
+import { assertUploadedPhoto, photoKeyPrefix, photoUrl } from "./photos-service"
 import type { Page } from "./to-page"
 import { toPage } from "./to-page"
 
@@ -182,7 +181,11 @@ export class EventsService {
         const newKeys = upsert.photoKeys.filter(key => !currentPhotoIds.has(key))
         await Promise.all(
             newKeys.map(async key => {
-                await this.assertUploaded(key, account)
+                await assertUploadedPhoto(
+                    this.photoStorage,
+                    key,
+                    photoKeyPrefix(account.id),
+                )
             }),
         )
 
@@ -194,6 +197,10 @@ export class EventsService {
         })
         if (!refs.venueExists) {
             throw appError("InvalidEventReference", `Venue ${upsert.venueId} not found`)
+        }
+        // An event already at a blocked venue keeps it
+        if (refs.venueBlocked && current?.venue.id !== upsert.venueId) {
+            throw appError("InvalidEventReference", `Venue ${upsert.venueId} is blocked`)
         }
         const missingCategoryId = upsert.categoryIds.find(
             categoryId => !refs.categoryIds.includes(categoryId),
@@ -249,31 +256,6 @@ export class EventsService {
         await this.deletePhotoObjects(
             [...currentPhotoIds.keys()].filter(key => !keptKeys.has(key)),
         )
-    }
-
-    /**
-     * @description Throws unless the key is an upload of the account with an allowed type and size
-     * @param key Photo key of the write
-     * @param account Account of the session
-     */
-    private async assertUploaded(key: string, account: Account): Promise<void> {
-        if (!key.startsWith(photoKeyPrefix(account.id))) {
-            throw appError(
-                "InvalidPhotoUpload",
-                `Photo ${key} is not an upload of the account`,
-            )
-        }
-        const head = await this.photoStorage.headObject(key)
-        if (
-            head === null ||
-            !ditheredPhotoContentTypeSchema.safeParse(head.contentType).success ||
-            head.sizeBytes > MAX_UPLOAD_SIZE_BYTES
-        ) {
-            throw appError(
-                "InvalidPhotoUpload",
-                `Photo ${key} is missing or not an allowed image`,
-            )
-        }
     }
 
     /**

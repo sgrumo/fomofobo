@@ -5,6 +5,7 @@ import { customErrorParamsSchema } from "./lib/custom-errors"
 import { MAX_EVENT_PHOTOS } from "./lib/limits"
 import { instantSchema, localDateTimeSchema } from "./lib/local-time"
 import { paginationQuerySchema } from "./lib/pagination"
+import { facebookUrlSchema, instagramUrlSchema } from "./lib/social-links"
 import { withTimeRange } from "./lib/time-range"
 import { recurrenceSchema } from "./recurrence"
 import { uploadContentTypeSchema, uploadRequestSchema } from "./uploads"
@@ -38,12 +39,8 @@ export const eventGalleryPhotoSchema = eventPhotoSchema.extend({ key: z.string()
 export type EventGalleryPhoto = z.infer<typeof eventGalleryPhotoSchema>
 
 export const eventExternalLinksSchema = z.object({
-    instagramUrl: z
-        .url({ protocol: /^https$/u, hostname: /^(?:www\.)?instagram\.com$/u })
-        .nullable(),
-    facebookUrl: z
-        .url({ protocol: /^https$/u, hostname: /^(?:(?:www|m)\.)?facebook\.com$/u })
-        .nullable(),
+    instagramUrl: instagramUrlSchema.nullable(),
+    facebookUrl: facebookUrlSchema.nullable(),
 })
 export type EventExternalLinks = z.infer<typeof eventExternalLinksSchema>
 
@@ -66,7 +63,7 @@ export const eventSchema = z.object({
     title: eventTitleSchema,
     description: eventDescriptionSchema,
     ...eventCategoriesShape,
-    venue: venueSchema,
+    venue: venueSchema.pick({ id: true, name: true, address: true, coordinates: true }),
     startsAt: localDateTimeSchema,
     endsAt: localDateTimeSchema,
     recurrence: recurrenceSchema.nullable(),
