@@ -90,7 +90,12 @@ const buildContainer = (): Container => {
         auth,
         authAccounts,
         organizers: new OrganizersService(authAccounts, accountsStorage),
-        categories: new CategoriesService(categoriesStorage),
+        categories: new CategoriesService(
+            categoriesStorage,
+            photos,
+            photoStorage,
+            env.PHOTOS_PUBLIC_BASE_URL,
+        ),
         venues: new VenuesService(
             new VenuesStorage(db),
             accountsStorage,

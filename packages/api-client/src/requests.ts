@@ -289,6 +289,11 @@ export const createApi = (options: ApiClientOptions) => {
         onSuccess: invalidateAfter("category"),
     })
 
+    const createCategoryImageUploadTicket = responsefulMutationEndpoint(
+        BackofficeCategoriesRoutes.createImageUploadTicket,
+        200,
+    )
+
     const deleteCategory = responselessMutationEndpoint(BackofficeCategoriesRoutes.delete)
     const deleteCategoryMutation = mutationOptions({
         mutationFn: (arg: { id: string }) =>
@@ -435,6 +440,7 @@ export const createApi = (options: ApiClientOptions) => {
         createCategoryMutation,
         updateCategory,
         updateCategoryMutation,
+        createCategoryImageUploadTicket,
         deleteCategory,
         deleteCategoryMutation,
         listOrganizers,

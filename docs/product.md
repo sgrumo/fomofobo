@@ -12,7 +12,7 @@ fomofobo is a responsive, mobile-first web app for finding events around a place
 
 ### Categories
 
-A category groups events by type and carries a unique name and an icon. The icon marks the category on the filter chips and on the map pins. Only Admins create, edit and delete categories, and the app refuses to delete a category that an event or a permanent venue uses.
+A category groups events by type and carries a unique name and an icon. The icon marks the category on the filter chips and on the map pins. An Admin can give a category an image, stored as a two-color dither like every photo. Only Admins create, edit and delete categories, and the app refuses to delete a category that an event or a permanent venue uses.
 
 ### Venues
 

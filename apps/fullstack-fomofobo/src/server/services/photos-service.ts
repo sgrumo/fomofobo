@@ -1,5 +1,6 @@
 import "server-only"
 import type { S3ObjectStorage } from "backend-shared"
+import { logger } from "backend-shared"
 import { ditheredPhotoContentTypeSchema, MAX_UPLOAD_SIZE_BYTES } from "models"
 import type { PhotoUploadRequest, PresignedUpload } from "models"
 
@@ -16,6 +17,13 @@ export const photoKeyPrefix = (accountId: string): string => `events/${accountId
  * @param venueId Venue whose cover is uploaded
  */
 export const venueCoverKeyPrefix = (venueId: string): string => `venues/${venueId}/`
+
+/**
+ * @description Returns the prefix of every image key of a category
+ * @param categoryId Category whose image is uploaded
+ */
+export const categoryImageKeyPrefix = (categoryId: string): string =>
+    `categories/${categoryId}/`
 
 /**
  * @description Throws unless the key sits under the prefix and holds a dithered photo within the size limit
@@ -45,6 +53,28 @@ export const assertUploadedPhoto = async (
             "InvalidPhotoUpload",
             `Photo ${key} is missing or not an allowed image`,
         )
+    }
+}
+
+/**
+ * @description Deletes a replaced or orphaned object from the bucket, and logs a failure
+ * @param photoStorage Bucket of the photos
+ * @param key Object key deleted
+ * @param label Name of the object in the log message, such as "Venue cover"
+ * @remarks Belongs after the database write: a failure then leaves an unused object
+ */
+export const deleteReplacedObject = async (
+    photoStorage: S3ObjectStorage,
+    key: string,
+    label: string,
+): Promise<void> => {
+    try {
+        await photoStorage.deleteObject(key)
+    } catch (error) {
+        logger.error(`${label} not deleted`, {
+            key,
+            error: error instanceof Error ? error.message : String(error),
+        })
     }
 }
 

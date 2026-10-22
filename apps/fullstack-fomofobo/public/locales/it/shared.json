@@ -566,6 +566,14 @@
             "Upload": "Carica la copertina",
             "Remove": "Rimuovi la copertina",
             "Saving": "Salvataggio della copertina"
+        },
+        "CategoryImage": {
+            "Label": "Immagine della categoria",
+            "Hint": "Prende il posto della copertina di un evento senza foto, in un luogo senza copertina. JPEG, PNG o WebP, fino a 10 MB: la salviamo in due colori.",
+            "None": "Nessuna immagine: al suo posto l'icona della categoria.",
+            "Upload": "Carica l'immagine della categoria",
+            "Remove": "Rimuovi l'immagine",
+            "Saving": "Salvataggio dell'immagine"
         }
     },
     "Offline": {

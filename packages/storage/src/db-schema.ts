@@ -136,6 +136,7 @@ export const categories = sqliteTable(
         id: text("id").primaryKey(),
         name: text("name").notNull().unique(),
         icon: text("icon", { enum: categoryIconValues }).notNull(),
+        imageObjectKey: text("image_object_key").unique(),
         createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
     },
     table => [

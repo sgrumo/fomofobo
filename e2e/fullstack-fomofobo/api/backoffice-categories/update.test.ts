@@ -1,10 +1,11 @@
-import { expectApiError, expectStatus } from "e2e-kit/assertions"
+import { expectApiError, expectStatus, expectToBeDefined } from "e2e-kit/assertions"
 import { describe, expect, it } from "vitest"
 
 import { signInAs } from "../auth/utils"
+import { downloadPhoto, uploadPhoto } from "../backoffice-events/utils"
 import { listCategories } from "../public/api"
 import { createCategory, updateCategory } from "./api"
-import { buildCategoryCreation } from "./utils"
+import { buildCategoryCreation, uploadCategoryImage } from "./utils"
 
 describe("PATCH /api/backoffice/categories/{id}", () => {
     it("changes the name and the icon", async () => {
@@ -20,10 +21,66 @@ describe("PATCH /api/backoffice/categories/{id}", () => {
         })
 
         expectStatus(res, 200)
-        expect(res.data).toStrictEqual({ id: created.data.id, ...change })
+        expect(res.data).toStrictEqual({ id: created.data.id, ...change, imageUrl: null })
         const list = await listCategories({})
         expectStatus(list, 200)
         expect(list.data).toStrictEqual([res.data])
+    })
+
+    it("stores an image uploaded through the ticket, replaces it, then removes it", async () => {
+        const { headers } = await signInAs("admin")
+        const created = await createCategory({ headers, body: buildCategoryCreation() })
+        expectStatus(created, 201)
+        const [first, second] = await Promise.all([
+            uploadCategoryImage(created.data.id),
+            uploadCategoryImage(created.data.id),
+        ])
+
+        const withFirst = await updateCategory({
+            headers,
+            pathParams: { id: created.data.id },
+            body: { imageKey: first.key },
+        })
+
+        expectStatus(withFirst, 200)
+        const firstUrl = withFirst.data.imageUrl
+        expectToBeDefined(firstUrl)
+        expect(await downloadPhoto(firstUrl)).toStrictEqual(first.bytes)
+        const withSecond = await updateCategory({
+            headers,
+            pathParams: { id: created.data.id },
+            body: { imageKey: second.key },
+        })
+        expectStatus(withSecond, 200)
+        const secondUrl = withSecond.data.imageUrl
+        expectToBeDefined(secondUrl)
+        const list = await listCategories({})
+        expectStatus(list, 200)
+        expect(list.data).toStrictEqual([withSecond.data])
+        expect(await downloadPhoto(firstUrl)).toBeNull()
+        const withoutImage = await updateCategory({
+            headers,
+            pathParams: { id: created.data.id },
+            body: { imageKey: null },
+        })
+        expectStatus(withoutImage, 200)
+        expect(withoutImage.data.imageUrl).toBeNull()
+        expect(await downloadPhoto(secondUrl)).toBeNull()
+    })
+
+    it("answers 400 to an image key outside the uploads of the category", async () => {
+        const { headers } = await signInAs("admin")
+        const created = await createCategory({ headers, body: buildCategoryCreation() })
+        expectStatus(created, 201)
+        const eventPhoto = await uploadPhoto(headers)
+
+        const res = await updateCategory({
+            headers,
+            pathParams: { id: created.data.id },
+            body: { imageKey: eventPhoto.key },
+        })
+
+        expectApiError(res, 400, { code: "InvalidPhotoUpload" })
     })
 
     it("accepts the name that the category already holds", async () => {

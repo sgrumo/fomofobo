@@ -54,5 +54,25 @@ export const buildBackofficeCategoriesRouter = (categories: CategoriesService) =
         }
     })
 
+    router.openapi(BackofficeCategoriesRoutes.createImageUploadTicket, async c => {
+        try {
+            const ticket = await categories.createImageUploadTicket(
+                c.req.valid("param").id,
+                c.req.valid("json"),
+            )
+            return respond(
+                c,
+                BackofficeCategoriesRoutes.createImageUploadTicket,
+                HttpStatus.Ok,
+                ticket,
+            )
+        } catch (error) {
+            throw toApplicationError(
+                error,
+                "Error creating the category image upload ticket",
+            )
+        }
+    })
+
     return router
 }

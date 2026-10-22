@@ -25,6 +25,7 @@ import {
     categoryFormStateFromCategory,
     categoryFormStateToCreation,
 } from "@/components/client/category-form/category-form.state"
+import { CategoryImageEditor } from "@/components/client/category-image-editor/category-image-editor"
 import { api } from "@/lib/api/client-api"
 import { useMutationFeedback } from "@/lib/hooks/use-mutation-feedback"
 
@@ -50,7 +51,7 @@ export const UpdateCategoryDialog = (props: UpdateCategoryDialogProps) => {
     return (
         <DialogRoot open={open} onOpenChange={onOpenChange}>
             <DialogTrigger render={props.trigger} />
-            <DialogContent className="max-h-[calc(min(26rem,90dvh))] w-[calc(min(30rem,90dvw))]">
+            <DialogContent className="max-h-[calc(min(44rem,90dvh))] w-[calc(min(30rem,90dvw))]">
                 <UpdateCategoryDialogContent
                     category={props.category}
                     onMutate={() => {
@@ -128,6 +129,12 @@ const UpdateCategoryDialogContent = (props: UpdateCategoryDialogContentProps) =>
                         disabled={isPending}
                     />
                 </Form>
+                <CategoryImageEditor
+                    category={props.category}
+                    disabled={isPending}
+                    onMutate={props.onMutate}
+                    onSettled={props.onSettled}
+                />
             </DialogBody>
             <DialogFooter className="grid grid-cols-2 gap-2">
                 <DialogClose

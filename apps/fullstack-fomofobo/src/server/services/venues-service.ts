@@ -1,6 +1,5 @@
 import "server-only"
 import type { S3ObjectStorage } from "backend-shared"
-import { logger } from "backend-shared"
 import type {
     Account,
     PhotoUploadRequest,
@@ -21,7 +20,12 @@ import type {
 import { expireTags, PUBLIC_TAG, venueTag } from "../cache"
 import { appError } from "../errors"
 import type { PhotosService } from "./photos-service"
-import { assertUploadedPhoto, photoUrl, venueCoverKeyPrefix } from "./photos-service"
+import {
+    assertUploadedPhoto,
+    deleteReplacedObject,
+    photoUrl,
+    venueCoverKeyPrefix,
+} from "./photos-service"
 import type { Page } from "./to-page"
 import { toPage } from "./to-page"
 
@@ -132,7 +136,11 @@ export class VenuesService {
             current.coverObjectKey !== null &&
             current.coverObjectKey !== coverPhotoKey
         ) {
-            await this.deleteCover(current.coverObjectKey)
+            await deleteReplacedObject(
+                this.photoStorage,
+                current.coverObjectKey,
+                "Venue cover",
+            )
         }
         return await this.getById(id)
     }
@@ -254,22 +262,6 @@ export class VenuesService {
             )
         }
         return venue
-    }
-
-    /**
-     * @description Deletes a replaced cover from the bucket, and logs a failure
-     * @param key Cover key deleted
-     * @remarks Belongs after the database write: a failure then leaves an unused object
-     */
-    private async deleteCover(key: string): Promise<void> {
-        try {
-            await this.photoStorage.deleteObject(key)
-        } catch (error) {
-            logger.error("Venue cover not deleted", {
-                key,
-                error: error instanceof Error ? error.message : String(error),
-            })
-        }
     }
 
     /**

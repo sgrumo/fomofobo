@@ -1,5 +1,11 @@
 import { createRoute, z } from "@hono/zod-openapi"
-import { categoryCreationSchema, categorySchema, categoryUpdateSchema } from "models"
+import {
+    categoryCreationSchema,
+    categorySchema,
+    categoryUpdateSchema,
+    photoUploadRequestSchema,
+    presignedUploadSchema,
+} from "models"
 
 import {
     badRequestResponse,
@@ -79,5 +85,38 @@ export const BackofficeCategoriesRoutes = {
         },
         tags: ["Backoffice"],
         summary: "Delete category",
+    }),
+
+    createImageUploadTicket: createRoute({
+        method: "post",
+        path: "/api/backoffice/categories/{id}/image/upload-ticket",
+        request: {
+            params: categoryParamsSchema,
+            body: {
+                required: true,
+                content: {
+                    "application/json": {
+                        schema: photoUploadRequestSchema.openapi("PhotoUploadRequest"),
+                    },
+                },
+            },
+        },
+        responses: {
+            200: {
+                content: {
+                    "application/json": {
+                        schema: presignedUploadSchema.openapi("PresignedUpload"),
+                    },
+                },
+                description: "Presigned PUT of one category image",
+            },
+            400: badRequestResponse,
+            ...sessionErrorResponses,
+            404: notFoundResponse("Category"),
+        },
+        tags: ["Backoffice"],
+        summary: "Create category image upload ticket",
+        description:
+            "Returns a presigned PUT under a key of the category. The category update then sends the key as `imageKey`.",
     }),
 }

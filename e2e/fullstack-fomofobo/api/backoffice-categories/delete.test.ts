@@ -1,18 +1,19 @@
-import { expectApiError, expectStatus } from "e2e-kit/assertions"
+import { expectApiError, expectStatus, expectToBeDefined } from "e2e-kit/assertions"
 import { describe, expect, it } from "vitest"
 
 import { signInAs } from "../auth/utils"
 import { createEvent, deleteEvent } from "../backoffice-events/api"
 import {
     buildEventUpsert,
+    downloadPhoto,
     seedEventReferences,
     uploadPhoto,
 } from "../backoffice-events/utils"
 import { createVenue, setVenueKind } from "../backoffice-venues/api"
 import { buildCinemaKind, buildVenueCreation } from "../backoffice-venues/utils"
 import { listCategories } from "../public/api"
-import { createCategory, deleteCategory } from "./api"
-import { buildCategoryCreation } from "./utils"
+import { createCategory, deleteCategory, updateCategory } from "./api"
+import { buildCategoryCreation, uploadCategoryImage } from "./utils"
 
 describe("DELETE /api/backoffice/categories/{id}", () => {
     it("deletes a category that no event uses", async () => {
@@ -26,6 +27,26 @@ describe("DELETE /api/backoffice/categories/{id}", () => {
         const list = await listCategories({})
         expectStatus(list, 200)
         expect(list.data).toStrictEqual([])
+    })
+
+    it("deletes the image of a deleted category from the bucket", async () => {
+        const { headers } = await signInAs("admin")
+        const created = await createCategory({ headers, body: buildCategoryCreation() })
+        expectStatus(created, 201)
+        const image = await uploadCategoryImage(created.data.id)
+        const withImage = await updateCategory({
+            headers,
+            pathParams: { id: created.data.id },
+            body: { imageKey: image.key },
+        })
+        expectStatus(withImage, 200)
+        const imageUrl = withImage.data.imageUrl
+        expectToBeDefined(imageUrl)
+
+        const res = await deleteCategory({ headers, pathParams: { id: created.data.id } })
+
+        expectStatus(res, 204)
+        expect(await downloadPhoto(imageUrl)).toBeNull()
     })
 
     it("deletes a category that only deleted events use", async () => {

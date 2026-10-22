@@ -23,11 +23,14 @@ export const categorySchema = z.object({
     id: z.uuid(),
     name: z.string().trim().min(1).max(60),
     icon: categoryIconSchema,
+    imageUrl: z.url().nullable(),
 })
 export type Category = z.infer<typeof categorySchema>
 
-export const categoryCreationSchema = categorySchema.omit({ id: true })
+export const categoryCreationSchema = categorySchema.pick({ name: true, icon: true })
 export type CategoryCreation = z.infer<typeof categoryCreationSchema>
 
-export const categoryUpdateSchema = nonEmptyUpdate(categoryCreationSchema.partial())
+export const categoryUpdateSchema = nonEmptyUpdate(
+    categoryCreationSchema.extend({ imageKey: z.string().min(1).nullable() }).partial(),
+)
 export type CategoryUpdate = z.infer<typeof categoryUpdateSchema>

@@ -15,7 +15,7 @@ describe("POST /api/backoffice/categories", () => {
         const res = await createCategory({ headers, body: creation })
 
         expectStatus(res, 201)
-        expect(res.data).toStrictEqual({ id: anyUuid, ...creation })
+        expect(res.data).toStrictEqual({ id: anyUuid, ...creation, imageUrl: null })
         const list = await listCategories({})
         expectStatus(list, 200)
         expect(list.data).toStrictEqual([res.data])

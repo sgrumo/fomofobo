@@ -64,6 +64,13 @@
       "when": 1792682346216,
       "tag": "0008_nappy_rattler",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1792687488955,
+      "tag": "0009_premium_quicksilver",
+      "breakpoints": true
     }
   ]
 }

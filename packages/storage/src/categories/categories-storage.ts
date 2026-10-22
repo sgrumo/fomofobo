@@ -1,17 +1,27 @@
 import { and, count, eq, inArray, isNotNull, isNull } from "drizzle-orm"
-import type { Category, CategoryUpdate } from "models"
+import type { Category, CategoryCreation, CategoryUpdate } from "models"
+import type { StrictOmit } from "shared/types"
 
 import type { DbInstanceFromSchema } from "../db-config"
 import { categories, eventCategories, events, venues } from "../db-schema"
 
+export type StoredCategory = StrictOmit<Category, "imageUrl"> & {
+    imageObjectKey: string | null
+}
+
+export type CategoryWrite = StrictOmit<CategoryUpdate, "imageKey"> & {
+    imageObjectKey?: string | null
+}
+
 /**
- * @description Maps a `categories` row to its model
+ * @description Maps a `categories` row to its record
  * @param row Row read from `categories`
  */
-const toCategory = (row: typeof categories.$inferSelect): Category => ({
+const toStoredCategory = (row: typeof categories.$inferSelect): StoredCategory => ({
     id: row.id,
     name: row.name,
     icon: row.icon,
+    imageObjectKey: row.imageObjectKey,
 })
 
 export class CategoriesStorage {
@@ -23,30 +33,30 @@ export class CategoriesStorage {
     /**
      * @description Fetches every category, ordered by name
      */
-    public async list(): Promise<Category[]> {
+    public async list(): Promise<StoredCategory[]> {
         const rows = await this.db.select().from(categories).orderBy(categories.name)
-        return rows.map(toCategory)
+        return rows.map(toStoredCategory)
     }
 
     /**
      * @description Fetches one category, or `null` when no row matches
      * @param id Category read
      */
-    public async findById(id: string): Promise<Category | null> {
+    public async findById(id: string): Promise<StoredCategory | null> {
         const [row] = await this.db.select().from(categories).where(eq(categories.id, id))
-        return row ? toCategory(row) : null
+        return row ? toStoredCategory(row) : null
     }
 
     /**
      * @description Fetches the category with the exact name, or `null` when no row matches
      * @param name Name searched
      */
-    public async findByName(name: string): Promise<Category | null> {
+    public async findByName(name: string): Promise<StoredCategory | null> {
         const [row] = await this.db
             .select()
             .from(categories)
             .where(eq(categories.name, name))
-        return row ? toCategory(row) : null
+        return row ? toStoredCategory(row) : null
     }
 
     /**
@@ -54,7 +64,10 @@ export class CategoriesStorage {
      * @param category Category inserted, carrying its id
      * @param createdAt Instant of the creation
      */
-    public async insert(category: Category, createdAt: Date): Promise<void> {
+    public async insert(
+        category: CategoryCreation & { id: string },
+        createdAt: Date,
+    ): Promise<void> {
         await this.db.insert(categories).values({
             id: category.id,
             name: category.name,
@@ -68,13 +81,20 @@ export class CategoriesStorage {
      * @param id Category changed
      * @param fields Fields replaced
      */
-    public async update(id: string, fields: CategoryUpdate): Promise<Category | null> {
+    public async update(
+        id: string,
+        fields: CategoryWrite,
+    ): Promise<StoredCategory | null> {
         const [row] = await this.db
             .update(categories)
-            .set({ name: fields.name, icon: fields.icon })
+            .set({
+                name: fields.name,
+                icon: fields.icon,
+                imageObjectKey: fields.imageObjectKey,
+            })
             .where(eq(categories.id, id))
             .returning()
-        return row ? toCategory(row) : null
+        return row ? toStoredCategory(row) : null
     }
 
     /**
@@ -101,7 +121,7 @@ export class CategoriesStorage {
      * @param id Category deleted
      * @remarks Fails on the foreign key while an event not deleted or a venue uses the category
      */
-    public async deleteWithDeletedEventLinks(id: string): Promise<Category | null> {
+    public async deleteWithDeletedEventLinks(id: string): Promise<StoredCategory | null> {
         const [, [row]] = await this.db.batch([
             this.db
                 .delete(eventCategories)
@@ -119,6 +139,6 @@ export class CategoriesStorage {
                 ),
             this.db.delete(categories).where(eq(categories.id, id)).returning(),
         ])
-        return row ? toCategory(row) : null
+        return row ? toStoredCategory(row) : null
     }
 }

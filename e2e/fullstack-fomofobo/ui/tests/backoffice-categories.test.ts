@@ -14,7 +14,7 @@ import { dismissToast, expectToast } from "e2e-ui-components/toast"
 import { signInAs } from "../../api/auth/utils"
 import { seedEvent } from "../../api/backoffice-events/utils"
 import { gotoBackofficePage, t } from "../app"
-import { signInBrowser } from "../backoffice"
+import { buildPhotoFile, signInBrowser } from "../backoffice"
 import { buildArea, seedCategory, seedVenue } from "../public"
 
 test.describe("backoffice categories", () => {
@@ -51,6 +51,33 @@ test.describe("backoffice categories", () => {
         await dismissToast(page, { type: "success" }, deleted)
         await expect(getAlertDialog(page)).toBeHidden()
         await expect(getTableRow(page, ["exact", name])).toHaveCount(0)
+    })
+
+    test("uploads the image of a category from its edit dialog", async ({ page }) => {
+        const category = await seedCategory()
+        await signInBrowser(page, "admin")
+
+        await gotoBackofficePage(page, "/backoffice/categories")
+        await clickTableRowAction(
+            page,
+            ["exact", category.name],
+            t("shared", "Backoffice.Actions.Edit"),
+        )
+        const dialog = getDialog(page, t("shared", "Backoffice.Categories.Update.Title"))
+        await dialog
+            .getByLabel(t("shared", "Backoffice.CategoryImage.Upload"), { exact: true })
+            .setInputFiles(await buildPhotoFile())
+
+        const updated = t("shared", "Backoffice.Categories.Toast.Updated", {
+            name: category.name,
+        })
+        await expectToast(page, { type: "success" }, updated)
+        await dismissToast(page, { type: "success" }, updated)
+        await expect(
+            dialog.getByRole("img", {
+                name: t("shared", "Backoffice.CategoryImage.Label"),
+            }),
+        ).toBeVisible()
     })
 
     test("refuses to delete a category that an event uses", async ({ page }) => {
