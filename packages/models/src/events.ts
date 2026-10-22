@@ -17,8 +17,13 @@ export const photoContentTypeSchema = uploadContentTypeSchema.extract([
 ])
 export type PhotoContentType = z.infer<typeof photoContentTypeSchema>
 
+export const ditheredPhotoContentTypeSchema = photoContentTypeSchema.extract([
+    "image/png",
+])
+export type DitheredPhotoContentType = z.infer<typeof ditheredPhotoContentTypeSchema>
+
 export const photoUploadRequestSchema = uploadRequestSchema.extend({
-    contentType: photoContentTypeSchema,
+    contentType: ditheredPhotoContentTypeSchema,
 })
 export type PhotoUploadRequest = z.infer<typeof photoUploadRequestSchema>
 

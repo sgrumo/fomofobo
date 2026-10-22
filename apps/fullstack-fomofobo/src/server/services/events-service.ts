@@ -2,7 +2,7 @@ import "server-only"
 import type { S3ObjectStorage } from "backend-shared"
 import { logger } from "backend-shared"
 import type { Account, Event, EventListItem, EventListQuery, EventUpsert } from "models"
-import { MAX_UPLOAD_SIZE_BYTES, photoContentTypeSchema } from "models"
+import { ditheredPhotoContentTypeSchema, MAX_UPLOAD_SIZE_BYTES } from "models"
 import type { EventsStorage, StoredEvent } from "storage"
 
 import { expandOccurrences } from "@/lib/events/expand-occurrences"
@@ -266,7 +266,7 @@ export class EventsService {
         const head = await this.photoStorage.headObject(key)
         if (
             head === null ||
-            !photoContentTypeSchema.safeParse(head.contentType).success ||
+            !ditheredPhotoContentTypeSchema.safeParse(head.contentType).success ||
             head.sizeBytes > MAX_UPLOAD_SIZE_BYTES
         ) {
             throw appError(

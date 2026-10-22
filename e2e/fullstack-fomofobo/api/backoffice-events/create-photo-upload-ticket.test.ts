@@ -16,8 +16,8 @@ describe("POST /api/backoffice/photos/upload-ticket", () => {
         const res = await createPhotoUploadTicket({
             headers,
             body: {
-                fileName: "cover.webp",
-                contentType: "image/webp",
+                fileName: "cover.png",
+                contentType: "image/png",
                 sizeBytes: bytes.byteLength,
             },
         })
@@ -25,7 +25,7 @@ describe("POST /api/backoffice/photos/upload-ticket", () => {
         expectStatus(res, 200)
         expect(res.data).toStrictEqual({
             url: anyHttpUrl,
-            headers: { "Content-Type": "image/webp" },
+            headers: { "Content-Type": "image/png" },
             key: expect.stringMatching(
                 new RegExp(`^events/${account.id}/[0-9a-f-]{36}$`, "u"),
             ),
@@ -38,12 +38,12 @@ describe("POST /api/backoffice/photos/upload-ticket", () => {
         expectRawStatus(upload, 200)
     })
 
-    it("answers 400 to an SVG, which the typed body cannot carry", async () => {
+    it("answers 400 to a photo type other than PNG, which the typed body cannot carry", async () => {
         const { headers } = await signInAs("organizer")
 
         const res = await axios.post(
             `${publishedAppUrl()}/api/backoffice/photos/upload-ticket`,
-            { fileName: "logo.svg", contentType: "image/svg+xml", sizeBytes: 10 },
+            { fileName: "cover.jpg", contentType: "image/jpeg", sizeBytes: 10 },
             { headers, validateStatus: () => true },
         )
 

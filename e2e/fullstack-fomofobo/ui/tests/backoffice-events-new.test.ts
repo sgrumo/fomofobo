@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test"
 import type { Page } from "@playwright/test"
-import { expectStatus } from "e2e-kit/assertions"
+import { expectStatus, expectToBeDefined } from "e2e-kit/assertions"
 import { clickButton } from "e2e-ui-components/button"
 import { checkCheckbox } from "e2e-ui-components/checkbox"
 import { selectComboboxItem, selectComboboxItems } from "e2e-ui-components/combobox"
@@ -17,8 +17,9 @@ import { dismissToast, expectToast } from "e2e-ui-components/toast"
 import { expectTogglePressed, pressToggle } from "e2e-ui-components/toggle"
 
 import { getEvent, listEvents } from "../../api/backoffice-events/api"
+import { downloadPhoto } from "../../api/backoffice-events/utils"
 import { gotoBackofficePage, reloadPage, t } from "../app"
-import { signInBrowser } from "../backoffice"
+import { buildPhotoFile, signInBrowser } from "../backoffice"
 import { buildArea, seedCategory, seedVenue } from "../public"
 
 /**
@@ -47,11 +48,7 @@ const fillEventEssentials = async (
     await fillInput(page, t("shared", "Backoffice.EventForm.EndTime"), "23:30")
     await page
         .getByLabel(t("shared", "Backoffice.Photos.Label"), { exact: true })
-        .setInputFiles({
-            name: "cover.png",
-            mimeType: "image/png",
-            buffer: Buffer.from(crypto.getRandomValues(new Uint8Array(2048))),
-        })
+        .setInputFiles(await buildPhotoFile())
     await expect(
         page.getByRole("img", {
             name: t("shared", "Backoffice.Photos.Photo", { index: 1 }),
@@ -64,7 +61,7 @@ test.describe("backoffice new event", () => {
         const category = await seedCategory()
         const venue = await seedVenue(buildArea())
         const title = `Single ${crypto.randomUUID()}`
-        await signInBrowser(page, "organizer")
+        const { headers } = await signInBrowser(page, "organizer")
 
         await gotoBackofficePage(page, "/backoffice/events/new")
         await pressToggle(page, t("shared", "Backoffice.EventEditor.Mode.form"))
@@ -85,6 +82,24 @@ test.describe("backoffice new event", () => {
             ["exact", venue.name],
             ["exact", t("shared", "Backoffice.Events.Single")],
         ])
+        const list = await listEvents({ headers, queryParams: { q: title } })
+        expectStatus(list, 200)
+        const [listed] = list.data.items
+        expectToBeDefined(listed)
+        const stored = await getEvent({ headers, pathParams: { id: listed.id } })
+        expectStatus(stored, 200)
+        const [cover] = stored.data.photos
+        expectToBeDefined(cover)
+        const photo = await downloadPhoto(cover.url)
+        expectToBeDefined(photo)
+        const header = new DataView(photo.buffer, photo.byteOffset + 16, 13)
+        // IHDR: width, height (267 rows of 3 px cells), bit depth, color type (3 = indexed)
+        expect([
+            header.getUint32(0),
+            header.getUint32(4),
+            header.getUint8(8),
+            header.getUint8(9),
+        ]).toStrictEqual([1200, 801, 1, 3])
     })
 
     test("creates a weekly event without one of its dates", async ({ page }) => {
@@ -178,11 +193,7 @@ test.describe("backoffice new event", () => {
         await expectCurrentStep(page, t("shared", "Backoffice.EventWizard.Steps.photos"))
         await page
             .getByLabel(t("shared", "Backoffice.Photos.Label"), { exact: true })
-            .setInputFiles({
-                name: "cover.png",
-                mimeType: "image/png",
-                buffer: Buffer.from(crypto.getRandomValues(new Uint8Array(2048))),
-            })
+            .setInputFiles(await buildPhotoFile())
         await expect(
             page.getByRole("img", {
                 name: t("shared", "Backoffice.Photos.Photo", { index: 1 }),

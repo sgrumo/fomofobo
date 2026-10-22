@@ -1,15 +1,15 @@
 import type { PresignedUpload } from "models"
 
 /**
- * @description Puts the file to the presigned URL with the headers its signature covers, and reports the share sent
+ * @description Puts the body to the presigned URL with the headers its signature covers, and reports the share sent
  * @param presigned Presigned URL and its signed headers
- * @param file File uploaded
- * @param onProgress Receives the share of the file sent, from 0 to 1
+ * @param body Body uploaded
+ * @param onProgress Receives the share of the body sent, from 0 to 1
  * @throws When the upload fails or answers outside the `2xx` range
  */
 export const uploadToPresignedUrl = (
     presigned: PresignedUpload,
-    file: File,
+    body: Blob,
     onProgress: (share: number) => void,
 ): Promise<void> =>
     new Promise((resolve, reject) => {
@@ -33,5 +33,5 @@ export const uploadToPresignedUrl = (
         request.addEventListener("error", () => {
             reject(new Error("Upload failed"))
         })
-        request.send(file)
+        request.send(body)
     })

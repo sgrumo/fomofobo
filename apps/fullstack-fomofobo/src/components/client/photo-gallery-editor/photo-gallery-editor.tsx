@@ -1,7 +1,10 @@
 "use client"
 
-import type { PhotoContentType } from "models"
-import { MAX_EVENT_PHOTOS, photoContentTypeSchema } from "models"
+import {
+    ditheredPhotoContentTypeSchema,
+    MAX_EVENT_PHOTOS,
+    photoContentTypeSchema,
+} from "models"
 import Image from "next/image"
 import type { ChangeEvent } from "react"
 import { useState } from "react"
@@ -14,6 +17,7 @@ import { useToast } from "ui-components/toast"
 
 import type { EventFormPhoto } from "@/components/client/event-form/event-form.state"
 import { api } from "@/lib/api/client-api"
+import { ditherPhoto } from "@/lib/upload/dither-photo"
 import { uploadToPresignedUrl } from "@/lib/upload/upload-to-presigned-url"
 import { validatePhotoFile } from "@/lib/upload/validate-photo-file"
 
@@ -53,22 +57,25 @@ const movePhoto = (
 }
 
 /**
- * @description Uploads the photo through an upload ticket of the session, and returns its key and a local preview URL
+ * @description Dithers the photo, uploads the dithered copy through an upload ticket of the session, and returns its key and a local preview URL
  * @param file Photo picked
- * @param contentType Content type the validation read
- * @param onProgress Receives the share of the file sent
+ * @param onProgress Receives the share of the dithered copy sent
  */
 const uploadPhoto = async (
     file: File,
-    contentType: PhotoContentType,
     onProgress: (share: number) => void,
 ): Promise<EventFormPhoto> => {
+    const dithered = await ditherPhoto(file)
     const ticket = await api.createPhotoUploadTicket({
         params: {},
-        body: { fileName: file.name, contentType, sizeBytes: file.size },
+        body: {
+            fileName: file.name,
+            contentType: ditheredPhotoContentTypeSchema.enum["image/png"],
+            sizeBytes: dithered.size,
+        },
     })
-    await uploadToPresignedUrl(ticket, file, onProgress)
-    return { key: ticket.key, url: URL.createObjectURL(file) }
+    await uploadToPresignedUrl(ticket, dithered, onProgress)
+    return { key: ticket.key, url: URL.createObjectURL(dithered) }
 }
 
 export const PhotoGalleryEditor = (props: PhotoGalleryEditorProps) => {
@@ -77,11 +84,11 @@ export const PhotoGalleryEditor = (props: PhotoGalleryEditorProps) => {
     const field = useFieldContext()
     const [pending, setPending] = useState<PendingUpload[]>([])
 
-    const startUpload = async (file: File, contentType: PhotoContentType) => {
+    const startUpload = async (file: File) => {
         const id = crypto.randomUUID()
         setPending(uploads => [...uploads, { id, name: file.name, share: 0 }])
         try {
-            const photo = await uploadPhoto(file, contentType, share => {
+            const photo = await uploadPhoto(file, share => {
                 setPending(uploads =>
                     uploads.map(item => (item.id === id ? { ...item, share } : item)),
                 )
@@ -131,7 +138,7 @@ export const PhotoGalleryEditor = (props: PhotoGalleryEditorProps) => {
                 continue
             }
 
-            void startUpload(file, validation.value)
+            void startUpload(file)
         }
     }
 

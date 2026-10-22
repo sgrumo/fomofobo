@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker"
 import { expectRawStatus, expectStatus } from "e2e-kit/assertions"
-import type { Event, EventUpsert, PhotoContentType, Recurrence, Venue } from "models"
+import type { Event, EventUpsert, Recurrence, Venue } from "models"
 
 import { signInAs } from "../auth/utils"
 import { createCategory } from "../backoffice-categories/api"
@@ -64,16 +64,18 @@ export const seedEventReferences = async (): Promise<{
 /**
  * @description Uploads random bytes through a photo upload ticket of the session, and returns the key and the bytes
  * @param headers Headers of the session that uploads
- * @param contentType Type of the photo
  */
-export const uploadPhoto = async (
-    headers: { Cookie: string },
-    contentType: PhotoContentType = "image/png",
-): Promise<{ key: string; bytes: Uint8Array }> => {
+export const uploadPhoto = async (headers: {
+    Cookie: string
+}): Promise<{ key: string; bytes: Uint8Array }> => {
     const bytes = crypto.getRandomValues(new Uint8Array(256))
     const ticket = await createPhotoUploadTicket({
         headers,
-        body: { fileName: "photo.png", contentType, sizeBytes: bytes.byteLength },
+        body: {
+            fileName: "photo.png",
+            contentType: "image/png",
+            sizeBytes: bytes.byteLength,
+        },
     })
     expectStatus(ticket, 200)
     const upload = await fetch(ticket.data.url, {
