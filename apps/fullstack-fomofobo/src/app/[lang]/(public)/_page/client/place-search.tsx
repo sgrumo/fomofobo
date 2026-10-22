@@ -5,13 +5,16 @@ import { identity } from "es-toolkit"
 import type { GeoPoint, OccurrenceRef, PlaceSuggestion } from "models"
 import { useRef, useState } from "react"
 import type { FocusEvent, MouseEvent } from "react"
+import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import { useDebounced } from "react-shared"
 import { Alert } from "ui-components/alert"
 import { SearchField } from "ui-components/search-field"
 import { Spinner } from "ui-components/spinner"
 
+import { RouteLink } from "@/framework/routes/route-link/route-link"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
+import { routes } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
 import { useOnline } from "@/lib/hooks/use-online"
 
@@ -28,6 +31,7 @@ interface PlaceSearchProps extends RouteClientComponentProps<"root"> {
 
 export const PlaceSearch = (props: PlaceSearchProps) => {
     const { t } = useTranslation("shared")
+    const language = useLanguage()
     const online = useOnline()
     const [text, setText] = useState(props.initialText)
     const [open, setOpen] = useState(false)
@@ -49,6 +53,7 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
 
     const places = suggestions.data?.places ?? []
     const events = suggestions.data?.events ?? []
+    const venues = suggestions.data?.venues ?? []
     const closeWhenFocusLeaves = (event: FocusEvent) => {
         if (
             !(event.relatedTarget instanceof Node) ||
@@ -114,7 +119,8 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                     ) : undefined}
                     {suggestions.isSuccess &&
                     places.length === 0 &&
-                    events.length === 0 ? (
+                    events.length === 0 &&
+                    venues.length === 0 ? (
                         <p className="tp-body-md text-fg-muted px-2">
                             {t("Search.Empty")}
                         </p>
@@ -170,6 +176,35 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                                 >
                                     {event.title}
                                 </button>
+                            ))}
+                        </section>
+                    ) : undefined}
+                    {venues.length > 0 ? (
+                        <section
+                            aria-label={t("Search.Venues")}
+                            className="flex flex-col"
+                        >
+                            <h2 className="tp-pixel-sm text-fg-muted px-2 uppercase">
+                                {t("Search.Venues")}
+                            </h2>
+                            {venues.map(venue => (
+                                <RouteLink
+                                    key={venue.venueId}
+                                    route={routes.venueDetail}
+                                    parameters={{
+                                        lang: language,
+                                        venueId: venue.venueId,
+                                    }}
+                                    query={{}}
+                                    className={itemClassName}
+                                    onBlur={closeWhenFocusLeaves}
+                                    onMouseDown={keepFocus}
+                                >
+                                    {venue.name}
+                                    <span className="tp-body-sm text-fg-muted block">
+                                        {venue.address}
+                                    </span>
+                                </RouteLink>
                             ))}
                         </section>
                     ) : undefined}

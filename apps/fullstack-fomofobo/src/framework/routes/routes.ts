@@ -59,6 +59,15 @@ export const routes = {
         }),
         querySchema: z.object({}),
     }),
+    venueDetail: createDynamicRoute({
+        segments: ["[lang]", "venues", "[venueId]"],
+        title: ({ t }) => t("PageTitle.Venue"),
+        parametersSchema: z.object({
+            lang: languageKeySchema,
+            venueId: z.string(),
+        }),
+        querySchema: z.object({ page: pageCodec.optional().catch(undefined) }),
+    }),
     saved: createStaticRoute({
         segments: ["[lang]", "saved"],
         title: ({ t }) => t("PageTitle.Saved"),

@@ -76,6 +76,36 @@ test.describe("installed app offline", () => {
         expect(offlinePhoto.fromServiceWorker()).toBe(true)
     })
 
+    test("renders a loaded venue page with its events after an offline reload", async ({
+        page,
+        context,
+    }) => {
+        const venue = await seedVenue(buildArea())
+        const category = await seedCategory()
+        const upcoming = await seedPublicEvent({ venue, category }, {})
+        const past = await seedPublicEvent(
+            { venue, category },
+            { startsAt: "2026-10-20T21:00", endsAt: "2026-10-20T23:30" },
+        )
+
+        await gotoPage(page, `/venues/${venue.id}/`)
+        await page.waitForFunction("navigator.serviceWorker.controller !== null")
+        // A second load under the worker caches the page, as on the event page.
+        await reloadPage(page)
+        await expect
+            .poll(() => page.evaluate("caches.match(location.href).then(Boolean)"))
+            .toBe(true)
+
+        await context.setOffline(true)
+        await reloadPage(page)
+
+        await expect(
+            page.getByRole("heading", { level: 1, name: venue.name }),
+        ).toBeVisible()
+        await expect(page.getByText(upcoming.title)).toBeVisible()
+        await expect(page.getByText(past.title)).toBeVisible()
+    })
+
     test("names the missing connection when a new filter cannot load offline", async ({
         page,
         context,

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest"
 import {
     dateTimeOf,
     dayMonthOf,
+    formatLocalDate,
     formatLocalDateTime,
     weekdayDateOf,
 } from "./local-format"
@@ -44,5 +45,11 @@ describe("formatLocalDateTime", () => {
     it("reads the wall clock of the value, whatever the zone of the machine", () => {
         expect(formatLocalDateTime("2026-10-24T21:00")).toBe("24.10.26 21:00")
         expect(formatLocalDateTime("2026-03-29T02:30")).toBe("29.03.26 02:30")
+    })
+})
+
+describe("formatLocalDate", () => {
+    it("reads the day, the month and the year of the value", () => {
+        expect(formatLocalDate("2026-10-04")).toBe("04/10/2026")
     })
 })

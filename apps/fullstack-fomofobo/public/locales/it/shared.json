@@ -12,6 +12,7 @@
     "PageTitle": {
         "Home": "Mappa",
         "Event": "Evento",
+        "Venue": "Locale",
         "Saved": "Eventi salvati",
         "Offline": "Offline",
         "DevShowcase": "Showcase",
@@ -80,6 +81,7 @@
         "Placeholder": "Cerca evento, luogo",
         "Places": "Luoghi",
         "Events": "Eventi",
+        "Venues": "Locali",
         "Loading": "Ricerca in corso",
         "Empty": "Nessun risultato.",
         "Unavailable": "La ricerca dei luoghi non è disponibile ora.",
@@ -136,6 +138,16 @@
             "x": "Condividi su X",
             "Copy": "Copia il link"
         }
+    },
+    "Venue": {
+        "Cover": "Foto di {{name}}",
+        "Website": "Sito web",
+        "Upcoming": "Prossimi eventi",
+        "NoUpcoming": "Nessun evento in programma.",
+        "History": "Eventi passati",
+        "HistoryLoading": "Caricamento eventi passati",
+        "HistoryError": "Non è stato possibile caricare gli eventi passati.",
+        "NoHistory": "Nessun evento passato."
     },
     "Saved": {
         "Toggle": "Salva",

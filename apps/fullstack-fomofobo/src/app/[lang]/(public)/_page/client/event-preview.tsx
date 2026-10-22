@@ -124,9 +124,20 @@ const PreviewBody = (props: PreviewBodyProps) => {
                     <BottomSheetTitle className="tp-pixel-xl uppercase">
                         {occurrence.title}
                     </BottomSheetTitle>
-                    <span className="tp-body-md text-fg-muted">
-                        {occurrence.venue.name}
-                    </span>
+                    {occurrence.venue.isBlocked ? (
+                        <span className="tp-body-md text-fg-muted">
+                            {occurrence.venue.name}
+                        </span>
+                    ) : (
+                        <RouteLink
+                            route={routes.venueDetail}
+                            parameters={{ lang: language, venueId: occurrence.venue.id }}
+                            query={{}}
+                            className="tp-body-md text-fg-muted underline"
+                        >
+                            {occurrence.venue.name}
+                        </RouteLink>
+                    )}
                     <span className="tp-pixel-sm uppercase">{details.join(" · ")}</span>
                 </div>
             </div>

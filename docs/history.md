@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-10-22 · Venues get a public page with past events
+
+### Changed
+
+Each venue has a public page with its profile, its upcoming events and a paged list of its past events. The search field also finds venues of the area.
+
+### Why
+
+A client request. The client wants visitors to follow a place, not only a single event.
+
+### Check next time
+
+Ask whether past events must stay readable before the retention rules are set, because the history reads events whose photos are gone.
+
 ## 2026-10-22 · Venues get owners, profiles and blocks
 
 ### Changed

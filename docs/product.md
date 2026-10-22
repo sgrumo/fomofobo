@@ -20,7 +20,7 @@ A venue is a reusable place with a name, an address and coordinates, and an opti
 
 An Organizer owns one venue at most, and creates and edits only that venue. An Admin creates every other venue, edits every venue, and gives a venue to an Organizer or takes it back. Any Organizer holds events at any venue.
 
-An Admin blocks a venue with a reason. A blocked venue can no longer be picked for an event, and the events already held there keep it and stay visible.
+An Admin blocks a venue with a reason. A blocked venue can no longer be picked for an event, and the events already held there keep it and stay visible. A blocked venue loses its public page, and its events show its name with no link.
 
 ### Events
 
@@ -60,13 +60,19 @@ A tap on a pin opens a preview of the occurrence. The preview shows status, venu
 
 ### Search and filters
 
-Results match every active filter. One search field matches event titles and sets a place as the search center. Category chips select one category at a time and show the result count of each category under the other filters. With no category chip pressed, the results hold every category. The date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days. On a phone, the category and date chips sit in a panel that a filter button opens.
+Results match every active filter. One search field matches event titles and the names of the venues in the area, and sets a place as the search center. A venue result opens the page of the venue. Category chips select one category at a time and show the result count of each category under the other filters. With no category chip pressed, the results hold every category. The date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days. On a phone, the category and date chips sit in a panel that a filter button opens.
 
 ### Event page
 
 Each event has its own URL, and for a repeating event the URL refers to one occurrence. The page offers directions to the venue, the external link of the event and a save action. Directions open Apple Maps on iOS and iPadOS, and Google Maps elsewhere.
 
 Share opens the share sheet of the device, or copies the link where none exists. A row of links shares the page on WhatsApp, Telegram, Facebook and X with its title, date, time and venue, and a button copies the link. A shared link shows a card with the title, the cover, and the description of the event or else its date, time and venue.
+
+### Venue page
+
+Each venue has its own URL, and the event page and the map preview link to it. The page shows the profile of the venue, directions to it and its links, with the share row of the event page.
+
+The page lists the upcoming events of the venue, one row for each event at its next occurrence, live events first. A row opens the event page. Below, the past events of the venue list their title and their first and last date, with no photo, newest first and in numbered pages.
 
 ### Saved events
 

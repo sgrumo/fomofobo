@@ -353,6 +353,25 @@ test.describe("map", () => {
         await expect(farPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
     })
 
+    test("opens the page of a venue of the area that the search names", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const venue = await seedVenue(center)
+
+        await gotoPage(page, mapPath(center))
+        await fillSearchField(page, t("shared", "Search.Label"), venue.name)
+        await page
+            .getByRole("region", { name: t("shared", "Search.Venues") })
+            .getByRole("link", { name: venue.name })
+            .click()
+
+        await expect(page).toHaveURL(`/it/venues/${venue.id}`)
+        await expect(
+            page.getByRole("heading", { level: 1, name: venue.name }),
+        ).toBeVisible()
+    })
+
     test("asks for a place search when location is denied, and offers to allow it", async ({
         page,
         context,

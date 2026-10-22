@@ -1,6 +1,6 @@
 import { tz } from "@date-fns/tz"
 import { format } from "date-fns"
-import type { LocalDateTime } from "models"
+import type { LocalDate, LocalDateTime } from "models"
 
 /**
  * @description Returns the `HH:mm` wall-clock time of an instant in the zone
@@ -50,3 +50,10 @@ export const weekdayDateOf = (
  */
 export const formatLocalDateTime = (localDateTime: LocalDateTime): string =>
     `${localDateTime.slice(8, 10)}.${localDateTime.slice(5, 7)}.${localDateTime.slice(2, 4)} ${localDateTime.slice(11, 16)}`
+
+/**
+ * @description Returns the `dd/MM/yyyy` text of a local date
+ * @param localDate Date with no zone, `2026-10-24` for instance
+ */
+export const formatLocalDate = (localDate: LocalDate): string =>
+    `${localDate.slice(8, 10)}/${localDate.slice(5, 7)}/${localDate.slice(0, 4)}`

@@ -1,7 +1,10 @@
 import { expect, test } from "@playwright/test"
+import { expectStatus } from "e2e-kit/assertions"
 import { clickIconButton } from "e2e-ui-components/icon-button"
 import { dismissToast, expectToast } from "e2e-ui-components/toast"
 
+import { signInAs } from "../../api/auth/utils"
+import { blockVenue } from "../../api/backoffice-venues/api"
 import { gotoPage, gotoPath, reloadPage, t } from "../app"
 import {
     blockPublicEvent,
@@ -44,6 +47,35 @@ test.describe("event detail", () => {
         await reloadPage(page)
 
         await expect(page.getByText(t("shared", "NotFound.Title"))).toBeVisible()
+    })
+
+    test("links the venue to its page, and names it alone once the venue is blocked", async ({
+        page,
+    }) => {
+        const venue = await seedVenue(buildArea())
+        const event = await seedPublicEvent({ venue, category: await seedCategory() }, {})
+        const admin = await signInAs("admin")
+
+        await gotoPage(page, `/events/${event.id}/2026-10-24/`)
+        await page.getByRole("link", { name: venue.name }).click()
+
+        await expect(page).toHaveURL(`/it/venues/${venue.id}`)
+        await expect(
+            page.getByRole("heading", { level: 1, name: venue.name }),
+        ).toBeVisible()
+
+        expectStatus(
+            await blockVenue({
+                headers: admin.headers,
+                pathParams: { id: venue.id },
+                body: { reason: "Closed for works" },
+            }),
+            200,
+        )
+        await gotoPage(page, `/events/${event.id}/2026-10-24/`)
+
+        await expect(page.getByText(venue.name)).toBeVisible()
+        await expect(page.getByRole("link", { name: venue.name })).toHaveCount(0)
     })
 
     test("describes the occurrence for a shared link", async ({ page, baseURL }) => {

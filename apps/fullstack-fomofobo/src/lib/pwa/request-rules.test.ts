@@ -38,6 +38,8 @@ describe("isPublicDataPath", () => {
         ["/api/public/occurrences", true],
         ["/api/public/occurrences/lookup", true],
         ["/api/public/occurrences/id/2026-10-18", true],
+        ["/api/public/venues/id", true],
+        ["/api/public/venues/id/history", true],
         ["/api/public/places", false],
         ["/api/backoffice/events", false],
     ])("reads %s as cached public data: %s", (pathname, expected) => {

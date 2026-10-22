@@ -1,8 +1,8 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
+import type { LanguageKey } from "i18n/i18n"
 import type { OccurrenceDetail } from "models"
-import type { ReactNode } from "react"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import { Badge } from "ui-components/badge"
@@ -12,45 +12,32 @@ import {
     PixelIconDirections,
     PixelIconFacebook,
     PixelIconInstagram,
-    PixelIconLink,
     PixelIconShare,
-    PixelIconTelegram,
-    PixelIconWhatsApp,
-    PixelIconX,
 } from "ui-components/pixel-icons"
 import { StatGrid } from "ui-components/stat-grid"
 import { Timeline } from "ui-components/timeline"
 import { useToast } from "ui-components/toast"
 
+import { DirectionsLink } from "@/components/client/directions-link/directions-link"
 import { SaveToggle } from "@/components/client/save-toggle/save-toggle"
+import { ShareRow } from "@/components/client/share-row/share-row"
 import { useDynamicRoute } from "@/framework/routes/route-hooks/use-dynamic-route"
+import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
 import { localTimeOf, weekdayDateOf } from "@/lib/events/local-format"
 import { occurrenceProgress } from "@/lib/events/occurrence-progress"
 import { occurrenceStatus } from "@/lib/events/occurrence-status"
-import { directionsUrl, mapsProviderOf } from "@/lib/geo/directions-url"
 import { useBackToMap } from "@/lib/hooks/use-back-to-map"
+import { useCopyLink } from "@/lib/hooks/use-copy-link"
 import { useNow } from "@/lib/hooks/use-now"
 import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 import { shareSummaryOf } from "@/lib/share/share-summary"
-import { shareUrlOf } from "@/lib/share/share-urls"
-import type { ShareTarget } from "@/lib/share/share-urls"
 
 import { PhotoGallery } from "./photo-gallery"
 
 const CLOCK_TICK_MS = 60_000
-
-const shareTargets: ReadonlyArray<{ target: ShareTarget; icon: ReactNode }> = [
-    { target: "whatsapp", icon: <PixelIconWhatsApp /> },
-    { target: "telegram", icon: <PixelIconTelegram /> },
-    { target: "facebook", icon: <PixelIconFacebook /> },
-    { target: "x", icon: <PixelIconX /> },
-]
-
-const shareLinkClassName =
-    "pixel-circle-40 drop-shadow-hard-md text-fg focus-visible:outline-focus relative inline-flex size-10 shrink-0 items-center justify-center rounded-full hover:[--pixel-fill:var(--color-surface-muted)] focus-visible:outline-2 focus-visible:outline-offset-2 [&>svg]:size-4"
 
 const actionClassName =
     "border-line shadow-hard-md tp-pixel-md flex flex-1 items-center justify-center gap-2 rounded-md border-2 px-4 py-3 uppercase [&>svg]:size-4"
@@ -64,6 +51,7 @@ export const EventDetailView = (props: EventDetailViewProps) => {
     const language = useLanguage()
     const goBack = useBackToMap()
     const toast = useToast()
+    const copyLink = useCopyLink()
     const now = useNow(CLOCK_TICK_MS)
     const { parameters } = useDynamicRoute(routes[props.route])
     // The page renders only after the server read the occurrence, so the cache holds it.
@@ -76,15 +64,6 @@ export const EventDetailView = (props: EventDetailViewProps) => {
 
     if (occurrence === undefined) {
         return undefined
-    }
-
-    const copyLink = async (url: string) => {
-        try {
-            await navigator.clipboard.writeText(url)
-            toast.add({ type: "success", messages: [t("Detail.LinkCopied")] })
-        } catch {
-            toast.add({ type: "error", error: { type: "generic" } })
-        }
     }
 
     const share = () => {
@@ -129,36 +108,18 @@ export const EventDetailView = (props: EventDetailViewProps) => {
             <ShareRow
                 url={props.url}
                 text={`${occurrence.title} · ${shareSummaryOf(occurrence, language)}`}
-                onCopy={() => {
-                    void copyLink(props.url)
-                }}
             />
             <nav
                 aria-label={t("Detail.Actions")}
                 className="bg-surface border-line fixed inset-x-0 bottom-0 flex gap-3 border-t-2 p-4"
             >
-                <a
-                    href={directionsUrl(occurrence.venue.coordinates, "google")}
-                    target="_blank"
-                    rel="noreferrer"
+                <DirectionsLink
+                    coordinates={occurrence.venue.coordinates}
                     className={`${actionClassName} bg-surface-inverse text-fg-inverse`}
-                    onClick={event => {
-                        if (
-                            mapsProviderOf(
-                                navigator.userAgent,
-                                navigator.maxTouchPoints,
-                            ) === "apple"
-                        ) {
-                            event.preventDefault()
-                            globalThis.location.assign(
-                                directionsUrl(occurrence.venue.coordinates, "apple"),
-                            )
-                        }
-                    }}
                 >
                     <PixelIconDirections />
                     {t("Detail.Directions")}
-                </a>
+                </DirectionsLink>
                 {occurrence.externalLinks.instagramUrl === null ? undefined : (
                     <a
                         href={occurrence.externalLinks.instagramUrl}
@@ -189,7 +150,7 @@ export const EventDetailView = (props: EventDetailViewProps) => {
 interface OccurrenceBodyProps {
     occurrence: OccurrenceDetail
     now: Date
-    language: string
+    language: LanguageKey
 }
 
 const OccurrenceBody = (props: OccurrenceBodyProps) => {
@@ -247,46 +208,23 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                 <h2 className="tp-pixel-sm text-fg-muted uppercase">
                     {t("Detail.Venue")}
                 </h2>
-                <p className="tp-pixel-lg">{occurrence.venue.name}</p>
+                {occurrence.venue.isBlocked ? (
+                    <p className="tp-pixel-lg">{occurrence.venue.name}</p>
+                ) : (
+                    <RouteLink
+                        route={routes.venueDetail}
+                        parameters={{
+                            lang: props.language,
+                            venueId: occurrence.venue.id,
+                        }}
+                        query={{}}
+                        className="tp-pixel-lg underline"
+                    >
+                        {occurrence.venue.name}
+                    </RouteLink>
+                )}
                 <p className="tp-body-md text-fg-muted">{occurrence.venue.address}</p>
             </section>
         </>
-    )
-}
-
-interface ShareRowProps {
-    url: string
-    text: string
-    onCopy: () => void
-}
-
-const ShareRow = (props: ShareRowProps) => {
-    const { t } = useTranslation("shared")
-
-    return (
-        <section aria-label={t("Detail.ShareOn.Label")} className="flex flex-col gap-2">
-            <h2 className="tp-pixel-sm text-fg-muted uppercase">
-                {t("Detail.ShareOn.Label")}
-            </h2>
-            <div className="flex flex-wrap gap-3">
-                {shareTargets.map(({ target, icon }) => (
-                    <a
-                        key={target}
-                        href={shareUrlOf(target, { url: props.url, text: props.text })}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label={t(`Detail.ShareOn.${target}`)}
-                        className={shareLinkClassName}
-                    >
-                        {icon}
-                    </a>
-                ))}
-                <IconButton
-                    aria-label={t("Detail.ShareOn.Copy")}
-                    icon={<PixelIconLink />}
-                    onClick={props.onCopy}
-                />
-            </div>
-        </section>
     )
 }
