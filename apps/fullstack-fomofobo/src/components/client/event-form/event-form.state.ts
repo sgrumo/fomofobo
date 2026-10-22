@@ -1,6 +1,6 @@
 import type { Action, FormErrors, FormResult } from "frontend-shared/types"
 import type { i18n as I18nInstance } from "i18next"
-import type { Event, EventUpsert } from "models"
+import type { Event, EventUpsert, PriceScheme } from "models"
 import { eventUpsertSchema } from "models"
 import { err, ok } from "shared/result"
 import type { Time, WeekDay } from "shared/temporal"
@@ -9,6 +9,7 @@ import type { Partial, Specified } from "shared/types"
 import { match } from "ts-pattern"
 import { z } from "zod"
 
+import { FREE_PRICE_SCHEME } from "@/lib/events/price-summary"
 import { parseFormState } from "@/lib/forms/forms"
 
 //#region Types
@@ -45,7 +46,8 @@ export interface EventFormState {
     addedDates: string[] | undefined
     removedDates: string[] | undefined
     photos: EventFormPhoto[] | undefined
-    price: string | undefined
+    priceScheme: PriceScheme | undefined
+    capacity: number | undefined
     instagramUrl: string | undefined
     facebookUrl: string | undefined
 }
@@ -68,7 +70,6 @@ export type EventFormAction =
     | { type: "added-dates"; value: string[] | undefined }
     | { type: "removed-dates"; value: string[] | undefined }
     | { type: "photos"; value: EventFormPhoto[] | undefined }
-    | { type: "price"; value: string | undefined }
     | { type: "instagram-url"; value: string | undefined }
     | { type: "facebook-url"; value: string | undefined }
 
@@ -94,7 +95,8 @@ export const initialEventFormState = (): EventFormState => ({
     addedDates: undefined,
     removedDates: undefined,
     photos: undefined,
-    price: undefined,
+    priceScheme: undefined,
+    capacity: undefined,
     instagramUrl: undefined,
     facebookUrl: undefined,
 })
@@ -123,7 +125,8 @@ export const eventFormStateFromEvent = (event: Event): EventFormState => {
         addedDates: event.recurrence?.addedDates,
         removedDates: event.recurrence?.removedDates,
         photos: event.photos.map(photo => ({ key: photo.key, url: photo.url })),
-        price: event.price ?? undefined,
+        priceScheme: event.priceScheme,
+        capacity: event.capacity ?? undefined,
         instagramUrl: event.externalLinks.instagramUrl ?? undefined,
         facebookUrl: event.externalLinks.facebookUrl ?? undefined,
     }
@@ -242,12 +245,6 @@ const photosAction =
         photos: action.value,
     })
 
-const priceAction =
-    (state: EventFormState) => (action: Action<EventFormAction, "price">) => ({
-        ...state,
-        price: action.value,
-    })
-
 const instagramUrlAction =
     (state: EventFormState) => (action: Action<EventFormAction, "instagram-url">) => ({
         ...state,
@@ -286,7 +283,6 @@ export const eventFormReducer = (
         .with({ type: "added-dates" }, addedDatesAction(state))
         .with({ type: "removed-dates" }, removedDatesAction(state))
         .with({ type: "photos" }, photosAction(state))
-        .with({ type: "price" }, priceAction(state))
         .with({ type: "instagram-url" }, instagramUrlAction(state))
         .with({ type: "facebook-url" }, facebookUrlAction(state))
         .exhaustive()
@@ -362,7 +358,8 @@ export const eventFormStateToUpsert = (
                 instagramUrl: state.instagramUrl ?? null,
                 facebookUrl: state.facebookUrl ?? null,
             },
-            price: state.price ?? null,
+            priceScheme: state.priceScheme ?? FREE_PRICE_SCHEME,
+            capacity: state.capacity ?? null,
             organizerId: context.isAdmin ? state.organizer?.id : undefined,
         } satisfies Specified<Partial<EventUpsert>, { exclude: "recurrence" }>,
         i18n,
@@ -400,7 +397,8 @@ export const eventFormStateToUpsert = (
             recurrenceTree === undefined ? undefined : { errors: recurrenceTree.errors },
         removedDates: undefined,
         photos: tree?.photoKeys,
-        price: tree?.price,
+        priceScheme: undefined,
+        capacity: tree?.capacity,
         instagramUrl: tree?.externalLinks?.properties?.instagramUrl,
         facebookUrl: tree?.externalLinks?.properties?.facebookUrl,
     } satisfies Specified<FormErrors<EventFormState>, { mode: "shallow" }>

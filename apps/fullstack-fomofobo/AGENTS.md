@@ -53,6 +53,7 @@ Fullstack app: one Next.js process serves the API and the pages. The API mounts 
 - Shared data a write marks stale -> `force-dynamic` + `unstable_cache(fn, keyParts, { tags })` **inside the service**. The cached function returns the response shape: the cache stores JSON, so a `Date` comes back as a string
 - A writer in the API calls `expireTags` of `src/server/cache.ts`, which runs `revalidateTag(tag, { expire: 0 })`: the next read misses. **NEVER** `revalidateTag(tag, "max")` for public data, which serves the stale value once more and shows a blocked event. `updateTag` throws outside a Server Action
 - A tag names what a write changes: `eventTag(id)` for one event, `PUBLIC_TAG` for every cached detail. A write that the tags of a cached read cannot name, such as a venue edit, expires `PUBLIC_TAG`
+- A change of the shape a cached function returns bumps the version suffix of its first key part (`occurrence-detail-v2`). The Vercel Data Cache keeps entries across deployments, so the old shape fails the response schema until its tag expires
 - Every value that changes the result goes in `keyParts`. **NEVER** cache a per-user read under a shared key, or a read whose key holds the clock or exact coordinates: it never hits
 - The Vercel Data Cache keeps an `unstable_cache` result across instances until its tag is revalidated. A cached read spends no Active CPU and no Turso row read
 

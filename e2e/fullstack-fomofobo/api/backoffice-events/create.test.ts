@@ -51,7 +51,8 @@ describe("POST /api/backoffice/events", () => {
             recurrence: null,
             photos: [{ id: anyUuid, url: anyHttpUrl, position: 0, key: photo.key }],
             externalLinks: upsert.externalLinks,
-            price: upsert.price,
+            priceScheme: upsert.priceScheme,
+            capacity: upsert.capacity,
             organizer: { id: account.id, name: account.name },
             isBlocked: false,
             blockReason: null,
@@ -65,6 +66,66 @@ describe("POST /api/backoffice/events", () => {
         expect(await downloadPhoto(res.data.photos[0]?.url ?? "")).toStrictEqual(
             photo.bytes,
         )
+    })
+
+    it("keeps the whole price scheme and the capacity of a free event that needs a card", async () => {
+        const { headers } = await signInAs("organizer")
+        const { categoryId, venueId } = await seedEventReferences()
+        const photo = await uploadPhoto(headers)
+        const upsert = buildEventUpsert(
+            { venueId, categoryId, photoKeys: [photo.key] },
+            {
+                priceScheme: {
+                    isFree: true,
+                    fullPriceCents: null,
+                    reducedPrices: [],
+                    membership: { name: "Tessera ARCI", costCents: 1000 },
+                    minimumAge: 18,
+                    notes: "Tessera in vendita all'ingresso",
+                },
+                capacity: 120,
+            },
+        )
+
+        const res = await createEvent({ headers, body: upsert })
+
+        expectStatus(res, 201)
+        const read = await getEvent({ headers, pathParams: { id: res.data.id } })
+        expectStatus(read, 200)
+        expect([read.data.priceScheme, read.data.capacity]).toStrictEqual([
+            upsert.priceScheme,
+            120,
+        ])
+    })
+
+    it("keeps the reduced prices of a paid event in their order", async () => {
+        const { headers } = await signInAs("organizer")
+        const { categoryId, venueId } = await seedEventReferences()
+        const photo = await uploadPhoto(headers)
+        const reducedPrices = [
+            { label: "Under 18", amountCents: 500 },
+            { label: "Studenti", amountCents: 800 },
+        ]
+
+        const res = await createEvent({
+            headers,
+            body: buildEventUpsert(
+                { venueId, categoryId, photoKeys: [photo.key] },
+                {
+                    priceScheme: {
+                        isFree: false,
+                        fullPriceCents: 1250,
+                        reducedPrices,
+                        membership: null,
+                        minimumAge: null,
+                        notes: null,
+                    },
+                },
+            ),
+        })
+
+        expectStatus(res, 201)
+        expect(res.data.priceScheme.reducedPrices).toStrictEqual(reducedPrices)
     })
 
     it("creates the event of an Organizer that an Admin picks", async () => {

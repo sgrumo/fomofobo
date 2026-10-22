@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker"
 import { expectRawStatus, expectStatus } from "e2e-kit/assertions"
-import type { Event, EventUpsert, Recurrence, Venue } from "models"
+import type { Event, EventUpsert, PriceScheme, Recurrence, Venue } from "models"
 
 import { signInAs } from "../auth/utils"
 import { createCategory } from "../backoffice-categories/api"
@@ -8,6 +8,18 @@ import { buildCategoryCreation } from "../backoffice-categories/utils"
 import { createVenue } from "../backoffice-venues/api"
 import { buildVenueCreation } from "../backoffice-venues/utils"
 import { createEvent, createPhotoUploadTicket } from "./api"
+
+/**
+ * @description Builds the price scheme of a free event with no card, no age and no notes
+ */
+export const buildFreePriceScheme = (): PriceScheme => ({
+    isFree: true,
+    fullPriceCents: null,
+    reducedPrices: [],
+    membership: null,
+    minimumAge: null,
+    notes: null,
+})
 
 /**
  * @description Builds the payload of a single event, 21:00 to 23:30 on the day, with the overrides
@@ -31,7 +43,8 @@ export const buildEventUpsert = (
         instagramUrl: "https://www.instagram.com/fomofobo",
         facebookUrl: null,
     },
-    price: "10 €",
+    priceScheme: { ...buildFreePriceScheme(), isFree: false, fullPriceCents: 1000 },
+    capacity: null,
     ...overrides,
 })
 

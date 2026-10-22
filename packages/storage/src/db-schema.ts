@@ -9,7 +9,7 @@ import {
     text,
     uniqueIndex,
 } from "drizzle-orm/sqlite-core"
-import type { Recurrence } from "models"
+import type { Recurrence, ReducedPrice } from "models"
 import { accountRoleValues, categoryIconValues, venueKindValues } from "models"
 
 /**
@@ -199,8 +199,17 @@ export const events = sqliteTable(
         recurrence: text("recurrence", { mode: "json" }).$type<Recurrence>(),
         instagramUrl: text("instagram_url"),
         facebookUrl: text("facebook_url"),
-        // `null` means free
-        price: text("price"),
+        isFree: integer("is_free", { mode: "boolean" }).notNull().default(true),
+        fullPriceCents: integer("full_price_cents"),
+        reducedPrices: text("reduced_prices", { mode: "json" })
+            .$type<ReducedPrice[]>()
+            .notNull()
+            .default(sql`'[]'`),
+        membershipName: text("membership_name"),
+        membershipCostCents: integer("membership_cost_cents"),
+        minimumAge: integer("minimum_age"),
+        priceNotes: text("price_notes"),
+        capacity: integer("capacity"),
         isBlocked: integer("is_blocked", { mode: "boolean" }).notNull().default(false),
         // PLACEHOLDER(OP-22)
         blockReason: text("block_reason"),

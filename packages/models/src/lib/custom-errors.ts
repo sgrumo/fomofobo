@@ -10,6 +10,8 @@ export const customErrorCodeSchema = z.enum([
     "duplicate-date",
     "date-added-and-removed",
     "range-incomplete",
+    "free-with-price",
+    "paid-without-price",
 ])
 export type CustomErrorCode = z.infer<typeof customErrorCodeSchema>
 

@@ -28,7 +28,7 @@ export const occurrenceSummarySchema = occurrenceRefSchema.extend({
     categoryIds: eventSchema.shape.categoryIds,
     primaryCategoryId: eventSchema.shape.primaryCategoryId,
     coverPhotoUrl: z.url().nullable(),
-    price: eventSchema.shape.price,
+    priceScheme: eventSchema.shape.priceScheme,
 })
 export type OccurrenceSummary = z.infer<typeof occurrenceSummarySchema>
 
@@ -42,6 +42,7 @@ export const occurrenceDetailSchema = occurrenceSummarySchema.extend({
     }),
     photos: z.array(eventPhotoSchema),
     externalLinks: eventExternalLinksSchema,
+    capacity: eventSchema.shape.capacity,
 })
 export type OccurrenceDetail = z.infer<typeof occurrenceDetailSchema>
 

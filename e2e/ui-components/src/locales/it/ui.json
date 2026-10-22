@@ -213,7 +213,9 @@
             "primary-category-not-in-list": "Scegli la categoria principale tra quelle selezionate.",
             "duplicate-date": "Ogni data può comparire una sola volta.",
             "date-added-and-removed": "Una data non può essere sia aggiunta sia rimossa.",
-            "range-incomplete": "Scegli entrambe le date dell'intervallo."
+            "range-incomplete": "Scegli entrambe le date dell'intervallo.",
+            "free-with-price": "Un evento gratuito non ha prezzi.",
+            "paid-without-price": "Inserisci un prezzo intero, un prezzo ridotto o una nota."
         }
     },
     "SelectionIndicator": {

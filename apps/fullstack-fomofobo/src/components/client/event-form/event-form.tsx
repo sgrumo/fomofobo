@@ -552,21 +552,6 @@ export const EventDetailsSection = (props: EventSectionProps) => {
 
     return (
         <>
-            {/* OP-14: an empty price reads "Gratis" in the public app */}
-            <Field
-                label={t("Backoffice.EventForm.Price")}
-                description={t("Backoffice.EventForm.PriceHint")}
-                required={false}
-                errors={props.errors?.price?.errors}
-            >
-                <StringInput
-                    value={value.price}
-                    onValueChange={price => {
-                        onAction({ type: "price", value: price })
-                    }}
-                    disabled={props.disabled}
-                />
-            </Field>
             <Field
                 label={t("Backoffice.EventForm.Instagram")}
                 required={false}

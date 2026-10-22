@@ -112,9 +112,10 @@ export class PublicOccurrencesService {
                               position: photo.position,
                           })),
                           externalLinks: stored.externalLinks,
+                          capacity: stored.capacity,
                       }
             },
-            ["occurrence-detail", ref.eventId, ref.date],
+            ["occurrence-detail-v2", ref.eventId, ref.date],
             { tags: [PUBLIC_TAG, eventTag(ref.eventId)] },
         )()
         const endedVisibleSince = await this.settings.endedVisibleSince(now)
@@ -166,7 +167,7 @@ export class PublicOccurrencesService {
                 occurrence.coverObjectKey === null
                     ? null
                     : photoUrl(this.photosPublicBaseUrl, occurrence.coverObjectKey),
-            price: occurrence.price,
+            priceScheme: occurrence.priceScheme,
         }
     }
 

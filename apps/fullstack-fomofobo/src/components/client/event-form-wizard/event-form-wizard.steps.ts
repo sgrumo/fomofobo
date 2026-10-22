@@ -31,7 +31,7 @@ export const EVENT_FORM_STEP_FIELDS: Record<
         "removedDates",
     ],
     photos: ["photos"],
-    details: ["price", "instagramUrl", "facebookUrl"],
+    details: ["priceScheme", "capacity", "instagramUrl", "facebookUrl"],
     review: [],
 }
 

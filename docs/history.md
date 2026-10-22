@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-10-22 · Free-text prices become a price scheme
+
+### Changed
+
+The event price moved from free text to a scheme: free or paid, a full price, reduced prices, a membership card and a minimum age. Events also take an optional capacity, and the old texts became the notes of a paid scheme.
+
+### Why
+
+A client request. Venues price by audience and by membership, which one text field could not express or filter.
+
+### Check next time
+
+Ask how the venues price their events, reductions and membership cards included, before the event form takes a price.
+
 ## 2026-10-22 · Cinemas and museums become permanent venues
 
 ### Changed

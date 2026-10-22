@@ -6,6 +6,7 @@ import type {
     Event,
     EventListItem,
     EventListQuery,
+    PriceScheme,
     Recurrence,
 } from "models"
 import type { StrictOmit } from "shared/types"
@@ -22,6 +23,7 @@ import {
 } from "../db-schema"
 import { likeContains } from "../utils/like"
 import { toLimitOffset } from "../utils/pagination"
+import { priceSchemeColumns, toPriceScheme } from "./price-scheme-columns"
 
 /**
  * @remarks Stays far under the 32,766 bound parameters of SQLite at 4 columns per row:
@@ -54,7 +56,8 @@ export interface EventWrite {
     recurrence: Recurrence | null
     instagramUrl: string | null
     facebookUrl: string | null
-    price: string | null
+    priceScheme: PriceScheme
+    capacity: number | null
     categoryIds: string[]
     primaryCategoryId: string
     photos: StoredEventPhoto[]
@@ -100,7 +103,8 @@ const toStoredEvent = (
         instagramUrl: row.event.instagramUrl,
         facebookUrl: row.event.facebookUrl,
     },
-    price: row.event.price,
+    priceScheme: toPriceScheme(row.event),
+    capacity: row.event.capacity,
     organizer: { id: row.event.organizerId, name: row.organizerName },
     isBlocked: row.event.isBlocked,
     blockReason: row.event.blockReason,
@@ -255,7 +259,8 @@ export class EventsStorage {
                 recurrence: event.recurrence,
                 instagramUrl: event.instagramUrl,
                 facebookUrl: event.facebookUrl,
-                price: event.price,
+                ...priceSchemeColumns(event.priceScheme),
+                capacity: event.capacity,
                 createdAt: at,
                 updatedAt: at,
             }),
@@ -283,7 +288,8 @@ export class EventsStorage {
                     recurrence: event.recurrence,
                     instagramUrl: event.instagramUrl,
                     facebookUrl: event.facebookUrl,
-                    price: event.price,
+                    ...priceSchemeColumns(event.priceScheme),
+                    capacity: event.capacity,
                     updatedAt: at,
                 })
                 .where(and(eq(events.id, event.id), isNull(events.deletedAt))),

@@ -117,7 +117,6 @@
         "Loading": "Caricamento evento",
         "Unavailable": "Questo evento non è più disponibile.",
         "Elapsed": "Tempo trascorso",
-        "Free": "Gratis",
         "Open": "Apri l'evento",
         "OpenVenue": "Apri il locale",
         "Programme": "Programmazione",
@@ -137,6 +136,9 @@
         "Date": "Data",
         "Time": "Orario",
         "Entry": "Ingresso",
+        "Capacity": "Capienza",
+        "Places_one": "{{count}} posto",
+        "Places_other": "{{count}} posti",
         "Now": "ora {{time}}",
         "Venue": "Luogo",
         "Instagram": "Instagram",
@@ -149,6 +151,13 @@
             "x": "Condividi su X",
             "Copy": "Copia il link"
         }
+    },
+    "Price": {
+        "Free": "Gratis",
+        "From": "da {{price}}",
+        "Paid": "A pagamento",
+        "Membership": "Tessera richiesta",
+        "MinimumAge": "{{age}}+"
     },
     "Venue": {
         "Cover": "Foto di {{name}}",
@@ -327,7 +336,6 @@
             "RestoreDate": "Ripristina il {{date}}",
             "Restore": "Ripristina",
             "Price": "Prezzo",
-            "PriceHint": "Testo libero. Se resta vuoto, l'app mostra l'evento come gratuito.",
             "Instagram": "Pagina Instagram",
             "Facebook": "Pagina Facebook"
         },

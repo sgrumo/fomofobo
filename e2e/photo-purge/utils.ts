@@ -128,7 +128,15 @@ export const seedEventWithPhotos = async (
             recurrence: null,
             instagramUrl: null,
             facebookUrl: null,
-            price: null,
+            priceScheme: {
+                isFree: true,
+                fullPriceCents: null,
+                reducedPrices: [],
+                membership: null,
+                minimumAge: null,
+                notes: null,
+            },
+            capacity: null,
             categoryIds: [categoryId],
             primaryCategoryId: categoryId,
             photos: photoKeys.map((objectKey, position) => ({

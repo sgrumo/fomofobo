@@ -19,6 +19,8 @@ import {
 import type { EventFormState } from "@/components/client/event-form/event-form.state"
 import { localDateTimeOf } from "@/components/client/event-form/event-form.state"
 import { formatLocalDateTime } from "@/lib/events/local-format"
+import { FREE_PRICE_SCHEME } from "@/lib/events/price-summary"
+import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 
 import type { EventFormStep } from "./event-form-wizard.steps"
 import {
@@ -158,6 +160,7 @@ interface EventReviewProps {
 
 const EventReview = (props: EventReviewProps) => {
     const { t } = useTranslation("shared")
+    const priceSummary = usePriceSummary()
     const value = props.value
     const startsAt = localDateTimeOf(value.startDate, value.startTime)
     const endsAt = localDateTimeOf(value.endDate, value.endTime)
@@ -196,7 +199,7 @@ const EventReview = (props: EventReviewProps) => {
         },
         {
             label: t("Backoffice.EventForm.Price"),
-            value: value.price ?? t("Preview.Free"),
+            value: priceSummary(value.priceScheme ?? FREE_PRICE_SCHEME),
         },
         { label: t("Backoffice.EventForm.Instagram"), value: value.instagramUrl },
         { label: t("Backoffice.EventForm.Facebook"), value: value.facebookUrl },

@@ -5,6 +5,7 @@ import type {
     GeoPoint,
     OccurrenceRef,
     PermanentVenueSummary,
+    PriceScheme,
     PublicVenue,
     SearchSuggestions,
     VenueHistoryItem,
@@ -22,6 +23,7 @@ import {
     venues,
 } from "../db-schema"
 import type { StoredEventPhoto } from "../events/events-storage"
+import { toPriceScheme } from "../events/price-scheme-columns"
 import { likeContains } from "../utils/like"
 import { toLimitOffset } from "../utils/pagination"
 
@@ -57,7 +59,7 @@ export interface StoredOccurrenceSummary {
     categoryIds: string[]
     primaryCategoryId: string
     coverObjectKey: string | null
-    price: string | null
+    priceScheme: PriceScheme
 }
 
 export type StoredPublicVenue = StrictOmit<PublicVenue, "coverPhotoUrl" | "upcoming"> & {
@@ -72,6 +74,7 @@ export interface StoredOccurrenceDetail extends StoredOccurrenceSummary {
     venueAddress: string
     photos: StoredEventPhoto[]
     externalLinks: { instagramUrl: string | null; facebookUrl: string | null }
+    capacity: number | null
 }
 
 /** @remarks Needs a join on `accounts` in each query that uses it */
@@ -108,7 +111,13 @@ const summaryColumns = {
     endsAt: eventOccurrences.endsAt,
     title: events.title,
     description: events.description,
-    price: events.price,
+    isFree: events.isFree,
+    fullPriceCents: events.fullPriceCents,
+    reducedPrices: events.reducedPrices,
+    membershipName: events.membershipName,
+    membershipCostCents: events.membershipCostCents,
+    minimumAge: events.minimumAge,
+    priceNotes: events.priceNotes,
     venueId: venues.id,
     venueName: venues.name,
     venueIsBlocked: venues.isBlocked,
@@ -156,7 +165,7 @@ const toSummary = (row: SummaryRow): StoredOccurrenceSummary => ({
     categoryIds: row.categoryIds.split(","),
     primaryCategoryId: row.primaryCategoryId,
     coverObjectKey: row.coverObjectKey,
-    price: row.price,
+    priceScheme: toPriceScheme(row),
 })
 
 /**
@@ -311,6 +320,7 @@ export class PublicOccurrencesStorage {
                     venueAddress: venues.address,
                     instagramUrl: events.instagramUrl,
                     facebookUrl: events.facebookUrl,
+                    capacity: events.capacity,
                 })
                 .from(eventOccurrences)
                 .innerJoin(events, eq(events.id, eventOccurrences.eventId))
@@ -337,6 +347,7 @@ export class PublicOccurrencesStorage {
                       instagramUrl: row.instagramUrl,
                       facebookUrl: row.facebookUrl,
                   },
+                  capacity: row.capacity,
               }
             : null
     }

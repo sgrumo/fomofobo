@@ -32,6 +32,7 @@ import { occurrenceStatus } from "@/lib/events/occurrence-status"
 import { useBackToMap } from "@/lib/hooks/use-back-to-map"
 import { useCopyLink } from "@/lib/hooks/use-copy-link"
 import { useNow } from "@/lib/hooks/use-now"
+import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 import { shareSummaryOf } from "@/lib/share/share-summary"
 
@@ -155,6 +156,7 @@ interface OccurrenceBodyProps {
 
 const OccurrenceBody = (props: OccurrenceBodyProps) => {
     const { t } = useTranslation("shared")
+    const priceSummary = usePriceSummary()
     const { occurrence } = props
     const span = {
         startsAt: new Date(occurrence.startsAt),
@@ -171,7 +173,15 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
             value: weekdayDateOf(span.startsAt, PLATFORM_TIME_ZONE, props.language),
         },
         { label: t("Detail.Time"), value: `${startTime}→${endTime}` },
-        { label: t("Detail.Entry"), value: occurrence.price ?? t("Preview.Free") },
+        { label: t("Detail.Entry"), value: priceSummary(occurrence.priceScheme) },
+        ...(occurrence.capacity === null
+            ? []
+            : [
+                  {
+                      label: t("Detail.Capacity"),
+                      value: t("Detail.Places", { count: occurrence.capacity }),
+                  },
+              ]),
     ]
 
     return (

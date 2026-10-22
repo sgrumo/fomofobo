@@ -24,7 +24,10 @@ test.describe("event detail", () => {
         page,
     }) => {
         const venue = await seedVenue(buildArea())
-        const event = await seedPublicEvent({ venue, category: await seedCategory() }, {})
+        const event = await seedPublicEvent(
+            { venue, category: await seedCategory() },
+            { capacity: 120 },
+        )
 
         await gotoPage(page, `/events/${event.id}/2026-10-24/`)
 
@@ -33,6 +36,9 @@ test.describe("event detail", () => {
         ).toBeVisible()
         await expect(page.getByText(venue.address)).toBeVisible()
         await expect(page.getByText("10 €")).toBeVisible()
+        await expect(
+            page.getByText(t("shared", "Detail.Places_other", { count: 120 })),
+        ).toBeVisible()
         await expect(
             page.getByRole("link", { name: t("shared", "Detail.Instagram") }),
         ).toHaveAttribute("href", "https://www.instagram.com/fomofobo")

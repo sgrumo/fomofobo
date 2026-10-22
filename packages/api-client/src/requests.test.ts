@@ -49,7 +49,15 @@ const event: Event = {
     recurrence: null,
     photos: [],
     externalLinks: { instagramUrl: null, facebookUrl: null },
-    price: null,
+    priceScheme: {
+        isFree: true,
+        fullPriceCents: null,
+        reducedPrices: [],
+        membership: null,
+        minimumAge: null,
+        notes: null,
+    },
+    capacity: null,
     organizer: { id: organizer.id, name: organizer.name },
     isBlocked: false,
     blockReason: null,
@@ -68,7 +76,15 @@ const eventUpsert: EventUpsert = {
     recurrence: null,
     photoKeys: ["events/photo.webp"],
     externalLinks: { instagramUrl: null, facebookUrl: null },
-    price: null,
+    priceScheme: {
+        isFree: true,
+        fullPriceCents: null,
+        reducedPrices: [],
+        membership: null,
+        minimumAge: null,
+        notes: null,
+    },
+    capacity: null,
 }
 
 /**

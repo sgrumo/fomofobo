@@ -9,6 +9,7 @@ import { clickIconButton } from "e2e-ui-components/icon-button"
 import { fillSearchField } from "e2e-ui-components/search-field"
 import { dismissToast, expectToast } from "e2e-ui-components/toast"
 
+import { buildFreePriceScheme } from "../../api/backoffice-events/utils"
 import { gotoPage, t } from "../app"
 import {
     buildArea,
@@ -587,7 +588,11 @@ test.describe("map", () => {
                 ),
                 category: await seedCategory(),
             },
-            { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00", price: null },
+            {
+                startsAt: "2026-10-24T11:00",
+                endsAt: "2026-10-24T13:00",
+                priceScheme: buildFreePriceScheme(),
+            },
         )
 
         await gotoPage(page, mapPath(center))
@@ -603,7 +608,7 @@ test.describe("map", () => {
 
         const preview = getBottomSheet(page, event.title)
         await expect(preview).toBeVisible()
-        await expect(preview).toContainText(t("shared", "Preview.Free"), {
+        await expect(preview).toContainText(t("shared", "Price.Free"), {
             ignoreCase: true,
         })
         await preview.getByRole("link", { name: t("shared", "Preview.Open") }).click()

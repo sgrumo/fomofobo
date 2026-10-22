@@ -31,17 +31,17 @@ INSERT INTO venues (id, name, address, latitude, longitude, created_by, created_
     ('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d02', 'Chiostro di San Domenico', 'Via Emilia 80, Imola', 44.3546, 11.7139, '0d8f2a4e-6c1b-4e7a-9f3d-2b5c8e1a7d40', unixepoch('now') * 1000, unixepoch('now') * 1000),
     ('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d03', 'Rocca Sforzesca', 'Piazzale Giovanni dalle Bande Nere, Imola', 44.3521, 11.7096, '0d8f2a4e-6c1b-4e7a-9f3d-2b5c8e1a7d40', unixepoch('now') * 1000, unixepoch('now') * 1000);
 
-INSERT INTO events (id, organizer_id, venue_id, title, description, starts_at_local, ends_at_local, recurrence, price, created_at, updated_at) VALUES
+INSERT INTO events (id, organizer_id, venue_id, title, description, starts_at_local, ends_at_local, recurrence, is_free, full_price_cents, created_at, updated_at) VALUES
     ('c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e01', '4b7e9c2d-1a3f-4d6b-8e5c-7f2a9b1c3d50', 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d02', 'Jazz al Chiostro', 'Trio acustico, standard e qualche sorpresa.',
-        strftime('%Y-%m-%dT%H:%M', 'now', 'localtime', '-1 hour'), strftime('%Y-%m-%dT%H:%M', 'now', 'localtime', '+2 hours'), NULL, '10 €', unixepoch('now') * 1000, unixepoch('now') * 1000),
+        strftime('%Y-%m-%dT%H:%M', 'now', 'localtime', '-1 hour'), strftime('%Y-%m-%dT%H:%M', 'now', 'localtime', '+2 hours'), NULL, 0, 1000, unixepoch('now') * 1000, unixepoch('now') * 1000),
     ('c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e02', '8c1d3e5f-7a9b-4c2d-9e4f-1a3b5c7d9e60', 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d03', 'Mostra in Rocca', NULL,
-        strftime('%Y-%m-%dT%H:%M', 'now', 'localtime', '-5 hours'), strftime('%Y-%m-%dT%H:%M', 'now', 'localtime', '-3 hours'), NULL, NULL, unixepoch('now') * 1000, unixepoch('now') * 1000),
+        strftime('%Y-%m-%dT%H:%M', 'now', 'localtime', '-5 hours'), strftime('%Y-%m-%dT%H:%M', 'now', 'localtime', '-3 hours'), NULL, 1, NULL, unixepoch('now') * 1000, unixepoch('now') * 1000),
     ('c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e03', '4b7e9c2d-1a3f-4d6b-8e5c-7f2a9b1c3d50', 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d01', 'Notte in piazza', 'Stand-up e musica fino a tardi.',
-        date('now', 'localtime', '+1 day') || 'T21:00', date('now', 'localtime', '+2 days') || 'T00:30', NULL, NULL, unixepoch('now') * 1000, unixepoch('now') * 1000),
+        date('now', 'localtime', '+1 day') || 'T21:00', date('now', 'localtime', '+2 days') || 'T00:30', NULL, 1, NULL, unixepoch('now') * 1000, unixepoch('now') * 1000),
     ('c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e04', '8c1d3e5f-7a9b-4c2d-9e4f-1a3b5c7d9e60', 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d01', 'Mercato del sabato', NULL,
         date('now', 'localtime', 'weekday 6') || 'T08:00', date('now', 'localtime', 'weekday 6') || 'T13:00',
         json_object('rule', json_object('frequency', 'weekly', 'weekdays', json_array('saturday'), 'until', date('now', 'localtime', 'weekday 6', '+14 days')), 'addedDates', json_array(), 'removedDates', json_array()),
-        NULL, unixepoch('now') * 1000, unixepoch('now') * 1000);
+        1, NULL, unixepoch('now') * 1000, unixepoch('now') * 1000);
 
 INSERT INTO event_categories (event_id, category_id, is_primary) VALUES
     ('c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e01', 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c01', 1),

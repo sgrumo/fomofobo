@@ -4,6 +4,7 @@ import {
     eventUpsertSchema,
     localDateTimeSchema,
     nonEmptyUpdate,
+    priceSchemeSchema,
     publicSearchQuerySchema,
     recurrenceSchema,
     semverSchema,
@@ -71,6 +72,14 @@ const timeRangeSchema = withTimeRange(
 )
 const weeklyRule = { frequency: "weekly", weekdays: ["wednesday"], until: "2026-12-30" }
 const categoryId = "6f9619ff-8b86-4d11-b42d-00c04fc964ff"
+const freePriceScheme = {
+    isFree: true,
+    fullPriceCents: null,
+    reducedPrices: [],
+    membership: null,
+    minimumAge: null,
+    notes: null,
+}
 const sampleEvent = {
     title: "Jazz al Chiostro",
     description: null,
@@ -82,7 +91,8 @@ const sampleEvent = {
     recurrence: null,
     photoKeys: ["events/sample/cover.jpg"],
     externalLinks: { instagramUrl: null, facebookUrl: null },
-    price: null,
+    priceScheme: freePriceScheme,
+    capacity: null,
 }
 
 /**
@@ -488,6 +498,17 @@ export const formErrorsShowcaseFields: Record<FormIssueKey, FormErrorsShowcaseFi
             { lat: "44.35", lng: "11.71", date: "range", from: "2026-10-14" },
             "range from 2026-10-14 with no end",
         ),
+    },
+    "FormErrors.Custom.free-with-price": {
+        schema: priceSchemeSchema,
+        initial: shown(
+            { ...freePriceScheme, fullPriceCents: 1000 },
+            "free, full price 10 €",
+        ),
+    },
+    "FormErrors.Custom.paid-without-price": {
+        schema: priceSchemeSchema,
+        initial: shown({ ...freePriceScheme, isFree: false }, "paid, no price, no notes"),
     },
 }
 

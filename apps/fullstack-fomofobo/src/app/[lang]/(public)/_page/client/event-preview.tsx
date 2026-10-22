@@ -26,6 +26,7 @@ import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { localTimeOf } from "@/lib/events/local-format"
 import { occurrenceProgress } from "@/lib/events/occurrence-progress"
 import { occurrenceStatus } from "@/lib/events/occurrence-status"
+import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 interface PreviewPaging {
@@ -103,6 +104,7 @@ interface PreviewBodyProps extends StrictOmit<
 const PreviewBody = (props: PreviewBodyProps) => {
     const { t } = useTranslation("shared")
     const language = useLanguage()
+    const priceSummary = usePriceSummary()
 
     const occurrence = props.occurrence
     const span = {
@@ -113,7 +115,7 @@ const PreviewBody = (props: PreviewBodyProps) => {
     const elapsedFraction = occurrenceProgress(span, props.now)
     const details = [
         ...occurrence.categoryIds.map(id => props.categories.get(id)?.name),
-        occurrence.price ?? t("Preview.Free"),
+        priceSummary(occurrence.priceScheme),
     ].filter(isDefined)
 
     return (

@@ -354,6 +354,8 @@ const formIssueKeyRecord: Record<FormIssueKey, true> = {
     "FormErrors.Custom.duplicate-date": true,
     "FormErrors.Custom.date-added-and-removed": true,
     "FormErrors.Custom.range-incomplete": true,
+    "FormErrors.Custom.free-with-price": true,
+    "FormErrors.Custom.paid-without-price": true,
 }
 
 export const formIssueKeys: string[] = Object.keys(formIssueKeyRecord)

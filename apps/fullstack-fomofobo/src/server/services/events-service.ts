@@ -237,7 +237,8 @@ export class EventsService {
             recurrence: upsert.recurrence,
             instagramUrl: upsert.externalLinks.instagramUrl,
             facebookUrl: upsert.externalLinks.facebookUrl,
-            price: upsert.price,
+            priceScheme: upsert.priceScheme,
+            capacity: upsert.capacity,
             categoryIds: upsert.categoryIds,
             primaryCategoryId: upsert.primaryCategoryId,
             photos: upsert.photoKeys.map((objectKey, position) => ({

@@ -20,7 +20,15 @@ const buildEventUpsert = (overrides: Partial<EventUpsert> = {}): EventUpsert => 
         recurrence: null,
         photoKeys: ["events/account/cover.jpg"],
         externalLinks: { instagramUrl: null, facebookUrl: null },
-        price: null,
+        priceScheme: {
+            isFree: true,
+            fullPriceCents: null,
+            reducedPrices: [],
+            membership: null,
+            minimumAge: null,
+            notes: null,
+        },
+        capacity: null,
         ...overrides,
     }
 }

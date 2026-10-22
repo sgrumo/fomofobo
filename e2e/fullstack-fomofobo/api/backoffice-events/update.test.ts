@@ -6,6 +6,7 @@ import { blockVenue } from "../backoffice-venues/api"
 import { blockEvent, createEvent, getEvent, updateEvent } from "./api"
 import {
     buildEventUpsert,
+    buildFreePriceScheme,
     downloadPhoto,
     seedEventReferences,
     uploadPhoto,
@@ -29,7 +30,11 @@ describe("PUT /api/backoffice/events/{id}", () => {
         expectStatus(created, 201)
         const upsert = buildEventUpsert(
             { venueId, categoryId, photoKeys: [added.key, kept.key] },
-            { title: "Jazz al chiostro", price: null },
+            {
+                title: "Jazz al chiostro",
+                priceScheme: buildFreePriceScheme(),
+                capacity: 250,
+            },
         )
 
         const res = await updateEvent({
@@ -41,7 +46,8 @@ describe("PUT /api/backoffice/events/{id}", () => {
         expectStatus(res, 200)
         expect(res.data).toMatchObject({
             title: "Jazz al chiostro",
-            price: null,
+            priceScheme: buildFreePriceScheme(),
+            capacity: 250,
             photos: [
                 { position: 0, key: added.key },
                 {

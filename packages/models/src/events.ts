@@ -7,6 +7,7 @@ import { instantSchema, localDateTimeSchema } from "./lib/local-time"
 import { paginationQuerySchema } from "./lib/pagination"
 import { facebookUrlSchema, instagramUrlSchema } from "./lib/social-links"
 import { withTimeRange } from "./lib/time-range"
+import { priceSchemeSchema } from "./price-scheme"
 import { recurrenceSchema } from "./recurrence"
 import { uploadContentTypeSchema, uploadRequestSchema } from "./uploads"
 import { venueSchema } from "./venues"
@@ -44,13 +45,12 @@ export const eventExternalLinksSchema = z.object({
 })
 export type EventExternalLinks = z.infer<typeof eventExternalLinksSchema>
 
-// `null` means free
-export const eventPriceSchema = z.string().trim().min(1).max(60).nullable()
-
 // PLACEHOLDER(OP-12)
 const eventDescriptionSchema = z.string().trim().min(1).max(280).nullable()
 
 const eventTitleSchema = z.string().trim().min(1).max(120)
+
+const eventCapacitySchema = z.int().min(1).max(100_000).nullable()
 
 // PLACEHOLDER(OP-11): the icon of the pin
 const eventCategoriesShape = {
@@ -69,7 +69,8 @@ export const eventSchema = z.object({
     recurrence: recurrenceSchema.nullable(),
     photos: z.array(eventGalleryPhotoSchema).max(MAX_EVENT_PHOTOS),
     externalLinks: eventExternalLinksSchema,
-    price: eventPriceSchema,
+    priceScheme: priceSchemeSchema,
+    capacity: eventCapacitySchema,
     organizer: accountSchema.pick({ id: true, name: true }),
     isBlocked: z.boolean(),
     // PLACEHOLDER(OP-22): `null` on a blocked event when the Admin gave no reason
@@ -94,7 +95,8 @@ export const eventUpsertSchema = withTimeRange(
         // PLACEHOLDER(OP-13)
         photoKeys: z.array(z.string().min(1)).min(1).max(MAX_EVENT_PHOTOS),
         externalLinks: eventExternalLinksSchema,
-        price: eventPriceSchema,
+        priceScheme: priceSchemeSchema,
+        capacity: eventCapacitySchema,
         // PLACEHOLDER(OP-21, TQ-18): Admins alone may send it
         organizerId: z.uuid().optional(),
     }),

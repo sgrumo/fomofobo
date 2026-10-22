@@ -26,7 +26,9 @@ An Admin blocks a venue with a reason. A blocked venue can no longer be picked f
 
 ### Events
 
-An event has a title, one or more categories, one venue, a start and an end, an ordered photo gallery whose first photo is the cover, optional Instagram and Facebook links, an optional price in free text and an owning organizer. The public app shows an event with no price as free. The end is later than the start and can fall on the next day. An event holds one to ten photos, and the account that writes the event uploads them. Each photo is stored as a two-color dither, at most 1200 pixels wide.
+An event has a title, one or more categories, one venue, a start and an end, an ordered photo gallery whose first photo is the cover, optional Instagram and Facebook links, a price scheme, an optional capacity and an owning organizer.
+
+The price scheme says whether the event is free or paid. A paid event has a full price, reduced prices with a label each, or notes alone. Free or paid, an event can require a membership card with an optional cost, and a minimum age. Amounts are in euro. The public app sums the scheme up in one line, such as "da 5 €" or "Gratis · Tessera richiesta · 18+", and a paid event with no amount shows its notes. The capacity is the number of places, shown and never enforced. The end is later than the start and can fall on the next day. An event holds one to ten photos, and the account that writes the event uploads them. Each photo is stored as a two-color dither, at most 1200 pixels wide.
 
 ### Recurrence and occurrences
 
