@@ -33,6 +33,7 @@ import { DEFAULT_CITY } from "@/lib/platform/platform"
 import { CategoryChips } from "./category-chips"
 import { DateChips } from "./date-chips"
 import { EventPreview } from "./event-preview"
+import type { PreviewEntry, PreviewVenue } from "./event-preview"
 import { PlaceSearch } from "./place-search"
 
 const EventMap = dynamic(() => import("./event-map").then(module => module.EventMap), {
@@ -49,6 +50,56 @@ const centerQuery = (point: GeoPoint) => {
     const { latitude, longitude } = roundCenter(point)
     return { lat: latitude, lng: longitude }
 }
+
+type PreviewTarget =
+    | { type: "occurrence"; ref: OccurrenceRef }
+    | { type: "venue"; venueId: string }
+
+/**
+ * @description Returns the preview entry of the selected occurrence, else of the selected venue
+ * @param occurrence Occurrence selected, if any
+ * @param venue Venue selected, if any
+ */
+const previewEntryOf = (
+    occurrence: OccurrenceSummary | undefined,
+    venue: PreviewVenue | undefined,
+): PreviewEntry | undefined => {
+    if (occurrence !== undefined) {
+        return { type: "occurrence", occurrence }
+    }
+    return venue === undefined ? undefined : { type: "venue", venue }
+}
+
+/**
+ * @description True when both entries preview the same occurrence or the same venue
+ * @param entry Entry of the spot
+ * @param selected Entry the preview shows
+ */
+const isSameEntry = (entry: PreviewEntry, selected: PreviewEntry | undefined): boolean =>
+    match([entry, selected])
+        .with(
+            [{ type: "occurrence" }, { type: "occurrence" }],
+            ([first, second]) =>
+                first.occurrence.eventId === second.occurrence.eventId &&
+                first.occurrence.date === second.occurrence.date,
+        )
+        .with(
+            [{ type: "venue" }, { type: "venue" }],
+            ([first, second]) => first.venue.id === second.venue.id,
+        )
+        .otherwise(() => false)
+
+/**
+ * @description Returns the selection that opens the preview of an entry
+ * @param entry Entry opened
+ */
+const targetOf = (entry: PreviewEntry): PreviewTarget =>
+    entry.type === "occurrence"
+        ? {
+              type: "occurrence",
+              ref: { eventId: entry.occurrence.eventId, date: entry.occurrence.date },
+          }
+        : { type: "venue", venueId: entry.venue.id }
 
 export const MapScreen = (props: RouteClientComponentProps<"root">) => {
     const { t } = useTranslation("shared")
@@ -108,8 +159,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
     const categoriesById = new Map(
         categories.data?.map(category => [category.id, category]),
     )
-    const iconOf = (occurrence: OccurrenceSummary) =>
-        categoriesById.get(occurrence.primaryCategoryId)?.icon ?? "other"
+    const iconOf = (categoryId: string) => categoriesById.get(categoryId)?.icon ?? "other"
 
     const selectedRef =
         query.event === undefined || query.occurrence === undefined
@@ -131,25 +181,57 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
         }),
         enabled: selectedRef !== undefined && fromResults === undefined,
     })
-    const selected = fromResults ?? detail.data
-    const sameSpot =
-        selected === undefined
-            ? []
-            : (results?.occurrences ?? []).filter(
-                  occurrence => occurrence.venue.id === selected.venue.id,
-              )
-    const spotIndex = sameSpot.findIndex(
-        occurrence =>
-            occurrence.eventId === selected?.eventId && occurrence.date === selected.date,
+    const selectedVenueId = selectedRef === undefined ? query.venue : undefined
+    const venueFromResults = results?.permanentVenues.find(
+        venue => venue.id === selectedVenueId,
     )
+    // A shared link can name a venue outside the results.
+    const venueDetail = useQuery({
+        ...api.getPublicVenueQuery({
+            params: { venueId: selectedVenueId ?? "" },
+            query: {},
+        }),
+        enabled: selectedVenueId !== undefined && venueFromResults === undefined,
+    })
+    const selectedOccurrence =
+        selectedRef === undefined ? undefined : (fromResults ?? detail.data)
+    const selectedVenue =
+        selectedVenueId === undefined ? undefined : (venueFromResults ?? venueDetail.data)
+    const selected = previewEntryOf(selectedOccurrence, selectedVenue)
+    const spotVenueId =
+        selected?.type === "occurrence"
+            ? selected.occurrence.venue.id
+            : selected?.venue.id
+    // At one venue, the events come first and the permanent venue last.
+    const sameSpot: PreviewEntry[] =
+        spotVenueId === undefined
+            ? []
+            : [
+                  ...(results?.occurrences ?? [])
+                      .filter(occurrence => occurrence.venue.id === spotVenueId)
+                      .map((occurrence): PreviewEntry => ({
+                          type: "occurrence",
+                          occurrence,
+                      })),
+                  ...(results?.permanentVenues ?? [])
+                      .filter(venue => venue.id === spotVenueId)
+                      .map((venue): PreviewEntry => ({ type: "venue", venue })),
+              ]
+    const spotIndex = sameSpot.findIndex(entry => isSameEntry(entry, selected))
 
     // True while the open preview owns the history entry that a close pops.
     const previewPushedRef = useRef(false)
-    const openPreview = (ref: OccurrenceRef) => {
-        const opening = selectedRef === undefined
+    const openPreview = (target: PreviewTarget) => {
+        const opening = selectedRef === undefined && selectedVenueId === undefined
         previewPushedRef.current = opening || previewPushedRef.current
         setQuery(
-            { event: ref.eventId, occurrence: ref.date },
+            target.type === "occurrence"
+                ? {
+                      event: target.ref.eventId,
+                      occurrence: target.ref.date,
+                      venue: undefined,
+                  }
+                : { event: undefined, occurrence: undefined, venue: target.venueId },
             { history: opening ? "push" : "replace" },
         )
     }
@@ -159,12 +241,15 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
             globalThis.history.back()
             return
         }
-        setQuery({ event: undefined, occurrence: undefined }, { history: "replace" })
+        setQuery(
+            { event: undefined, occurrence: undefined, venue: undefined },
+            { history: "replace" },
+        )
     }
     const showSpotEntry = (index: number) => {
         const entry = sameSpot.at(index)
         if (entry !== undefined && index >= 0) {
-            openPreview({ eventId: entry.eventId, date: entry.date })
+            openPreview(targetOf(entry))
         }
     }
 
@@ -230,9 +315,15 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 center={center}
                 position={position}
                 occurrences={results?.occurrences ?? []}
+                permanentVenues={results?.permanentVenues ?? []}
                 iconOf={iconOf}
                 now={now}
-                onSelect={openPreview}
+                onSelect={ref => {
+                    openPreview({ type: "occurrence", ref })
+                }}
+                onSelectVenue={venueId => {
+                    openPreview({ type: "venue", venueId })
+                }}
             />
             <div className="pointer-events-none absolute inset-x-4 top-4 flex flex-col gap-2 [&>*]:pointer-events-auto">
                 <div className="flex items-center gap-2">
@@ -250,7 +341,9 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                                     q: undefined,
                                 })
                             }}
-                            onEventSelect={openPreview}
+                            onEventSelect={ref => {
+                                openPreview({ type: "occurrence", ref })
+                            }}
                             onTextSubmit={text => {
                                 setQuery({ q: text, place: undefined })
                             }}
@@ -342,9 +435,11 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
             </div>
             <EventPreview
                 route={props.route}
-                open={selectedRef !== undefined}
-                occurrence={selected}
-                loadFailed={detail.isError}
+                open={selectedRef !== undefined || selectedVenueId !== undefined}
+                entry={selected}
+                loadFailed={
+                    selectedRef === undefined ? venueDetail.isError : detail.isError
+                }
                 categories={categoriesById}
                 now={now}
                 paging={

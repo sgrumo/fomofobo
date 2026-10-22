@@ -19,6 +19,7 @@
     --palette-green-strong: #276b33;
     --palette-green-pale: #d6ead0;
     --palette-lilac: #f0b4fc;
+    --palette-sky: #a6dcff;
     --palette-violet: #6a3fd1;
     --palette-blue-strong: #1f5f9e;
     --palette-blue-pale: #d4e4f2;
@@ -63,6 +64,7 @@
     --color-live-strong: var(--palette-red-strong);
     --color-upcoming: var(--palette-yellow);
     --color-ended: var(--palette-gray-light);
+    --color-permanent: var(--palette-sky);
     --color-social: var(--palette-lilac);
     --color-position: var(--palette-lilac);
 

@@ -13,6 +13,8 @@ interface MapMarkerProps extends RouteClientComponentProps<"root"> {
     map: MapLibreMap
     coordinates: GeoPoint
     anchor: PositionAnchor
+    // Stacking order among the markers, higher on top
+    layer: number
     children: ReactNode
 }
 
@@ -24,10 +26,11 @@ export const MapMarker = (props: MapMarkerProps) => {
         const marker = new Marker({ element, anchor: props.anchor })
             .setLngLat([longitude, latitude])
             .addTo(props.map)
+        marker.getElement().style.zIndex = String(props.layer)
         return () => {
             marker.remove()
         }
-    }, [element, latitude, longitude, props.anchor, props.map])
+    }, [element, latitude, longitude, props.anchor, props.layer, props.map])
 
     return createPortal(props.children, element)
 }

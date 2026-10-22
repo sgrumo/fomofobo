@@ -8,6 +8,7 @@ export const badgeStyles = styles((tone: BadgeTone) => [
         "bg-live text-fg": tone === "live",
         "bg-upcoming text-fg": tone === "upcoming",
         "bg-ended text-fg": tone === "ended",
+        "bg-permanent text-fg": tone === "permanent",
         "bg-surface text-fg": tone === "neutral",
         "bg-surface-inverse text-fg-inverse": tone === "inverse",
     },

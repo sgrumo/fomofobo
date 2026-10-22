@@ -9,7 +9,7 @@ import { buildCategoryCreation } from "../api/backoffice-categories/utils"
 import { blockEvent } from "../api/backoffice-events/api"
 import { seedEvent } from "../api/backoffice-events/utils"
 import { createVenue } from "../api/backoffice-venues/api"
-import { buildVenueCreation } from "../api/backoffice-venues/utils"
+import { buildVenueCreation, seedCinema } from "../api/backoffice-venues/utils"
 import { SATURDAY_NOON } from "../api/public/utils"
 
 const TEST_NOW_HEADER = "x-test-now"
@@ -92,6 +92,16 @@ export const seedVenue = async (coordinates: GeoPoint): Promise<Venue> => {
     expectStatus(venue, 201)
     return venue.data
 }
+
+/**
+ * @description Persists a cinema at the point through an Admin, in the category
+ * @param coordinates Coordinates of the cinema
+ * @param category Category the cinema matches
+ */
+export const seedPublicCinema = async (
+    coordinates: GeoPoint,
+    category: Category,
+): Promise<Venue> => await seedCinema(category.id, { coordinates })
 
 /**
  * @description Persists one event of an Organizer at the venue, in the category

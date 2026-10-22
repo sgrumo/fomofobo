@@ -36,6 +36,7 @@ const colorGroups = [
             ["live-strong", "--color-live-strong"],
             ["upcoming", "--color-upcoming"],
             ["ended", "--color-ended"],
+            ["permanent", "--color-permanent"],
             ["social", "--color-social"],
             ["position", "--color-position"],
         ],

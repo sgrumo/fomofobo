@@ -46,8 +46,9 @@ export const routes = {
             to: localDateSchema.optional().catch(undefined),
             event: z.uuid().optional().catch(undefined),
             occurrence: localDateSchema.optional().catch(undefined),
+            venue: z.uuid().optional().catch(undefined),
         }),
-        queryOptions: { event: { push: true } },
+        queryOptions: { event: { push: true }, venue: { push: true } },
     }),
     eventDetail: createDynamicRoute({
         segments: ["[lang]", "events", "[eventId]", "[date]"],

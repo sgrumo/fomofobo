@@ -8,6 +8,7 @@ export const BadgeShowcase = () => (
         <Badge tone="live">Live</Badge>
         <Badge tone="upcoming">21:30</Badge>
         <Badge tone="ended">Ended</Badge>
+        <Badge tone="permanent">Cinema</Badge>
         <Badge tone="neutral" dot={true}>
             14.10.26
         </Badge>

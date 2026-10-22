@@ -56,13 +56,15 @@ The search center is the position of the device when the visitor grants location
 
 ### Map
 
-Each result is a pin at its venue with the icon of its category, and its look follows the status. A tag above the pin reads live for a live result, the start time for an upcoming result of today, and the date for an upcoming result of another day. Pins too close to tell apart merge into a cluster with a count, and its ring shows the share of live, upcoming and ended results.
+Each result is a pin at its venue with the icon of its category, and its look follows the status. A tag above the pin reads live for a live result, the start time for an upcoming result of today, and the date for an upcoming result of another day. Pins too close to tell apart merge into a cluster with a count, and its ring shows the share of live, upcoming, ended and permanent results. Live pins draw above every other pin, and permanent venues below every event.
+
+Every permanent venue inside the search area is a pin of its own color, whatever the date filter, with the icon of its category and its kind as the tag. Its preview shows the kind, the cover, the name and the address, with a link to the programme and one to the venue page. When a permanent venue also holds events, the preview pages through the events first and the venue last.
 
 A tap on a pin opens a preview of the occurrence. The preview shows status, venue, categories, price and times, with the elapsed time when live and a link to the event page. When several results share one venue, the preview pages through them.
 
 ### Search and filters
 
-Results match every active filter. One search field matches event titles and the names of the venues in the area, and sets a place as the search center. A venue result opens the page of the venue. Category chips select one category at a time and show the result count of each category under the other filters. With no category chip pressed, the results hold every category. The date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days. On a phone, the category and date chips sit in a panel that a filter button opens.
+Results match every active filter, and a permanent venue matches every filter but the date. One search field matches event titles and the names of the venues in the area, and sets a place as the search center. A venue result opens the page of the venue. Category chips select one category at a time and show the result count of each category under the other filters, permanent venues included. With no category chip pressed, the results hold every category. The date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days. On a phone, the category and date chips sit in a panel that a filter button opens.
 
 ### Event page
 

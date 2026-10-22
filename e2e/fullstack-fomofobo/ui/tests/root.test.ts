@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test"
+import { expectToBeDefined } from "e2e-kit/assertions"
 import { expectAlert } from "e2e-ui-components/alert"
 import { getBottomSheet } from "e2e-ui-components/bottom-sheet"
 import { clickButton } from "e2e-ui-components/button"
@@ -15,6 +16,7 @@ import {
     offsetPoint,
     preparePublicPage,
     seedCategory,
+    seedPublicCinema,
     seedPublicEvent,
     seedVenue,
 } from "../public"
@@ -92,19 +94,97 @@ test.describe("map", () => {
         ]) {
             await seedPublicEvent({ venue, category }, times)
         }
+        await seedPublicCinema(venue.coordinates, category)
 
         await gotoPage(page, mapPath(center))
 
         await expect(
             page.getByRole("button", {
                 name: t("shared", "Map.Cluster", {
-                    count: 3,
+                    count: 4,
                     live: 1,
                     upcoming: 1,
                     ended: 1,
+                    permanent: 1,
                 }),
             }),
         ).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+    })
+
+    test("shows a cinema under any date filter, and opens its programme and its page from the preview", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const cinema = await seedPublicCinema(
+            offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+            await seedCategory(),
+        )
+
+        await gotoPage(page, `${mapPath(center)}&date=tomorrow`)
+        await page
+            .getByRole("button", {
+                name: t("shared", "Map.VenuePin", {
+                    name: cinema.name,
+                    kind: t("shared", "VenueKind.cinema"),
+                }),
+            })
+            .click({ timeout: MAP_TIMEOUT_MS })
+
+        const preview = getBottomSheet(page, cinema.name)
+        expectToBeDefined(cinema.programmeUrl)
+        await expect(preview).toContainText(t("shared", "VenueKind.cinema"))
+        await expect(
+            preview.getByRole("link", { name: t("shared", "Preview.Programme") }),
+        ).toHaveAttribute("href", cinema.programmeUrl)
+        await preview
+            .getByRole("link", { name: t("shared", "Preview.OpenVenue") })
+            .click()
+
+        await expect(page).toHaveURL(`/it/venues/${cinema.id}`)
+        await expect(
+            page.getByRole("heading", { level: 1, name: cinema.name }),
+        ).toBeVisible()
+    })
+
+    test("opens the live event of a cinema first, then pages to the cinema", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const category = await seedCategory()
+        const cinema = await seedPublicCinema(
+            offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+            category,
+        )
+        const screening = await seedPublicEvent(
+            { venue: cinema, category },
+            { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
+        )
+
+        await gotoPage(page, mapPath(center))
+        await page
+            .getByRole("button", {
+                name: t("shared", "Map.Cluster", {
+                    count: 2,
+                    live: 1,
+                    upcoming: 0,
+                    ended: 0,
+                    permanent: 1,
+                }),
+            })
+            .click({ timeout: MAP_TIMEOUT_MS })
+
+        await expect(getBottomSheet(page, screening.title)).toContainText(
+            t("shared", "Preview.Position", { index: 1, total: 2 }),
+        )
+        await clickIconButton(page, t("shared", "Preview.Next"))
+
+        const preview = getBottomSheet(page, cinema.name)
+        await expect(preview).toContainText(
+            t("shared", "Preview.Position", { index: 2, total: 2 }),
+        )
+        await expect(
+            preview.getByRole("link", { name: t("shared", "Preview.Programme") }),
+        ).toBeVisible()
     })
 
     test("narrows the pins to the pressed category, with the count of each chip, and shows every category again once unpressed", async ({

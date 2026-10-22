@@ -1,1 +1,7 @@
-export type BadgeTone = "live" | "upcoming" | "ended" | "neutral" | "inverse"
+export type BadgeTone =
+    | "live"
+    | "upcoming"
+    | "ended"
+    | "permanent"
+    | "neutral"
+    | "inverse"

@@ -38,7 +38,8 @@
         "Unsupported": "Questo browser non riesce a disegnare la mappa.",
         "LiveBadge": "Live",
         "Pin": "{{title}}, {{status}}, {{time}}",
-        "Cluster": "{{count}} eventi: {{live}} in corso, {{upcoming}} in arrivo, {{ended}} finiti. Ingrandisci",
+        "VenuePin": "{{name}}, {{kind}}",
+        "Cluster": "{{count}} risultati: {{live}} in corso, {{upcoming}} in arrivo, {{ended}} finiti, {{permanent}} tra cinema, musei, teatri e gallerie. Ingrandisci",
         "Position": "La tua posizione",
         "Locate": "Centra sulla mia posizione",
         "LocationOff": "La posizione è disattivata. Consentila per vedere gli eventi intorno a te, oppure cerca un luogo.",
@@ -76,6 +77,12 @@
         "upcoming": "In arrivo",
         "ended": "Finito"
     },
+    "VenueKind": {
+        "cinema": "Cinema",
+        "museum": "Museo",
+        "theatre": "Teatro",
+        "gallery": "Galleria"
+    },
     "Search": {
         "Label": "Cerca eventi o luoghi",
         "Placeholder": "Cerca evento, luogo",
@@ -110,8 +117,10 @@
         "Elapsed": "Tempo trascorso",
         "Free": "Gratis",
         "Open": "Apri l'evento",
-        "Previous": "Evento precedente qui",
-        "Next": "Evento successivo qui",
+        "OpenVenue": "Apri il locale",
+        "Programme": "Programmazione",
+        "Previous": "Precedente qui",
+        "Next": "Successivo qui",
         "Position": "{{index}}/{{total}} qui"
     },
     "Detail": {

@@ -1,7 +1,13 @@
 "use client"
 
 import { Map as MapLibreMap, setWorkerUrl } from "maplibre-gl"
-import type { CategoryIcon, GeoPoint, OccurrenceRef, OccurrenceSummary } from "models"
+import type {
+    CategoryIcon,
+    GeoPoint,
+    OccurrenceRef,
+    OccurrenceSummary,
+    PermanentVenueSummary,
+} from "models"
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Alert } from "ui-components/alert"
@@ -10,14 +16,21 @@ import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { localDateOf } from "@/lib/events/date-window"
 import { dayMonthOf, localTimeOf } from "@/lib/events/local-format"
 import { occurrenceStatus } from "@/lib/events/occurrence-status"
-import { buildEventClusters, CLUSTER_MAX_ZOOM } from "@/lib/map/event-clusters"
-import type { EventMapFeature } from "@/lib/map/event-clusters"
+import {
+    buildEventClusters,
+    CLUSTER_MAX_ZOOM,
+    clusterLayer,
+    firstLeafIndex,
+    markerLayer,
+} from "@/lib/map/event-clusters"
+import type { EventMapFeature, MapPointKind } from "@/lib/map/event-clusters"
 import { mapStyle } from "@/lib/map/map-style"
 import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"
 import { MapMarker } from "./map-marker"
+import { VenuePin } from "./venue-pin"
 
 setWorkerUrl(
     new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).toString(),
@@ -75,9 +88,11 @@ interface EventMapProps extends RouteClientComponentProps<"root"> {
     center: GeoPoint
     position: GeoPoint | undefined
     occurrences: OccurrenceSummary[]
-    iconOf: (occurrence: OccurrenceSummary) => CategoryIcon
+    permanentVenues: PermanentVenueSummary[]
+    iconOf: (categoryId: string) => CategoryIcon
     now: Date
     onSelect: (ref: OccurrenceRef) => void
+    onSelectVenue: (venueId: string) => void
 }
 
 export const EventMap = (props: EventMapProps) => {
@@ -124,10 +139,11 @@ export const EventMap = (props: EventMapProps) => {
         map?.flyTo({ center: [longitude, latitude] })
     }, [map, latitude, longitude])
 
-    const clusters = buildEventClusters(
-        props.occurrences.map(occurrence => ({
+    // The cluster index of a permanent venue follows every occurrence.
+    const clusters = buildEventClusters([
+        ...props.occurrences.map(occurrence => ({
             coordinates: occurrence.venue.coordinates,
-            status: occurrenceStatus(
+            kind: occurrenceStatus(
                 {
                     startsAt: new Date(occurrence.startsAt),
                     endsAt: new Date(occurrence.endsAt),
@@ -135,7 +151,24 @@ export const EventMap = (props: EventMapProps) => {
                 props.now,
             ),
         })),
-    )
+        ...props.permanentVenues.map(
+            (venue): { coordinates: GeoPoint; kind: MapPointKind } => ({
+                coordinates: venue.coordinates,
+                kind: "permanent",
+            }),
+        ),
+    ])
+    const selectIndex = (index: number) => {
+        const occurrence = props.occurrences.at(index)
+        if (occurrence !== undefined) {
+            props.onSelect({ eventId: occurrence.eventId, date: occurrence.date })
+            return
+        }
+        const venue = props.permanentVenues.at(index - props.occurrences.length)
+        if (venue !== undefined) {
+            props.onSelectVenue(venue.id)
+        }
+    }
     const features =
         viewport === undefined ? [] : clusters.getClusters(viewport.bbox, viewport.zoom)
     const today = localDateOf(props.now, PLATFORM_TIME_ZONE)
@@ -182,6 +215,7 @@ export const EventMap = (props: EventMapProps) => {
                                   map={map}
                                   coordinates={point}
                                   anchor="center"
+                                  layer={clusterLayer(feature.properties)}
                               >
                                   <EventCluster
                                       route={props.route}
@@ -189,25 +223,22 @@ export const EventMap = (props: EventMapProps) => {
                                       liveCount={feature.properties.liveCount}
                                       upcomingCount={feature.properties.upcomingCount}
                                       endedCount={feature.properties.endedCount}
+                                      permanentCount={feature.properties.permanentCount}
                                       onExpand={() => {
                                           const zoom =
                                               clusters.getClusterExpansionZoom(clusterId)
                                           // Past the last cluster zoom the points share one spot, so no zoom splits them.
-                                          const leaf =
-                                              zoom > CLUSTER_MAX_ZOOM
-                                                  ? clusters.getLeaves(clusterId, 1).at(0)
-                                                  : undefined
                                           const first =
-                                              leaf === undefined
-                                                  ? undefined
-                                                  : props.occurrences.at(
-                                                        leaf.properties.index,
+                                              zoom > CLUSTER_MAX_ZOOM
+                                                  ? firstLeafIndex(
+                                                        clusters.getLeaves(
+                                                            clusterId,
+                                                            Infinity,
+                                                        ),
                                                     )
+                                                  : undefined
                                           if (first !== undefined) {
-                                              props.onSelect({
-                                                  eventId: first.eventId,
-                                                  date: first.date,
-                                              })
+                                              selectIndex(first)
                                               return
                                           }
                                           map.easeTo({
@@ -220,7 +251,34 @@ export const EventMap = (props: EventMapProps) => {
                           )
                       }
 
-                      const occurrence = props.occurrences.at(feature.properties.index)
+                      const { index, kind } = feature.properties
+                      if (kind === "permanent") {
+                          const venue = props.permanentVenues.at(
+                              index - props.occurrences.length,
+                          )
+                          return venue === undefined ? undefined : (
+                              <MapMarker
+                                  route={props.route}
+                                  key={`venue-${venue.id}`}
+                                  map={map}
+                                  coordinates={point}
+                                  anchor="bottom"
+                                  layer={markerLayer(kind)}
+                              >
+                                  <VenuePin
+                                      route={props.route}
+                                      name={venue.name}
+                                      kind={venue.kind}
+                                      icon={props.iconOf(venue.categoryId)}
+                                      onSelect={() => {
+                                          props.onSelectVenue(venue.id)
+                                      }}
+                                  />
+                              </MapMarker>
+                          )
+                      }
+
+                      const occurrence = props.occurrences.at(index)
                       if (occurrence === undefined) {
                           return undefined
                       }
@@ -233,18 +291,19 @@ export const EventMap = (props: EventMapProps) => {
                               map={map}
                               coordinates={point}
                               anchor="bottom"
+                              layer={markerLayer(kind)}
                           >
                               <EventPin
                                   route={props.route}
                                   title={occurrence.title}
-                                  status={feature.properties.status}
+                                  status={kind}
                                   startTime={localTimeOf(startsAt, PLATFORM_TIME_ZONE)}
                                   startDay={
                                       localDateOf(startsAt, PLATFORM_TIME_ZONE) === today
                                           ? undefined
                                           : dayMonthOf(startsAt, PLATFORM_TIME_ZONE)
                                   }
-                                  icon={props.iconOf(occurrence)}
+                                  icon={props.iconOf(occurrence.primaryCategoryId)}
                                   onSelect={() => {
                                       props.onSelect({
                                           eventId: occurrence.eventId,
@@ -261,6 +320,7 @@ export const EventMap = (props: EventMapProps) => {
                     map={map}
                     coordinates={props.position}
                     anchor="center"
+                    layer={markerLayer("live") + 1}
                 >
                     <span
                         role="img"
