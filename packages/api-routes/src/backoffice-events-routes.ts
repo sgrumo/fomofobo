@@ -5,6 +5,7 @@ import {
     eventListQuerySchema,
     eventSchema,
     eventUpsertSchema,
+    occurrenceSaveCountSchema,
     paginatedResponseSchema,
     photoUploadRequestSchema,
     presignedUploadSchema,
@@ -191,5 +192,31 @@ export const BackofficeEventsRoutes = {
         summary: "Create photo upload ticket",
         description:
             "Returns a presigned PUT that binds the content type and the size. The event write then lists the returned key.",
+    }),
+
+    listSaveCounts: createRoute({
+        method: "get",
+        path: "/api/backoffice/events/{id}/saves",
+        request: { params: eventParamsSchema },
+        responses: {
+            200: {
+                content: {
+                    "application/json": {
+                        schema: z
+                            .array(
+                                occurrenceSaveCountSchema.openapi("OccurrenceSaveCount"),
+                            )
+                            .openapi("OccurrenceSaveCountList"),
+                    },
+                },
+                description:
+                    "Occurrences not ended yet, by start, each with its count of saves",
+            },
+            ...sessionErrorResponses,
+            404: notFoundResponse("Event"),
+        },
+        tags: ["Backoffice"],
+        summary: "List event save counts",
+        description: "Counts every save, under the participant threshold too.",
     }),
 }

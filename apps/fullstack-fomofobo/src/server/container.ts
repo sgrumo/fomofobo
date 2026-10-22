@@ -9,6 +9,7 @@ import {
     EventsStorage,
     PublicOccurrencesStorage,
     RateLimitsStorage,
+    SavesStorage,
     SettingsStorage,
     VenuesStorage,
 } from "storage"
@@ -26,6 +27,7 @@ import { OrganizersService } from "./services/organizers-service"
 import { PhotosService } from "./services/photos-service"
 import { PlacesService } from "./services/places-service"
 import { PublicOccurrencesService } from "./services/public-occurrences-service"
+import { PublicSavesService } from "./services/public-saves-service"
 import { PublicVenuesService } from "./services/public-venues-service"
 import { SettingsService } from "./services/settings-service"
 import { VenuesService } from "./services/venues-service"
@@ -43,6 +45,7 @@ export interface Container {
     occurrences: PublicOccurrencesService
     places: PlacesService
     publicVenues: PublicVenuesService
+    saves: PublicSavesService
     settings: SettingsService
 }
 
@@ -78,8 +81,11 @@ const buildContainer = (): Container => {
     const occurrencesStorage = new PublicOccurrencesStorage(db)
     const photos = new PhotosService(photoStorage)
     const settings = new SettingsService(new SettingsStorage(db))
+    const savesStorage = new SavesStorage(db)
+    const rateLimitsStorage = new RateLimitsStorage(db)
     const occurrences = new PublicOccurrencesService(
         occurrencesStorage,
+        savesStorage,
         settings,
         env.PHOTOS_PUBLIC_BASE_URL,
         new URL("/fallbacks/", env.APP_BASE_URL).href,
@@ -107,6 +113,7 @@ const buildContainer = (): Container => {
         ),
         events: new EventsService(
             new EventsStorage(db),
+            savesStorage,
             photoStorage,
             env.PHOTOS_PUBLIC_BASE_URL,
         ),
@@ -122,9 +129,10 @@ const buildContainer = (): Container => {
                 baseUrl: env.GEOAPIFY_BASE_URL,
                 apiKey: env.GEOAPIFY_API_KEY,
             }),
-            new RateLimitsStorage(db),
+            rateLimitsStorage,
             occurrencesStorage,
         ),
+        saves: new PublicSavesService(savesStorage, rateLimitsStorage, occurrences),
         settings,
     }
 }

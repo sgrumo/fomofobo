@@ -9,6 +9,7 @@ export const updateEvent = createApiCall(BackofficeEventsRoutes.update)
 export const deleteEvent = createApiCall(BackofficeEventsRoutes.delete)
 export const blockEvent = createApiCall(BackofficeEventsRoutes.block)
 export const unblockEvent = createApiCall(BackofficeEventsRoutes.unblock)
+export const listEventSaveCounts = createApiCall(BackofficeEventsRoutes.listSaveCounts)
 export const createPhotoUploadTicket = createApiCall(
     BackofficeEventsRoutes.createPhotoUploadTicket,
 )

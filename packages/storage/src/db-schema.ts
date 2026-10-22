@@ -283,3 +283,17 @@ export const eventOccurrences = sqliteTable(
         index("event_occurrences_window_idx").on(table.endsAt, table.startsAt),
     ],
 )
+
+// Keys on the local date, not on an occurrence row: an event write replaces its occurrence rows
+export const occurrenceSaves = sqliteTable(
+    "occurrence_saves",
+    {
+        eventId: text("event_id")
+            .notNull()
+            .references(() => events.id, { onDelete: "cascade" }),
+        localDate: text("local_date").notNull(),
+        deviceId: text("device_id").notNull(),
+        createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+    },
+    table => [primaryKey({ columns: [table.eventId, table.localDate, table.deviceId] })],
+)

@@ -99,6 +99,7 @@ const buildApi = (): OpenAPIHono => {
         photos,
         places,
         publicVenues,
+        saves,
         settings,
         venues,
     } = getContainer()
@@ -121,7 +122,13 @@ const buildApi = (): OpenAPIHono => {
 
     app.route(
         "/",
-        buildPublicRouter({ categories, occurrences, places, venues: publicVenues }),
+        buildPublicRouter({
+            categories,
+            occurrences,
+            places,
+            saves,
+            venues: publicVenues,
+        }),
     )
 
     app.use(`${apiBasePath}/backoffice/*`, backofficeSession(authAccounts))

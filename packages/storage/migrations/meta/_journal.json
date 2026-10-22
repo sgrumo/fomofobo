@@ -71,6 +71,13 @@
       "when": 1792687488955,
       "tag": "0009_premium_quicksilver",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1792701923434,
+      "tag": "0010_many_shaman",
+      "breakpoints": true
     }
   ]
 }

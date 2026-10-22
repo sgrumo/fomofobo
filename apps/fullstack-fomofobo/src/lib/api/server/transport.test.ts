@@ -90,6 +90,17 @@ describe("serverTransport", () => {
         })
     })
 
+    it("should forward the client address", async () => {
+        await serverTransport(
+            { method: "put", path: "/api/public/saves/id/2026-10-24" },
+            { forwardedFor: "203.0.113.7, 10.0.0.1" },
+        )
+
+        expect(request.mock.calls[0]?.[1]?.headers).toStrictEqual({
+            "x-forwarded-for": "203.0.113.7, 10.0.0.1",
+        })
+    })
+
     it("should forward the test instant", async () => {
         await serverTransport(
             { method: "get", path: "/api/todos" },

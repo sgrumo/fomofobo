@@ -115,5 +115,23 @@ export const buildBackofficeEventsRouter = (
         }
     })
 
+    router.openapi(BackofficeEventsRoutes.listSaveCounts, async c => {
+        try {
+            const counts = await events.listSaveCounts(
+                c.req.valid("param").id,
+                c.var.account,
+                c.var.now,
+            )
+            return respond(
+                c,
+                BackofficeEventsRoutes.listSaveCounts,
+                HttpStatus.Ok,
+                counts,
+            )
+        } catch (error) {
+            throw toApplicationError(error, "Error listing the save counts")
+        }
+    })
+
     return router
 }

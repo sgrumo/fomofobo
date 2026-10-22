@@ -9,6 +9,7 @@ import { SEARCH_RADIUS_METERS } from "@/lib/platform/platform"
 import { PLACES_TAG } from "../cache"
 import { appError } from "../errors"
 import type { GeocodingProvider } from "../geocoding/geoapify-provider"
+import { rateLimitClientOf } from "./rate-limit-client"
 
 const PLACES_CALLS_PER_WINDOW = 30
 const PLACES_WINDOW_MS = 60_000
@@ -44,9 +45,8 @@ export class PlacesService {
         now: Date,
     ): Promise<SearchSuggestions> {
         // PLACEHOLDER(OP-05): places, then the events whose title matches
-        const client = forwardedFor?.split(",")[0]?.trim().slice(0, 64) ?? "unknown"
         const calls = await this.rateLimitsStorage.hit(
-            `places:${client}`,
+            `places:${rateLimitClientOf(forwardedFor)}`,
             now,
             PLACES_WINDOW_MS,
         )

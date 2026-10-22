@@ -4,6 +4,7 @@ import {
     localDateSchema,
     occurrenceDetailSchema,
     occurrenceLookupQuerySchema,
+    occurrenceSaveSchema,
     occurrenceSummarySchema,
     paginatedResponseSchema,
     placeSearchQuerySchema,
@@ -21,6 +22,11 @@ import {
     serviceUnavailableResponse,
     tooManyRequestsResponse,
 } from "./lib/common-responses"
+
+const occurrenceParamsSchema = z.object({
+    eventId: z.uuid().openapi("Event ID"),
+    date: localDateSchema.openapi("Local start date"),
+})
 
 export const PublicRoutes = {
     listCategories: createRoute({
@@ -96,10 +102,7 @@ export const PublicRoutes = {
         method: "get",
         path: "/api/public/occurrences/{eventId}/{date}",
         request: {
-            params: z.object({
-                eventId: z.uuid().openapi("Event ID"),
-                date: localDateSchema.openapi("Local start date"),
-            }),
+            params: occurrenceParamsSchema,
         },
         responses: {
             200: {
@@ -191,5 +194,54 @@ export const PublicRoutes = {
         summary: "List venue history",
         description:
             "Returns the visible events of a venue that is not blocked whose last occurrence ended, with their first and last date.",
+    }),
+
+    saveOccurrence: createRoute({
+        method: "put",
+        path: "/api/public/saves/{eventId}/{date}",
+        request: {
+            params: occurrenceParamsSchema,
+            body: {
+                required: true,
+                content: {
+                    "application/json": {
+                        schema: occurrenceSaveSchema.openapi("OccurrenceSave"),
+                    },
+                },
+            },
+        },
+        responses: {
+            204: { description: "Save counted" },
+            400: badRequestResponse,
+            404: notFoundResponse("Occurrence"),
+            429: tooManyRequestsResponse,
+        },
+        tags: ["Public"],
+        summary: "Save occurrence",
+        description:
+            "Counts the save of a visible occurrence by an anonymous device id. A second save of the same device counts once.",
+    }),
+
+    unsaveOccurrence: createRoute({
+        method: "delete",
+        path: "/api/public/saves/{eventId}/{date}",
+        request: {
+            params: occurrenceParamsSchema,
+            body: {
+                required: true,
+                content: {
+                    "application/json": {
+                        schema: occurrenceSaveSchema.openapi("OccurrenceSave"),
+                    },
+                },
+            },
+        },
+        responses: {
+            204: { description: "Save removed, or there was none" },
+            400: badRequestResponse,
+            429: tooManyRequestsResponse,
+        },
+        tags: ["Public"],
+        summary: "Unsave occurrence",
     }),
 }

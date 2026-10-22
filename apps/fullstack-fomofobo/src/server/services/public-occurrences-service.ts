@@ -9,8 +9,10 @@ import type {
     PublicSearchResponse,
 } from "models"
 import { unstable_cache } from "next/cache"
+import type { StrictOmit } from "shared/types"
 import type {
     PublicOccurrencesStorage,
+    SavesStorage,
     StoredOccurrenceSummary,
     StoredPermanentVenue,
 } from "storage"
@@ -29,18 +31,29 @@ import { appError } from "../errors"
 import { photoUrl } from "./photos-service"
 import type { SettingsService } from "./settings-service"
 
+/**
+ * @description Returns the count of saves the public app shows: the count at the threshold or above, else `null`
+ * @param saveCount Saves of the occurrence
+ * @param threshold Participant threshold of the platform settings
+ */
+const interestedCountOf = (saveCount: number, threshold: number): number | null =>
+    saveCount >= threshold ? saveCount : null
+
 export class PublicOccurrencesService {
     private readonly occurrencesStorage: PublicOccurrencesStorage
+    private readonly savesStorage: SavesStorage
     private readonly settings: SettingsService
     private readonly photosPublicBaseUrl: string
     private readonly fallbackImagesBaseUrl: string
     public constructor(
         occurrencesStorage: PublicOccurrencesStorage,
+        savesStorage: SavesStorage,
         settings: SettingsService,
         photosPublicBaseUrl: string,
         fallbackImagesBaseUrl: string,
     ) {
         this.occurrencesStorage = occurrencesStorage
+        this.savesStorage = savesStorage
         this.settings = settings
         this.photosPublicBaseUrl = photosPublicBaseUrl
         this.fallbackImagesBaseUrl = fallbackImagesBaseUrl
@@ -87,7 +100,7 @@ export class PublicOccurrencesService {
         })
         return {
             window: { from: window.from.toISOString(), to: window.to.toISOString() },
-            occurrences: result.occurrences.map(occurrence => this.toSummary(occurrence)),
+            occurrences: await this.summariesOf(result.occurrences),
             permanentVenues: result.permanentVenues.map(venue =>
                 this.toPermanentVenue(venue),
             ),
@@ -97,18 +110,18 @@ export class PublicOccurrencesService {
     }
 
     /**
-     * @description Fetches one visible occurrence with its photos and links, from the cache of public reads
+     * @description Fetches one visible occurrence with its photos and links from the cache of public reads, and its count of saves outside it
      * @param ref Event and local start date, any date for a single event
      * @param now Instant that hides an occurrence ended too long ago
      */
-    public async find(ref: OccurrenceRef, now: Date): Promise<OccurrenceDetail> {
+    public async get(ref: OccurrenceRef, now: Date): Promise<OccurrenceDetail> {
         const detail = await unstable_cache(
             async () => {
                 const stored = await this.occurrencesStorage.findDetail(ref)
                 return stored === null
                     ? null
                     : {
-                          ...this.toSummary(stored),
+                          ...this.baseSummaryOf(stored),
                           venue: { ...stored.venue, address: stored.venueAddress },
                           photos: stored.photos.map(photo => ({
                               id: photo.id,
@@ -129,7 +142,15 @@ export class PublicOccurrencesService {
                 `Occurrence ${ref.eventId} ${ref.date} not found`,
             )
         }
-        return detail
+        // Read beside the cached detail: a save expires no cache.
+        const [saveCount, { participantThreshold }] = await Promise.all([
+            this.savesStorage.countFor({ eventId: detail.eventId, date: detail.date }),
+            this.settings.get(),
+        ])
+        return {
+            ...detail,
+            interestedCount: interestedCountOf(saveCount, participantThreshold),
+        }
     }
 
     /**
@@ -149,14 +170,33 @@ export class PublicOccurrencesService {
             refs,
             await this.settings.endedVisibleSince(now),
         )
-        return occurrences.map(occurrence => this.toSummary(occurrence))
+        return await this.summariesOf(occurrences)
     }
 
     /**
-     * @description Maps a stored occurrence to its public summary, with the URL of its cover
+     * @description Maps stored occurrences to their public summaries, with the count of saves at the participant threshold or above
+     * @param occurrences Stored occurrences
+     */
+    public async summariesOf(
+        occurrences: StoredOccurrenceSummary[],
+    ): Promise<OccurrenceSummary[]> {
+        const { participantThreshold } = await this.settings.get()
+        return occurrences.map(occurrence => ({
+            ...this.baseSummaryOf(occurrence),
+            interestedCount: interestedCountOf(
+                occurrence.saveCount,
+                participantThreshold,
+            ),
+        }))
+    }
+
+    /**
+     * @description Maps a stored occurrence to its public summary with no count, with the URL of its cover
      * @param occurrence Stored occurrence
      */
-    public toSummary(occurrence: StoredOccurrenceSummary): OccurrenceSummary {
+    private baseSummaryOf(
+        occurrence: StoredOccurrenceSummary,
+    ): StrictOmit<OccurrenceSummary, "interestedCount"> {
         return {
             eventId: occurrence.eventId,
             date: occurrence.localDate,

@@ -125,6 +125,9 @@ export const createApi = (options: ApiClientOptions) => {
             queryKey: cacheKeys.publicOccurrence(variables),
         })
 
+    const saveOccurrence = responselessMutationEndpoint(PublicRoutes.saveOccurrence)
+    const unsaveOccurrence = responselessMutationEndpoint(PublicRoutes.unsaveOccurrence)
+
     const searchPlaces = bodylessQueryEndpoint(PublicRoutes.searchPlaces, 200)
     const searchPlacesQuery = (
         variables: QueryVariables<typeof PublicRoutes.searchPlaces>,
@@ -159,6 +162,18 @@ export const createApi = (options: ApiClientOptions) => {
         queryOptions({
             queryFn: () => getBackofficeEvent(variables),
             queryKey: cacheKeys.backofficeEvent(variables),
+        })
+
+    const listEventSaveCounts = bodylessQueryEndpoint(
+        BackofficeEventsRoutes.listSaveCounts,
+        200,
+    )
+    const listEventSaveCountsQuery = (
+        variables: QueryVariables<typeof BackofficeEventsRoutes.listSaveCounts>,
+    ) =>
+        queryOptions({
+            queryFn: () => listEventSaveCounts(variables),
+            queryKey: cacheKeys.backofficeEventSaveCounts(variables),
         })
 
     const createEvent = responsefulMutationEndpoint(BackofficeEventsRoutes.create, 201)
@@ -396,6 +411,8 @@ export const createApi = (options: ApiClientOptions) => {
         lookupOccurrencesQuery,
         getOccurrence,
         getOccurrenceQuery,
+        saveOccurrence,
+        unsaveOccurrence,
         getPublicVenue,
         getPublicVenueQuery,
         listVenueHistory,
@@ -408,6 +425,8 @@ export const createApi = (options: ApiClientOptions) => {
         listBackofficeEventsQuery,
         getBackofficeEvent,
         getBackofficeEventQuery,
+        listEventSaveCounts,
+        listEventSaveCountsQuery,
         createEvent,
         createEventMutation,
         updateEvent,

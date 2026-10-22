@@ -67,6 +67,7 @@ describe("GET /api/public/occurrences", () => {
                     primaryCategoryId: categoryId,
                     coverPhotoUrl: saturday.photos[0]?.url,
                     priceScheme: saturday.priceScheme,
+                    interestedCount: null,
                 },
                 expect.objectContaining({
                     eventId: sunday.id,

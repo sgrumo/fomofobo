@@ -21,17 +21,20 @@ export interface ApiDispatcher {
  * @description Sends the request into an application and parses its answer
  * @param api Application the request is dispatched into
  * @param request Method, path, query and body of the call
- * @param options Session cookies and test instant forwarded to the API, when the caller holds them
+ * @param options Session cookies, client address and test instant forwarded to the API, when the caller holds them
  * @throws When the application answers outside the `2xx` range
  */
 export const dispatchToApi = async (
     api: ApiDispatcher,
     request: ApiRequest,
-    options?: { cookie?: string; testNow?: string },
+    options?: { cookie?: string; forwardedFor?: string; testNow?: string },
 ): Promise<unknown> => {
     const requestHeaders = {
         ...(request.body === undefined ? {} : { "Content-Type": "application/json" }),
         ...(options?.cookie === undefined ? {} : { Cookie: options.cookie }),
+        ...(options?.forwardedFor === undefined
+            ? {}
+            : { "x-forwarded-for": options.forwardedFor }),
         ...(options?.testNow === undefined ? {} : { [TEST_NOW_HEADER]: options.testNow }),
     }
 
@@ -65,6 +68,8 @@ export const dispatchToApi = async (
  * Server Action both reach the API with no network hop and with no base URL to resolve
  * @remarks Forwards the session cookies of the request, so the API identifies the
  * visitor on a prefetch and inside a Server Action exactly as it does over HTTP
+ * @remarks Forwards the client address, so a rate limit counts the visitor of a Server Action
+ * and not the server
  * @remarks Forwards the test instant header too, which the API reads under `APP_ENV=test`
  * alone, so a page of the E2E suite runs on the clock of its browser calls
  */
@@ -72,6 +77,7 @@ export const serverTransport = async (request: ApiRequest): Promise<unknown> => 
     const requestHeaders = await headers()
     return await dispatchToApi(getApi(), request, {
         cookie: await getSessionCookieHeader(),
+        forwardedFor: requestHeaders.get("x-forwarded-for") ?? undefined,
         testNow: requestHeaders.get(TEST_NOW_HEADER) ?? undefined,
     })
 }

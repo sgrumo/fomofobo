@@ -22,6 +22,7 @@ import {
     eventOccurrences,
     eventPhotos,
     events,
+    occurrenceSaves,
     venues,
 } from "../db-schema"
 import type { StoredEventPhoto } from "../events/events-storage"
@@ -62,6 +63,7 @@ export interface StoredOccurrenceSummary {
     categoryIds: string[]
     primaryCategoryId: string
     coverObjectKey: string | null
+    saveCount: number
     fallback: {
         venueCoverObjectKey: string | null
         categoryImageObjectKey: string | null
@@ -139,6 +141,7 @@ const summaryColumns = {
     coverObjectKey: sql<
         string | null
     >`(select ${eventPhotos.objectKey} from ${eventPhotos} where ${eventPhotos.eventId} = ${events.id} order by ${eventPhotos.position} limit 1)`,
+    saveCount: sql<number>`(select count(*) from ${occurrenceSaves} where ${occurrenceSaves.eventId} = ${events.id} and ${occurrenceSaves.localDate} = ${eventOccurrences.localDate})`,
     venueCoverObjectKey: venues.coverObjectKey,
     categoryImageObjectKey: sql<
         string | null
@@ -180,6 +183,7 @@ const toSummary = (row: SummaryRow): StoredOccurrenceSummary => ({
     categoryIds: row.categoryIds.split(","),
     primaryCategoryId: row.primaryCategoryId,
     coverObjectKey: row.coverObjectKey,
+    saveCount: row.saveCount,
     fallback: {
         venueCoverObjectKey: row.venueCoverObjectKey,
         categoryImageObjectKey: row.categoryImageObjectKey,

@@ -1,8 +1,15 @@
 import "server-only"
 import type { S3ObjectStorage } from "backend-shared"
 import { logger } from "backend-shared"
-import type { Account, Event, EventListItem, EventListQuery, EventUpsert } from "models"
-import type { EventsStorage, StoredEvent } from "storage"
+import type {
+    Account,
+    Event,
+    EventListItem,
+    EventListQuery,
+    EventUpsert,
+    OccurrenceSaveCount,
+} from "models"
+import type { EventsStorage, SavesStorage, StoredEvent } from "storage"
 
 import { expandOccurrences } from "@/lib/events/expand-occurrences"
 import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
@@ -40,14 +47,17 @@ const organizerOf = (
 
 export class EventsService {
     private readonly eventsStorage: EventsStorage
+    private readonly savesStorage: SavesStorage
     private readonly photoStorage: S3ObjectStorage
     private readonly photosPublicBaseUrl: string
     public constructor(
         eventsStorage: EventsStorage,
+        savesStorage: SavesStorage,
         photoStorage: S3ObjectStorage,
         photosPublicBaseUrl: string,
     ) {
         this.eventsStorage = eventsStorage
+        this.savesStorage = savesStorage
         this.photoStorage = photoStorage
         this.photosPublicBaseUrl = photosPublicBaseUrl
     }
@@ -139,6 +149,26 @@ export class EventsService {
         }
         expireTags(eventTag(id))
         return await this.getById(id, account)
+    }
+
+    /**
+     * @description Fetches the occurrences of an event that have not ended, by start, each with its count of saves
+     * @param id Event read
+     * @param account Account of the session
+     * @param now Instant the occurrences end after
+     */
+    public async listSaveCounts(
+        id: string,
+        account: Account,
+        now: Date,
+    ): Promise<OccurrenceSaveCount[]> {
+        await this.findVisibleTo(id, account)
+        const counts = await this.savesStorage.listOccurrenceCounts(id, now)
+        return counts.map(row => ({
+            date: row.localDate,
+            startsAt: row.startsAt.toISOString(),
+            count: row.count,
+        }))
     }
 
     /**

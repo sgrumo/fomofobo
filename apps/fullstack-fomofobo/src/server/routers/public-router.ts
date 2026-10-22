@@ -8,16 +8,18 @@ import { toApplicationError } from "../errors"
 import type { CategoriesService } from "../services/categories-service"
 import type { PlacesService } from "../services/places-service"
 import type { PublicOccurrencesService } from "../services/public-occurrences-service"
+import type { PublicSavesService } from "../services/public-saves-service"
 import type { PublicVenuesService } from "../services/public-venues-service"
 
 /**
  * @description Builds the router of the public app reads, open to every visitor
- * @param services Category reads, occurrence and venue reads, and place suggestions
+ * @param services Category reads, occurrence and venue reads, place suggestions, and anonymous saves
  */
 export const buildPublicRouter = (services: {
     categories: CategoriesService
     occurrences: PublicOccurrencesService
     places: PlacesService
+    saves: PublicSavesService
     venues: PublicVenuesService
 }) => {
     const router = createRouter<ClockEnv>()
@@ -57,7 +59,7 @@ export const buildPublicRouter = (services: {
 
     router.openapi(PublicRoutes.getOccurrence, async c => {
         try {
-            const occurrence = await services.occurrences.find(
+            const occurrence = await services.occurrences.get(
                 c.req.valid("param"),
                 c.var.now,
             )
@@ -102,6 +104,34 @@ export const buildPublicRouter = (services: {
             return respond(c, PublicRoutes.listVenueHistory, HttpStatus.Ok, page)
         } catch (error) {
             throw toApplicationError(error, "Error listing the venue history")
+        }
+    })
+
+    router.openapi(PublicRoutes.saveOccurrence, async c => {
+        try {
+            await services.saves.save(
+                c.req.valid("param"),
+                c.req.valid("json").deviceId,
+                c.req.header("x-forwarded-for"),
+                c.var.now,
+            )
+            return c.body(null, HttpStatus.NoContent)
+        } catch (error) {
+            throw toApplicationError(error, "Error saving the occurrence")
+        }
+    })
+
+    router.openapi(PublicRoutes.unsaveOccurrence, async c => {
+        try {
+            await services.saves.unsave(
+                c.req.valid("param"),
+                c.req.valid("json").deviceId,
+                c.req.header("x-forwarded-for"),
+                c.var.now,
+            )
+            return c.body(null, HttpStatus.NoContent)
+        } catch (error) {
+            throw toApplicationError(error, "Error unsaving the occurrence")
         }
     })
 

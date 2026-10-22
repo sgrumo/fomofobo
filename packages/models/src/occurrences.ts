@@ -29,6 +29,8 @@ export const occurrenceSummarySchema = occurrenceRefSchema.extend({
     primaryCategoryId: eventSchema.shape.primaryCategoryId,
     coverPhotoUrl: z.url(),
     priceScheme: eventSchema.shape.priceScheme,
+    // `null` under the participant threshold of the platform settings
+    interestedCount: z.int().nonnegative().nullable(),
 })
 export type OccurrenceSummary = z.infer<typeof occurrenceSummarySchema>
 

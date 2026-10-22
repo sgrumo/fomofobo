@@ -1,6 +1,6 @@
 import { z } from "@hono/zod-openapi"
 
-import { instantSchema } from "./lib/local-time"
+import { instantSchema, localDateSchema } from "./lib/local-time"
 import { occurrenceRefSchema } from "./occurrences"
 
 // PLACEHOLDER(OP-18): one occurrence, or the whole series
@@ -15,3 +15,13 @@ export const savedEventsStorageSchema = z.object({
     events: z.array(savedEventSchema),
 })
 export type SavedEventsStorage = z.infer<typeof savedEventsStorageSchema>
+
+export const occurrenceSaveSchema = z.object({ deviceId: z.uuid() })
+export type OccurrenceSave = z.infer<typeof occurrenceSaveSchema>
+
+export const occurrenceSaveCountSchema = z.object({
+    date: localDateSchema,
+    startsAt: instantSchema,
+    count: z.int().nonnegative(),
+})
+export type OccurrenceSaveCount = z.infer<typeof occurrenceSaveCountSchema>

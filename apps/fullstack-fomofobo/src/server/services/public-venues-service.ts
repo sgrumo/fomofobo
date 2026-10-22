@@ -43,7 +43,7 @@ export class PublicVenuesService {
         ])
         return {
             ...venue,
-            upcoming: upcoming.map(occurrence => this.occurrences.toSummary(occurrence)),
+            upcoming: await this.occurrences.summariesOf(upcoming),
         }
     }
 

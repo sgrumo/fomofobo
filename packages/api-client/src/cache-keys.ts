@@ -11,6 +11,7 @@ export const specifier = {
     detail: "detail",
     list: "list",
     lookup: "lookup",
+    saves: "saves",
     search: "search",
 }
 
@@ -69,6 +70,9 @@ export const cacheKeys = (() => {
     const backofficeEvent = (
         variables: QueryVariables<typeof BackofficeEventsRoutes.getById>,
     ) => [...baseBackofficeEvents, specifier.detail, variables]
+    const backofficeEventSaveCounts = (
+        variables: QueryVariables<typeof BackofficeEventsRoutes.listSaveCounts>,
+    ) => [...baseBackofficeEvents, specifier.saves, variables]
     const venueList = (variables: QueryVariables<typeof BackofficeVenuesRoutes.list>) => [
         ...baseVenues,
         specifier.list,
@@ -106,6 +110,7 @@ export const cacheKeys = (() => {
         placeSearch,
         backofficeEventList,
         backofficeEvent,
+        backofficeEventSaveCounts,
         venueList,
         venue,
         organizerList,

@@ -51,6 +51,7 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
             primaryCategoryId: categoryId,
             coverPhotoUrl: event.photos[0]?.url,
             priceScheme: event.priceScheme,
+            interestedCount: null,
             photos: event.photos.map(({ id, url, position }) => ({ id, url, position })),
             externalLinks: event.externalLinks,
             capacity: event.capacity,
