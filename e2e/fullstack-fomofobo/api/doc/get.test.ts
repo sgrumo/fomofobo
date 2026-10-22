@@ -3,6 +3,7 @@ import {
     BackofficeEventsRoutes,
     BackofficeOrganizersRoutes,
     BackofficeSessionRoutes,
+    BackofficeSettingsRoutes,
     BackofficeVenuesRoutes,
     PublicRoutes,
 } from "api-routes"
@@ -21,6 +22,7 @@ describe("GET /api/doc", () => {
             BackofficeVenuesRoutes,
             BackofficeEventsRoutes,
             BackofficeOrganizersRoutes,
+            BackofficeSettingsRoutes,
         ]
         const served = groups.flatMap(routes =>
             Object.values(routes).map(route => `${route.method} ${route.path}`),
