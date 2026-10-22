@@ -38,11 +38,11 @@ An occurrence is upcoming before its start, live from its start until its end, a
 
 An event and all its occurrences are visible only when neither the event nor its organizer is blocked. A hidden event is absent from every part of the public app, saved events included, from the next request on. Saving an event in the backoffice publishes it at once.
 
-An occurrence stays visible for three days after its end, then leaves the public app, its page and the saved list included. A repeating event stays visible through its other occurrences.
+An occurrence stays visible for the retention days of the platform settings after its end, three by default, then leaves the public app, its page and the saved list included. With zero days it leaves at its end. A repeating event stays visible through its other occurrences.
 
 ### Retention
 
-Once every occurrence of an event ended more than three days ago, a daily job deletes the photos of the event from the bucket, to cut the storage cost. The database keeps the event and its occurrences for statistics, and the backoffice still lists the event. A save of such an event needs at least one new photo.
+Once every occurrence of an event ended more than the retention days ago, a daily job deletes the photos of the event from the bucket, to cut the storage cost. The database keeps the event and its occurrences for statistics, and the backoffice still lists the event. A save of such an event needs at least one new photo.
 
 ### Search area
 
@@ -66,7 +66,7 @@ Share opens the share sheet of the device, or copies the link where none exists.
 
 ### Saved events
 
-Visitors save events with no account. Saved events stay on the device only, and the saved list shows only the visible ones. A saved event stays in the list until the visitor removes it, or until three days after it ends.
+Visitors save events with no account. Saved events stay on the device only, and the saved list shows only the visible ones. A saved event stays in the list until the visitor removes it, or until the retention days after it ends.
 
 ### Installation and offline use
 
@@ -95,6 +95,12 @@ The event form opens as a wizard of five steps: basics, place and time, photos, 
 ### Organizer management
 
 Admins create organizer accounts with a name and an email, and block or unblock them. Admins see every event, organizer, venue and category of the platform, with the blocked state of events and organizers. The backoffice shows no statistics.
+
+### Platform settings
+
+An Admin sets the retention days of ended events, from 0 to 90, and the participant threshold, from 1 to 1000. The backoffice shows who saved them last and when. Until an Admin saves them, the defaults apply: three days and a threshold of 20. A larger value brings back events that ended before it, without the photos already deleted.
+
+The participant threshold gates a count of saves on the event (not built).
 
 ## Architecture and integrations
 

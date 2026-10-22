@@ -19,6 +19,14 @@ export const dayMonthOf = (instant: Date, timeZone: string): string =>
     format(instant, "dd/MM", { in: tz(timeZone) })
 
 /**
+ * @description Returns the `dd/MM/yyyy HH:mm` date and time of an instant in the zone
+ * @param instant Instant read
+ * @param timeZone IANA zone of the wall clock
+ */
+export const dateTimeOf = (instant: Date, timeZone: string): string =>
+    format(instant, "dd/MM/yyyy HH:mm", { in: tz(timeZone) })
+
+/**
  * @description Returns the short weekday and the `dd/MM` date of an instant in the zone, in
  * the language
  * @param instant Instant read

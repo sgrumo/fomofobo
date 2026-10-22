@@ -37,6 +37,11 @@ const NAVIGATION = [
         label: "Backoffice.Nav.Organizers",
         adminOnly: true,
     },
+    {
+        href: routes.backofficeSettings.path({ parameters: {}, query: {} }),
+        label: "Backoffice.Nav.Settings",
+        adminOnly: true,
+    },
 ] as const
 
 export const BackofficeShell = (props: BackofficeShellProps) => {

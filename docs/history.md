@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-10-22 · Ended events stay for a number of days an Admin sets
+
+### Changed
+
+The days an ended event stays in the public app, and keeps its photos, are a setting of the backoffice, three by default. An Admin changes it at any time, and the daily photo purge follows it.
+
+### Why
+
+A client request. The owner wants to decide the retention without a release.
+
+### Check next time
+
+Ask which limits of the domain the client wants to tune alone, and plan a settings page for them from the start.
+
 ## 2026-10-21 · English dropped, the app speaks Italian
 
 ### Changed

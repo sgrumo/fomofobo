@@ -132,6 +132,12 @@ export const routes = {
         parametersSchema: z.object({}),
         querySchema: z.object({}),
     }),
+    backofficeSettings: createDynamicRoute({
+        segments: ["backoffice", "settings"],
+        title: ({ t }) => t("PageTitle.Backoffice.Settings"),
+        parametersSchema: z.object({}),
+        querySchema: z.object({}),
+    }),
     backofficeOrganizers: createDynamicRoute({
         segments: ["backoffice", "organizers"],
         title: ({ t }) => t("PageTitle.Backoffice.Organizers"),

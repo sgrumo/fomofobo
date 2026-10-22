@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest"
 
-import { dayMonthOf, formatLocalDateTime, weekdayDateOf } from "./local-format"
+import {
+    dateTimeOf,
+    dayMonthOf,
+    formatLocalDateTime,
+    weekdayDateOf,
+} from "./local-format"
 
 describe("dayMonthOf", () => {
     it("reads the day of the zone", () => {
@@ -8,6 +13,15 @@ describe("dayMonthOf", () => {
         const lateEvening = new Date("2026-10-14T22:30:00Z")
         expect(dayMonthOf(lateEvening, "Europe/Rome")).toBe("15/10")
         expect(dayMonthOf(lateEvening, "UTC")).toBe("14/10")
+    })
+})
+
+describe("dateTimeOf", () => {
+    it("reads the date and the time of the zone", () => {
+        // 22:30 UTC on the 14th is 00:30 on the 15th in Rome.
+        const lateEvening = new Date("2026-10-14T22:30:00Z")
+        expect(dateTimeOf(lateEvening, "Europe/Rome")).toBe("15/10/2026 00:30")
+        expect(dateTimeOf(lateEvening, "UTC")).toBe("14/10/2026 22:30")
     })
 })
 

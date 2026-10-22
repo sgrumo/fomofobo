@@ -8,7 +8,10 @@ test.describe("backoffice shell", () => {
     test("shows each role its sections", async ({ page }) => {
         const sections = [
             { role: "organizer", names: ["Events", "Venues"] },
-            { role: "admin", names: ["Events", "Venues", "Categories", "Organizers"] },
+            {
+                role: "admin",
+                names: ["Events", "Venues", "Categories", "Organizers", "Settings"],
+            },
         ] as const
 
         for (const { role, names } of sections) {

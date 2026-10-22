@@ -24,7 +24,8 @@
             "Event": "Modifica evento",
             "Venues": "Luoghi",
             "Categories": "Categorie",
-            "Organizers": "Organizzatori"
+            "Organizers": "Organizzatori",
+            "Settings": "Impostazioni"
         }
     },
     "Map": {
@@ -153,7 +154,8 @@
             "Events": "Eventi",
             "Venues": "Luoghi",
             "Categories": "Categorie",
-            "Organizers": "Organizzatori"
+            "Organizers": "Organizzatori",
+            "Settings": "Impostazioni"
         },
         "Login": {
             "Title": "Accedi",
@@ -442,6 +444,22 @@
                 "CloseWhileSettingPassword": "Attendi che la password sia impostata.",
                 "CloseWhileSaving": "Attendi che la modifica sia salvata."
             }
+        },
+        "Settings": {
+            "Title": "Impostazioni",
+            "Save": "Salva",
+            "LastChange": "Ultima modifica di {{name}}, {{date}}.",
+            "LastChangeNoAuthor": "Ultima modifica: {{date}}.",
+            "Defaults": "Valori predefiniti: nessun Admin li ha ancora modificati.",
+            "Toast": {
+                "Saved": "Impostazioni salvate."
+            }
+        },
+        "SettingsForm": {
+            "EndedVisibleDays": "Giorni dopo la fine",
+            "EndedVisibleDaysHint": "Per quanti giorni un evento finito resta nell'app. Poi esce dall'app e le sue foto vengono cancellate. Da 0 a {{max}}.",
+            "ParticipantThreshold": "Soglia degli interessati",
+            "ParticipantThresholdHint": "Un evento mostra il numero di interessati solo da questa soglia in su. Da 1 a {{max}}."
         }
     },
     "Offline": {
