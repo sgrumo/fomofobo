@@ -18,3 +18,4 @@ export const DEFAULT_CITY: { label: string; center: GeoPoint } = {
 // PLACEHOLDER(TQ-04): every limit below
 export const MAX_OCCURRENCES_PER_EVENT = 366
 export const MAX_SEARCH_RESULTS = 500
+export const MAX_PERMANENT_VENUE_RESULTS = 100

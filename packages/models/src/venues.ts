@@ -67,13 +67,16 @@ export const venueUpdateSchema = nonEmptyUpdate(
 )
 export type VenueUpdate = z.infer<typeof venueUpdateSchema>
 
+export const permanentVenueKindChangeSchema = z.object({
+    kind: permanentVenueKindSchema,
+    programmeUrl: venueProgrammeUrlSchema,
+    categoryId: z.uuid(),
+})
+export type PermanentVenueKindChange = z.infer<typeof permanentVenueKindChangeSchema>
+
 export const venueKindChangeSchema = z.discriminatedUnion("kind", [
     z.object({ kind: z.literal("regular") }),
-    z.object({
-        kind: permanentVenueKindSchema,
-        programmeUrl: venueProgrammeUrlSchema,
-        categoryId: z.uuid(),
-    }),
+    permanentVenueKindChangeSchema,
 ])
 export type VenueKindChange = z.infer<typeof venueKindChangeSchema>
 

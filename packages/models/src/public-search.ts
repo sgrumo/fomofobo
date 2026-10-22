@@ -5,6 +5,7 @@ import { MAX_SEARCH_CATEGORIES } from "./lib/limits"
 import { instantSchema, localDateSchema } from "./lib/local-time"
 import { queryArraySchema } from "./lib/query-array"
 import { occurrenceSummarySchema } from "./occurrences"
+import { permanentVenueSummarySchema } from "./public-venues"
 
 export const dateFilterKindSchema = z.enum([
     "default",
@@ -61,6 +62,7 @@ export type PublicSearchQuery = z.infer<typeof publicSearchQuerySchema>
 export const publicSearchResponseSchema = z.object({
     window: z.object({ from: instantSchema, to: instantSchema }),
     occurrences: z.array(occurrenceSummarySchema),
+    permanentVenues: z.array(permanentVenueSummarySchema),
     categoryCounts: z.array(
         z.object({ categoryId: z.uuid(), count: z.int().nonnegative() }),
     ),

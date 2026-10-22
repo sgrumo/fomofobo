@@ -8,7 +8,8 @@ import {
     seedEvent,
     seedEventReferences,
 } from "../backoffice-events/utils"
-import { blockVenue } from "../backoffice-venues/api"
+import { blockVenue, setVenueKind } from "../backoffice-venues/api"
+import { buildCinemaKind } from "../backoffice-venues/utils"
 import { getPublicVenue } from "./api"
 import { SATURDAY_NOON } from "./utils"
 
@@ -42,6 +43,8 @@ describe("GET /api/public/venues/{venueId}", () => {
             description: null,
             coverPhotoUrl: null,
             links: { websiteUrl: null, instagramUrl: null, facebookUrl: null },
+            kind: "regular",
+            programmeUrl: null,
             upcoming: [
                 expect.objectContaining({ eventId: live.id, date: "2026-10-24" }),
                 expect.objectContaining({ eventId: tonight.id, date: "2026-10-24" }),
@@ -94,6 +97,31 @@ describe("GET /api/public/venues/{venueId}", () => {
 
         expectStatus(res, 200)
         expect(res.data.upcoming).toStrictEqual([])
+    })
+
+    it("answers the kind and the programme link once the venue becomes a cinema", async () => {
+        const admin = await signInAs("admin")
+        const { categoryId, venueId } = await seedEventReferences()
+        const before = await getPublicVenue({ pathParams: { venueId } })
+        expectStatus(before, 200)
+        const cinema = buildCinemaKind(categoryId)
+        expectStatus(
+            await setVenueKind({
+                headers: admin.headers,
+                pathParams: { id: venueId },
+                body: cinema,
+            }),
+            200,
+        )
+
+        const res = await getPublicVenue({ pathParams: { venueId } })
+
+        expectStatus(res, 200)
+        expect([before.data.kind, res.data.kind, res.data.programmeUrl]).toStrictEqual([
+            "regular",
+            "cinema",
+            cinema.programmeUrl,
+        ])
     })
 
     it("answers 404 for a blocked venue and for an unknown one", async () => {

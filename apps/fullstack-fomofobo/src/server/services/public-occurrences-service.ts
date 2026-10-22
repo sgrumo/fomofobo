@@ -4,15 +4,21 @@ import type {
     OccurrenceLookupQuery,
     OccurrenceRef,
     OccurrenceSummary,
+    PermanentVenueSummary,
     PublicSearchQuery,
     PublicSearchResponse,
 } from "models"
 import { unstable_cache } from "next/cache"
-import type { PublicOccurrencesStorage, StoredOccurrenceSummary } from "storage"
+import type {
+    PublicOccurrencesStorage,
+    StoredOccurrenceSummary,
+    StoredPermanentVenue,
+} from "storage"
 
 import { dateWindow, localDateOf } from "@/lib/events/date-window"
 import { boundingBox } from "@/lib/geo/bounding-box"
 import {
+    MAX_PERMANENT_VENUE_RESULTS,
     MAX_SEARCH_RESULTS,
     PLATFORM_TIME_ZONE,
     SEARCH_RADIUS_METERS,
@@ -38,7 +44,7 @@ export class PublicOccurrencesService {
     }
 
     /**
-     * @description Fetches the visible occurrences of the area and the date window, live first, with the counts per category
+     * @description Fetches the visible occurrences of the area and the date window, live first, the permanent venues of the area, and the counts per category
      * @param query Center, text, categories and date filter
      * @param now Instant that sets today, the status order and the occurrences ended too long ago
      */
@@ -72,11 +78,15 @@ export class PublicOccurrencesService {
             categoryIds: query.categoryIds,
             now,
             limit: MAX_SEARCH_RESULTS,
+            permanentVenueLimit: MAX_PERMANENT_VENUE_RESULTS,
             onePerEvent: true,
         })
         return {
             window: { from: window.from.toISOString(), to: window.to.toISOString() },
             occurrences: result.occurrences.map(occurrence => this.toSummary(occurrence)),
+            permanentVenues: result.permanentVenues.map(venue =>
+                this.toPermanentVenue(venue),
+            ),
             categoryCounts: result.categoryCounts,
             truncated: result.truncated,
         }
@@ -157,6 +167,21 @@ export class PublicOccurrencesService {
                     ? null
                     : photoUrl(this.photosPublicBaseUrl, occurrence.coverObjectKey),
             price: occurrence.price,
+        }
+    }
+
+    /**
+     * @description Maps a stored permanent venue to its summary, with the URL of its cover
+     * @param venue Stored permanent venue
+     */
+    private toPermanentVenue(venue: StoredPermanentVenue): PermanentVenueSummary {
+        const { coverObjectKey, ...rest } = venue
+        return {
+            ...rest,
+            coverPhotoUrl:
+                coverObjectKey === null
+                    ? null
+                    : photoUrl(this.photosPublicBaseUrl, coverObjectKey),
         }
     }
 }

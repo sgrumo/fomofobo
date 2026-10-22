@@ -1,5 +1,9 @@
 import { faker } from "@faker-js/faker"
-import type { VenueCreation, VenueKindChange } from "models"
+import { expectStatus } from "e2e-kit/assertions"
+import type { PermanentVenueKindChange, Venue, VenueCreation } from "models"
+
+import { signInAs } from "../auth/utils"
+import { createVenue, setVenueKind } from "./api"
 
 /**
  * @description Builds the payload of a venue near Imola with a unique name
@@ -17,8 +21,32 @@ export const buildVenueCreation = (): VenueCreation => ({
  * @description Builds the payload of a cinema kind with a programme link, in the category
  * @param categoryId Category the cinema matches
  */
-export const buildCinemaKind = (categoryId: string): VenueKindChange => ({
+export const buildCinemaKind = (categoryId: string): PermanentVenueKindChange => ({
     kind: "cinema",
     programmeUrl: `https://www.cinema-imola.it/programmazione/${crypto.randomUUID()}`,
     categoryId,
 })
+
+/**
+ * @description Persists a venue through an Admin and makes it a cinema in the category
+ * @param categoryId Category the cinema matches
+ * @param overrides Fields of the creation replaced, such as the name and the coordinates
+ */
+export const seedCinema = async (
+    categoryId: string,
+    overrides: Partial<VenueCreation> = {},
+): Promise<Venue> => {
+    const { headers } = await signInAs("admin")
+    const created = await createVenue({
+        headers,
+        body: { ...buildVenueCreation(), ...overrides },
+    })
+    expectStatus(created, 201)
+    const cinema = await setVenueKind({
+        headers,
+        pathParams: { id: created.data.id },
+        body: buildCinemaKind(categoryId),
+    })
+    expectStatus(cinema, 200)
+    return cinema.data
+}

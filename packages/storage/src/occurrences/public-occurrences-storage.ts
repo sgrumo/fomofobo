@@ -1,9 +1,12 @@
 import type { SQL } from "drizzle-orm"
-import { and, count, desc, eq, gt, inArray, isNull, lt, or, sql } from "drizzle-orm"
+import { and, count, desc, eq, gt, inArray, isNull, lt, ne, or, sql } from "drizzle-orm"
+import { unionAll } from "drizzle-orm/sqlite-core"
 import type {
     GeoPoint,
     OccurrenceRef,
+    PermanentVenueSummary,
     PublicVenue,
+    SearchSuggestions,
     VenueHistoryItem,
     VenueHistoryQuery,
 } from "models"
@@ -38,6 +41,7 @@ export interface PublicOccurrenceSearch {
     categoryIds?: string[]
     now: Date
     limit: number
+    permanentVenueLimit: number
     // PLACEHOLDER(OP-17)
     onePerEvent: boolean
 }
@@ -57,6 +61,10 @@ export interface StoredOccurrenceSummary {
 }
 
 export type StoredPublicVenue = StrictOmit<PublicVenue, "coverPhotoUrl" | "upcoming"> & {
+    coverObjectKey: string | null
+}
+
+export type StoredPermanentVenue = StrictOmit<PermanentVenueSummary, "coverPhotoUrl"> & {
     coverObjectKey: string | null
 }
 
@@ -168,12 +176,13 @@ export class PublicOccurrencesStorage {
     }
 
     /**
-     * @description Fetches the visible occurrences of an area and a window, live first, with the counts per category
-     * @param search Window, area, filters, clock and cap of the search
-     * @remarks Counts the events of each category under every filter but the category one
+     * @description Fetches the visible occurrences of an area and a window, live first, the permanent venues of the area by name, and the counts per category
+     * @param search Window, area, filters, clock and caps of the search
+     * @remarks Counts the events and the permanent venues of each category under every filter but the category one
      */
     public async search(search: PublicOccurrenceSearch): Promise<{
         occurrences: StoredOccurrenceSummary[]
+        permanentVenues: StoredPermanentVenue[]
         categoryCounts: Array<{ categoryId: string; count: number }>
         truncated: boolean
     }> {
@@ -189,6 +198,12 @@ export class PublicOccurrencesStorage {
         const firstInWindow = search.onePerEvent
             ? sql`${eventOccurrences.startsAt} = (select min(inner_occurrence.starts_at) from ${eventOccurrences} as inner_occurrence where inner_occurrence.event_id = ${eventOccurrences.eventId} and inner_occurrence.ends_at > ${search.window.from.getTime()} and inner_occurrence.starts_at < ${search.window.to.getTime()})`
             : undefined
+        const permanentVenueFilter = and(
+            sql`${venues.isBlocked} = 0`,
+            ne(venues.kind, "regular"),
+            insideArea(search),
+            search.q === undefined ? undefined : likeContains(venues.name, search.q),
+        )
         const categoryFilter =
             search.categoryIds === undefined
                 ? undefined
@@ -200,7 +215,30 @@ export class PublicOccurrencesStorage {
                           .where(inArray(eventCategories.categoryId, search.categoryIds)),
                   )
 
-        const [rows, counts] = await this.db.batch([
+        const categoryUses = unionAll(
+            this.db
+                .selectDistinct({
+                    categoryId: sql<string>`${eventCategories.categoryId}`.as(
+                        "category_id",
+                    ),
+                    itemId: sql<string>`${events.id}`.as("item_id"),
+                })
+                .from(eventOccurrences)
+                .innerJoin(events, eq(events.id, eventOccurrences.eventId))
+                .innerJoin(venues, eq(venues.id, events.venueId))
+                .innerJoin(accounts, eq(accounts.id, events.organizerId))
+                .innerJoin(eventCategories, eq(eventCategories.eventId, events.id))
+                .where(baseFilter),
+            this.db
+                .select({
+                    categoryId: sql<string>`${venues.categoryId}`.as("category_id"),
+                    itemId: sql<string>`${venues.id}`.as("item_id"),
+                })
+                .from(venues)
+                .where(permanentVenueFilter),
+        ).as("category_uses")
+
+        const [rows, permanentRows, counts] = await this.db.batch([
             selectSummaryRows(this.db)
                 .where(and(baseFilter, firstInWindow, categoryFilter))
                 .orderBy(
@@ -210,22 +248,53 @@ export class PublicOccurrencesStorage {
                 )
                 .limit(search.limit + 1),
             this.db
-                .select({
-                    categoryId: eventCategories.categoryId,
-                    count: sql<number>`count(distinct ${events.id})`,
-                })
-                .from(eventOccurrences)
-                .innerJoin(events, eq(events.id, eventOccurrences.eventId))
-                .innerJoin(venues, eq(venues.id, events.venueId))
-                .innerJoin(accounts, eq(accounts.id, events.organizerId))
-                .innerJoin(eventCategories, eq(eventCategories.eventId, events.id))
-                .where(baseFilter)
-                .groupBy(eventCategories.categoryId),
+                .select()
+                .from(venues)
+                .where(
+                    and(
+                        permanentVenueFilter,
+                        search.categoryIds === undefined
+                            ? undefined
+                            : inArray(venues.categoryId, search.categoryIds),
+                    ),
+                )
+                .orderBy(venues.name, venues.id)
+                .limit(search.permanentVenueLimit + 1),
+            this.db
+                .select({ categoryId: categoryUses.categoryId, count: count() })
+                .from(categoryUses)
+                .groupBy(sql`${categoryUses.categoryId}`),
         ])
         return {
             occurrences: rows.slice(0, search.limit).map(toSummary),
+            // The filter keeps permanent rows alone: the check narrows their types.
+            permanentVenues: permanentRows
+                .slice(0, search.permanentVenueLimit)
+                .flatMap(row =>
+                    row.kind === "regular" ||
+                    row.programmeUrl === null ||
+                    row.categoryId === null
+                        ? []
+                        : [
+                              {
+                                  id: row.id,
+                                  name: row.name,
+                                  address: row.address,
+                                  coordinates: {
+                                      latitude: row.latitude,
+                                      longitude: row.longitude,
+                                  },
+                                  coverObjectKey: row.coverObjectKey,
+                                  kind: row.kind,
+                                  programmeUrl: row.programmeUrl,
+                                  categoryId: row.categoryId,
+                              },
+                          ],
+                ),
             categoryCounts: counts,
-            truncated: rows.length > search.limit,
+            truncated:
+                rows.length > search.limit ||
+                permanentRows.length > search.permanentVenueLimit,
         }
     }
 
@@ -357,6 +426,8 @@ export class PublicOccurrencesStorage {
                       instagramUrl: row.instagramUrl,
                       facebookUrl: row.facebookUrl,
                   },
+                  kind: row.kind,
+                  programmeUrl: row.programmeUrl,
               }
             : null
     }
@@ -457,9 +528,14 @@ export class PublicOccurrencesStorage {
         > & {
             q: string
         },
-    ): Promise<Array<{ venueId: string; name: string; address: string }>> {
+    ): Promise<SearchSuggestions["venues"]> {
         return await this.db
-            .select({ venueId: venues.id, name: venues.name, address: venues.address })
+            .select({
+                venueId: venues.id,
+                name: venues.name,
+                address: venues.address,
+                kind: venues.kind,
+            })
             .from(venues)
             .where(
                 and(

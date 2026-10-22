@@ -28,6 +28,7 @@ export const searchSuggestionsSchema = z.object({
             venueId: venueSchema.shape.id,
             name: venueSchema.shape.name,
             address: venueSchema.shape.address,
+            kind: venueSchema.shape.kind,
         }),
     ),
 })

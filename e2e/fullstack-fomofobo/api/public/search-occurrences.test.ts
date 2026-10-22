@@ -8,8 +8,8 @@ import { blockEvent, deleteEvent } from "../backoffice-events/api"
 import { seedEvent, seedEventReferences } from "../backoffice-events/utils"
 import { blockOrganizer } from "../backoffice-organizers/api"
 import { updateSettings } from "../backoffice-settings/api"
-import { createVenue } from "../backoffice-venues/api"
-import { buildVenueCreation } from "../backoffice-venues/utils"
+import { blockVenue, createVenue } from "../backoffice-venues/api"
+import { buildVenueCreation, seedCinema } from "../backoffice-venues/utils"
 import { searchOccurrences } from "./api"
 import { SATURDAY_NOON } from "./utils"
 
@@ -70,9 +70,112 @@ describe("GET /api/public/occurrences", () => {
                     startsAt: "2026-10-25T20:00:00.000Z",
                 }),
             ],
+            permanentVenues: [],
             categoryCounts: [{ categoryId, count: 2 }],
             truncated: false,
         })
+    })
+
+    it("answers the permanent venues of the area under any date filter, and counts them", async () => {
+        const { headers } = await signInAs("organizer")
+        const admin = await signInAs("admin")
+        const { categoryId, venue, venueId } = await seedEventReferences()
+        const [near, , blocked] = await Promise.all([
+            seedCinema(categoryId, { coordinates: venue.coordinates }),
+            seedCinema(categoryId, {
+                coordinates: { latitude: 44.4938, longitude: 11.3426 },
+            }),
+            seedCinema(categoryId, { coordinates: venue.coordinates }),
+        ])
+        expectStatus(
+            await blockVenue({
+                headers: admin.headers,
+                pathParams: { id: blocked.id },
+                body: { reason: "Closed for works" },
+            }),
+            200,
+        )
+        await seedEvent(headers, { venueId, categoryId })
+
+        const res = await searchOccurrences({
+            headers: { "x-test-now": SATURDAY_NOON },
+            queryParams: {
+                lat: venue.coordinates.latitude,
+                lng: venue.coordinates.longitude,
+                date: "tomorrow",
+            },
+        })
+
+        expectStatus(res, 200)
+        expect([
+            res.data.occurrences,
+            res.data.permanentVenues,
+            res.data.categoryCounts,
+        ]).toStrictEqual([
+            [],
+            [
+                {
+                    id: near.id,
+                    name: near.name,
+                    address: near.address,
+                    coordinates: near.coordinates,
+                    coverPhotoUrl: null,
+                    kind: "cinema",
+                    programmeUrl: near.programmeUrl,
+                    categoryId,
+                },
+            ],
+            [{ categoryId, count: 1 }],
+        ])
+    })
+
+    it("filters the permanent venues by name and by category, and counts them under the other filters", async () => {
+        const admin = await signInAs("admin")
+        const { categoryId: cinema, venue } = await seedEventReferences()
+        const art = await createCategory({
+            headers: admin.headers,
+            body: buildCategoryCreation(),
+        })
+        expectStatus(art, 201)
+        const [astra] = await Promise.all([
+            seedCinema(cinema, {
+                name: `Cinema Astra ${crypto.randomUUID().slice(0, 8)}`,
+                coordinates: venue.coordinates,
+            }),
+            seedCinema(art.data.id, {
+                name: `Astra Arte ${crypto.randomUUID().slice(0, 8)}`,
+                coordinates: venue.coordinates,
+            }),
+            seedCinema(cinema, {
+                name: `Cinema Modernissimo ${crypto.randomUUID().slice(0, 8)}`,
+                coordinates: venue.coordinates,
+            }),
+        ])
+
+        const res = await searchOccurrences({
+            headers: { "x-test-now": SATURDAY_NOON },
+            queryParams: {
+                lat: venue.coordinates.latitude,
+                lng: venue.coordinates.longitude,
+                q: "astra",
+                categoryIds: [cinema],
+            },
+        })
+
+        expectStatus(res, 200)
+        expect(res.data.permanentVenues.map(permanent => permanent.id)).toStrictEqual([
+            astra.id,
+        ])
+        expect(
+            res.data.categoryCounts.toSorted((a, b) =>
+                a.categoryId.localeCompare(b.categoryId),
+            ),
+        ).toStrictEqual(
+            [
+                { categoryId: cinema, count: 1 },
+                { categoryId: art.data.id, count: 1 },
+            ].toSorted((a, b) => a.categoryId.localeCompare(b.categoryId)),
+        )
     })
 
     it("hides a blocked event, a deleted event and the events of a blocked organizer", async () => {

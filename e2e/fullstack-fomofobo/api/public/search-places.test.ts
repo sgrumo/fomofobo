@@ -9,7 +9,7 @@ import {
     seedEventReferences,
 } from "../backoffice-events/utils"
 import { blockVenue, createVenue } from "../backoffice-venues/api"
-import { buildVenueCreation } from "../backoffice-venues/utils"
+import { buildVenueCreation, seedCinema } from "../backoffice-venues/utils"
 import { searchPlaces } from "./api"
 import { SATURDAY_NOON } from "./utils"
 
@@ -53,10 +53,10 @@ describe("GET /api/public/places", () => {
         })
     })
 
-    it("suggests the venues of the area whose name matches, and no blocked one", async () => {
+    it("suggests the venues of the area whose name matches with their kind, and no blocked one", async () => {
         const admin = await signInAs("admin")
-        const { venue } = await seedEventReferences()
-        const [open, closed] = await Promise.all([
+        const { categoryId, venue } = await seedEventReferences()
+        const [open, closed, cinema] = await Promise.all([
             createVenue({
                 headers: admin.headers,
                 body: {
@@ -72,6 +72,10 @@ describe("GET /api/public/places", () => {
                     name: `Teatro Chiuso ${crypto.randomUUID().slice(0, 8)}`,
                     coordinates: venue.coordinates,
                 },
+            }),
+            seedCinema(categoryId, {
+                name: `Teatro Cinema ${crypto.randomUUID().slice(0, 8)}`,
+                coordinates: venue.coordinates,
             }),
         ])
         expectStatus(open, 201)
@@ -99,7 +103,18 @@ describe("GET /api/public/places", () => {
 
         expectStatus(res, 200)
         expect(res.data.venues).toStrictEqual([
-            { venueId: open.data.id, name: open.data.name, address: open.data.address },
+            {
+                venueId: cinema.id,
+                name: cinema.name,
+                address: cinema.address,
+                kind: "cinema",
+            },
+            {
+                venueId: open.data.id,
+                name: open.data.name,
+                address: open.data.address,
+                kind: "regular",
+            },
         ])
     })
 
