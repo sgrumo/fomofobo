@@ -10,6 +10,7 @@ import {
     seedEventReferences,
     uploadPhoto,
 } from "../backoffice-events/utils"
+import { updateSettings } from "../backoffice-settings/api"
 import { lookupOccurrences } from "./api"
 import { SATURDAY_NOON } from "./utils"
 
@@ -82,6 +83,39 @@ describe("GET /api/public/occurrences/lookup", () => {
             event.id,
         ])
         expect(expired.data).toStrictEqual([])
+    })
+
+    it("drops a ref at its end when an Admin saved zero retention days", async () => {
+        const { headers } = await signInAs("organizer")
+        const admin = await signInAs("admin")
+        const { categoryId, venueId } = await seedEventReferences()
+        const event = await seedEvent(headers, { venueId, categoryId })
+        const queryParams = { ref: [`${event.id}:2026-10-24`] }
+        expectStatus(
+            await updateSettings({
+                headers: admin.headers,
+                body: { endedVisibleDays: 0, participantThreshold: 20 },
+            }),
+            200,
+        )
+
+        const [running, ended] = await Promise.all([
+            lookupOccurrences({
+                headers: { "x-test-now": "2026-10-24T21:29:00.000Z" },
+                queryParams,
+            }),
+            lookupOccurrences({
+                headers: { "x-test-now": "2026-10-24T21:30:00.000Z" },
+                queryParams,
+            }),
+        ])
+
+        expectStatus(running, 200)
+        expectStatus(ended, 200)
+        expect(running.data.map(occurrence => occurrence.eventId)).toStrictEqual([
+            event.id,
+        ])
+        expect(ended.data).toStrictEqual([])
     })
 
     it("resolves the saved ref of a single event that moved to another date", async () => {

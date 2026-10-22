@@ -85,7 +85,7 @@ export const PublicRoutes = {
         tags: ["Public"],
         summary: "Look up saved occurrences",
         description:
-            "Returns the occurrences of the refs that are still visible, in the order of the refs. A ref to a single event matches on any date. An occurrence that ended three days ago or more is not visible.",
+            "Returns the occurrences of the refs that are still visible, in the order of the refs. A ref to a single event matches on any date. An occurrence that ended at least the retention days of the platform settings ago is not visible.",
     }),
 
     getOccurrence: createRoute({
@@ -111,7 +111,7 @@ export const PublicRoutes = {
         tags: ["Public"],
         summary: "Get occurrence",
         description:
-            "Returns one visible occurrence. A single event matches on any date, so a link survives a change of its date. An occurrence that ended three days ago or more is not visible.",
+            "Returns one visible occurrence. A single event matches on any date, so a link survives a change of its date. An occurrence that ended at least the retention days of the platform settings ago is not visible.",
     }),
 
     searchPlaces: createRoute({

@@ -177,6 +177,22 @@ describe("mutation invalidations", () => {
             [{ queryKey: ["backofficeEvents"] }],
         ])
     })
+
+    it("invalidates the settings after a settings write", async () => {
+        const { client, invalidateQueries, api } = apiReturning({
+            endedVisibleDays: 5,
+            participantThreshold: 30,
+            updatedAt: "2026-10-21T10:00:00.000Z",
+            updatedBy: { id: organizer.id, name: organizer.name },
+        })
+
+        await new MutationObserver(client, api.updateSettingsMutation).mutate({
+            endedVisibleDays: 5,
+            participantThreshold: 30,
+        })
+
+        expect(invalidateQueries.mock.calls).toStrictEqual([[{ queryKey: ["settings"] }]])
+    })
 })
 
 describe("lookupOccurrences", () => {

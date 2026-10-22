@@ -11,7 +11,7 @@ import { match } from "ts-pattern"
 import { SIGN_IN_PATH } from "@/lib/auth/sign-in"
 
 import { backofficeSession } from "./auth/backoffice-session"
-import { CATEGORIES_TAG, expireTags, PLACES_TAG, PUBLIC_TAG } from "./cache"
+import { CATEGORIES_TAG, expireTags, PLACES_TAG, PUBLIC_TAG, SETTINGS_TAG } from "./cache"
 import { requestClock } from "./clock"
 import { getContainer } from "./container"
 import type { AppErrorCode } from "./errors"
@@ -20,6 +20,7 @@ import { buildBackofficeCategoriesRouter } from "./routers/backoffice-categories
 import { buildBackofficeEventsRouter } from "./routers/backoffice-events-router"
 import { buildBackofficeOrganizersRouter } from "./routers/backoffice-organizers-router"
 import { buildBackofficeSessionRouter } from "./routers/backoffice-session-router"
+import { buildBackofficeSettingsRouter } from "./routers/backoffice-settings-router"
 import { buildBackofficeVenuesRouter } from "./routers/backoffice-venues-router"
 import { buildPublicRouter } from "./routers/public-router"
 
@@ -92,6 +93,7 @@ const buildApi = (): OpenAPIHono => {
         organizers,
         photos,
         places,
+        settings,
         venues,
     } = getContainer()
 
@@ -119,11 +121,12 @@ const buildApi = (): OpenAPIHono => {
     app.route("/", buildBackofficeVenuesRouter(venues))
     app.route("/", buildBackofficeOrganizersRouter(organizers))
     app.route("/", buildBackofficeEventsRouter(events, photos))
+    app.route("/", buildBackofficeSettingsRouter(settings))
 
     if (appConfig.testRoutesEnabled) {
         app.post(`${apiBasePath}/test/reset-database`, async c => {
             await deleteAllRows(db)
-            expireTags(PUBLIC_TAG, CATEGORIES_TAG, PLACES_TAG)
+            expireTags(PUBLIC_TAG, CATEGORIES_TAG, PLACES_TAG, SETTINGS_TAG)
             return c.body(null, HttpStatus.NoContent)
         })
         app.post(`${apiBasePath}/test/accounts`, async c => {

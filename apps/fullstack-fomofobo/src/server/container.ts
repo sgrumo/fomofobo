@@ -9,6 +9,7 @@ import {
     EventsStorage,
     PublicOccurrencesStorage,
     RateLimitsStorage,
+    SettingsStorage,
     VenuesStorage,
 } from "storage"
 
@@ -25,6 +26,7 @@ import { OrganizersService } from "./services/organizers-service"
 import { PhotosService } from "./services/photos-service"
 import { PlacesService } from "./services/places-service"
 import { PublicOccurrencesService } from "./services/public-occurrences-service"
+import { SettingsService } from "./services/settings-service"
 import { VenuesService } from "./services/venues-service"
 
 export interface Container {
@@ -39,6 +41,7 @@ export interface Container {
     photos: PhotosService
     occurrences: PublicOccurrencesService
     places: PlacesService
+    settings: SettingsService
 }
 
 /**
@@ -70,6 +73,7 @@ const buildContainer = (): Container => {
     })
     const authAccounts = new AuthAccountsService(auth, accountsStorage)
     const occurrencesStorage = new PublicOccurrencesStorage(db)
+    const settings = new SettingsService(new SettingsStorage(db))
 
     return {
         appConfig,
@@ -87,6 +91,7 @@ const buildContainer = (): Container => {
         photos: new PhotosService(photoStorage),
         occurrences: new PublicOccurrencesService(
             occurrencesStorage,
+            settings,
             env.PHOTOS_PUBLIC_BASE_URL,
         ),
         places: new PlacesService(
@@ -97,6 +102,7 @@ const buildContainer = (): Container => {
             new RateLimitsStorage(db),
             occurrencesStorage,
         ),
+        settings,
     }
 }
 

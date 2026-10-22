@@ -7,6 +7,7 @@ import { buildCategoryCreation } from "../backoffice-categories/utils"
 import { blockEvent, deleteEvent } from "../backoffice-events/api"
 import { seedEvent, seedEventReferences } from "../backoffice-events/utils"
 import { blockOrganizer } from "../backoffice-organizers/api"
+import { updateSettings } from "../backoffice-settings/api"
 import { createVenue } from "../backoffice-venues/api"
 import { buildVenueCreation } from "../backoffice-venues/utils"
 import { searchOccurrences } from "./api"
@@ -186,6 +187,48 @@ describe("GET /api/public/occurrences", () => {
         expect(res.data.occurrences.map(occurrence => occurrence.eventId)).toStrictEqual([
             late.id,
         ])
+    })
+
+    it("hides an occurrence ended today once an Admin saved zero retention days", async () => {
+        const { headers } = await signInAs("organizer")
+        const admin = await signInAs("admin")
+        const { categoryId, venue, venueId } = await seedEventReferences()
+        const morning = await seedEvent(
+            headers,
+            { venueId, categoryId },
+            { startsAt: "2026-10-24T08:00", endsAt: "2026-10-24T09:00" },
+        )
+        const before = await searchOccurrences({
+            headers: { "x-test-now": SATURDAY_NOON },
+            queryParams: {
+                lat: venue.coordinates.latitude,
+                lng: venue.coordinates.longitude,
+                date: "today",
+            },
+        })
+        expectStatus(before, 200)
+        expect(
+            before.data.occurrences.map(occurrence => occurrence.eventId),
+        ).toStrictEqual([morning.id])
+        expectStatus(
+            await updateSettings({
+                headers: admin.headers,
+                body: { endedVisibleDays: 0, participantThreshold: 20 },
+            }),
+            200,
+        )
+
+        const after = await searchOccurrences({
+            headers: { "x-test-now": SATURDAY_NOON },
+            queryParams: {
+                lat: venue.coordinates.latitude,
+                lng: venue.coordinates.longitude,
+                date: "today",
+            },
+        })
+
+        expectStatus(after, 200)
+        expect(after.data.occurrences).toStrictEqual([])
     })
 
     it("answers 400 to a range that starts before today", async () => {

@@ -1,5 +1,4 @@
 import "server-only"
-import { ENDED_OCCURRENCE_VISIBLE_MS } from "models"
 import type {
     OccurrenceDetail,
     OccurrenceLookupQuery,
@@ -22,29 +21,26 @@ import {
 import { eventTag, PUBLIC_TAG } from "../cache"
 import { appError } from "../errors"
 import { photoUrl } from "./photos-service"
-
-/**
- * @description Returns the instant an ended occurrence must end after to stay visible
- * @param now Current instant
- */
-const endedVisibleSince = (now: Date): Date =>
-    new Date(now.getTime() - ENDED_OCCURRENCE_VISIBLE_MS)
+import type { SettingsService } from "./settings-service"
 
 export class PublicOccurrencesService {
     private readonly occurrencesStorage: PublicOccurrencesStorage
+    private readonly settings: SettingsService
     private readonly photosPublicBaseUrl: string
     public constructor(
         occurrencesStorage: PublicOccurrencesStorage,
+        settings: SettingsService,
         photosPublicBaseUrl: string,
     ) {
         this.occurrencesStorage = occurrencesStorage
+        this.settings = settings
         this.photosPublicBaseUrl = photosPublicBaseUrl
     }
 
     /**
      * @description Fetches the visible occurrences of the area and the date window, live first, with the counts per category
      * @param query Center, text, categories and date filter
-     * @param now Instant that sets today and the status order
+     * @param now Instant that sets today, the status order and the occurrences ended too long ago
      */
     public async search(
         query: PublicSearchQuery,
@@ -60,9 +56,15 @@ export class PublicOccurrencesService {
         }
 
         const window = dateWindow(query, now, PLATFORM_TIME_ZONE)
+        const endedVisibleSince = await this.settings.endedVisibleSince(now)
         const center = { latitude: query.lat, longitude: query.lng }
         const result = await this.occurrencesStorage.search({
-            window,
+            window: {
+                from: new Date(
+                    Math.max(window.from.getTime(), endedVisibleSince.getTime()),
+                ),
+                to: window.to,
+            },
             center,
             radiusMeters: SEARCH_RADIUS_METERS,
             box: boundingBox(center, SEARCH_RADIUS_METERS),
@@ -105,10 +107,8 @@ export class PublicOccurrencesService {
             ["occurrence-detail", ref.eventId, ref.date],
             { tags: [PUBLIC_TAG, eventTag(ref.eventId)] },
         )()
-        if (
-            detail === null ||
-            Date.parse(detail.endsAt) <= endedVisibleSince(now).getTime()
-        ) {
+        const endedVisibleSince = await this.settings.endedVisibleSince(now)
+        if (detail === null || Date.parse(detail.endsAt) <= endedVisibleSince.getTime()) {
             throw appError(
                 "OccurrenceNotFound",
                 `Occurrence ${ref.eventId} ${ref.date} not found`,
@@ -132,7 +132,7 @@ export class PublicOccurrencesService {
         })
         const occurrences = await this.occurrencesStorage.lookup(
             refs,
-            endedVisibleSince(now),
+            await this.settings.endedVisibleSince(now),
         )
         return occurrences.map(occurrence => this.toSummary(occurrence))
     }

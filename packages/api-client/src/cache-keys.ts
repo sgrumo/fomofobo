@@ -23,6 +23,7 @@ export const cacheKey = {
     venues: "venues",
     organizers: "organizers",
     clientCompatibility: "clientCompatibility",
+    settings: "settings",
 }
 
 /**
@@ -37,6 +38,7 @@ export const cacheKeys = (() => {
     const baseVenues = [cacheKey.venues]
     const baseOrganizers = [cacheKey.organizers]
     const baseClientCompatibility = [cacheKey.clientCompatibility]
+    const baseSettings = [cacheKey.settings]
 
     const publicOccurrenceSearch = (
         variables: QueryVariables<typeof PublicRoutes.searchOccurrences>,
@@ -84,6 +86,7 @@ export const cacheKeys = (() => {
         allCategories: baseCategories,
         me: baseMe,
         allClientCompatibility: baseClientCompatibility,
+        settings: baseSettings,
         publicOccurrenceSearch,
         publicOccurrenceLookup,
         publicOccurrence,
@@ -106,4 +109,5 @@ export const writeInvalidations = {
     category: [cacheKeys.allCategories],
     venue: [cacheKeys.allVenues, cacheKeys.allBackofficeEvents],
     organizer: [cacheKeys.allOrganizers, cacheKeys.allBackofficeEvents],
+    settings: [cacheKeys.settings],
 }

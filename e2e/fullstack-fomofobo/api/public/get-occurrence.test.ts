@@ -10,6 +10,7 @@ import {
     seedEventReferences,
     uploadPhoto,
 } from "../backoffice-events/utils"
+import { updateSettings } from "../backoffice-settings/api"
 import { getOccurrence } from "./api"
 import { SATURDAY_NOON } from "./utils"
 
@@ -116,6 +117,35 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
             }),
             getOccurrence({
                 headers: { "x-test-now": "2026-10-27T21:30:00.000Z" },
+                pathParams: ref,
+            }),
+        ])
+
+        expectStatus(lastMinute, 200)
+        expectApiError(expired, 404, { code: "OccurrenceNotFound" })
+    })
+
+    it("answers 404 once the occurrence ended the retention days an Admin saved", async () => {
+        const { headers } = await signInAs("organizer")
+        const admin = await signInAs("admin")
+        const { categoryId, venueId } = await seedEventReferences()
+        const event = await seedEvent(headers, { venueId, categoryId })
+        const ref = { eventId: event.id, date: "2026-10-24" }
+        expectStatus(
+            await updateSettings({
+                headers: admin.headers,
+                body: { endedVisibleDays: 1, participantThreshold: 20 },
+            }),
+            200,
+        )
+
+        const [lastMinute, expired] = await Promise.all([
+            getOccurrence({
+                headers: { "x-test-now": "2026-10-25T21:29:00.000Z" },
+                pathParams: ref,
+            }),
+            getOccurrence({
+                headers: { "x-test-now": "2026-10-25T21:30:00.000Z" },
                 pathParams: ref,
             }),
         ])

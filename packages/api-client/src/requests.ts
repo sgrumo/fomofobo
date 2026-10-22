@@ -5,6 +5,7 @@ import {
     BackofficeEventsRoutes,
     BackofficeOrganizersRoutes,
     BackofficeSessionRoutes,
+    BackofficeSettingsRoutes,
     BackofficeVenuesRoutes,
     ClientCompatibilityRoutes,
     PublicRoutes,
@@ -18,6 +19,7 @@ import type {
     EventUpsert,
     OrganizerCreation,
     OrganizerPassword,
+    PlatformSettingsUpdate,
     VenueCreation,
     VenueUpdate,
 } from "models"
@@ -289,6 +291,25 @@ export const createApi = (options: ApiClientOptions) => {
         onSuccess: invalidateAfter("organizer"),
     })
 
+    const getSettings = bodylessQueryEndpoint(BackofficeSettingsRoutes.get, 200)
+    const getSettingsQuery = (
+        variables: QueryVariables<typeof BackofficeSettingsRoutes.get>,
+    ) =>
+        queryOptions({
+            queryFn: () => getSettings(variables),
+            queryKey: cacheKeys.settings,
+        })
+
+    const updateSettings = responsefulMutationEndpoint(
+        BackofficeSettingsRoutes.update,
+        200,
+    )
+    const updateSettingsMutation = mutationOptions({
+        mutationFn: (body: PlatformSettingsUpdate) =>
+            updateSettings({ params: {}, body }),
+        onSuccess: invalidateAfter("settings"),
+    })
+
     // The platform and the version travel as headers, which the transport of each app
     // adds to every request. So the call itself takes no variable.
     const checkClientCompatibility = bodylessQueryEndpoint(
@@ -357,6 +378,10 @@ export const createApi = (options: ApiClientOptions) => {
         unblockOrganizerMutation,
         setOrganizerPassword,
         setOrganizerPasswordMutation,
+        getSettings,
+        getSettingsQuery,
+        updateSettings,
+        updateSettingsMutation,
         checkClientCompatibility,
         checkClientCompatibilityQuery,
     }

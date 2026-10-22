@@ -5,6 +5,7 @@ import { revalidateTag } from "next/cache"
 export const PUBLIC_TAG = "public"
 export const CATEGORIES_TAG = "categories"
 export const PLACES_TAG = "places"
+export const SETTINGS_TAG = "settings"
 
 /**
  * @description Returns the cache tag of the public reads of one event
