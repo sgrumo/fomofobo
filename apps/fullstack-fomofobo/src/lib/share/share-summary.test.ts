@@ -11,6 +11,7 @@ describe("shareSummaryOf", () => {
                 id: crypto.randomUUID(),
                 name: "Chiostro di San Francesco",
                 coordinates: { latitude: 44.3533, longitude: 11.7147 },
+                isBlocked: false,
             },
         }
 

@@ -1,6 +1,13 @@
 import type { SQL } from "drizzle-orm"
-import { and, eq, gt, inArray, isNull, lt, or, sql } from "drizzle-orm"
-import type { GeoPoint, OccurrenceRef } from "models"
+import { and, count, desc, eq, gt, inArray, isNull, lt, or, sql } from "drizzle-orm"
+import type {
+    GeoPoint,
+    OccurrenceRef,
+    PublicVenue,
+    VenueHistoryItem,
+    VenueHistoryQuery,
+} from "models"
+import type { StrictOmit } from "shared/types"
 
 import type { DbInstanceFromSchema, DbSelect } from "../db-config"
 import {
@@ -13,6 +20,7 @@ import {
 } from "../db-schema"
 import type { StoredEventPhoto } from "../events/events-storage"
 import { likeContains } from "../utils/like"
+import { toLimitOffset } from "../utils/pagination"
 
 const EARTH_RADIUS_METERS = 6_371_000
 
@@ -41,11 +49,15 @@ export interface StoredOccurrenceSummary {
     endsAt: Date
     title: string
     description: string | null
-    venue: { id: string; name: string; coordinates: GeoPoint }
+    venue: { id: string; name: string; coordinates: GeoPoint; isBlocked: boolean }
     categoryIds: string[]
     primaryCategoryId: string
     coverObjectKey: string | null
     price: string | null
+}
+
+export type StoredPublicVenue = StrictOmit<PublicVenue, "coverPhotoUrl" | "upcoming"> & {
+    coverObjectKey: string | null
 }
 
 export interface StoredOccurrenceDetail extends StoredOccurrenceSummary {
@@ -91,6 +103,7 @@ const summaryColumns = {
     price: events.price,
     venueId: venues.id,
     venueName: venues.name,
+    venueIsBlocked: venues.isBlocked,
     latitude: venues.latitude,
     longitude: venues.longitude,
     // UUIDs hold no comma, so the list splits back without loss
@@ -130,6 +143,7 @@ const toSummary = (row: SummaryRow): StoredOccurrenceSummary => ({
         id: row.venueId,
         name: row.venueName,
         coordinates: { latitude: row.latitude, longitude: row.longitude },
+        isBlocked: row.venueIsBlocked,
     },
     categoryIds: row.categoryIds.split(","),
     primaryCategoryId: row.primaryCategoryId,
@@ -318,6 +332,143 @@ export class PublicOccurrencesStorage {
                 ),
             )
             .orderBy(eventOccurrences.startsAt, eventOccurrences.eventId)
+            .limit(search.limit)
+    }
+
+    /**
+     * @description Fetches the profile of a venue that is not blocked, or `null` when none matches
+     * @param id Venue read
+     */
+    public async findPublicVenue(id: string): Promise<StoredPublicVenue | null> {
+        const [row] = await this.db
+            .select()
+            .from(venues)
+            .where(and(eq(venues.id, id), sql`${venues.isBlocked} = 0`))
+        return row
+            ? {
+                  id: row.id,
+                  name: row.name,
+                  address: row.address,
+                  coordinates: { latitude: row.latitude, longitude: row.longitude },
+                  description: row.description,
+                  coverObjectKey: row.coverObjectKey,
+                  links: {
+                      websiteUrl: row.websiteUrl,
+                      instagramUrl: row.instagramUrl,
+                      facebookUrl: row.facebookUrl,
+                  },
+              }
+            : null
+    }
+
+    /**
+     * @description Fetches the visible events of a venue that have an occurrence not yet ended, each with that next occurrence, live first, then soonest
+     * @param venueId Venue whose events are read
+     * @param now Instant that sets the status order and the occurrences ended
+     * @param limit Cap of the events read
+     */
+    public async listVenueUpcoming(
+        venueId: string,
+        now: Date,
+        limit: number,
+    ): Promise<StoredOccurrenceSummary[]> {
+        const at = now.getTime()
+        const rows = await selectSummaryRows(this.db)
+            .where(
+                and(
+                    visibleEvent,
+                    eq(events.venueId, venueId),
+                    sql`${eventOccurrences.startsAt} = (select min(next_occurrence.starts_at) from ${eventOccurrences} as next_occurrence where next_occurrence.event_id = ${eventOccurrences.eventId} and next_occurrence.ends_at > ${at})`,
+                ),
+            )
+            .orderBy(
+                sql`case when ${eventOccurrences.startsAt} <= ${at} then 0 else 1 end`,
+                eventOccurrences.startsAt,
+                eventOccurrences.eventId,
+            )
+            .limit(limit)
+        return rows.map(toSummary)
+    }
+
+    /**
+     * @description Fetches one page of the visible events of a venue whose last occurrence ended, newest end first, with the total
+     * @param venueId Venue whose events are read
+     * @param now Instant every occurrence of a past event ends at or before
+     * @param query Page of the history
+     */
+    public async listVenueHistory(
+        venueId: string,
+        now: Date,
+        query: VenueHistoryQuery,
+    ): Promise<{ items: VenueHistoryItem[]; total: number }> {
+        const lastEndsAt = sql<number>`max(${eventOccurrences.endsAt})`
+        const pastEvents = this.db
+            .select({
+                eventId: events.id,
+                title: events.title,
+                categoryIds:
+                    sql<string>`(select group_concat(${eventCategories.categoryId}) from ${eventCategories} where ${eventCategories.eventId} = ${events.id})`.as(
+                        "category_ids",
+                    ),
+                firstDate: sql<string>`min(${eventOccurrences.localDate})`.as(
+                    "first_date",
+                ),
+                lastDate: sql<string>`max(${eventOccurrences.localDate})`.as("last_date"),
+                lastEndsAt: lastEndsAt.as("last_ends_at"),
+            })
+            .from(events)
+            .innerJoin(eventOccurrences, eq(eventOccurrences.eventId, events.id))
+            .innerJoin(accounts, eq(accounts.id, events.organizerId))
+            .where(and(visibleEvent, eq(events.venueId, venueId)))
+            .groupBy(events.id)
+            .having(sql`${lastEndsAt} <= ${now.getTime()}`)
+            .as("past_events")
+        const { limit, offset } = toLimitOffset(query)
+
+        const [countResult, rows] = await this.db.batch([
+            this.db.select({ value: count() }).from(pastEvents),
+            this.db
+                .select()
+                .from(pastEvents)
+                .orderBy(desc(pastEvents.lastEndsAt), pastEvents.eventId)
+                .limit(limit)
+                .offset(offset),
+        ])
+        return {
+            items: rows.map(row => ({
+                eventId: row.eventId,
+                title: row.title,
+                categoryIds: row.categoryIds.split(","),
+                firstDate: row.firstDate,
+                lastDate: row.lastDate,
+            })),
+            total: countResult[0]?.value ?? 0,
+        }
+    }
+
+    /**
+     * @description Fetches the venues of the area that are not blocked and whose name matches, ordered by name
+     * @param search Text, area and cap of the suggestions
+     */
+    public async suggestVenues(
+        search: Pick<
+            PublicOccurrenceSearch,
+            "center" | "radiusMeters" | "box" | "limit"
+        > & {
+            q: string
+        },
+    ): Promise<Array<{ venueId: string; name: string; address: string }>> {
+        return await this.db
+            .select({ venueId: venues.id, name: venues.name, address: venues.address })
+            .from(venues)
+            .where(
+                and(
+                    sql`${venues.isBlocked} = 0`,
+                    insideArea(search),
+                    likeContains(venues.name, search.q),
+                ),
+            )
+            .orderBy(venues.name, venues.id)
             .limit(search.limit)
     }
 }

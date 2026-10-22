@@ -57,6 +57,7 @@ describe("GET /api/public/occurrences", () => {
                         id: venue.id,
                         name: venue.name,
                         coordinates: venue.coordinates,
+                        isBlocked: false,
                     },
                     categoryIds: [categoryId],
                     primaryCategoryId: categoryId,

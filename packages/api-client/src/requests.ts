@@ -96,6 +96,25 @@ export const createApi = (options: ApiClientOptions) => {
             queryKey: cacheKeys.publicOccurrenceLookup(variables),
         })
 
+    const getPublicVenue = bodylessQueryEndpoint(PublicRoutes.getVenue, 200)
+    const getPublicVenueQuery = (
+        variables: QueryVariables<typeof PublicRoutes.getVenue>,
+    ) =>
+        queryOptions({
+            queryFn: () => getPublicVenue(variables),
+            queryKey: cacheKeys.publicVenue(variables),
+        })
+
+    const listVenueHistory = bodylessQueryEndpoint(PublicRoutes.listVenueHistory, 200)
+    const listVenueHistoryQuery = (
+        variables: QueryVariables<typeof PublicRoutes.listVenueHistory>,
+    ) =>
+        queryOptions({
+            queryFn: () => listVenueHistory(variables),
+            queryKey: cacheKeys.publicVenueHistory(variables),
+            placeholderData: keepPreviousData,
+        })
+
     const getOccurrence = bodylessQueryEndpoint(PublicRoutes.getOccurrence, 200)
     const getOccurrenceQuery = (
         variables: QueryVariables<typeof PublicRoutes.getOccurrence>,
@@ -364,6 +383,10 @@ export const createApi = (options: ApiClientOptions) => {
         lookupOccurrencesQuery,
         getOccurrence,
         getOccurrenceQuery,
+        getPublicVenue,
+        getPublicVenueQuery,
+        listVenueHistory,
+        listVenueHistoryQuery,
         searchPlaces,
         searchPlacesQuery,
         getMe,

@@ -8,6 +8,8 @@ import {
     seedEvent,
     seedEventReferences,
 } from "../backoffice-events/utils"
+import { blockVenue, createVenue } from "../backoffice-venues/api"
+import { buildVenueCreation } from "../backoffice-venues/utils"
 import { searchPlaces } from "./api"
 import { SATURDAY_NOON } from "./utils"
 
@@ -47,7 +49,58 @@ describe("GET /api/public/places", () => {
             events: [
                 { eventId: event.id, date: "2026-10-24", title: "Jazz al Chiostro" },
             ],
+            venues: [],
         })
+    })
+
+    it("suggests the venues of the area whose name matches, and no blocked one", async () => {
+        const admin = await signInAs("admin")
+        const { venue } = await seedEventReferences()
+        const [open, closed] = await Promise.all([
+            createVenue({
+                headers: admin.headers,
+                body: {
+                    ...buildVenueCreation(),
+                    name: `Teatro Stignani ${crypto.randomUUID().slice(0, 8)}`,
+                    coordinates: venue.coordinates,
+                },
+            }),
+            createVenue({
+                headers: admin.headers,
+                body: {
+                    ...buildVenueCreation(),
+                    name: `Teatro Chiuso ${crypto.randomUUID().slice(0, 8)}`,
+                    coordinates: venue.coordinates,
+                },
+            }),
+        ])
+        expectStatus(open, 201)
+        expectStatus(closed, 201)
+        expectStatus(
+            await blockVenue({
+                headers: admin.headers,
+                pathParams: { id: closed.data.id },
+                body: { reason: "Closed for works" },
+            }),
+            200,
+        )
+
+        const res = await searchPlaces({
+            headers: {
+                "x-test-now": SATURDAY_NOON,
+                "x-forwarded-for": crypto.randomUUID(),
+            },
+            queryParams: {
+                q: "teatro",
+                lat: venue.coordinates.latitude,
+                lng: venue.coordinates.longitude,
+            },
+        })
+
+        expectStatus(res, 200)
+        expect(res.data.venues).toStrictEqual([
+            { venueId: open.data.id, name: open.data.name, address: open.data.address },
+        ])
     })
 
     it("suggests the next occurrence of a repeating event that has not ended", async () => {

@@ -2,6 +2,7 @@ import { z } from "@hono/zod-openapi"
 
 import { geoPointSchema } from "./lib/geo"
 import { occurrenceSummarySchema } from "./occurrences"
+import { venueSchema } from "./venues"
 
 export const placeSuggestionSchema = z.object({
     label: z.string(),
@@ -21,6 +22,13 @@ export const searchSuggestionsSchema = z.object({
     places: z.array(placeSuggestionSchema),
     events: z.array(
         occurrenceSummarySchema.pick({ eventId: true, date: true, title: true }),
+    ),
+    venues: z.array(
+        z.object({
+            venueId: venueSchema.shape.id,
+            name: venueSchema.shape.name,
+            address: venueSchema.shape.address,
+        }),
     ),
 })
 export type SearchSuggestions = z.infer<typeof searchSuggestionsSchema>

@@ -11,6 +11,7 @@ import {
     uploadPhoto,
 } from "../backoffice-events/utils"
 import { updateSettings } from "../backoffice-settings/api"
+import { blockVenue } from "../backoffice-venues/api"
 import { getOccurrence } from "./api"
 import { SATURDAY_NOON } from "./utils"
 
@@ -38,6 +39,7 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
                 name: venue.name,
                 address: venue.address,
                 coordinates: venue.coordinates,
+                isBlocked: false,
             },
             categoryIds: [categoryId],
             primaryCategoryId: categoryId,
@@ -152,6 +154,29 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
 
         expectStatus(lastMinute, 200)
         expectApiError(expired, 404, { code: "OccurrenceNotFound" })
+    })
+
+    it("keeps the occurrence of a blocked venue and flags the venue", async () => {
+        const { headers } = await signInAs("organizer")
+        const admin = await signInAs("admin")
+        const { categoryId, venueId } = await seedEventReferences()
+        const event = await seedEvent(headers, { venueId, categoryId })
+        expectStatus(
+            await blockVenue({
+                headers: admin.headers,
+                pathParams: { id: venueId },
+                body: { reason: "Closed for works" },
+            }),
+            200,
+        )
+
+        const res = await getOccurrence({
+            headers: { "x-test-now": SATURDAY_NOON },
+            pathParams: { eventId: event.id, date: "2026-10-24" },
+        })
+
+        expectStatus(res, 200)
+        expect(res.data.venue).toMatchObject({ id: venueId, isBlocked: true })
     })
 
     it("answers 404 on the next request once an Admin blocks the event", async () => {

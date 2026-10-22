@@ -141,7 +141,7 @@ export class PublicOccurrencesService {
      * @description Maps a stored occurrence to its public summary, with the URL of its cover
      * @param occurrence Stored occurrence
      */
-    private toSummary(occurrence: StoredOccurrenceSummary): OccurrenceSummary {
+    public toSummary(occurrence: StoredOccurrenceSummary): OccurrenceSummary {
         return {
             eventId: occurrence.eventId,
             date: occurrence.localDate,

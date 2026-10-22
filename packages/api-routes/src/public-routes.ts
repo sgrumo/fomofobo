@@ -5,10 +5,14 @@ import {
     occurrenceDetailSchema,
     occurrenceLookupQuerySchema,
     occurrenceSummarySchema,
+    paginatedResponseSchema,
     placeSearchQuerySchema,
+    publicVenueSchema,
     publicSearchQuerySchema,
     publicSearchResponseSchema,
     searchSuggestionsSchema,
+    venueHistoryItemSchema,
+    venueHistoryQuerySchema,
 } from "models"
 
 import {
@@ -134,8 +138,58 @@ export const PublicRoutes = {
             503: serviceUnavailableResponse("Geocoding provider unavailable"),
         },
         tags: ["Public"],
-        summary: "Suggest places and events",
+        summary: "Suggest places, events and venues",
         description:
-            "Returns the places of the geocoding provider biased to the center, and the visible events whose title matches.",
+            "Returns the places of the geocoding provider biased to the center, the visible events whose title matches, and the venues of the area whose name matches.",
+    }),
+
+    getVenue: createRoute({
+        method: "get",
+        path: "/api/public/venues/{venueId}",
+        request: {
+            params: z.object({ venueId: z.uuid().openapi("Venue ID") }),
+        },
+        responses: {
+            200: {
+                content: {
+                    "application/json": {
+                        schema: publicVenueSchema.openapi("PublicVenue"),
+                    },
+                },
+                description: "Venue with its upcoming events",
+            },
+            404: notFoundResponse("Venue"),
+        },
+        tags: ["Public"],
+        summary: "Get venue",
+        description:
+            "Returns a venue that is not blocked, with each visible event that has an occurrence not yet ended: live first, then soonest.",
+    }),
+
+    listVenueHistory: createRoute({
+        method: "get",
+        path: "/api/public/venues/{venueId}/history",
+        request: {
+            params: z.object({ venueId: z.uuid().openapi("Venue ID") }),
+            query: venueHistoryQuerySchema.openapi("VenueHistoryQuery"),
+        },
+        responses: {
+            200: {
+                content: {
+                    "application/json": {
+                        schema: paginatedResponseSchema(venueHistoryItemSchema).openapi(
+                            "VenueHistoryPage",
+                        ),
+                    },
+                },
+                description: "Past events of the venue, newest end first",
+            },
+            400: badRequestResponse,
+            404: notFoundResponse("Venue"),
+        },
+        tags: ["Public"],
+        summary: "List venue history",
+        description:
+            "Returns the visible events of a venue that is not blocked whose last occurrence ended, with their first and last date.",
     }),
 }

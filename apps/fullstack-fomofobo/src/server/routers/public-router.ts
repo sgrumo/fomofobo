@@ -8,15 +8,17 @@ import { toApplicationError } from "../errors"
 import type { CategoriesService } from "../services/categories-service"
 import type { PlacesService } from "../services/places-service"
 import type { PublicOccurrencesService } from "../services/public-occurrences-service"
+import type { PublicVenuesService } from "../services/public-venues-service"
 
 /**
  * @description Builds the router of the public app reads, open to every visitor
- * @param services Category reads, occurrence reads and place suggestions
+ * @param services Category reads, occurrence and venue reads, and place suggestions
  */
 export const buildPublicRouter = (services: {
     categories: CategoriesService
     occurrences: PublicOccurrencesService
     places: PlacesService
+    venues: PublicVenuesService
 }) => {
     const router = createRouter<ClockEnv>()
 
@@ -75,6 +77,31 @@ export const buildPublicRouter = (services: {
             return respond(c, PublicRoutes.searchPlaces, HttpStatus.Ok, suggestions)
         } catch (error) {
             throw toApplicationError(error, "Error suggesting places")
+        }
+    })
+
+    router.openapi(PublicRoutes.getVenue, async c => {
+        try {
+            const venue = await services.venues.get(
+                c.req.valid("param").venueId,
+                c.var.now,
+            )
+            return respond(c, PublicRoutes.getVenue, HttpStatus.Ok, venue)
+        } catch (error) {
+            throw toApplicationError(error, "Error reading the venue")
+        }
+    })
+
+    router.openapi(PublicRoutes.listVenueHistory, async c => {
+        try {
+            const page = await services.venues.listHistory(
+                c.req.valid("param").venueId,
+                c.req.valid("query"),
+                c.var.now,
+            )
+            return respond(c, PublicRoutes.listVenueHistory, HttpStatus.Ok, page)
+        } catch (error) {
+            throw toApplicationError(error, "Error listing the venue history")
         }
     })
 

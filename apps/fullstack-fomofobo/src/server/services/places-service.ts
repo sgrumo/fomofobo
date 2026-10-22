@@ -16,6 +16,7 @@ const PLACES_WINDOW_MS = 60_000
 const PLACES_COUNTRY_CODE = "it"
 const PLACES_CACHE_SECONDS = 86_400
 const EVENTS_PER_SUGGESTION = 5
+const VENUES_PER_SUGGESTION = 5
 
 export class PlacesService {
     private readonly provider: GeocodingProvider
@@ -60,7 +61,12 @@ export class PlacesService {
             longitude: Math.round(query.lng * 100) / 100,
         }
         const center = { latitude: query.lat, longitude: query.lng }
-        const [places, events] = await Promise.all([
+        const area = {
+            center,
+            radiusMeters: SEARCH_RADIUS_METERS,
+            box: boundingBox(center, SEARCH_RADIUS_METERS),
+        }
+        const [places, events, venues] = await Promise.all([
             unstable_cache(
                 async () =>
                     await this.provider.suggest(text, {
@@ -77,12 +83,15 @@ export class PlacesService {
                 { tags: [PLACES_TAG], revalidate: PLACES_CACHE_SECONDS },
             )(),
             this.occurrencesStorage.suggestEvents({
+                ...area,
                 q: query.q,
-                center,
-                radiusMeters: SEARCH_RADIUS_METERS,
-                box: boundingBox(center, SEARCH_RADIUS_METERS),
                 now,
                 limit: EVENTS_PER_SUGGESTION,
+            }),
+            this.occurrencesStorage.suggestVenues({
+                ...area,
+                q: query.q,
+                limit: VENUES_PER_SUGGESTION,
             }),
         ])
         return {
@@ -92,6 +101,7 @@ export class PlacesService {
                 date: event.localDate,
                 title: event.title,
             })),
+            venues,
         }
     }
 }

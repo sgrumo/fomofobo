@@ -96,6 +96,7 @@ const buildApi = (): OpenAPIHono => {
         organizers,
         photos,
         places,
+        publicVenues,
         settings,
         venues,
     } = getContainer()
@@ -116,7 +117,10 @@ const buildApi = (): OpenAPIHono => {
 
     app.post(SIGN_IN_PATH, c => auth.handler(c.req.raw))
 
-    app.route("/", buildPublicRouter({ categories, occurrences, places }))
+    app.route(
+        "/",
+        buildPublicRouter({ categories, occurrences, places, venues: publicVenues }),
+    )
 
     app.use(`${apiBasePath}/backoffice/*`, backofficeSession(authAccounts))
     app.route("/", buildBackofficeSessionRouter())

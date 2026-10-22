@@ -24,7 +24,7 @@ export const occurrenceSummarySchema = occurrenceRefSchema.extend({
     endsAt: instantSchema,
     title: eventSchema.shape.title,
     description: eventSchema.shape.description,
-    venue: venueSchema.pick({ id: true, name: true, coordinates: true }),
+    venue: venueSchema.pick({ id: true, name: true, coordinates: true, isBlocked: true }),
     categoryIds: eventSchema.shape.categoryIds,
     primaryCategoryId: eventSchema.shape.primaryCategoryId,
     coverPhotoUrl: z.url().nullable(),
@@ -33,7 +33,13 @@ export const occurrenceSummarySchema = occurrenceRefSchema.extend({
 export type OccurrenceSummary = z.infer<typeof occurrenceSummarySchema>
 
 export const occurrenceDetailSchema = occurrenceSummarySchema.extend({
-    venue: venueSchema.pick({ id: true, name: true, address: true, coordinates: true }),
+    venue: venueSchema.pick({
+        id: true,
+        name: true,
+        address: true,
+        coordinates: true,
+        isBlocked: true,
+    }),
     photos: z.array(eventPhotoSchema),
     externalLinks: eventExternalLinksSchema,
 })

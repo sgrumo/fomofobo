@@ -16,6 +16,7 @@ export const specifier = {
 
 export const cacheKey = {
     publicOccurrences: "publicOccurrences",
+    publicVenues: "publicVenues",
     places: "places",
     categories: "categories",
     me: "me",
@@ -31,6 +32,7 @@ export const cacheKey = {
  */
 export const cacheKeys = (() => {
     const basePublicOccurrences = [cacheKey.publicOccurrences]
+    const basePublicVenues = [cacheKey.publicVenues]
     const basePlaces = [cacheKey.places]
     const baseCategories = [cacheKey.categories]
     const baseMe = [cacheKey.me]
@@ -49,6 +51,14 @@ export const cacheKeys = (() => {
     const publicOccurrence = (
         variables: QueryVariables<typeof PublicRoutes.getOccurrence>,
     ) => [...basePublicOccurrences, specifier.detail, variables]
+    const publicVenue = (variables: QueryVariables<typeof PublicRoutes.getVenue>) => [
+        ...basePublicVenues,
+        specifier.detail,
+        variables,
+    ]
+    const publicVenueHistory = (
+        variables: QueryVariables<typeof PublicRoutes.listVenueHistory>,
+    ) => [...basePublicVenues, specifier.list, variables]
     const placeSearch = (variables: QueryVariables<typeof PublicRoutes.searchPlaces>) => [
         ...basePlaces,
         variables,
@@ -78,6 +88,7 @@ export const cacheKeys = (() => {
 
     return {
         allPublicOccurrences: basePublicOccurrences,
+        allPublicVenues: basePublicVenues,
         allPlaces: basePlaces,
         allBackofficeEvents: baseBackofficeEvents,
         allVenues: baseVenues,
@@ -90,6 +101,8 @@ export const cacheKeys = (() => {
         publicOccurrenceSearch,
         publicOccurrenceLookup,
         publicOccurrence,
+        publicVenue,
+        publicVenueHistory,
         placeSearch,
         backofficeEventList,
         backofficeEvent,
