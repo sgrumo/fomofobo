@@ -2,7 +2,7 @@ import { and, count, eq, inArray, isNotNull, isNull } from "drizzle-orm"
 import type { Category, CategoryUpdate } from "models"
 
 import type { DbInstanceFromSchema } from "../db-config"
-import { categories, eventCategories, events } from "../db-schema"
+import { categories, eventCategories, events, venues } from "../db-schema"
 
 /**
  * @description Maps a `categories` row to its model
@@ -78,22 +78,28 @@ export class CategoriesStorage {
     }
 
     /**
-     * @description Fetches the count of the events not deleted that use the category
+     * @description Fetches the count of the events not deleted and of the venues that use the category
      * @param id Category counted
      */
-    public async countEventUses(id: string): Promise<number> {
-        const [result] = await this.db
-            .select({ value: count() })
-            .from(eventCategories)
-            .innerJoin(events, eq(events.id, eventCategories.eventId))
-            .where(and(eq(eventCategories.categoryId, id), isNull(events.deletedAt)))
-        return result?.value ?? 0
+    public async countUses(id: string): Promise<number> {
+        const [[eventUses], [venueUses]] = await this.db.batch([
+            this.db
+                .select({ value: count() })
+                .from(eventCategories)
+                .innerJoin(events, eq(events.id, eventCategories.eventId))
+                .where(and(eq(eventCategories.categoryId, id), isNull(events.deletedAt))),
+            this.db
+                .select({ value: count() })
+                .from(venues)
+                .where(eq(venues.categoryId, id)),
+        ])
+        return (eventUses?.value ?? 0) + (venueUses?.value ?? 0)
     }
 
     /**
      * @description Deletes one category with its links to deleted events, or returns `null` when no row matches
      * @param id Category deleted
-     * @remarks Fails on the foreign key while an event not deleted uses the category
+     * @remarks Fails on the foreign key while an event not deleted or a venue uses the category
      */
     public async deleteWithDeletedEventLinks(id: string): Promise<Category | null> {
         const [, [row]] = await this.db.batch([

@@ -10,7 +10,7 @@ import {
     uniqueIndex,
 } from "drizzle-orm/sqlite-core"
 import type { Recurrence } from "models"
-import { accountRoleValues, categoryIconValues } from "models"
+import { accountRoleValues, categoryIconValues, venueKindValues } from "models"
 
 /**
  * @description Builds the quoted SQL list of enum values for a CHECK constraint
@@ -159,6 +159,11 @@ export const venues = sqliteTable(
         websiteUrl: text("website_url"),
         instagramUrl: text("instagram_url"),
         facebookUrl: text("facebook_url"),
+        kind: text("kind", { enum: venueKindValues }).notNull().default("regular"),
+        programmeUrl: text("programme_url"),
+        categoryId: text("category_id").references(() => categories.id, {
+            onDelete: "restrict",
+        }),
         createdBy: text("created_by").references(() => accounts.id, {
             onDelete: "set null",
         }),

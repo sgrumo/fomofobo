@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-10-22 · Cinemas and museums become permanent venues
+
+### Changed
+
+A venue can be a cinema, a museum, a theatre or a gallery, with a link to its programme outside the app. Only Admins manage these venues.
+
+### Why
+
+A client request. Cinemas and museums have no start and no end, and their programme lives on their own sites.
+
+### Check next time
+
+Ask whether some places stay open over time with no dated events, before the map shows only dated results.
+
 ## 2026-10-22 · Venues get a public page with past events
 
 ### Changed

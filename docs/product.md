@@ -12,13 +12,15 @@ fomofobo is a responsive, mobile-first web app for finding events around a place
 
 ### Categories
 
-A category groups events by type and carries a unique name and an icon. The icon marks the category on the filter chips and on the map pins. Only Admins create, edit and delete categories, and the app refuses to delete a category that an event uses.
+A category groups events by type and carries a unique name and an icon. The icon marks the category on the filter chips and on the map pins. Only Admins create, edit and delete categories, and the app refuses to delete a category that an event or a permanent venue uses.
 
 ### Venues
 
 A venue is a reusable place with a name, an address and coordinates, and an optional description, cover and website, Instagram and Facebook links. Every event takes place at exactly one venue, and events share venues. The backoffice takes the address and the coordinates of a venue from the place search, and a pin on the map corrects the position.
 
 An Organizer owns one venue at most, and creates and edits only that venue. An Admin creates every other venue, edits every venue, and gives a venue to an Organizer or takes it back. Any Organizer holds events at any venue.
+
+An Admin gives a venue a permanent kind: cinema, museum, theatre or gallery. A permanent venue carries one link to its programme outside the app and one category, and only Admins edit it, so it has no owner. A venue with an owner keeps the regular kind until the Admin takes the owner away.
 
 An Admin blocks a venue with a reason. A blocked venue can no longer be picked for an event, and the events already held there keep it and stay visible. A blocked venue loses its public page, and its events show its name with no link.
 

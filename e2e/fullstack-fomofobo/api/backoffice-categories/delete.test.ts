@@ -8,6 +8,8 @@ import {
     seedEventReferences,
     uploadPhoto,
 } from "../backoffice-events/utils"
+import { createVenue, setVenueKind } from "../backoffice-venues/api"
+import { buildCinemaKind, buildVenueCreation } from "../backoffice-venues/utils"
 import { listCategories } from "../public/api"
 import { createCategory, deleteCategory } from "./api"
 import { buildCategoryCreation } from "./utils"
@@ -68,6 +70,29 @@ describe("DELETE /api/backoffice/categories/{id}", () => {
         const res = await deleteCategory({
             headers: admin.headers,
             pathParams: { id: categoryId },
+        })
+
+        expectApiError(res, 409, { code: "CategoryInUse" })
+    })
+
+    it("answers 409 while a permanent venue uses the category", async () => {
+        const { headers } = await signInAs("admin")
+        const category = await createCategory({ headers, body: buildCategoryCreation() })
+        const venue = await createVenue({ headers, body: buildVenueCreation() })
+        expectStatus(category, 201)
+        expectStatus(venue, 201)
+        expectStatus(
+            await setVenueKind({
+                headers,
+                pathParams: { id: venue.data.id },
+                body: buildCinemaKind(category.data.id),
+            }),
+            200,
+        )
+
+        const res = await deleteCategory({
+            headers,
+            pathParams: { id: category.data.id },
         })
 
         expectApiError(res, 409, { code: "CategoryInUse" })

@@ -27,6 +27,8 @@ export type AppErrorCode =
     | "VenueLimitReached"
     | "VenueOwnerTaken"
     | "InvalidVenueOwner"
+    | "PermanentVenueOwner"
+    | "InvalidVenueCategory"
 
 export const { appError, toApplicationError, handleRouteNotFound } =
     createErrorUtils<AppErrorCode>({

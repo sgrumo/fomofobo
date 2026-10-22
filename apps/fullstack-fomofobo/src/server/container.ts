@@ -66,6 +66,7 @@ const buildContainer = (): Container => {
     })
 
     const accountsStorage = new AccountsStorage(db)
+    const categoriesStorage = new CategoriesStorage(db)
     const photoStorage = new S3ObjectStorage({
         bucket: env.S3_BUCKET,
         region: env.S3_REGION,
@@ -89,10 +90,11 @@ const buildContainer = (): Container => {
         auth,
         authAccounts,
         organizers: new OrganizersService(authAccounts, accountsStorage),
-        categories: new CategoriesService(new CategoriesStorage(db)),
+        categories: new CategoriesService(categoriesStorage),
         venues: new VenuesService(
             new VenuesStorage(db),
             accountsStorage,
+            categoriesStorage,
             photos,
             photoStorage,
             env.PHOTOS_PUBLIC_BASE_URL,

@@ -22,6 +22,7 @@ import type {
     PlatformSettingsUpdate,
     VenueBlock,
     VenueCreation,
+    VenueKindChange,
     VenueOwner,
     VenueUpdate,
 } from "models"
@@ -243,6 +244,13 @@ export const createApi = (options: ApiClientOptions) => {
         onSuccess: invalidateAfter("venue"),
     })
 
+    const setVenueKind = responsefulMutationEndpoint(BackofficeVenuesRoutes.setKind, 200)
+    const setVenueKindMutation = mutationOptions({
+        mutationFn: (arg: { id: string; body: VenueKindChange }) =>
+            setVenueKind({ params: { id: arg.id }, body: arg.body }),
+        onSuccess: invalidateAfter("venue"),
+    })
+
     const blockVenue = responsefulMutationEndpoint(BackofficeVenuesRoutes.block, 200)
     const blockVenueMutation = mutationOptions({
         mutationFn: (arg: { id: string; body: VenueBlock }) =>
@@ -416,6 +424,8 @@ export const createApi = (options: ApiClientOptions) => {
         updateVenueMutation,
         setVenueOwner,
         setVenueOwnerMutation,
+        setVenueKind,
+        setVenueKindMutation,
         blockVenue,
         blockVenueMutation,
         unblockVenue,

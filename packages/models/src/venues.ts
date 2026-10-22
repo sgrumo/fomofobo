@@ -16,6 +16,21 @@ export const venueLinksSchema = z.object({
 })
 export type VenueLinks = z.infer<typeof venueLinksSchema>
 
+export const venueKindValues = [
+    "regular",
+    "cinema",
+    "museum",
+    "theatre",
+    "gallery",
+] as const
+export const venueKindSchema = z.enum(venueKindValues)
+export type VenueKind = z.infer<typeof venueKindSchema>
+
+export const permanentVenueKindSchema = venueKindSchema.exclude(["regular"])
+export type PermanentVenueKind = z.infer<typeof permanentVenueKindSchema>
+
+export const venueProgrammeUrlSchema = z.url({ protocol: /^https$/u }).max(500)
+
 export const venueSchema = z.object({
     id: z.uuid(),
     name: z.string().trim().min(1).max(120),
@@ -24,6 +39,10 @@ export const venueSchema = z.object({
     description: z.string().trim().min(1).max(500).nullable(),
     coverPhotoUrl: z.url().nullable(),
     links: venueLinksSchema,
+    kind: venueKindSchema,
+    // `programmeUrl` and `categoryId` are `null` exactly when the kind is `regular`
+    programmeUrl: venueProgrammeUrlSchema.nullable(),
+    categoryId: z.uuid().nullable(),
     owner: accountSchema.pick({ id: true, name: true }).nullable(),
     isBlocked: z.boolean(),
     blockReason: z.string().nullable(),
@@ -47,6 +66,16 @@ export const venueUpdateSchema = nonEmptyUpdate(
         .partial(),
 )
 export type VenueUpdate = z.infer<typeof venueUpdateSchema>
+
+export const venueKindChangeSchema = z.discriminatedUnion("kind", [
+    z.object({ kind: z.literal("regular") }),
+    z.object({
+        kind: permanentVenueKindSchema,
+        programmeUrl: venueProgrammeUrlSchema,
+        categoryId: z.uuid(),
+    }),
+])
+export type VenueKindChange = z.infer<typeof venueKindChangeSchema>
 
 export const venueOwnerSchema = z.object({ ownerId: z.uuid().nullable() })
 export type VenueOwner = z.infer<typeof venueOwnerSchema>

@@ -53,13 +53,13 @@ export class CategoriesService {
     }
 
     /**
-     * @description Deletes a category that no event in place uses, with its links to deleted events
+     * @description Deletes a category that no event in place and no venue uses, with its links to deleted events
      * @param id Category deleted
      */
     public async delete(id: string): Promise<void> {
         // PLACEHOLDER(OP-24): a category in use stays
-        if ((await this.categoriesStorage.countEventUses(id)) > 0) {
-            throw appError("CategoryInUse", `An event uses the category ${id}`)
+        if ((await this.categoriesStorage.countUses(id)) > 0) {
+            throw appError("CategoryInUse", `An event or a venue uses the category ${id}`)
         }
         if ((await this.categoriesStorage.deleteWithDeletedEventLinks(id)) === null) {
             throw appError("CategoryNotFound", `Category ${id} not found`)

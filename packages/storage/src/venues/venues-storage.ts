@@ -1,5 +1,11 @@
-import { and, count, eq, or } from "drizzle-orm"
-import type { Venue, VenueCreation, VenueListQuery, VenueUpdate } from "models"
+import { and, count, eq, isNull, or } from "drizzle-orm"
+import type {
+    Venue,
+    VenueCreation,
+    VenueKindChange,
+    VenueListQuery,
+    VenueUpdate,
+} from "models"
 import type { StrictOmit } from "shared/types"
 
 import type { DbInstanceFromSchema } from "../db-config"
@@ -34,6 +40,9 @@ const toStoredVenue = (row: {
         instagramUrl: row.venue.instagramUrl,
         facebookUrl: row.venue.facebookUrl,
     },
+    kind: row.venue.kind,
+    programmeUrl: row.venue.programmeUrl,
+    categoryId: row.venue.categoryId,
     owner:
         row.venue.ownerId === null || row.ownerName === null
             ? null
@@ -174,7 +183,7 @@ export class VenuesStorage {
     }
 
     /**
-     * @description Persists the owner of one venue, and returns false when no row matches
+     * @description Persists the owner of one venue, and returns false when no row matches or an owner meets a permanent venue
      * @param id Venue changed
      * @param ownerId New owner, `null` for no owner
      * @param updatedAt Instant of the change
@@ -188,7 +197,41 @@ export class VenuesStorage {
         const rows = await this.db
             .update(venues)
             .set({ ownerId, updatedAt })
-            .where(eq(venues.id, id))
+            .where(
+                and(
+                    eq(venues.id, id),
+                    ownerId === null ? undefined : eq(venues.kind, "regular"),
+                ),
+            )
+            .returning({ id: venues.id })
+        return rows.length > 0
+    }
+
+    /**
+     * @description Persists the kind of one venue, and returns false when no row matches or a permanent kind meets an owner
+     * @param id Venue changed
+     * @param change Kind, with the programme link and the category of a permanent kind
+     * @param updatedAt Instant of the change
+     */
+    public async setKind(
+        id: string,
+        change: VenueKindChange,
+        updatedAt: Date,
+    ): Promise<boolean> {
+        const rows = await this.db
+            .update(venues)
+            .set({
+                kind: change.kind,
+                programmeUrl: change.kind === "regular" ? null : change.programmeUrl,
+                categoryId: change.kind === "regular" ? null : change.categoryId,
+                updatedAt,
+            })
+            .where(
+                and(
+                    eq(venues.id, id),
+                    change.kind === "regular" ? undefined : isNull(venues.ownerId),
+                ),
+            )
             .returning({ id: venues.id })
         return rows.length > 0
     }

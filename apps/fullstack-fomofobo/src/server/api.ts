@@ -47,6 +47,7 @@ export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus 
             "TooManyOccurrences",
             "PastDateRange",
             "InvalidVenueOwner",
+            "InvalidVenueCategory",
             () => HttpStatus.BadRequest,
         )
         .with(
@@ -67,6 +68,7 @@ export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus 
             "CategoryNameTaken",
             "VenueLimitReached",
             "VenueOwnerTaken",
+            "PermanentVenueOwner",
             () => HttpStatus.Conflict,
         )
         .with("TooManyRequests", () => HttpStatus.TooManyRequests)

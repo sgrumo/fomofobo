@@ -5,6 +5,7 @@ import {
     presignedUploadSchema,
     venueBlockSchema,
     venueCreationSchema,
+    venueKindChangeSchema,
     venueListQuerySchema,
     venueOwnerSchema,
     venueSchema,
@@ -139,10 +140,42 @@ export const BackofficeVenuesRoutes = {
             400: badRequestResponse,
             ...sessionErrorResponses,
             404: notFoundResponse("Venue"),
-            409: conflictResponse("The Organizer already owns another venue"),
+            409: conflictResponse(
+                "The Organizer already owns another venue, or the venue is permanent",
+            ),
         },
         tags: ["Backoffice"],
         summary: "Set venue owner",
+    }),
+
+    setKind: createRoute({
+        method: "put",
+        path: "/api/backoffice/venues/{id}/kind",
+        request: {
+            params: venueParamsSchema,
+            body: {
+                required: true,
+                content: {
+                    "application/json": {
+                        schema: venueKindChangeSchema.openapi("VenueKindChange"),
+                    },
+                },
+            },
+        },
+        responses: {
+            200: {
+                content: { "application/json": { schema: venueResponseSchema } },
+                description: "Kind set",
+            },
+            400: badRequestResponse,
+            ...sessionErrorResponses,
+            404: notFoundResponse("Venue"),
+            409: conflictResponse("The venue has an owner, so it cannot be permanent"),
+        },
+        tags: ["Backoffice"],
+        summary: "Set venue kind",
+        description:
+            "A permanent kind (cinema, museum, theatre, gallery) takes a programme link and a category, and only a venue with no owner takes it.",
     }),
 
     block: createRoute({

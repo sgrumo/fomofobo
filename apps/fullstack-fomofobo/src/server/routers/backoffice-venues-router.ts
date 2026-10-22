@@ -16,6 +16,7 @@ export const buildBackofficeVenuesRouter = (venues: VenuesService) => {
     const router = createRouter<BackofficeEnv>()
 
     router.use(BackofficeVenuesRoutes.setOwner.getRoutingPath(), requireRole("admin"))
+    router.use(BackofficeVenuesRoutes.setKind.getRoutingPath(), requireRole("admin"))
     router.use(BackofficeVenuesRoutes.block.getRoutingPath(), requireRole("admin"))
     router.use(BackofficeVenuesRoutes.unblock.getRoutingPath(), requireRole("admin"))
 
@@ -68,6 +69,18 @@ export const buildBackofficeVenuesRouter = (venues: VenuesService) => {
             return respond(c, BackofficeVenuesRoutes.setOwner, HttpStatus.Ok, venue)
         } catch (error) {
             throw toApplicationError(error, "Error setting the venue owner")
+        }
+    })
+
+    router.openapi(BackofficeVenuesRoutes.setKind, async c => {
+        try {
+            const venue = await venues.setKind(
+                c.req.valid("param").id,
+                c.req.valid("json"),
+            )
+            return respond(c, BackofficeVenuesRoutes.setKind, HttpStatus.Ok, venue)
+        } catch (error) {
+            throw toApplicationError(error, "Error setting the venue kind")
         }
     })
 

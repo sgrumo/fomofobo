@@ -2,8 +2,10 @@ import { expectApiError, expectStatus } from "e2e-kit/assertions"
 import { describe, expect, it } from "vitest"
 
 import { signInAs } from "../auth/utils"
-import { createVenue, getVenue, setVenueOwner } from "./api"
-import { buildVenueCreation } from "./utils"
+import { createCategory } from "../backoffice-categories/api"
+import { buildCategoryCreation } from "../backoffice-categories/utils"
+import { createVenue, getVenue, setVenueKind, setVenueOwner } from "./api"
+import { buildCinemaKind, buildVenueCreation } from "./utils"
 
 describe("PUT /api/backoffice/venues/{id}/owner", () => {
     it("gives a venue to an Organizer, then takes it back", async () => {
@@ -53,6 +55,31 @@ describe("PUT /api/backoffice/venues/{id}/owner", () => {
         })
 
         expectApiError(res, 409, { code: "VenueOwnerTaken" })
+    })
+
+    it("answers 409 to an owner for a permanent venue", async () => {
+        const { headers } = await signInAs("admin")
+        const organizer = await signInAs("organizer")
+        const category = await createCategory({ headers, body: buildCategoryCreation() })
+        const created = await createVenue({ headers, body: buildVenueCreation() })
+        expectStatus(category, 201)
+        expectStatus(created, 201)
+        expectStatus(
+            await setVenueKind({
+                headers,
+                pathParams: { id: created.data.id },
+                body: buildCinemaKind(category.data.id),
+            }),
+            200,
+        )
+
+        const res = await setVenueOwner({
+            headers,
+            pathParams: { id: created.data.id },
+            body: { ownerId: organizer.account.id },
+        })
+
+        expectApiError(res, 409, { code: "PermanentVenueOwner" })
     })
 
     it("answers 400 to an owner that is not an Organizer", async () => {

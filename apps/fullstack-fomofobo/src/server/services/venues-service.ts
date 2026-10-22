@@ -7,10 +7,16 @@ import type {
     PresignedUpload,
     Venue,
     VenueCreation,
+    VenueKindChange,
     VenueListQuery,
     VenueUpdate,
 } from "models"
-import type { AccountsStorage, StoredVenue, VenuesStorage } from "storage"
+import type {
+    AccountsStorage,
+    CategoriesStorage,
+    StoredVenue,
+    VenuesStorage,
+} from "storage"
 
 import { expireTags, PUBLIC_TAG, venueTag } from "../cache"
 import { appError } from "../errors"
@@ -22,18 +28,21 @@ import { toPage } from "./to-page"
 export class VenuesService {
     private readonly venuesStorage: VenuesStorage
     private readonly accountsStorage: AccountsStorage
+    private readonly categoriesStorage: CategoriesStorage
     private readonly photos: PhotosService
     private readonly photoStorage: S3ObjectStorage
     private readonly photosPublicBaseUrl: string
     public constructor(
         venuesStorage: VenuesStorage,
         accountsStorage: AccountsStorage,
+        categoriesStorage: CategoriesStorage,
         photos: PhotosService,
         photoStorage: S3ObjectStorage,
         photosPublicBaseUrl: string,
     ) {
         this.venuesStorage = venuesStorage
         this.accountsStorage = accountsStorage
+        this.categoriesStorage = categoriesStorage
         this.photos = photos
         this.photoStorage = photoStorage
         this.photosPublicBaseUrl = photosPublicBaseUrl
@@ -144,12 +153,19 @@ export class VenuesService {
     }
 
     /**
-     * @description Persists the owner of a venue, an Organizer that owns no other venue, or none
+     * @description Persists the owner of a venue, an Organizer that owns no other venue, or none; a permanent venue takes none
      * @param id Venue changed
      * @param ownerId New owner, `null` for no owner
      */
     public async setOwner(id: string, ownerId: string | null): Promise<Venue> {
+        const venue = await this.findStored(id)
         if (ownerId !== null) {
+            if (venue.kind !== "regular") {
+                throw appError(
+                    "PermanentVenueOwner",
+                    `Venue ${id} is permanent and takes no owner`,
+                )
+            }
             const owner = await this.accountsStorage.findById(ownerId)
             if (owner?.role !== "organizer") {
                 throw appError("InvalidVenueOwner", `Organizer ${ownerId} not found`)
@@ -163,8 +179,36 @@ export class VenuesService {
             }
         }
         if (!(await this.venuesStorage.setOwner(id, ownerId, new Date()))) {
-            throw appError("VenueNotFound", `Venue ${id} not found`)
+            throw appError(
+                "PermanentVenueOwner",
+                `Venue ${id} became permanent meanwhile`,
+            )
         }
+        return await this.getById(id)
+    }
+
+    /**
+     * @description Persists the kind of a venue, with the programme link and the category of a permanent kind, which a venue with an owner cannot take
+     * @param id Venue changed
+     * @param change Kind, and the programme link and the category of a permanent kind
+     */
+    public async setKind(id: string, change: VenueKindChange): Promise<Venue> {
+        const venue = await this.findStored(id)
+        if (change.kind !== "regular") {
+            if (venue.owner !== null) {
+                throw appError("PermanentVenueOwner", `Venue ${id} has an owner`)
+            }
+            if ((await this.categoriesStorage.findById(change.categoryId)) === null) {
+                throw appError(
+                    "InvalidVenueCategory",
+                    `Category ${change.categoryId} not found`,
+                )
+            }
+        }
+        if (!(await this.venuesStorage.setKind(id, change, new Date()))) {
+            throw appError("PermanentVenueOwner", `Venue ${id} got an owner meanwhile`)
+        }
+        expireTags(PUBLIC_TAG, venueTag(id))
         return await this.getById(id)
     }
 
