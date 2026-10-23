@@ -89,8 +89,29 @@
         "Retry": "Riprova",
         "BackToMap": "Torna alla mappa",
         "Back": "Indietro",
+        "Gallery": "Foto di {{title}}",
+        "Photo": "Foto {{index}} di {{total}}",
+        "PhotoCounter": "Foto {{index}}/{{total}}",
+        "Cover": "Immagine di {{title}}",
+        "Date": "Data",
+        "Time": "Orario",
+        "Entry": "Ingresso",
+        "Capacity": "Capienza",
+        "Places_one": "{{count}} posto",
+        "Places_other": "{{count}} posti",
+        "Interest": "Interesse",
         "Interested_one": "{{count}} interessato",
-        "Interested_other": "{{count}} interessati"
+        "Interested_other": "{{count}} interessati",
+        "Prices": {
+            "Label": "Prezzi e accesso",
+            "Entry": "Ingresso",
+            "Full": "Intero",
+            "Membership": "Tessera richiesta",
+            "MinimumAge": "Età minima",
+            "Notes": "Note"
+        },
+        "Now": "ora {{time}}",
+        "Venue": "Luogo"
     },
     "Price": {
         "Free": "Gratis",
