@@ -102,7 +102,7 @@ The saved list works offline for every saved event that the device showed online
 
 A native app for iOS and Android offers the features of the public web app: map, search and filters, preview, event and venue pages, saved events and offline reads (not built). It has no sign-in and no backoffice, and it speaks Italian alone.
 
-The stores install and update the app, in place of the install button and the update prompt of the web app. A version gate asks for a store update when the server marks the installed version as too old, and shows a maintenance notice when the server says so (not built).
+The stores install and update the app, in place of the install button and the update prompt of the web app. A version gate asks for a store update when the server marks the installed version as too old, and shows a maintenance notice when the server says so.
 
 ### Backoffice access
 
