@@ -21,17 +21,17 @@ Deployable applications.
 
 Shared libraries consumed by apps via pnpm workspace references.
 
-| Package          | Description                                                                                                                                               |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `api-client`     | Typed frontend API layer generated from `api-routes`: endpoint factories, cache keys and TanStack Query options, with the HTTP transport injected per app |
-| `api-routes`     | OpenAPI-compliant REST route definitions built with `@hono/zod-openapi`                                                                                   |
-| `backend-shared` | Common backend utilities: Winston logger, environment-aware configuration                                                                                 |
-| `domain`         | Pure domain logic of the public clients, web and native, with no React and no DOM: status, time formats, map spots, prices, save queue, share links       |
-| `models`         | Zod schemas and inferred TypeScript types shared across frontend and backend                                                                              |
-| `i18n`           | Framework-agnostic i18next core: language keys, translation mapping, and locale-file checks for app tests                                                 |
-| `react-i18n`     | React binding of the i18n package: language hooks, translation types                                                                                      |
-| `obfuscation`    | Reversible string obfuscation/deobfuscation primitives (no crypto)                                                                                        |
-| `storage`        | libSQL data access layer using Drizzle ORM (schema, migrations, repositories)                                                                             |
+| Package          | Description                                                                                                                                                      |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `api-client`     | Typed frontend API layer generated from `api-routes`: endpoint factories, cache keys and TanStack Query options, with the HTTP transport injected per app        |
+| `api-routes`     | OpenAPI-compliant REST route definitions built with `@hono/zod-openapi`                                                                                          |
+| `backend-shared` | Common backend utilities: Winston logger, environment-aware configuration                                                                                        |
+| `domain`         | Pure domain logic of the public clients, web and native, with no React and no DOM: status, time formats, map spots, prices, save queue, share links, pixel icons |
+| `models`         | Zod schemas and inferred TypeScript types shared across frontend and backend                                                                                     |
+| `i18n`           | Framework-agnostic i18next core: language keys, translation mapping, and locale-file checks for app tests                                                        |
+| `react-i18n`     | React binding of the i18n package: language hooks, translation types                                                                                             |
+| `obfuscation`    | Reversible string obfuscation/deobfuscation primitives (no crypto)                                                                                               |
+| `storage`        | libSQL data access layer using Drizzle ORM (schema, migrations, repositories)                                                                                    |
 
 ### Database
 

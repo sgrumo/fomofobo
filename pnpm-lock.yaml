@@ -1248,6 +1248,9 @@ importers:
       date-fns:
         specifier: 'catalog:'
         version: 4.4.0
+      domain:
+        specifier: workspace:*
+        version: link:../domain
       es-toolkit:
         specifier: 'catalog:'
         version: 1.52.0
@@ -1395,15 +1398,15 @@ importers:
 
   scripts/fallback-images:
     dependencies:
+      domain:
+        specifier: workspace:*
+        version: link:../../packages/domain
       models:
         specifier: workspace:*
         version: link:../../packages/models
       shared:
         specifier: workspace:*
         version: link:../../packages/shared
-      ui-components:
-        specifier: workspace:*
-        version: link:../../packages/ui-components
     devDependencies:
       '@types/node':
         specifier: ^24.13.1

@@ -68,7 +68,7 @@ Headless, app-agnostic React UI primitives built on `@base-ui/react`. Consumed b
 - `stat-grid` - outlined grid of label and value cells
 - `pagination` - page navigation
 - `icons` - SVG icon component set
-- `pixel-icons` - pixel icon set on a 12 x 12 grid, one component per icon, plus `PixelIcon`, which takes the icon name. `pixel-icons/bitmaps` exports the bitmaps alone, for a Node script that loads no React
+- `pixel-icons` - pixel icon set on a 12 x 12 grid, one component per icon, plus `PixelIcon`, which takes the icon name. The bitmaps live in `domain/pixel-icons`, which the native app and the Node scripts read with no React
 
 **Infrastructure (non-component exports)**
 
@@ -78,7 +78,7 @@ Headless, app-agnostic React UI primitives built on `@base-ui/react`. Consumed b
 
 ## Conventions
 
-- **No app coupling**: nothing here imports from an app. Cross-package utils come from `frontend-shared`, `react-shared`, or `shared`.
+- **No app coupling**: nothing here imports from an app. Cross-package utils come from `frontend-shared`, `react-shared`, or `shared`. The pixel icon bitmaps come from `domain`.
 - **i18n**: components **NEVER** hardcode user-facing text. Read the translate fn via `const { i18n } = useUiContext()` then call `i18n.t(key, params)`; the consuming app supplies it through `UiProvider`. Declare every key (with its interpolation params) in `i18n/ui-translations.ts` (`UiInterpolations`).
 - **Prop spreading is allowed** here - these are primitives that forward native props.
 - **Folder layout** per component: `index.ts` (barrel), `<name>.tsx`, optional `<name>.styles.ts` / `<name>.helper.ts` / `<name>.context.ts`, `<name>.test.tsx`. Add the entry to `package.json` `exports`.

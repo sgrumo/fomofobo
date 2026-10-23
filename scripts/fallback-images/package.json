@@ -11,9 +11,9 @@
         "fallback-images": "tsx src/index.ts"
     },
     "dependencies": {
+        "domain": "workspace:*",
         "models": "workspace:*",
-        "shared": "workspace:*",
-        "ui-components": "workspace:*"
+        "shared": "workspace:*"
     },
     "devDependencies": {
         "@types/node": "catalog:",

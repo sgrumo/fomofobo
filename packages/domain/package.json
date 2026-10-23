@@ -13,6 +13,7 @@
         "./occurrence-progress": "./src/occurrence-progress.ts",
         "./occurrence-status": "./src/occurrence-status.ts",
         "./pin-tag": "./src/pin-tag.ts",
+        "./pixel-icons": "./src/pixel-icons.ts",
         "./platform": "./src/platform.ts",
         "./price-details": "./src/price-details.ts",
         "./price-summary": "./src/price-summary.ts",
