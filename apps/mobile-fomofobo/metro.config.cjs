@@ -30,4 +30,5 @@ config.resolver.resolveRequest = (context, moduleName, platform) =>
           )
         : context.resolveRequest(context, moduleName, platform)
 
-module.exports = withNativeWind(config, { input: "./src/global.css" })
+// A rem of 16 points keeps the spacing scale equal to the web app, `h-11` a 44 pt target included
+module.exports = withNativeWind(config, { input: "./src/global.css", inlineRem: 16 })

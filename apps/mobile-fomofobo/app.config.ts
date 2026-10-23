@@ -7,6 +7,7 @@ import { languageKeys } from "i18n/i18n"
 // The Expo config loader resolves a relative import only with its extension.
 import { parseEnv } from "./config/env.ts"
 import { resolveTarget } from "./config/target.ts"
+import { FONT_FAMILIES, THEME_COLORS } from "./src/lib/theme/theme-tokens.ts"
 
 const env = parseEnv(process.env)
 const target = resolveTarget(env.APP_ENV)
@@ -33,6 +34,18 @@ const googleServicesFile = (file: string): string | undefined =>
         ? `./${target.firebaseDir}/${file}`
         : undefined
 
+// Static faces of the `@expo-google-fonts` packages, embedded at build time
+const fontFiles = {
+    displayRegular:
+        "./node_modules/@expo-google-fonts/space-mono/400Regular/SpaceMono_400Regular.ttf",
+    displayBold:
+        "./node_modules/@expo-google-fonts/space-mono/700Bold/SpaceMono_700Bold.ttf",
+    sansRegular:
+        "./node_modules/@expo-google-fonts/funnel-sans/400Regular/FunnelSans_400Regular.ttf",
+    sansBold:
+        "./node_modules/@expo-google-fonts/funnel-sans/700Bold/FunnelSans_700Bold.ttf",
+}
+
 const config: ExpoConfig = {
     extra: {
         appEnv: env.APP_ENV,
@@ -48,6 +61,7 @@ const config: ExpoConfig = {
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
+    backgroundColor: THEME_COLORS.surface,
     ios: {
         supportsTablet: true,
         bundleIdentifier: appId,
@@ -79,7 +93,33 @@ const config: ExpoConfig = {
             {
                 image: "./assets/splash-icon.png",
                 resizeMode: "contain",
-                backgroundColor: "#ffffff",
+                backgroundColor: THEME_COLORS.surface,
+            },
+        ],
+        // iOS takes the family name from the font file. Android takes it from `fontFamily`, which
+        // matches that name, so one `fontFamily` and a `fontWeight` select a face on both.
+        [
+            "expo-font",
+            {
+                ios: { fonts: Object.values(fontFiles) },
+                android: {
+                    fonts: [
+                        {
+                            fontFamily: FONT_FAMILIES.display,
+                            fontDefinitions: [
+                                { path: fontFiles.displayRegular, weight: 400 },
+                                { path: fontFiles.displayBold, weight: 700 },
+                            ],
+                        },
+                        {
+                            fontFamily: FONT_FAMILIES.sans,
+                            fontDefinitions: [
+                                { path: fontFiles.sansRegular, weight: 400 },
+                                { path: fontFiles.sansBold, weight: 700 },
+                            ],
+                        },
+                    ],
+                },
             },
         ],
         // R8 shrinks and obfuscates the release build. A native library that reaches a class

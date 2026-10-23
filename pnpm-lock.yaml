@@ -468,6 +468,12 @@ importers:
 
   apps/mobile-fomofobo:
     dependencies:
+      '@expo-google-fonts/funnel-sans':
+        specifier: ^0.4.2
+        version: 0.4.2
+      '@expo-google-fonts/space-mono':
+        specifier: ^0.4.2
+        version: 0.4.2
       '@gorhom/bottom-sheet':
         specifier: ^5.2.8
         version: 5.2.14(@types/react@19.2.18)(react-native-gesture-handler@3.1.0)(react-native-reanimated@4.5.5)(react-native@0.86.3)(react@19.2.3)
@@ -501,6 +507,9 @@ importers:
       expo-constants:
         specifier: ~57.0.6
         version: 57.0.22(expo@57.0.30)(react-native@0.86.3)(supports-color@8.1.1)
+      expo-font:
+        specifier: ~57.0.4
+        version: 57.0.4(expo@57.0.30)(react-native@0.86.3)(react@19.2.3)
       expo-linking:
         specifier: ~57.0.3
         version: 57.0.13(expo@57.0.30)(react-native@0.86.3)(react@19.2.3)(supports-color@8.1.1)
@@ -2913,8 +2922,14 @@ packages:
       '@noble/hashes':
         optional: true
 
+  '@expo-google-fonts/funnel-sans@0.4.2':
+    resolution: {integrity: sha512-YVTJCBOxYM2ciGcP/GhXvY9yq75WQOnXCTaFV8aMCv4XFYbc2z0YyoAykI70xBb3rzUryXv8hhwGqIKI58pPCQ==}
+
   '@expo-google-fonts/material-symbols@0.4.50':
     resolution: {integrity: sha512-XNSgSfd+1p6wqRAzzhrckGngHJQ1/z+oCMdI5FN+x/VnDeMMFGkXsuRNPYcZTYYff1GwVwx4u6Gqnb30aALysw==}
+
+  '@expo-google-fonts/space-mono@0.4.2':
+    resolution: {integrity: sha512-soYY/qcKcnY7xjIhuMAVzJYxSdJ3Z8TjrtFHOB5SK7/4MEMGpoaw+CAVyvXnA3fsO7J7waIW+/5Z0Y0i/CfSeg==}
 
   '@expo/cli@57.0.31':
     resolution: {integrity: sha512-NPTMPGQ9i3KzULyP1bzp8hMggoe3QlkfICw388zJuj0UhqfGHEZURkJFuHBksb/ndTjfrCrCBOO0HQz/9QzXIw==}
@@ -9541,7 +9556,11 @@ snapshots:
     optionalDependencies:
       '@noble/hashes': 2.4.0
 
+  '@expo-google-fonts/funnel-sans@0.4.2': {}
+
   '@expo-google-fonts/material-symbols@0.4.50': {}
+
+  '@expo-google-fonts/space-mono@0.4.2': {}
 
   '@expo/cli@57.0.31(@expo/dom-webview@57.0.1)(@expo/metro-runtime@57.0.17)(expo-constants@57.0.22)(expo-font@57.0.4)(expo-router@57.0.28)(expo@57.0.30)(react-dom@19.2.3)(react-native@0.86.3)(react@19.2.3)(supports-color@8.1.1)(typescript@7.0.2)':
     dependencies:

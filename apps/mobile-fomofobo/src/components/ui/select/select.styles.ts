@@ -10,7 +10,7 @@ export const selectPlaceholderStyles = "text-muted-foreground text-sm"
 export const selectChevronStyles = "text-muted-foreground size-4"
 
 export const selectHeaderStyles =
-    "flex-row items-center justify-between border-b border-neutral-200 px-4 py-3"
+    "flex-row items-center justify-between border-b border-line-muted px-4 py-3"
 
 export const selectHeaderTitleStyles = "text-base font-semibold"
 

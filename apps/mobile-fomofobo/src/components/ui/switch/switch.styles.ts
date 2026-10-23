@@ -3,7 +3,7 @@ export const switchTrackStyles =
 
 export const switchTrackActiveStyles = "bg-primary"
 
-export const switchTrackInactiveStyles = "bg-neutral-300"
+export const switchTrackInactiveStyles = "bg-line-muted"
 
 export const switchThumbStyles = "size-6 rounded-full bg-white shadow-sm shadow-black/20"
 

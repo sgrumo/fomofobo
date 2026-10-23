@@ -155,7 +155,8 @@ Every new component and screen must comply with these rules. Non-compliance will
 
 - Normal text on background: **4.5:1** minimum contrast ratio.
 - Large text (18pt+ or 14pt+ bold) and UI components: **3:1** minimum.
-- Never hardcode a color. Use the theme colors of `tailwind.config.cjs`.
+- Never hardcode a color. Use a token class (`bg-surface`, `text-fg`). A native prop that takes a color value (SVG fill, navigator option) reads `THEME_COLORS` of `src/lib/theme/theme-tokens.ts`, the one home of the palette.
+- `src/lib/theme/theme-tokens.test.ts` fails on a color class with no token, and on a text pair under AA. Add a new text pair to its list.
 
 ### Font Sizes
 

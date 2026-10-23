@@ -47,7 +47,7 @@ const TAB_ITEMS: readonly TabItem[] = [
 ]
 
 const ShowcaseSection = (props: { title: string; children: React.ReactNode }) => (
-    <View className="gap-3 border-b border-neutral-200 pb-6">
+    <View className="gap-3 border-b border-line-muted pb-6">
         <Text variant="h3">{props.title}</Text>
         {props.children}
     </View>

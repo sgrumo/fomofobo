@@ -24,14 +24,14 @@ interface GateMessageProps {
 const BlockedScreen = (props: GateMessageProps) => (
     <View
         accessibilityRole="alert"
-        className="bg-background flex-1 items-center justify-center gap-4 px-6"
+        className="flex-1 items-center justify-center gap-4 bg-background px-6"
     >
         <Text accessibilityRole="header" className="text-center text-2xl font-semibold">
             {props.title}
         </Text>
         <Text
             accessibilityLiveRegion="polite"
-            className="text-muted-foreground text-center text-base"
+            className="text-center text-base text-muted-foreground"
         >
             {props.message}
         </Text>
@@ -57,12 +57,12 @@ const UpdatePopup = (props: UpdatePopupProps) => {
     const { t } = useTranslation("version-gate")
 
     return (
-        <View className="absolute inset-0 items-center justify-center bg-black/50 p-6">
-            <View className="bg-card border-border w-full gap-3 rounded-lg border p-4 shadow-lg">
+        <View className="absolute inset-0 items-center justify-center bg-overlay p-6">
+            <View className="w-full gap-3 rounded-lg border border-border bg-card p-4 shadow-lg">
                 <Text accessibilityRole="header" className="text-base font-semibold">
                     {t("UpdateOptional.Title")}
                 </Text>
-                <Text className="text-muted-foreground text-sm">
+                <Text className="text-sm text-muted-foreground">
                     {t("UpdateOptional.Message")}
                 </Text>
                 <View className="flex-row gap-2">
