@@ -1,0 +1,11 @@
+Device ID	Device Name
+# iPhones allowed to install an ad-hoc App Distribution build.
+#
+# One row per device, tab-separated, never spaces:
+#   00008120-001A2C3D4E5F6G7H<TAB>Alice iPhone 15
+#
+# Read the UDID from Xcode > Window > Devices and Simulators, or from the device's
+# Finder sidebar page. After a change run `bundle exec fastlane ios certificates`, then
+# build again: an ipa signed before a UDID existed can never install on that device.
+#
+# Blank rows and rows starting with `#` are skipped. The header row above is required.

@@ -7,6 +7,8 @@
         "clean": "pnpm -r --if-present run clean && rm -rf .ignored/checklist.log .ignored/tests",
         "clean:hard": "pnpm clean && pnpm -r --if-present run clean:hard && find . -type d -name node_modules -prune -exec rm -rf {} +",
         "dev:fomofobo": "pnpm -C apps/fullstack-fomofobo dev",
+        "dev:mobile:ios": "pnpm -C apps/mobile-fomofobo ios",
+        "dev:mobile:android": "pnpm -C apps/mobile-fomofobo android",
         "checklist": "bash scripts/checklist/checklist.sh --config configs/checklist/repo.json",
         "typecheck": "pnpm -r --if-present run typecheck",
         "lint": "FORCE_COLOR=${FORCE_COLOR:-1} pnpm -r --if-present run lint",

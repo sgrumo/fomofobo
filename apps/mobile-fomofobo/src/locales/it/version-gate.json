@@ -1,0 +1,20 @@
+{
+    "UpdateOptional": {
+        "Title": "È disponibile un aggiornamento",
+        "Message": "Puoi continuare a usare l'app. Aggiorna quando vuoi.",
+        "Action": "Aggiorna ora",
+        "Dismiss": "Più tardi",
+        "DismissLabel": "Chiudi l'avviso di aggiornamento"
+    },
+    "UpdateRequired": {
+        "Title": "Aggiornamento necessario",
+        "Message": "Questa versione dell'app non è più compatibile. Aggiorna per continuare.",
+        "Action": "Aggiorna ora"
+    },
+    "Maintenance": {
+        "Title": "App in manutenzione",
+        "Message": "L'app non è disponibile in questo momento. Riprova tra qualche minuto.",
+        "Action": "Riprova"
+    },
+    "Retry": "Riprova"
+}

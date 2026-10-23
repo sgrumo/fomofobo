@@ -1,0 +1,8 @@
+storage_mode("s3")
+s3_bucket(ENV["MATCH_S3_BUCKET"])
+s3_region(ENV["MATCH_S3_REGION"] || "eu-west-1")
+# Storage only. No `type` and no `app_identifier`: the store id needs an appstore profile,
+# the tester id whichever profile its beta channel signs with, and one static file cannot
+# express that - fastlane loads this file before a lane can resolve which environment is
+# being built. Every lane passes both values explicitly - see the `certificates` lane in the
+# Fastfile.

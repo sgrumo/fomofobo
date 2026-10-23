@@ -1,0 +1,12 @@
+{
+    "Categories": {
+        "Title": "Categorie",
+        "Loading": "Caricamento delle categorie...",
+        "Error": "Impossibile caricare le categorie."
+    },
+    "AppError": {
+        "Title": "Qualcosa è andato storto",
+        "Message": "Un errore ha bloccato l'app. Riprova.",
+        "Retry": "Riprova"
+    }
+}

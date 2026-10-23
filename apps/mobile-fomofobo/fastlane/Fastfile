@@ -1,0 +1,595 @@
+require "json"
+
+PROJECT_ROOT = File.expand_path("..", __dir__)
+IOS_DIR = File.join(PROJECT_ROOT, "ios")
+ANDROID_DIR = File.join(PROJECT_ROOT, "android")
+# Named after `name` in app.config.ts: that is what `expo prebuild` calls the generated
+# project, workspace and scheme, so a rename of the app means a rename of these too. `name`
+# is deliberately environment-independent, unlike the application id, so one path serves both
+# environments.
+XCODEPROJ = File.join(IOS_DIR, "fomofobo.xcodeproj")
+XCWORKSPACE = File.join(IOS_DIR, "fomofobo.xcworkspace")
+SCHEME = "fomofobo"
+AAB_PATH = File.join(ANDROID_DIR, "app/build/outputs/bundle/release/app-release.aab")
+APK_PATH = File.join(ANDROID_DIR, "app/build/outputs/apk/release/app-release.apk")
+# UDIDs of the iPhones allowed to install an ad-hoc build. Apple's sample format, which
+# `register_devices` enforces: a `Device ID<tab>Device Name` header row first, then one
+# tab-separated row per device. Blank rows and rows starting with `#` are skipped. Tabs, never
+# spaces. Committed, since a UDID identifies a device and not a person, and the list has to be
+# reviewable: an ipa only installs on a device its profile already named.
+DEVICES_FILE = File.join(__dir__, "devices.txt")
+
+# Every Play track that can already hold a version code. Codes are global per package, so a
+# production release must clear whatever any track holds, not only the previous production
+# release - the testing tracks can still carry codes from before App Distribution took over
+# the beta channel.
+PLAY_TRACKS = ["internal", "alpha", "beta", "production"]
+
+# The native Firebase config each platform reads. app.config.ts points `googleServicesFile`
+# at firebase/<env>/<file>, and dev and prod are separate Firebase projects with separate
+# keys, so the two directories never hold the same file.
+FIREBASE_CONFIG_FILES = { "ios" => "GoogleService-Info.plist", "android" => "google-services.json" }
+
+default_platform(:ios)
+
+# app.config.ts owns the application id: it appends `.dev` outside prod, so the id a lane
+# must sign, query and upload under is only knowable by evaluating that file. Reading the
+# evaluated config keeps one source of truth, so no lane can query one id and ship another.
+#
+# Keyed on the environment rather than memoised once: `force_dev_env` sets APP_ENV inside the
+# lane, so a value read before that must never leak into the build that follows. The
+# subprocess also gets APP_ENV explicitly, so the answer never depends on ambient state.
+APP_CONFIG_CACHE = {}
+
+def app_config_for(env_name)
+  APP_CONFIG_CACHE[env_name] ||= begin
+    raw = Dir.chdir(PROJECT_ROOT) { `APP_ENV=#{env_name} pnpm exec expo config --json` }
+    # Ruby tags a command capture with the external encoding of the locale, and a runner
+    # with no LANG set gets US-ASCII. A `name` in app.config.ts that carries an accent -
+    # any real product name might - then raises `invalid byte sequence in US-ASCII` on the
+    # `strip` below, before anything can parse. The bytes are UTF-8 whatever the locale
+    # says, so state that instead of trusting the environment.
+    json = raw.force_encoding("UTF-8")
+    begin
+      raise JSON::ParserError, "the command failed" unless $?.success?
+      raise JSON::ParserError, "the output is not valid UTF-8" unless json.valid_encoding?
+      raise JSON::ParserError, "empty output" if json.strip.empty?
+
+      JSON.parse(json)
+    rescue JSON::ParserError => error
+      # A non-zero exit, a mis-encoded capture, an empty capture and stdout noise all land
+      # here, and the message says which. Each one leaves the lane unable to name the
+      # application id, so none of them can be allowed to continue.
+      UI.user_error!(
+        "Could not read the app config for APP_ENV=#{env_name} (#{error.message}). The lanes " \
+        "take the application id from `expo config --json`. If the output above names an " \
+        "invalid variable, fix it in .env. Otherwise run `pnpm install` at the repo root, " \
+        "check that `pnpm exec expo config --json` prints JSON in the app directory, then run " \
+        "this lane again."
+      )
+    end
+  end
+end
+
+# Unset is local, matching app.config.ts.
+def current_env_name
+  ENV.fetch("APP_ENV", "local")
+end
+
+def app_config
+  app_config_for(current_env_name)
+end
+
+def ios_bundle_id
+  ios_bundle_id_for(current_env_name)
+end
+
+def android_package
+  app_config.dig("android", "package") ||
+    UI.user_error!("app.config.ts declares no android.package")
+end
+
+# Data rows only, mirroring what `register_devices` counts: it rejects blank and `#` rows, then
+# treats the first surviving row as the header. Zero devices is a success there, not an error,
+# so the warning has to live here - a profile naming no device signs and exports happily, and
+# then installs for nobody.
+def adhoc_device_count
+  return 0 unless File.exist?(DEVICES_FILE)
+
+  # UTF-8 stated, not inferred: a device name carries whatever the owner typed, and Ruby
+  # reads the file in the encoding of the locale. A workstation with no LANG set gets
+  # US-ASCII, and `strip` then raises on the first accented name.
+  rows = File.readlines(DEVICES_FILE, encoding: "UTF-8").reject do |line|
+    line.strip.empty? || line.strip.start_with?("#")
+  end
+  [rows.count - 1, 0].max
+end
+
+# Named environment rather than the current one: `certificates` syncs both apps in one run,
+# and each needs a different profile type.
+def ios_bundle_id_for(env_name)
+  app_config_for(env_name).dig("ios", "bundleIdentifier") ||
+    UI.user_error!("app.config.ts declares no ios.bundleIdentifier for APP_ENV=#{env_name}")
+end
+
+# app.config.ts stamps the fallback version 1.0.0 when APP_VERSION is unset, and Play accepts
+# any versionName. So a workstation release can reach the store as 1.0.0, where the client
+# version gate then blocks it forever.
+def require_app_version
+  return unless ENV["APP_VERSION"].to_s.empty?
+
+  UI.user_error!(
+    "APP_VERSION is not set. app.config.ts then stamps version 1.0.0, and a store " \
+    "release with that version cannot pass the client version gate. " \
+    "Set APP_VERSION=x.y.z, then run this lane again."
+  )
+end
+
+# App Distribution builds target dev unconditionally: the dev API, the dev Firebase project and
+# the `.dev` application id, so testers never reach production data. app.config.ts keys every
+# environment-dependent value off APP_ENV, so overriding it here is what keeps the distribute
+# lanes dev-only - a bare `fastlane ios distribute` cannot produce a prod build either. The
+# `pnpm ci:<platform>:distribute` scripts pass APP_ENV=dev anyway; this is the backstop.
+def force_dev_env
+  if ENV["APP_ENV"] && ENV["APP_ENV"] != "dev"
+    UI.important("Ignoring APP_ENV=#{ENV["APP_ENV"]} - beta lanes always build against dev")
+  end
+  ENV["APP_ENV"] = "dev"
+  # app.config.ts validates .env, so an invalid value fails here and not after the build.
+  app_config
+  UI.important("APP_ENV=dev - building against the dev environment")
+end
+
+# Release lanes demand APP_ENV=prod at the call site. A store submission is the one build that
+# reaches real users, so it must be asked for and can never be inferred: unset or any other
+# value aborts instead of falling back, which keeps the failure mode fail-closed in both
+# directions. Use `pnpm ci:<platform>:release`, which sets it.
+def require_prod_env
+  unless ENV["APP_ENV"] == "prod"
+    UI.user_error!(
+      "Release lanes require APP_ENV=prod (got #{ENV["APP_ENV"].inspect}). " \
+      "Run `pnpm ci:ios:release` / `pnpm ci:android:release`."
+    )
+  end
+  app_config
+  UI.important("APP_ENV=prod - building against PRODUCTION (store release)")
+end
+
+# A project uses one iOS beta channel, and `devices.txt` says which: the file exists only
+# where testers get an ad-hoc build. Both lanes ship in every project, so without this a
+# lane run in the wrong one reaches `match(readonly: true)` after prebuild and CocoaPods -
+# minutes in - and fails on a profile its channel never synced.
+IOS_BETA_CHANNELS = { true => "adhoc", false => "testflight" }
+
+def require_ios_beta_channel(expected)
+  actual = IOS_BETA_CHANNELS[File.exist?(DEVICES_FILE)]
+  return if actual == expected
+
+  other = expected == "adhoc" ? "beta" : "distribute"
+  UI.user_error!(
+    "This project is on the #{actual} iOS beta channel, and `fastlane ios " \
+    "#{expected == "adhoc" ? "distribute" : "beta"}` serves the #{expected} one. Run " \
+    "`pnpm ci:ios:#{other}` instead. The channel comes from fastlane/devices.txt, which " \
+    "only an ad-hoc project holds."
+  )
+end
+
+# Expo reports a missing googleServicesFile as a bare path error in the middle of prebuild.
+# The check names the environment and the secret instead.
+def require_firebase_config(platform)
+  env_name = current_env_name
+  path = File.join(PROJECT_ROOT, "firebase", env_name, FIREBASE_CONFIG_FILES[platform])
+  return if File.exist?(path)
+
+  UI.user_error!(
+    "Missing #{path}. app.config.ts points googleServicesFile there for APP_ENV=#{env_name}. " \
+    "Download it from the #{env_name} Firebase project, or restore it from the " \
+    "FIREBASE_#{platform.upcase}_CONFIG_#{env_name.upcase}_BASE64 secret."
+  )
+end
+
+# --clean regenerates the native project from app.config.ts, which is the only way the
+# firebase/ config file for the resolved APP_ENV lands in it. --no-install keeps expo's own
+# `pod install` out of the way: CocoaPods is pinned in the Gemfile and the runner has no
+# global `pod`, so the install must go through bundler.
+def prebuild(platform)
+  require_firebase_config(platform)
+  Dir.chdir(PROJECT_ROOT) do
+    sh("pnpm expo prebuild --clean --no-install -p #{platform}")
+  end
+  cocoapods(podfile: File.join(IOS_DIR, "Podfile")) if platform == "ios"
+end
+
+def android_signing_properties
+  {
+    "android.injected.signing.store.file" => ENV["ANDROID_KEYSTORE_PATH"],
+    "android.injected.signing.store.password" => ENV["ANDROID_KEYSTORE_PASSWORD"],
+    "android.injected.signing.key.alias" => ENV["ANDROID_KEY_ALIAS"],
+    "android.injected.signing.key.password" => ENV["ANDROID_KEY_PASSWORD"],
+  }
+end
+
+# App Distribution hands the tester the artifact verbatim - nothing re-signs it, unlike a Play
+# upload. Google keys an OAuth client on (application id, certificate SHA-1), so a debug-signed
+# fallback would reach testers with a fingerprint no OAuth client knows, and Google Sign-In
+# would fail with an opaque DEVELOPER_ERROR instead of a build error. Fail here instead.
+def require_android_keystore
+  return unless ENV["ANDROID_KEYSTORE_PATH"].to_s.empty?
+
+  UI.user_error!(
+    "ANDROID_KEYSTORE_PATH is not set. App Distribution does not re-sign, so a tester build " \
+    "must carry the release certificate whose SHA-1 the dev Firebase project knows. " \
+    "Set the ANDROID_KEYSTORE_* values, then run this lane again."
+  )
+end
+
+def app_store_api_key
+  app_store_connect_api_key(
+    key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+    issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
+    key_content: ENV["APP_STORE_CONNECT_API_KEY"],
+    is_key_content_base64: true
+  )
+end
+
+# `prebuild` regenerates the native project on every run, resetting whatever identifier the
+# previous run derived. Two workflows now upload (beta and release), each with its own run
+# counter, so no CI-side counter can stay monotonic across both. Both stores are therefore
+# asked what they already hold and the next number is derived from that.
+def next_ios_build_number(bundle_id, api_key)
+  latest_testflight_build_number(
+    api_key: api_key,
+    app_identifier: bundle_id,
+    initial_build_number: 0
+  ) + 1
+end
+
+def next_play_version_code
+  latest = PLAY_TRACKS.reduce(0) do |highest, track|
+    codes = begin
+      google_play_track_version_codes(
+        package_name: android_package,
+        json_key: ENV["GOOGLE_PLAY_JSON_KEY_PATH"],
+        track: track
+      )
+    rescue StandardError => error
+      # A track with no release yet raises rather than returning an empty list.
+      UI.important("Skipping Play track #{track}: #{error.message}")
+      []
+    end
+    [highest, codes.map(&:to_i).max || 0].max
+  end
+  latest + 1
+end
+
+# App Distribution holds every tester build of the `.dev` id, so it holds the counter too, the
+# way TestFlight does for the store lanes. A run number restarts with each workflow, and
+# Android refuses to install an APK whose code is not above the installed one. Exported
+# before `prebuild`, which evaluates app.config.ts and stamps the value from APP_BUILD_NUMBER.
+def stamp_next_app_distribution_build_number(app_id)
+  latest = firebase_app_distribution_get_latest_release(
+    app: app_id,
+    service_credentials_file: ENV["FIREBASE_SERVICE_ACCOUNT_JSON_PATH"]
+  )
+  ENV["APP_BUILD_NUMBER"] = (latest&.dig(:buildVersion).to_i + 1).to_s
+  UI.important("APP_BUILD_NUMBER=#{ENV["APP_BUILD_NUMBER"]}")
+end
+
+# The keychain `setup_ci` creates. Its own default, restated because the teardown needs the
+# same name.
+CI_KEYCHAIN_NAME = "fastlane_tmp_keychain"
+
+# `setup_ci` creates that keychain with an **empty password** and makes it the default one,
+# and `match` then puts the distribution certificate and its private key in it. The macOS
+# runner is persistent, so without this the keychain outlives the job and hands the signing
+# identity to whoever runs next on the host.
+#
+# Never raises: it runs from an `ensure`, where a raise would replace the failure that sent
+# the lane there. Off CI `setup_ci` creates nothing, and `delete_keychain` then fails to
+# locate it - which is the expected path, not an error.
+def delete_ci_keychain
+  delete_keychain(name: CI_KEYCHAIN_NAME)
+rescue StandardError => error
+  UI.important("Left #{CI_KEYCHAIN_NAME} alone: #{error.message}")
+end
+
+def apply_manual_signing(bundle_id, profile_name)
+  update_code_signing_settings(
+    path: XCODEPROJ,
+    use_automatic_signing: false,
+    team_id: ENV["APPLE_TEAM_ID"],
+    bundle_identifier: bundle_id,
+    profile_name: profile_name,
+    code_sign_identity: "iPhone Distribution"
+  )
+end
+
+# Takes the id rather than resolving it: this runs from an `ensure`, where a raise would
+# replace the failure that sent the lane here.
+def restore_automatic_signing(bundle_id)
+  update_code_signing_settings(
+    path: XCODEPROJ,
+    use_automatic_signing: true,
+    team_id: ENV["APPLE_TEAM_ID"],
+    bundle_identifier: bundle_id
+  )
+end
+
+# Returns the build number stamped into the archive, which the release lane needs to attach
+# this exact build to the store version.
+def build_ios_app(bundle_id, api_key)
+  build_number = next_ios_build_number(bundle_id, api_key)
+  match(type: "appstore", readonly: true, api_key: api_key, app_identifier: bundle_id)
+  apply_manual_signing(bundle_id, ENV["sigh_#{bundle_id}_appstore_profile-name"])
+  increment_build_number(xcodeproj: XCODEPROJ, build_number: build_number)
+  build_app(
+    workspace: XCWORKSPACE,
+    scheme: SCHEME,
+    export_method: "app-store"
+  )
+  build_number
+end
+
+# Ad-hoc rather than app-store: App Distribution hands a tester the ipa verbatim, and iOS
+# installs it only when the provisioning profile already names that device. So the profile
+# carries a device list, and a tester added later needs `certificates` rerun AND a new build -
+# an ipa signed before their UDID existed can never install for them.
+#
+# No build number is stamped here, unlike the release lane: the `distribute` lane exports it
+# before `prebuild`, from what App Distribution already holds.
+def build_ios_adhoc_app(bundle_id, api_key)
+  match(type: "adhoc", readonly: true, api_key: api_key, app_identifier: bundle_id)
+  apply_manual_signing(bundle_id, ENV["sigh_#{bundle_id}_adhoc_profile-name"])
+  ipa_path = build_app(
+    workspace: XCWORKSPACE,
+    scheme: SCHEME,
+    export_method: "ad-hoc"
+  )
+  UI.user_error!("build_app produced no ipa to distribute") if ipa_path.to_s.empty?
+  ipa_path
+end
+
+platform :ios do
+  desc "Sync signing assets via match - the tester profile follows the beta channel"
+  lane :certificates do
+    # No `setup_ci` here, unlike the build lanes. This runs on a workstation, where the
+    # login keychain is unlocked and the certificate has to stay in it afterwards.
+    api_key = app_store_api_key
+    # The store id always takes an appstore profile.
+    match(type: "appstore", api_key: api_key, app_identifier: ios_bundle_id_for("prod"))
+
+    # The tester id takes whichever profile its channel signs with, and the presence of the
+    # device list is what says which channel this project uses: `devices.txt` exists only in
+    # a project whose testers get an ad-hoc build. A TestFlight build is signed for the store
+    # like any other, so it needs an appstore profile and no device anywhere.
+    unless File.exist?(DEVICES_FILE)
+      match(type: "appstore", api_key: api_key, app_identifier: ios_bundle_id_for("dev"))
+      next
+    end
+
+    # Before match: an ad-hoc profile embeds the device list, so a UDID missing from the portal
+    # is simply absent from the profile it builds.
+    if adhoc_device_count.zero?
+      UI.important(
+        "No devices listed in #{DEVICES_FILE}. The ad-hoc profile will name none, so the ipa " \
+        "will install for nobody. Add `UDID<tab>Name` rows below the header first."
+      )
+    end
+    register_devices(devices_file: DEVICES_FILE, api_key: api_key)
+    # force_for_new_devices regenerates the profile when the device list grew; without it match
+    # reuses the stored one and the new tester silently cannot install.
+    match(
+      type: "adhoc",
+      api_key: api_key,
+      app_identifier: ios_bundle_id_for("dev"),
+      force_for_new_devices: true
+    )
+  end
+
+  desc "Build an ad-hoc ipa and hand it to internal testers via Firebase App Distribution (dev environment)"
+  lane :distribute do
+    require_ios_beta_channel("adhoc")
+    force_dev_env
+    bundle_id = ios_bundle_id
+    stamp_next_app_distribution_build_number(ENV["FIREBASE_IOS_APP_ID"])
+    prebuild("ios")
+    api_key = app_store_api_key
+    begin
+      # Creates a temporary keychain and points match at it. The login keychain of the runner
+      # is locked in a non-interactive session, so `match` installs the certificate into a
+      # keychain that `codesign` cannot open - and the archive then fails inside
+      # `[CP] Embed Pods Frameworks`, which signs every embedded framework. The action
+      # detects CI itself and does nothing on a workstation, where the login keychain is
+      # already unlocked. It must run before `match`.
+      setup_ci
+      ipa_path = build_ios_adhoc_app(bundle_id, api_key)
+      firebase_app_distribution(
+        app: ENV["FIREBASE_IOS_APP_ID"],
+        service_credentials_file: ENV["FIREBASE_SERVICE_ACCOUNT_JSON_PATH"],
+        ipa_path: ipa_path,
+        groups: ENV["FIREBASE_TESTER_GROUPS"],
+        release_notes: ENV["FIREBASE_RELEASE_NOTES"]
+      )
+    ensure
+      restore_automatic_signing(bundle_id)
+      delete_ci_keychain
+    end
+  end
+
+  desc "Build the dev app and hand it to internal testers on TestFlight (dev environment)"
+  lane :beta do
+    require_ios_beta_channel("testflight")
+    force_dev_env
+    bundle_id = ios_bundle_id
+    prebuild("ios")
+    api_key = app_store_api_key
+    begin
+      # See the `distribute` lane for why this is here and not above `prebuild`.
+      setup_ci
+      # An appstore profile, not an ad-hoc one: a TestFlight build is signed for the store
+      # like any other. `build_ios_app` derives the build number from the TestFlight of this
+      # application id, which the `.dev` record has once it exists.
+      build_number = build_ios_app(bundle_id, api_key)
+
+      # No `groups`. `groups` is an external-testing concept: pilot answers it with
+      # `add_beta_groups`, and App Store Connect rejects that for an internal group -
+      # "Builds cannot be assigned to this internal group". An internal group receives
+      # builds through its own "automatically distribute" setting, which must stay on.
+      #
+      # `submit_beta_review: false` is the guard. pilot defaults it to true and sends the
+      # build to Beta App Review whenever `groups` is set, and review is an external-testing
+      # gate: App Store Connect then refuses with "Beta App Description is required to submit
+      # a build for external testing".
+      #
+      # The changelog survives the missing groups: pilot writes it in `update_beta_app_meta`,
+      # before the distribution step. Waiting for processing is what allows that at all -
+      # App Store Connect takes no meta for a build it has not finished ingesting.
+      upload_to_testflight(
+        api_key: api_key,
+        app_identifier: bundle_id,
+        distribute_external: false,
+        submit_beta_review: false,
+        changelog: ENV["TESTFLIGHT_CHANGELOG"],
+        skip_waiting_for_build_processing: false
+      )
+      UI.success("Build #{build_number} of #{bundle_id} is on TestFlight")
+    ensure
+      restore_automatic_signing(bundle_id)
+      delete_ci_keychain
+    end
+  end
+
+  desc "Build and submit to App Review (production) - no TestFlight distribution"
+  lane :release do
+    require_prod_env
+    require_app_version
+    bundle_id = ios_bundle_id
+    prebuild("ios")
+    api_key = app_store_api_key
+    version = ENV["APP_VERSION"]
+    begin
+      # Creates a temporary keychain and points match at it. The login keychain of the runner
+      # is locked in a non-interactive session, so `match` installs the certificate into a
+      # keychain that `codesign` cannot open - and the archive then fails inside
+      # `[CP] Embed Pods Frameworks`, which signs every embedded framework. The action
+      # detects CI itself and does nothing on a workstation, where the login keychain is
+      # already unlocked. It must run before `match`.
+      setup_ci
+      build_number = build_ios_app(bundle_id, api_key)
+
+      # An ipa has to be ingested by App Store Connect before it can be attached to a
+      # version, and that upload is the same endpoint TestFlight uses - there is no way
+      # around it. Nothing is distributed though: no testers, no external group, no beta
+      # review. Waiting for processing is what makes the submission below possible, since
+      # App Store Connect refuses to attach a build it has not finished ingesting.
+      upload_to_testflight(
+        api_key: api_key,
+        app_identifier: bundle_id,
+        distribute_external: false,
+        skip_submission: true,
+        skip_waiting_for_build_processing: false
+      )
+
+      # Store metadata (description, screenshots, "What's New", and whether the version
+      # releases automatically once approved) stays hand-managed in App Store Connect: with
+      # skip_metadata deliver never reads the local filesystem, so it cannot overwrite what
+      # is there with the empty values this repo does not keep. Fill "What's New" in App
+      # Store Connect first, or the submission is rejected for empty release notes on a new
+      # version. app_version still creates the version if it does not exist yet, and
+      # build_number attaches this exact build rather than whatever happens to be latest.
+      upload_to_app_store(
+        api_key: api_key,
+        app_identifier: bundle_id,
+        app_version: version,
+        build_number: build_number.to_s,
+        skip_binary_upload: true,
+        skip_metadata: true,
+        skip_screenshots: true,
+        submit_for_review: true,
+        run_precheck_before_submit: false,
+        force: true,
+        submission_information: {
+          export_compliance_uses_encryption: false,
+          add_id_info_uses_idfa: false,
+        }
+      )
+      UI.success("#{version} (#{build_number}) submitted for App Review")
+    ensure
+      restore_automatic_signing(bundle_id)
+      delete_ci_keychain
+    end
+  end
+end
+
+# Play release notes live in fastlane/metadata/android/<locale>/changelogs/, and supply only
+# looks there when that directory exists. Everything else it could read from the same tree -
+# store listing, images, screenshots - is skipped explicitly, so adding a changelog can never
+# turn into an accidental overwrite of the Play listing with files this repo does not keep.
+PLAY_UPLOAD_OPTIONS = {
+  skip_upload_metadata: true,
+  skip_upload_images: true,
+  skip_upload_screenshots: true,
+}
+
+def build_aab(version_code)
+  prebuild("android")
+  gradle(
+    task: "clean bundleRelease",
+    project_dir: ANDROID_DIR,
+    # The Expo template leaves org.gradle.caching unset, so without this the task-output
+    # cache is never written and every task re-executes against a warm GRADLE_USER_HOME.
+    flags: "--build-cache",
+    properties: android_signing_properties.merge("android.injected.version.code" => version_code)
+  )
+end
+
+platform :android do
+  desc "Build and release to the Play Store production track (production)"
+  lane :release do
+    require_prod_env
+    require_app_version
+    build_aab(next_play_version_code)
+    upload_to_play_store(
+      track: "production",
+      release_status: "completed",
+      package_name: android_package,
+      json_key: ENV["GOOGLE_PLAY_JSON_KEY_PATH"],
+      aab: AAB_PATH,
+      **PLAY_UPLOAD_OPTIONS
+    )
+  end
+
+  desc "Build a signed release APK and hand it to internal testers via Firebase App Distribution (dev environment)"
+  lane :distribute do
+    force_dev_env
+    require_android_keystore
+    stamp_next_app_distribution_build_number(ENV["FIREBASE_ANDROID_APP_ID"])
+    prebuild("android")
+    # App Distribution hands testers the artifact verbatim, so it must be an APK that a
+    # phone can install directly - the release lane's AAB is not.
+    #
+    # Signed with the release keystore, which `require_android_keystore` insists on: nothing
+    # re-signs an App Distribution artifact, so the certificate a tester receives is this one,
+    # and the dev Firebase project keys its OAuth client on that certificate's SHA-1.
+    #
+    # One ABI, matching quality.yaml's android-build: x86/x86_64 are emulator-only and
+    # armeabi-v7a is 32-bit hardware, and a tester installs this on neither. The release lane
+    # keeps all four, since Play splits an AAB per device itself.
+    gradle(
+      task: "clean assembleRelease",
+      project_dir: ANDROID_DIR,
+      flags: "--build-cache",
+      properties: {
+        "reactNativeArchitectures" => "arm64-v8a",
+      }.merge(android_signing_properties)
+    )
+    firebase_app_distribution(
+      app: ENV["FIREBASE_ANDROID_APP_ID"],
+      service_credentials_file: ENV["FIREBASE_SERVICE_ACCOUNT_JSON_PATH"],
+      android_artifact_type: "APK",
+      android_artifact_path: APK_PATH,
+      groups: ENV["FIREBASE_TESTER_GROUPS"],
+      release_notes: ENV["FIREBASE_RELEASE_NOTES"]
+    )
+  end
+end

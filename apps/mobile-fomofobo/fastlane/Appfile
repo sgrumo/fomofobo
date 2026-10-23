@@ -1,0 +1,17 @@
+# Production defaults. fastlane loads this file before a lane runs, so it cannot know the
+# environment: `force_dev_env` sets APP_ENV inside the lane, after this point. Every lane
+# therefore passes `app_identifier` / `package_name` explicitly from the evaluated
+# app.config.ts, and nothing here is load-bearing for a build. Add no action that relies on
+# these values without passing the id itself.
+app_identifier("it.quinck.fomofobo")
+
+for_platform :ios do
+  apple_id(ENV["APPLE_ID"])
+  team_id(ENV["APPLE_TEAM_ID"])
+  itc_team_id(ENV["ITC_TEAM_ID"])
+end
+
+for_platform :android do
+  package_name("it.quinck.fomofobo")
+  json_key_file(ENV["GOOGLE_PLAY_JSON_KEY_PATH"])
+end

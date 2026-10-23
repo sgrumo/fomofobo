@@ -1,0 +1,8 @@
+{
+    "extends": "./tsconfig.app.json",
+    "compilerOptions": {
+        "types": ["node"],
+        "allowImportingTsExtensions": true
+    },
+    "include": ["app.config.ts", "app.config.test.ts", "config"]
+}

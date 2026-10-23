@@ -1,0 +1,5 @@
+# Fastlane discovers plugin actions from this file, not from the Gemfile: a
+# `fastlane-plugin-*` gem that is merely installed stays invisible to the Fastfile.
+# The Gemfile eval_gemfile's it, so `bundle install` still resolves these.
+
+gem "fastlane-plugin-firebase_app_distribution", "1.0.0"

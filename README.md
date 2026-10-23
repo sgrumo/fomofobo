@@ -12,10 +12,11 @@ Every package declares its own dependencies. `pnpm-workspace.yaml` holds the ver
 
 Deployable applications.
 
-| App                  | Description                                                                                                                                                    |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `fullstack-fomofobo` | Next.js fullstack app - App Router with Hono + OpenAPI API routes, Server Component prefetch, Server Action mutations, Tailwind, TanStack Query, react-i18next |
-| `photo-purge`        | Daily job that deletes from the bucket the photos of the events that left the public app. `.github/workflows/purge-photos.yaml` runs it                        |
+| App                  | Description                                                                                                                                                     |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fullstack-fomofobo` | Next.js fullstack app - App Router with Hono + OpenAPI API routes, Server Component prefetch, Server Action mutations, Tailwind, TanStack Query, react-i18next  |
+| `mobile-fomofobo`    | Expo native app with the public features of the web app, no sign-in. It calls the API of `fullstack-fomofobo`. See its [README](apps/mobile-fomofobo/README.md) |
+| `photo-purge`        | Daily job that deletes from the bucket the photos of the events that left the public app. `.github/workflows/purge-photos.yaml` runs it                         |
 
 ### Packages
 
@@ -68,6 +69,8 @@ The CLI runs inside `scripts/admin-accounts`, so a `file:` URL is relative to th
 | Command                    | Description                                            |
 | -------------------------- | ------------------------------------------------------ |
 | `pnpm dev:fomofobo`        | Start the fomofobo fullstack dev server                |
+| `pnpm dev:mobile:ios`      | Build and run the mobile app on the iOS simulator      |
+| `pnpm dev:mobile:android`  | Build and run the mobile app on an Android emulator    |
 | `pnpm checklist`           | Full CI check: typecheck, test, lint, format, build    |
 | `pnpm typecheck`           | Typecheck all packages                                 |
 | `pnpm lint:fix`            | Lint and autofix all packages                          |
