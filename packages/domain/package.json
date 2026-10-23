@@ -14,6 +14,7 @@
         "./map-query": "./src/map-query.ts",
         "./map-search": "./src/map-search.ts",
         "./map-style": "./src/map-style.ts",
+        "./occurrence-facts": "./src/occurrence-facts.ts",
         "./occurrence-progress": "./src/occurrence-progress.ts",
         "./occurrence-status": "./src/occurrence-status.ts",
         "./pin-tag": "./src/pin-tag.ts",

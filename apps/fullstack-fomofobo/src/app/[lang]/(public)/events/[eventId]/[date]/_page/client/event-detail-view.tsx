@@ -1,7 +1,8 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { localTimeOf, weekdayDateOf } from "domain/local-format"
+import { localTimeOf } from "domain/local-format"
+import { occurrenceFactsOf } from "domain/occurrence-facts"
 import { occurrenceProgress } from "domain/occurrence-progress"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
@@ -171,32 +172,30 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
     const startTime = localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)
     const endTime = localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)
 
-    const facts = [
-        {
-            label: t("Detail.Date"),
-            value: weekdayDateOf(span.startsAt, PLATFORM_TIME_ZONE, props.language),
-        },
-        { label: t("Detail.Time"), value: `${startTime}→${endTime}` },
-        { label: t("Detail.Entry"), value: priceSummary(occurrence.priceScheme) },
-        ...(occurrence.capacity === null
-            ? []
-            : [
-                  {
-                      label: t("Detail.Capacity"),
-                      value: t("Detail.Places", { count: occurrence.capacity }),
-                  },
-              ]),
-        ...(occurrence.interestedCount === null
-            ? []
-            : [
-                  {
-                      label: t("Detail.Interest"),
-                      value: t("Detail.Interested", {
-                          count: occurrence.interestedCount,
-                      }),
-                  },
-              ]),
-    ]
+    const facts = occurrenceFactsOf(occurrence, props.language).map(fact =>
+        match(fact)
+            .with({ type: "date" }, date => ({
+                label: t("Detail.Date"),
+                value: date.weekdayDate,
+            }))
+            .with({ type: "time" }, time => ({
+                label: t("Detail.Time"),
+                value: `${time.start}→${time.end}`,
+            }))
+            .with({ type: "entry" }, entry => ({
+                label: t("Detail.Entry"),
+                value: priceSummary(entry.priceScheme),
+            }))
+            .with({ type: "capacity" }, capacity => ({
+                label: t("Detail.Capacity"),
+                value: t("Detail.Places", { count: capacity.places }),
+            }))
+            .with({ type: "interested" }, interested => ({
+                label: t("Detail.Interest"),
+                value: t("Detail.Interested", { count: interested.count }),
+            }))
+            .exhaustive(),
+    )
 
     return (
         <>
