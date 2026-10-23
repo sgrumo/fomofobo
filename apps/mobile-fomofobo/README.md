@@ -23,9 +23,9 @@ A lane builds against one of two environments, `dev` or `prod`. `APP_ENV` select
 
 The dev build carries its own application id, so both apps install side by side. No workflow runs the lanes: a person runs them by hand on a Mac.
 
-An iOS tester costs a UDID in `fastlane/devices.txt`, a `certificates` rerun and a fresh build, with a cap of 100 devices per membership year. Android always uses App Distribution: the `.dev` package has no Play listing.
+An iOS tester costs a UDID in `fastlane/devices.txt`, a `certificates` rerun and a fresh build. Android always uses App Distribution: the `.dev` package has no Play listing.
 
-Run the lanes through the pnpm scripts, which pass `APP_ENV`. Never set `APP_ENV` by hand.
+Run the lanes through the pnpm scripts, which pass `APP_ENV`. Never set `APP_ENV` by hand. [RELEASE.md](./RELEASE.md) holds the one-time setup of the Mac and the accounts, and the steps to ship a build.
 
 ```sh
 pnpm release:ios:distribute
