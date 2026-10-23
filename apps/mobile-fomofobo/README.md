@@ -28,8 +28,8 @@ An iOS tester costs a UDID in `fastlane/devices.txt`, a `certificates` rerun and
 Run the lanes through the pnpm scripts, which pass `APP_ENV`. Never set `APP_ENV` by hand.
 
 ```sh
-pnpm ci:ios:distribute
-pnpm ci:android:distribute
-pnpm ci:ios:release
-pnpm ci:android:release
+pnpm release:ios:distribute
+pnpm release:android:distribute
+pnpm release:ios:store
+pnpm release:android:store
 ```

@@ -5,10 +5,10 @@
 # these values without passing the id itself.
 app_identifier("it.quinck.fomofobo")
 
+# No apple_id and no itc_team_id: every iOS action takes the App Store Connect API key, which
+# names the team.
 for_platform :ios do
-  apple_id(ENV["APPLE_ID"])
   team_id(ENV["APPLE_TEAM_ID"])
-  itc_team_id(ENV["ITC_TEAM_ID"])
 end
 
 for_platform :android do

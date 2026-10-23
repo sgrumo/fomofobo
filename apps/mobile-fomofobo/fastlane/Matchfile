@@ -1,8 +1,9 @@
-storage_mode("s3")
-s3_bucket(ENV["MATCH_S3_BUCKET"])
-s3_region(ENV["MATCH_S3_REGION"] || "eu-west-1")
+# A private git repository of the owner, reached with the SSH key of the Mac. MATCH_PASSWORD
+# encrypts its content.
+storage_mode("git")
+git_url(ENV["MATCH_GIT_URL"])
 # Storage only. No `type` and no `app_identifier`: the store id needs an appstore profile,
-# the tester id whichever profile its beta channel signs with, and one static file cannot
+# the dev id an ad-hoc profile, and one static file cannot
 # express that - fastlane loads this file before a lane can resolve which environment is
 # being built. Every lane passes both values explicitly - see the `certificates` lane in the
 # Fastfile.

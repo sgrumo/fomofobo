@@ -59,19 +59,19 @@ schema per environment, and `config/target.ts` maps the environment to an identi
 `app.config.ts` calls both, so an invalid value fails `expo start`, `prebuild` and every
 lane, never the app on first launch.
 
-|                        | unset or `local`             | `dev`                                   | `prod`                           |
-| ---------------------- | ---------------------------- | --------------------------------------- | -------------------------------- |
-| `API_URL`              | defaults to `localhost:3000` | required, `https`                       | required, `https`                |
-| Application id, scheme | `.dev` id, `fomofobodev`     | `.dev` id, `fomofobodev`                | store id, `fomofobo`             |
-| Firebase native config | `firebase/dev/`              | `firebase/dev/`                         | `firebase/prod/`                 |
-| Lanes                  | none                         | one iOS beta lane, `android distribute` | `ios release`, `android release` |
+|                        | unset or `local`             | `dev`                                  | `prod`                           |
+| ---------------------- | ---------------------------- | -------------------------------------- | -------------------------------- |
+| `API_URL`              | defaults to `localhost:3000` | required, `https`                      | required, `https`                |
+| Application id, scheme | `.dev` id, `fomofobodev`     | `.dev` id, `fomofobodev`               | store id, `fomofobo`             |
+| Firebase native config | `firebase/dev/`              | `firebase/dev/`                        | `firebase/prod/`                 |
+| Lanes                  | none                         | `ios distribute`, `android distribute` | `ios release`, `android release` |
 
 - An unrecognized `APP_ENV` fails. One variable has one name in every environment: no `_DEV`
   suffix.
 - `.env` holds the local values. To point a local build at another backend, put the values in
   `.env.<name>` and run `ENV_NAME=<name> pnpm start`.
-- **NEVER** set `APP_ENV` by hand for a build. The `pnpm ci:*` scripts pass it, and the lanes
-  refuse a wrong value.
+- **NEVER** set `APP_ENV` by hand for a build. The `pnpm release:*` scripts pass it, and the
+  lanes refuse a wrong value.
 - Add an app var: add it to `.env.template`, to every block of `config/env.ts` with a default
   in the `local` block when a safe one exists, to `extra` in `app.config.ts`, and to
   `src/lib/env.ts`.

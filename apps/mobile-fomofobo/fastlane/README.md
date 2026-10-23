@@ -21,7 +21,7 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 [bundle exec] fastlane ios certificates
 ```
 
-Sync signing assets via match - the tester profile follows the beta channel
+Sync signing assets via match - appstore for the store id, ad hoc for the dev id
 
 ### ios distribute
 
@@ -30,14 +30,6 @@ Sync signing assets via match - the tester profile follows the beta channel
 ```
 
 Build an ad-hoc ipa and hand it to internal testers via Firebase App Distribution (dev environment)
-
-### ios beta
-
-```sh
-[bundle exec] fastlane ios beta
-```
-
-Build the dev app and hand it to internal testers on TestFlight (dev environment)
 
 ### ios release
 
