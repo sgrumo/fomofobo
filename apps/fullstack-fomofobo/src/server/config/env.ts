@@ -2,6 +2,7 @@ import "server-only"
 import { z } from "@hono/zod-openapi"
 import { logger } from "backend-shared"
 import { s3EndpointSchema } from "backend-shared/config"
+import { semverSchema } from "models"
 import { formatEnvFailure, optionalEnv } from "shared/env"
 
 import { appEnvValues } from "./app-config"
@@ -79,6 +80,14 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         GEOAPIFY_BASE_URL: z.url().default("https://api.geoapify.com"),
         // Unset: the places route answers 503 without a call
         GEOAPIFY_API_KEY: optionalEnv(z.string().nonempty()),
+        IOS_MIN_VERSION: optionalEnv(semverSchema),
+        IOS_CURRENT_VERSION: optionalEnv(semverSchema),
+        IOS_RELEASE_LIVE: optionalEnv(z.stringbool()),
+        IOS_STORE_URL: optionalEnv(z.string().nonempty()),
+        ANDROID_MIN_VERSION: optionalEnv(semverSchema),
+        ANDROID_CURRENT_VERSION: optionalEnv(semverSchema),
+        ANDROID_RELEASE_LIVE: optionalEnv(z.stringbool()),
+        ANDROID_STORE_URL: optionalEnv(z.string().nonempty()),
     }),
     z.object({
         APP_ENV: appEnv.extract(["preview", "vercel"]),
@@ -94,6 +103,14 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         PHOTOS_PUBLIC_BASE_URL: photosPublicBaseUrlSchema,
         GEOAPIFY_BASE_URL: z.url(),
         GEOAPIFY_API_KEY: z.string().nonempty(),
+        IOS_MIN_VERSION: optionalEnv(semverSchema),
+        IOS_CURRENT_VERSION: optionalEnv(semverSchema),
+        IOS_RELEASE_LIVE: optionalEnv(z.stringbool()),
+        IOS_STORE_URL: optionalEnv(z.string().nonempty()),
+        ANDROID_MIN_VERSION: optionalEnv(semverSchema),
+        ANDROID_CURRENT_VERSION: optionalEnv(semverSchema),
+        ANDROID_RELEASE_LIVE: optionalEnv(z.stringbool()),
+        ANDROID_STORE_URL: optionalEnv(z.string().nonempty()),
     }),
 ])
 export type Env = z.infer<typeof envVariants>
