@@ -5,6 +5,7 @@ import {
     BackofficeSessionRoutes,
     BackofficeSettingsRoutes,
     BackofficeVenuesRoutes,
+    ClientCompatibilityRoutes,
     PublicRoutes,
 } from "api-routes"
 import axios from "axios"
@@ -17,6 +18,7 @@ describe("GET /api/doc", () => {
     it("documents every route that the app serves", async () => {
         const groups: Array<Record<string, { method: string; path: string }>> = [
             PublicRoutes,
+            ClientCompatibilityRoutes,
             BackofficeSessionRoutes,
             BackofficeCategoriesRoutes,
             BackofficeVenuesRoutes,

@@ -12,6 +12,21 @@ const DATABASE_DIR = path.resolve(ROOT_DIR, ".ignored/e2e-databases")
 export const LOCALES_DIR = path.resolve(APP_DIR, "public/locales")
 
 /**
+ * @remarks Sets an iOS release that is live and an Android release that is not, so
+ * every action of the version gate is reachable
+ */
+export const VERSION_GATE_ENV = {
+    IOS_MIN_VERSION: "1.4.0",
+    IOS_CURRENT_VERSION: "1.6.0",
+    IOS_RELEASE_LIVE: "true",
+    IOS_STORE_URL: "https://apps.apple.com/app/id1234567890",
+    ANDROID_MIN_VERSION: "2.0.0",
+    ANDROID_CURRENT_VERSION: "2.0.0",
+    ANDROID_RELEASE_LIVE: "false",
+    ANDROID_STORE_URL: "market://details?id=it.quinck.fomofobo",
+}
+
+/**
  * @description Builds the production bundle of the app with `next build`
  */
 export const buildApp = () => {
@@ -54,6 +69,7 @@ export const appServer = (options: {
         PHOTOS_PUBLIC_BASE_URL: options.photosPublicBaseUrl,
         GEOAPIFY_BASE_URL: options.geocodingBaseUrl,
         GEOAPIFY_API_KEY: "e2e-geoapify-key",
+        ...VERSION_GATE_ENV,
     },
     // The app answers here in every environment; the Swagger route does not.
     healthUrl: `http://127.0.0.1:${options.port}/api/health`,
