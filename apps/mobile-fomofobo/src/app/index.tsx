@@ -10,6 +10,7 @@ import { Keyboard, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { match } from "ts-pattern"
 
+import { CategoryChips } from "@/components/map/category-chips"
 import { EventMap } from "@/components/map/event-map"
 import { EventPreview } from "@/components/map/event-preview"
 import type { PreviewEntry, PreviewVenue } from "@/components/map/event-preview"
@@ -232,6 +233,12 @@ const MapScreen = () => {
                     onTextSubmit={text => {
                         setQuery(textQueryOf(text))
                     }}
+                />
+                <CategoryChips
+                    categories={categories ?? []}
+                    counts={results?.categoryCounts}
+                    selected={query.category}
+                    onChange={setQuery}
                 />
                 {__DEV__ && (
                     <Link href="/showcase" asChild={true}>

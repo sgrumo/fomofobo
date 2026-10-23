@@ -43,6 +43,9 @@
         "PoweredBy": "Powered by Geoapify",
         "NeedsConnection": "La ricerca dei luoghi richiede la connessione."
     },
+    "Filters": {
+        "Categories": "Categorie"
+    },
     "Status": {
         "live": "In corso",
         "upcoming": "In arrivo",
