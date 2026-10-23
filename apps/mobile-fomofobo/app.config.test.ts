@@ -80,8 +80,7 @@ describe("app.config", () => {
         expect(config.android?.package).toMatch(soundBundleId)
     })
 
-    // Google rejects a second OAuth client for an application id it already knows, so a
-    // build talking to the dev Firebase project cannot reuse the production id.
+    // A tester build installs beside the store build only under its own application id.
     it("suffixes both application ids on a dev build", async () => {
         const prod = await loadConfigFor("prod")
         const dev = await loadConfigFor("dev")
@@ -180,8 +179,8 @@ describe("app.config", () => {
         })
     })
 
-    // quality.yaml prebuilds with no secrets, so a missing file must drop the key rather
-    // than point prebuild at a path that does not exist.
+    // The app has no Firebase SDK and no build needs the file, so a missing file must drop
+    // the key rather than point prebuild at a path that does not exist.
     it("omits googleServicesFile when the file is absent", async () => {
         const released = await loadConfigFor("dev")
         expect(released.ios?.googleServicesFile).toBeUndefined()

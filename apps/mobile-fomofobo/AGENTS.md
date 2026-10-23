@@ -40,15 +40,15 @@ src/components/ui/
 ## Environment
 
 - App env vars flow: `.env` -> `app.config.ts` `extra` -> `expo-constants` -> `src/lib/env.ts`
-- CI/Fastlane env vars stay in `.env` only - **NOT** exposed to the app via `extra`
+- Fastlane env vars stay in `.env` only - **NOT** exposed to the app via `extra`
 - `.env.template` is the source of truth for required vars
 
-| Reads `.env`                       | How                                                                              |
-| ---------------------------------- | -------------------------------------------------------------------------------- |
-| Expo CLI, for `app.config.ts`      | Built in. `config/env.ts` validates the result, the only validation of `.env`    |
-| Fastlane, for the lane-only values | Built in: the first of `fastlane/` and this directory that holds a `*.env*` file |
-| `with-env`, for `ENV_NAME=<name>`  | Loads `.env.<name>` over `.env`                                                  |
-| The app, on the device             | Never. `src/lib/env.ts` validates `extra`, which `app.config.ts` builds          |
+| Reads `.env`                       | How                                                                                                                                                         |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Expo CLI, for `app.config.ts`      | Built in. `config/env.ts` validates the result, the only validation of `.env`                                                                               |
+| Fastlane, for the lane-only values | Built in: the first of `fastlane/` and this directory that holds a `*.env*` file. `--env <name>` of the `release:*` scripts loads `.env.<name>` over `.env` |
+| `with-env`, for `ENV_NAME=<name>`  | Loads `.env.<name>` over `.env`                                                                                                                             |
+| The app, on the device             | Never. `src/lib/env.ts` validates `extra`, which `app.config.ts` builds                                                                                     |
 
 - **NEVER** add a `*.env*` file to `fastlane/`. Fastlane then reads that folder and skips the `.env` of this directory
 
@@ -59,24 +59,24 @@ schema per environment, and `config/target.ts` maps the environment to an identi
 `app.config.ts` calls both, so an invalid value fails `expo start`, `prebuild` and every
 lane, never the app on first launch.
 
-|                        | unset or `local`             | `dev`                                   | `prod`                           |
-| ---------------------- | ---------------------------- | --------------------------------------- | -------------------------------- |
-| `API_URL`              | defaults to `localhost:3000` | required, `https`                       | required, `https`                |
-| Application id, scheme | `.dev` id, `fomofobodev`     | `.dev` id, `fomofobodev`                | store id, `fomofobo`             |
-| Firebase native config | `firebase/dev/`              | `firebase/dev/`                         | `firebase/prod/`                 |
-| Lanes                  | none                         | one iOS beta lane, `android distribute` | `ios release`, `android release` |
+|                        | unset or `local`             | `dev`                                  | `prod`                           |
+| ---------------------- | ---------------------------- | -------------------------------------- | -------------------------------- |
+| `API_URL`              | defaults to `localhost:3000` | required, `https`                      | required, `https`                |
+| Application id, scheme | `.dev` id, `fomofobodev`     | `.dev` id, `fomofobodev`               | store id, `fomofobo`             |
+| Firebase native config | `firebase/dev/`              | `firebase/dev/`                        | `firebase/prod/`                 |
+| Lanes                  | none                         | `ios distribute`, `android distribute` | `ios release`, `android release` |
 
 - An unrecognized `APP_ENV` fails. One variable has one name in every environment: no `_DEV`
   suffix.
 - `.env` holds the local values. To point a local build at another backend, put the values in
   `.env.<name>` and run `ENV_NAME=<name> pnpm start`.
-- **NEVER** set `APP_ENV` by hand for a build. The `pnpm ci:*` scripts pass it, and the lanes
-  refuse a wrong value.
+- **NEVER** set `APP_ENV` by hand for a build. The `pnpm release:*` scripts pass it, and the
+  lanes refuse a wrong value.
 - Add an app var: add it to `.env.template`, to every block of `config/env.ts` with a default
   in the `local` block when a safe one exists, to `extra` in `app.config.ts`, and to
   `src/lib/env.ts`.
-- dev and prod are **separate Firebase projects**. Their config files never overlap - see
-  `firebase/README.md`.
+- The app has no Firebase SDK, so the native config files are optional. One dev Firebase
+  project serves App Distribution - see `firebase/README.md`.
 - The app reads `env.appEnv`. Gate environment-dependent behaviour on it with an exhaustive
   `match`, never on `__DEV__`, which is about the JS bundle and not the target environment.
 
@@ -120,18 +120,18 @@ lane, never the app on first launch.
 
 ## Fastlane
 
-Each lane carries its rules and their reasons as comments in `fastlane/Fastfile`. Read them before you change a lane. `.github/mobile-release.md` holds the store and signing setup.
+A person runs the lanes by hand on a Mac, through the `pnpm release:*` scripts. No workflow builds the app. `RELEASE.md` holds the setup, the secrets and the ship steps. Each lane carries its rules and their reasons as comments in `fastlane/Fastfile`. Read them before you change a lane.
 
-- Never use the CI run number as a build number. A run number counts every CI run, not the uploads.
+- Take a build number from what the store or App Distribution holds, never from a local counter.
 - A change of signing key breaks the in-place upgrade on the devices of the testers.
 
 ### Ruby and gems
 
-- `.ruby-version` holds the exact release, and it must match the release that the `android-builder` image ships.
-- Every direct gem carries an exact version, in the `Gemfile` and in `fastlane/Pluginfile`. This is the whole drift policy. A `lockFileMaintenance` refresh then moves transitive gems only. The `Gemfile` comments carry the `:ios` constraints.
-- CI installs the gems in frozen mode. If the `Gemfile` and `Gemfile.lock` disagree, the job fails with `the lockfile can't be updated because frozen mode is set`.
-- `Gemfile.lock` locks `arm64-darwin`, `ruby` and `x86_64-linux`. The Darwin entry carries no OS version. For a new runner platform, run `bundle lock --add-platform <platform>`.
-- The shared Renovate config disables the `bundler` manager. Only a `lockFileMaintenance` refresh and a security advisory reach the gem files. Both build through `android-build` and `ios-build` first.
+- `.ruby-version` holds the exact release that the Mac runs.
+- Every direct gem carries an exact version, in the `Gemfile` and in `fastlane/Pluginfile`. This is the whole drift policy. The `Gemfile` comments carry the `:ios` constraints.
+- Commit `Gemfile.lock` with every change of the `Gemfile` or `fastlane/Pluginfile`.
+- The Darwin entry of `Gemfile.lock` carries no OS version. For a new Mac platform, run `bundle lock --add-platform <platform>`.
+- `RELEASE.md` says how to move a gem or the Ruby release.
 
 ## Accessibility
 

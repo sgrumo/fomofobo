@@ -1,8 +1,10 @@
 # Firebase native config
 
-The `distribute` lanes and the `release` lanes build against **two different Firebase
-projects**. Each project has its own API keys, so each has its own pair of native config
-files.
+The app has no Firebase SDK, so no build needs a file of this folder. Firebase App
+Distribution ships the dev builds with the values of `.env` alone. See `RELEASE.md`.
+
+If a Firebase SDK joins the app, each environment reads its own pair of files from its own
+Firebase project:
 
 ```
 firebase/
@@ -15,8 +17,9 @@ firebase/
 ```
 
 `app.config.ts` points `googleServicesFile` at `firebase/prod` when `APP_ENV=prod`, and at
-`firebase/dev` otherwise. `expo prebuild` copies the resolved file into the native project,
-so the Firebase project a build talks to is fixed at prebuild time.
+`firebase/dev` otherwise. It leaves the key out when the file is missing. `expo prebuild`
+copies the resolved file into the native project, so the Firebase project a build talks to
+is fixed at prebuild time.
 
 Each project registers the app under the id that environment builds:
 
@@ -28,11 +31,5 @@ Each project registers the app under the id that environment builds:
 CAUTION: A config file that names a different application id makes the Android build fail.
 The Google Services gradle plugin reports `No matching client found for package name`.
 
-Google keys an OAuth client on the pair (application id, signing certificate SHA-1), and
-rejects a duplicate pair even across two projects. This is why the two environments need two
-application ids. See `.github/mobile-release.md`.
-
 All four files are git-ignored: they carry API keys. Download each one from its own Firebase
 project (**Project Settings > Your apps > Download**), and put it in the matching directory.
-
-CI restores them from base64 secrets.

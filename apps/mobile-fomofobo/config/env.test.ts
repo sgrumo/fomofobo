@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import { parseEnv } from "./env"
 
 describe("parseEnv", () => {
-    // quality.yaml and the checklist build with no .env, so a local build needs no value.
+    // The checklist builds with no .env, so a local build needs no value.
     it("parses an empty environment as local with full defaults", () => {
         const env = parseEnv({})
         expect(env.APP_ENV).toBe("local")

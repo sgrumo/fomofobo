@@ -17,16 +17,15 @@ const target = resolveTarget(env.APP_ENV)
 // holds.
 const buildNumber = env.APP_BUILD_NUMBER ?? 1
 
-// Google keys an OAuth client on the pair (application id, signing certificate SHA-1), and
-// rejects a duplicate pair even across two projects. Two Firebase projects therefore need
-// two application ids.
+// The local and dev builds carry their own application id, so they install beside the store
+// build on one phone.
 const baseAppId = "it.quinck.fomofobo"
 const appId = `${baseAppId}${target.appIdSuffix}`
 
 /**
  * @description Returns the config path when the file is present, undefined otherwise
  * @param file Name of the native Firebase config file
- * @remarks Omits the key rather than failing, so quality.yaml can prebuild with no secrets
+ * @remarks Omits the key rather than failing, so a build with no Firebase file still prebuilds
  */
 const googleServicesFile = (file: string): string | undefined =>
     existsSync(path.join(process.cwd(), target.firebaseDir, file))

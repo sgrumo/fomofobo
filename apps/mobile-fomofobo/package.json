@@ -20,11 +20,10 @@
         "test": "vitest --run",
         "fmt": "oxfmt",
         "fmt:check": "oxfmt --check",
-        "ci:ios:release": "APP_ENV=prod bundle exec fastlane ios release",
-        "ci:ios:distribute": "APP_ENV=dev bundle exec fastlane ios distribute",
-        "ci:ios:beta": "APP_ENV=dev bundle exec fastlane ios beta",
-        "ci:android:release": "APP_ENV=prod bundle exec fastlane android release",
-        "ci:android:distribute": "APP_ENV=dev bundle exec fastlane android distribute"
+        "release:ios:distribute": "APP_ENV=dev bundle exec fastlane ios distribute --env dev",
+        "release:android:distribute": "APP_ENV=dev bundle exec fastlane android distribute --env dev",
+        "release:ios:store": "APP_ENV=prod bundle exec fastlane ios release --env prod",
+        "release:android:store": "APP_ENV=prod bundle exec fastlane android release --env prod"
     },
     "dependencies": {
         "@gorhom/bottom-sheet": "^5.2.8",
