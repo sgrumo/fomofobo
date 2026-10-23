@@ -1,4 +1,5 @@
 import "server-only"
+import { boundingBox } from "domain/bounding-box"
 import { localDateOf } from "domain/local-format"
 import { PLATFORM_TIME_ZONE, SEARCH_RADIUS_METERS } from "domain/platform"
 import type {
@@ -20,7 +21,6 @@ import type {
 } from "storage"
 
 import { dateWindow } from "@/lib/events/date-window"
-import { boundingBox } from "@/lib/geo/bounding-box"
 import { MAX_PERMANENT_VENUE_RESULTS, MAX_SEARCH_RESULTS } from "@/lib/platform/platform"
 
 import { eventTag, PUBLIC_TAG } from "../cache"

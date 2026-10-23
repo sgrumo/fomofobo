@@ -4,13 +4,17 @@
     "private": true,
     "type": "module",
     "exports": {
+        "./bounding-box": "./src/bounding-box.ts",
+        "./directions-url": "./src/directions-url.ts",
         "./event-clusters": "./src/event-clusters.ts",
+        "./haversine-distance": "./src/haversine-distance.ts",
         "./local-format": "./src/local-format.ts",
         "./map-style": "./src/map-style.ts",
         "./occurrence-progress": "./src/occurrence-progress.ts",
         "./occurrence-status": "./src/occurrence-status.ts",
         "./pin-tag": "./src/pin-tag.ts",
         "./platform": "./src/platform.ts",
+        "./round-center": "./src/round-center.ts",
         "./spot-entries": "./src/spot-entries.ts"
     },
     "scripts": {

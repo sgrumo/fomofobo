@@ -1,10 +1,9 @@
 import "server-only"
+import { boundingBox } from "domain/bounding-box"
 import { SEARCH_RADIUS_METERS } from "domain/platform"
 import type { PlaceSearchQuery, SearchSuggestions } from "models"
 import { unstable_cache } from "next/cache"
 import type { PublicOccurrencesStorage, RateLimitsStorage } from "storage"
-
-import { boundingBox } from "@/lib/geo/bounding-box"
 
 import { PLACES_TAG } from "../cache"
 import { appError } from "../errors"
