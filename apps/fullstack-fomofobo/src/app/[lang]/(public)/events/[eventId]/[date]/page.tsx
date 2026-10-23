@@ -1,11 +1,11 @@
 import { HydrationBoundary } from "@tanstack/react-query"
+import { shareSummaryOf } from "domain/share-summary"
 import type { Metadata } from "next"
 
 import { routes } from "@/framework/routes/routes"
 import { getDynamicRoute } from "@/framework/routes/server/get-dynamic-route"
 import { serverApi } from "@/lib/api/server/api"
 import { prefetchQueries } from "@/lib/query/server/prefetch"
-import { shareSummaryOf } from "@/lib/share/share-summary"
 import { appBaseUrl } from "@/server/config/app-base-url"
 
 import { EventDetailView } from "./_page/client/event-detail-view"

@@ -17,7 +17,11 @@
         "./price-details": "./src/price-details.ts",
         "./price-summary": "./src/price-summary.ts",
         "./round-center": "./src/round-center.ts",
-        "./spot-entries": "./src/spot-entries.ts"
+        "./save-queue": "./src/save-queue.ts",
+        "./share-summary": "./src/share-summary.ts",
+        "./share-urls": "./src/share-urls.ts",
+        "./spot-entries": "./src/spot-entries.ts",
+        "./venue-history": "./src/venue-history.ts"
     },
     "scripts": {
         "clean": "rm -rf *.tsbuildinfo",

@@ -1,3 +1,4 @@
+import { HttpStatus } from "models"
 import type { OccurrenceRef, SaveChange } from "models"
 
 /**
@@ -31,3 +32,12 @@ export const dropSentSaveChange = (
     pending.filter(
         entry => !isSameOccurrence(entry, sent) || entry.action !== sent.action,
     )
+
+/**
+ * @description True when the API refused a change for good, so a retry would fail the same way: a client error other than a rate limit
+ * @param status HTTP status of the refusal
+ */
+export const isFinalSaveRefusal = (status: number): boolean =>
+    status >= HttpStatus.BadRequest &&
+    status < HttpStatus.InternalError &&
+    status !== HttpStatus.TooManyRequests

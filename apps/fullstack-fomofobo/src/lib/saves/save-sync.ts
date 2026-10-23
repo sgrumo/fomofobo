@@ -1,11 +1,13 @@
+import {
+    dropSentSaveChange,
+    isFinalSaveRefusal,
+    queueSaveChange,
+} from "domain/save-queue"
 import type { SaveChange } from "models"
-import { HttpStatus } from "models"
 
 import { api } from "@/lib/api/client-api"
 import { ApiTransportError } from "@/lib/api/transport-error"
 import { localStorage } from "@/lib/storage/local-storage"
-
-import { dropSentSaveChange, queueSaveChange } from "./save-queue"
 
 /**
  * @description Returns the id of this device, created and persisted on the first call
@@ -19,16 +21,6 @@ const deviceId = (): string => {
     localStorage.setItem("device-id", created)
     return created
 }
-
-/**
- * @description True when the API refused the change for good, so a retry would fail the same way
- * @param error Error of the call
- */
-const isFinalRefusal = (error: unknown): boolean =>
-    error instanceof ApiTransportError &&
-    error.status >= HttpStatus.BadRequest &&
-    error.status < HttpStatus.InternalError &&
-    error.status !== HttpStatus.TooManyRequests
 
 /**
  * @description Sends one change, and returns true when it leaves the queue
@@ -45,7 +37,7 @@ const sendSaveChange = async (change: SaveChange): Promise<boolean> => {
             : api.unsaveOccurrence(request))
         return true
     } catch (error) {
-        return isFinalRefusal(error)
+        return error instanceof ApiTransportError && isFinalSaveRefusal(error.status)
     }
 }
 

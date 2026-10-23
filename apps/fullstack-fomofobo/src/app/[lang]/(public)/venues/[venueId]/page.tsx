@@ -1,11 +1,11 @@
 import { HydrationBoundary } from "@tanstack/react-query"
+import { VENUE_HISTORY_PAGE_SIZE } from "domain/venue-history"
 import type { Metadata } from "next"
 
 import { routes } from "@/framework/routes/routes"
 import { getDynamicRoute } from "@/framework/routes/server/get-dynamic-route"
 import { serverApi } from "@/lib/api/server/api"
 import { prefetchQueries } from "@/lib/query/server/prefetch"
-import { VENUE_HISTORY_PAGE_SIZE } from "@/lib/venues/history"
 import { appBaseUrl } from "@/server/config/app-base-url"
 
 import { VenueDetailView } from "./_page/client/venue-detail-view"
