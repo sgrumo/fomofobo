@@ -4,13 +4,8 @@
 deploys of the branch. Each deploy needs `quality`, so a deploy cannot start
 unless quality passed.
 
-A project with the mobile app also has two workflows that run on manual dispatch:
-
-- `mobile-dev-release.yaml` sends a dev build of any branch to the testers.
-- `mobile-store-release.yaml` submits a production build of `main` to the stores.
-
-Both reuse the `ci.yaml` run of the commit, so quality does not run a second time.
-[`mobile-release.md`](mobile-release.md) says how to run them.
+No workflow builds or ships the mobile app. A person runs its Fastlane lanes on
+a Mac, as `apps/mobile-fomofobo/README.md` says.
 
 `purge-photos.yaml` runs every day. It dispatches one run of itself for each
 environment, on the branch of that environment, and each run deletes the photos
@@ -34,8 +29,10 @@ To add an environment, for example `qa`:
 
 ## Deploys
 
-The `deploy-vercel` job of `ci.yaml` deploys the app. `infra/vercel/README.md` says
-what each environment needs first.
+The `deploy-vercel` job of `ci.yaml` deploys the app, only when the changes reach
+the app, a package it depends on, or its deploy files. `infra/vercel/README.md` says
+what each environment needs first. To deploy with no change, dispatch `ci.yaml` on
+the branch.
 
 A deploy job passes `secrets: inherit`, so the job reads the secrets of its
 GitHub environment. A variable in the `with:` of a deploy job comes from the
@@ -47,9 +44,10 @@ secret.
 
 ## Quality
 
-`quality.yaml` runs the build, lint, typecheck, unit tests, one E2E suite per app
-and the native builds of the mobile app. The `Test Report` check run lists the
-failed suites and tests of the run.
+`quality.yaml` runs the build, lint, typecheck, unit tests and one E2E suite per
+app, and only the typecheck and lint of the mobile app. Each job runs only when
+the changes reach its part of the repo, as `.github/AGENTS.md` says. The
+`Test Report` check run lists the failed suites and tests of the run.
 
 ## Caches
 

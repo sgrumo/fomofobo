@@ -2,6 +2,10 @@ name: Quality
 
 on:
     workflow_call:
+        outputs:
+            vercel:
+                description: "True when the changes reach the deploy of fullstack-fomofobo"
+                value: ${{ jobs.changes.outputs.vercel }}
 
 permissions:
     contents: read
@@ -13,20 +17,63 @@ permissions:
     pull-requests: read
 
 jobs:
+    # Maps the changes of the event to the parts of the repo they reach. A manual run
+    # reaches every part.
+    changes:
+        name: Detect changes
+        runs-on: ubuntu-latest
+        container:
+            image: node:24.19.0-bookworm
+        outputs:
+            web: ${{ steps.detect.outputs.web }}
+            mobile: ${{ steps.detect.outputs.mobile }}
+            vercel: ${{ steps.detect.outputs.vercel }}
+        steps:
+            - uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0
+            - name: Mark workspace as safe for git
+              run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+            - uses: ./.github/actions/setup-monorepo
+              with:
+                  install: "false"
+            - id: detect
+              run: node .github/scripts/detect-changes.mjs
+              env:
+                  BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+
     build-and-check:
         name: Build, Typecheck & Lint
         runs-on: ubuntu-latest
         container:
             image: node:24.19.0-bookworm
+        needs: changes
+        if: needs.changes.outputs.web == 'true'
         steps:
             - uses: actions/checkout@v7
             - uses: ./.github/actions/setup-monorepo
             - name: Build all packages
-              run: pnpm build
+              run: pnpm -r --if-present --filter '!mobile-fomofobo' run build
             - name: Typecheck
-              run: pnpm typecheck
+              run: pnpm -r --if-present --filter '!mobile-fomofobo' run typecheck
             - name: Lint
-              run: pnpm lint
+              run: pnpm -r --if-present --filter '!mobile-fomofobo' run lint
+
+    # The mobile app has no E2E suite, and its native builds run on a Mac by hand.
+    mobile-check:
+        name: Mobile Typecheck & Lint
+        runs-on: ubuntu-latest
+        container:
+            image: node:24.19.0-bookworm
+        needs: changes
+        if: needs.changes.outputs.mobile == 'true'
+        steps:
+            - uses: actions/checkout@v7
+            - uses: ./.github/actions/setup-monorepo
+            - name: Typecheck
+              run: pnpm -C apps/mobile-fomofobo typecheck
+            - name: Lint
+              run: pnpm -C apps/mobile-fomofobo lint
 
     unit-tests:
         name: Unit Tests
@@ -38,7 +85,7 @@ jobs:
             - uses: actions/checkout@v7
             - uses: ./.github/actions/setup-monorepo
             - name: Run unit tests
-              run: pnpm test
+              run: pnpm -r --if-present --filter '!mobile-fomofobo' run test
             - name: Upload unit test reports
               if: ${{ !cancelled() }}
               continue-on-error: true
@@ -69,10 +116,11 @@ jobs:
         container:
             image: node:24.19.0-bookworm
         needs:
+            - changes
             - unit-tests
             - e2e-fomofobo
             - e2e-photo-purge
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && needs.changes.outputs.web == 'true' }}
         steps:
             - uses: actions/checkout@v7
             - name: Mark workspace as safe for git

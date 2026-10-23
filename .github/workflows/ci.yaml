@@ -59,10 +59,11 @@ jobs:
                       dev) echo "environment=dev" >> "$GITHUB_OUTPUT" ;;
                   esac
 
+    # Deploys only when the changes reach the app or its deploy files. See .github/AGENTS.md.
     deploy-vercel:
         name: Deploy Vercel
         needs: [quality, resolve-env]
-        if: needs.resolve-env.outputs.environment != ''
+        if: needs.resolve-env.outputs.environment != '' && needs.quality.outputs.vercel == 'true'
         uses: ./.github/workflows/deploy-vercel.yaml
         with:
             environment: ${{ needs.resolve-env.outputs.environment }}
