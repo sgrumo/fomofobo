@@ -52,14 +52,12 @@
         "shared": "workspace:*",
         "storage": "workspace:*",
         "styles": "workspace:*",
-        "supercluster": "^9.1.0",
         "tailwindcss": "catalog:",
         "ts-pattern": "catalog:",
         "ui-components": "workspace:*",
         "zod": "catalog:"
     },
     "devDependencies": {
-        "@maplibre/maplibre-gl-style-spec": "^26.4.4",
         "@tailwindcss/postcss": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",

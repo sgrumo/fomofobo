@@ -4,10 +4,14 @@
     "private": true,
     "type": "module",
     "exports": {
+        "./event-clusters": "./src/event-clusters.ts",
         "./local-format": "./src/local-format.ts",
+        "./map-style": "./src/map-style.ts",
         "./occurrence-progress": "./src/occurrence-progress.ts",
         "./occurrence-status": "./src/occurrence-status.ts",
-        "./platform": "./src/platform.ts"
+        "./pin-tag": "./src/pin-tag.ts",
+        "./platform": "./src/platform.ts",
+        "./spot-entries": "./src/spot-entries.ts"
     },
     "scripts": {
         "clean": "rm -rf *.tsbuildinfo",
@@ -22,9 +26,13 @@
         "@date-fns/tz": "catalog:",
         "date-fns": "catalog:",
         "es-toolkit": "catalog:",
-        "models": "workspace:*"
+        "models": "workspace:*",
+        "shared": "workspace:*",
+        "supercluster": "^9.1.0",
+        "ts-pattern": "catalog:"
     },
     "devDependencies": {
+        "@maplibre/maplibre-gl-style-spec": "^26.4.4",
         "oxlint": "catalog:",
         "oxlint-tsgolint": "catalog:",
         "typescript": "catalog:",

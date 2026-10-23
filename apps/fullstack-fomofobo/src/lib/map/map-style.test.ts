@@ -2,16 +2,10 @@ import { existsSync, readFileSync } from "node:fs"
 import { createRequire } from "node:module"
 import path from "node:path"
 
-import { validateStyleMin } from "@maplibre/maplibre-gl-style-spec"
+import { mapStyle } from "domain/map-style"
 import { describe, expect, it } from "vitest"
 
-import { mapStyle } from "./map-style"
-
 describe("map style", () => {
-    it("passes the MapLibre style validation", () => {
-        expect(validateStyleMin(mapStyle)).toStrictEqual([])
-    })
-
     it("paints with the map palette of packages/styles only", () => {
         const globalsCss = readFileSync(
             createRequire(import.meta.url).resolve("styles"),

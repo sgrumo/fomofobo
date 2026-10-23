@@ -1,3 +1,4 @@
+import { sum } from "es-toolkit"
 import type { GeoPoint, OccurrenceStatus } from "models"
 import { isDefined } from "shared/values"
 import Supercluster from "supercluster"
@@ -104,17 +105,53 @@ export const buildEventClusters = (
     )
 
 /**
+ * @description Returns the counts of a cluster per kind
+ * @param cluster Counts of the cluster per kind
+ */
+const kindCountsOf = (cluster: EventClusterProperties): Record<MapPointKind, number> => ({
+    live: cluster.liveCount,
+    upcoming: cluster.upcomingCount,
+    ended: cluster.endedCount,
+    permanent: cluster.permanentCount,
+})
+
+/**
  * @description Returns the stacking layer of a cluster: the layer of the highest kind it holds
  * @param cluster Counts of the cluster per kind
  */
 export const clusterLayer = (cluster: EventClusterProperties): number => {
-    const counts: Record<MapPointKind, number> = {
-        live: cluster.liveCount,
-        upcoming: cluster.upcomingCount,
-        ended: cluster.endedCount,
-        permanent: cluster.permanentCount,
-    }
+    const counts = kindCountsOf(cluster)
     return LAYER_ORDER.findLastIndex(kind => counts[kind] > 0)
+}
+
+export interface ClusterArc {
+    kind: MapPointKind
+    // Percentages of the ring, 0 to 100
+    from: number
+    to: number
+}
+
+/**
+ * @description Returns the arcs of the ring of a cluster, one per kind from the top layer down, each sized by the share of its kind
+ * @param cluster Counts of the cluster per kind
+ */
+export const clusterArcs = (cluster: EventClusterProperties): ClusterArc[] => {
+    const counts = kindCountsOf(cluster)
+    const total = sum(Object.values(counts))
+    return LAYER_ORDER.toReversed().reduce<{ arcs: ClusterArc[]; counted: number }>(
+        ({ arcs, counted }, kind) => ({
+            arcs: [
+                ...arcs,
+                {
+                    kind,
+                    from: (counted / total) * 100,
+                    to: ((counted + counts[kind]) / total) * 100,
+                },
+            ],
+            counted: counted + counts[kind],
+        }),
+        { arcs: [], counted: 0 },
+    ).arcs
 }
 
 /**

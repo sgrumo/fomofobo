@@ -1,7 +1,17 @@
 "use client"
 
-import { dayMonthOf, localDateOf, localTimeOf } from "domain/local-format"
+import {
+    buildEventClusters,
+    CLUSTER_MAX_ZOOM,
+    clusterLayer,
+    firstLeafIndex,
+    markerLayer,
+    venueSpots,
+} from "domain/event-clusters"
+import type { EventMapFeature, MapPointKind } from "domain/event-clusters"
+import { mapStyle } from "domain/map-style"
 import { occurrenceStatus } from "domain/occurrence-status"
+import { pinStartOf } from "domain/pin-tag"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { Map as MapLibreMap, setWorkerUrl } from "maplibre-gl"
 import type {
@@ -16,16 +26,6 @@ import { useTranslation } from "react-i18next"
 import { Alert } from "ui-components/alert"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
-import {
-    buildEventClusters,
-    CLUSTER_MAX_ZOOM,
-    clusterLayer,
-    firstLeafIndex,
-    markerLayer,
-    venueSpots,
-} from "@/lib/map/event-clusters"
-import type { EventMapFeature, MapPointKind } from "@/lib/map/event-clusters"
-import { mapStyle } from "@/lib/map/map-style"
 
 import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"
@@ -177,7 +177,6 @@ export const EventMap = (props: EventMapProps) => {
     }
     const features =
         viewport === undefined ? [] : clusters.getClusters(viewport.bbox, viewport.zoom)
-    const today = localDateOf(props.now, PLATFORM_TIME_ZONE)
 
     if (!supported) {
         return <Alert type="error" text={t("Map.Unsupported")} className="m-4" />
@@ -288,8 +287,6 @@ export const EventMap = (props: EventMapProps) => {
                       if (occurrence === undefined) {
                           return undefined
                       }
-                      const startsAt = new Date(occurrence.startsAt)
-
                       return (
                           <MapMarker
                               route={props.route}
@@ -303,12 +300,11 @@ export const EventMap = (props: EventMapProps) => {
                                   route={props.route}
                                   title={occurrence.title}
                                   status={kind}
-                                  startTime={localTimeOf(startsAt, PLATFORM_TIME_ZONE)}
-                                  startDay={
-                                      localDateOf(startsAt, PLATFORM_TIME_ZONE) === today
-                                          ? undefined
-                                          : dayMonthOf(startsAt, PLATFORM_TIME_ZONE)
-                                  }
+                                  start={pinStartOf(
+                                      new Date(occurrence.startsAt),
+                                      props.now,
+                                      PLATFORM_TIME_ZONE,
+                                  )}
                                   icon={props.iconOf(occurrence.primaryCategoryId)}
                                   moreCount={moreCount}
                                   onSelect={() => {
