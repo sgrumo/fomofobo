@@ -14,6 +14,8 @@
         "./occurrence-status": "./src/occurrence-status.ts",
         "./pin-tag": "./src/pin-tag.ts",
         "./platform": "./src/platform.ts",
+        "./price-details": "./src/price-details.ts",
+        "./price-summary": "./src/price-summary.ts",
         "./round-center": "./src/round-center.ts",
         "./spot-entries": "./src/spot-entries.ts"
     },

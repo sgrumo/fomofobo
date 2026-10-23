@@ -5,11 +5,13 @@ import { localTimeOf, weekdayDateOf } from "domain/local-format"
 import { occurrenceProgress } from "domain/occurrence-progress"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
+import { priceDetailRows } from "domain/price-details"
+import { formatEuroCents } from "domain/price-summary"
 import type { LanguageKey } from "i18n/i18n"
 import type { OccurrenceDetail, PriceScheme } from "models"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
-import { isDefined } from "shared/values"
+import { match } from "ts-pattern"
 import { Badge } from "ui-components/badge"
 import { IconButton } from "ui-components/icon-button"
 import {
@@ -31,7 +33,6 @@ import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
-import { formatEuroCents } from "@/lib/events/price-summary"
 import { useBackToMap } from "@/lib/hooks/use-back-to-map"
 import { useCopyLink } from "@/lib/hooks/use-copy-link"
 import { useNow } from "@/lib/hooks/use-now"
@@ -259,48 +260,45 @@ interface PriceDetailsProps {
 
 const PriceDetails = (props: PriceDetailsProps) => {
     const { t } = useTranslation("shared")
-    const scheme = props.priceScheme
-    const membership = scheme.membership
-    const rows = [
-        scheme.isFree
-            ? { key: "entry", label: t("Detail.Prices.Entry"), value: t("Price.Free") }
-            : undefined,
-        scheme.fullPriceCents === null
-            ? undefined
-            : {
-                  key: "full",
-                  label: t("Detail.Prices.Full"),
-                  value: formatEuroCents(scheme.fullPriceCents),
-              },
-        ...scheme.reducedPrices.map((reduced, index) => ({
-            key: `reduced-${String(index)}`,
-            label: reduced.label,
-            value: formatEuroCents(reduced.amountCents),
-        })),
-        membership === null
-            ? undefined
-            : {
-                  key: "membership",
-                  label: t("Detail.Prices.Membership"),
-                  value:
-                      membership.costCents === null
-                          ? membership.name
-                          : `${membership.name} · ${formatEuroCents(membership.costCents)}`,
-              },
-        scheme.minimumAge === null
-            ? undefined
-            : {
-                  key: "minimum-age",
-                  label: t("Detail.Prices.MinimumAge"),
-                  value: t("Price.MinimumAge", { age: scheme.minimumAge }),
-              },
-        scheme.notes === null
-            ? undefined
-            : { key: "notes", label: t("Detail.Prices.Notes"), value: scheme.notes },
-    ].filter(isDefined)
+    const rows = priceDetailRows(props.priceScheme).map(row =>
+        match(row)
+            .with({ type: "free" }, () => ({
+                key: "entry",
+                label: t("Detail.Prices.Entry"),
+                value: t("Price.Free"),
+            }))
+            .with({ type: "full" }, full => ({
+                key: "full",
+                label: t("Detail.Prices.Full"),
+                value: formatEuroCents(full.cents),
+            }))
+            .with({ type: "reduced" }, reduced => ({
+                key: `reduced-${String(reduced.index)}`,
+                label: reduced.label,
+                value: formatEuroCents(reduced.cents),
+            }))
+            .with({ type: "membership" }, membership => ({
+                key: "membership",
+                label: t("Detail.Prices.Membership"),
+                value:
+                    membership.costCents === null
+                        ? membership.name
+                        : `${membership.name} · ${formatEuroCents(membership.costCents)}`,
+            }))
+            .with({ type: "minimum-age" }, minimumAge => ({
+                key: "minimum-age",
+                label: t("Detail.Prices.MinimumAge"),
+                value: t("Price.MinimumAge", { age: minimumAge.age }),
+            }))
+            .with({ type: "notes" }, notes => ({
+                key: "notes",
+                label: t("Detail.Prices.Notes"),
+                value: notes.text,
+            }))
+            .exhaustive(),
+    )
 
-    // One row says no more than the summary of the facts above.
-    return rows.length <= 1 ? undefined : (
+    return rows.length === 0 ? undefined : (
         <section aria-label={t("Detail.Prices.Label")} className="flex flex-col gap-2">
             <h2 className="tp-pixel-sm text-fg-muted uppercase">
                 {t("Detail.Prices.Label")}

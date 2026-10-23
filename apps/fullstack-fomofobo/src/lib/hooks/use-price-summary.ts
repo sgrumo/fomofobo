@@ -1,8 +1,7 @@
+import { formatEuroCents, priceSummaryParts } from "domain/price-summary"
 import type { PriceScheme } from "models"
 import { useTranslation } from "react-i18next"
 import { match } from "ts-pattern"
-
-import { formatEuroCents, priceSummaryParts } from "@/lib/events/price-summary"
 
 /**
  * @description Returns a function that writes the one-line price summary of a scheme, such as "da 5 € · 18+"
