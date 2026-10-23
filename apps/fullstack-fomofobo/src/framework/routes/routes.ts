@@ -1,5 +1,5 @@
+import { mapQuerySchema } from "domain/map-query"
 import { languageKeys, languageKeySchema } from "i18n/i18n"
-import { dateFilterKindSchema, localDateSchema } from "models"
 import { z } from "zod"
 
 import {
@@ -7,16 +7,6 @@ import {
     createRouteHandler,
     createStaticRoute,
 } from "./routes.helper"
-
-/**
- * @description Builds the codec of one coordinate read from the URL
- * @param limit Largest absolute value of the coordinate
- */
-const coordinateCodec = (limit: number) =>
-    z.codec(z.string().regex(z.regexes.number), z.number().min(-limit).max(limit), {
-        decode: Number,
-        encode: value => value.toString(),
-    })
 
 const pageCodec = z.codec(z.string().regex(/^[1-9]\d{0,5}$/u), z.int().min(1), {
     decode: Number,
@@ -35,20 +25,7 @@ export const routes = {
         segments: ["[lang]"],
         title: ({ t }) => t("PageTitle.Home"),
         parametersSchema: z.object({ lang: languageKeySchema }),
-        querySchema: z.object({
-            lat: coordinateCodec(90).optional().catch(undefined),
-            lng: coordinateCodec(180).optional().catch(undefined),
-            place: z.string().trim().min(1).optional().catch(undefined),
-            q: z.string().trim().min(1).optional().catch(undefined),
-            category: z.uuid().optional().catch(undefined),
-            free: z.stringbool().optional().catch(undefined),
-            date: dateFilterKindSchema.optional().catch(undefined),
-            from: localDateSchema.optional().catch(undefined),
-            to: localDateSchema.optional().catch(undefined),
-            event: z.uuid().optional().catch(undefined),
-            occurrence: localDateSchema.optional().catch(undefined),
-            venue: z.uuid().optional().catch(undefined),
-        }),
+        querySchema: mapQuerySchema,
         queryOptions: { event: { push: true }, venue: { push: true } },
     }),
     eventDetail: createDynamicRoute({

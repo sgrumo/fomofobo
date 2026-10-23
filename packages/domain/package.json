@@ -9,6 +9,7 @@
         "./event-clusters": "./src/event-clusters.ts",
         "./haversine-distance": "./src/haversine-distance.ts",
         "./local-format": "./src/local-format.ts",
+        "./map-query": "./src/map-query.ts",
         "./map-style": "./src/map-style.ts",
         "./occurrence-progress": "./src/occurrence-progress.ts",
         "./occurrence-status": "./src/occurrence-status.ts",
@@ -40,7 +41,8 @@
         "models": "workspace:*",
         "shared": "workspace:*",
         "supercluster": "^9.1.0",
-        "ts-pattern": "catalog:"
+        "ts-pattern": "catalog:",
+        "zod": "catalog:"
     },
     "devDependencies": {
         "@maplibre/maplibre-gl-style-spec": "^26.4.4",
