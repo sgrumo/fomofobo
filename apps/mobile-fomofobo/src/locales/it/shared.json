@@ -83,6 +83,12 @@
         "Position": "{{index}}/{{total}} qui"
     },
     "Detail": {
+        "Loading": "Caricamento evento",
+        "NotFound": "Questo evento non esiste o non è più visibile.",
+        "LoadFailed": "Non è stato possibile caricare l'evento.",
+        "Retry": "Riprova",
+        "BackToMap": "Torna alla mappa",
+        "Back": "Indietro",
         "Interested_one": "{{count}} interessato",
         "Interested_other": "{{count}} interessati"
     },
@@ -94,7 +100,6 @@
         "MinimumAge": "{{age}}+"
     },
     "Pending": {
-        "Event": "Evento",
         "Venue": "Locale",
         "Soon": "Questa pagina arriva presto."
     }
