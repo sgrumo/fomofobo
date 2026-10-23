@@ -85,6 +85,7 @@ const config: ExpoConfig = {
     },
     plugins: [
         "expo-router",
+        "@maplibre/maplibre-react-native",
         // iOS reads the app languages for its native UI and its store listing
         ["expo-localization", { supportedLocales: { ios: languageKeys } }],
         [

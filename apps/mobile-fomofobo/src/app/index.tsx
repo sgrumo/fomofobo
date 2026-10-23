@@ -1,59 +1,43 @@
-import { useQuery } from "@tanstack/react-query"
+import { DEFAULT_CITY } from "domain/platform"
 import { Link } from "expo-router"
-import { useTranslation } from "react-i18next"
-import { FlatList, View } from "react-native"
+import { View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
+import { EventMap } from "@/components/map/event-map"
+import { useMapQuery } from "@/components/map/use-map-query"
 import { Button } from "@/components/ui/button/button"
-import { Notice } from "@/components/ui/notice/notice"
 import { Text } from "@/components/ui/text/text"
-import { api } from "@/lib/api/client"
 
-const HomeScreen = () => {
-    const { t } = useTranslation("shared")
-    const {
-        data: categories,
-        isLoading: categoriesLoading,
-        isError: categoriesError,
-    } = useQuery(api.listCategoriesQuery({ params: {}, query: {} }))
+const MapScreen = () => {
+    const { query } = useMapQuery()
+
+    const center =
+        query.lat === undefined || query.lng === undefined
+            ? DEFAULT_CITY.center
+            : { latitude: query.lat, longitude: query.lng }
 
     return (
-        <SafeAreaView className="flex-1">
-            <View className="flex-1 gap-4 px-4 pt-4">
-                <Text variant="pixel-xl" accessibilityRole="header">
-                    {t("Categories.Title")}
-                </Text>
-
-                {categoriesLoading && (
-                    <Notice tone="loading" lines={[t("Categories.Loading")]} />
-                )}
-
-                {categoriesError && (
-                    <Notice tone="error" lines={[t("Categories.Error")]} />
-                )}
-
-                {categories !== undefined && (
-                    <FlatList
-                        data={categories}
-                        keyExtractor={category => category.id}
-                        renderItem={info => <Text>{info.item.name}</Text>}
-                        contentContainerClassName="gap-2 pb-4"
-                    />
-                )}
-
-                {__DEV__ && (
+        <View className="flex-1 bg-map-ground">
+            <EventMap center={center} />
+            {__DEV__ && (
+                <SafeAreaView
+                    edges={["top"]}
+                    className="absolute left-4 top-0"
+                    pointerEvents="box-none"
+                >
                     <Link href="/showcase" asChild={true}>
                         <Button
                             variant="secondary"
+                            size="sm"
                             accessibilityLabel="Open the showcase"
                         >
                             <Text>Showcase</Text>
                         </Button>
                     </Link>
-                )}
-            </View>
-        </SafeAreaView>
+                </SafeAreaView>
+            )}
+        </View>
     )
 }
 
-export default HomeScreen
+export default MapScreen

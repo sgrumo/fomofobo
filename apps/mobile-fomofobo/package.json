@@ -29,6 +29,7 @@
         "@expo-google-fonts/funnel-sans": "^0.4.2",
         "@expo-google-fonts/space-mono": "^0.4.2",
         "@gorhom/bottom-sheet": "^5.2.8",
+        "@maplibre/maplibre-react-native": "^11.5.0",
         "@rn-primitives/slot": "^1.2.0",
         "@tanstack/react-query": "catalog:",
         "api-client": "workspace:*",
