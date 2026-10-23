@@ -29,6 +29,20 @@
         "Error": "Non è stato possibile caricare gli eventi. Mostro gli ultimi risultati.",
         "Truncated": "Troppi eventi per mostrarli tutti. Restringi la ricerca."
     },
+    "Search": {
+        "Label": "Cerca eventi o luoghi",
+        "Placeholder": "Cerca evento, luogo",
+        "Places": "Luoghi",
+        "Events": "Eventi",
+        "Venues": "Locali",
+        "PermanentVenues": "Cinema e musei",
+        "Loading": "Ricerca in corso",
+        "Empty": "Nessun risultato.",
+        "Unavailable": "La ricerca dei luoghi non è disponibile ora.",
+        "TooMany": "Troppe ricerche in poco tempo. Riprova tra un minuto.",
+        "PoweredBy": "Powered by Geoapify",
+        "NeedsConnection": "La ricerca dei luoghi richiede la connessione."
+    },
     "Status": {
         "live": "In corso",
         "upcoming": "In arrivo",

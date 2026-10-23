@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest"
 
+import { ApiResponseError } from "./api-response-error"
 import { createApiRequest } from "./transport"
 
 const request = createApiRequest("https://api.test")
@@ -58,6 +59,27 @@ describe("createApiRequest", () => {
         await expect(request({ method: "get", path: "/api/todos/1" })).rejects.toThrow(
             "GET /api/todos/1 failed (404): Todo not found",
         )
+    })
+
+    it("rejects with the status and the api error of the body", async () => {
+        const apiError = { code: "PastDateRange", message: "Past range", status: 400 }
+        respondWith(400, JSON.stringify(apiError))
+
+        const failure = request({ method: "get", path: "/api/public/occurrences" })
+
+        await expect(failure).rejects.toBeInstanceOf(ApiResponseError)
+        await expect(failure).rejects.toMatchObject({ status: 400, apiError })
+    })
+
+    it("rejects with the status alone when the error body is not json", async () => {
+        respondWith(429, "Too many requests")
+
+        await expect(
+            request({ method: "get", path: "/api/public/places" }),
+        ).rejects.toMatchObject({
+            status: 429,
+            apiError: undefined,
+        })
     })
 
     it("still reports the status when the error body is not json", async () => {

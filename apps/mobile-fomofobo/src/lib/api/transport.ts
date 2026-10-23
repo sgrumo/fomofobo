@@ -1,6 +1,9 @@
 import type { ApiRequest } from "api-client/client"
 import { apiErrorSchema } from "models"
+import type { ApiError } from "models"
 import { Result } from "shared/result"
+
+import { ApiResponseError } from "./api-response-error"
 
 /**
  * @description Maps a query object to a URL search string
@@ -22,17 +25,17 @@ const toQueryString = (query: unknown): string => {
 }
 
 /**
- * @description Returns the message of an API error body
+ * @description Returns the API error of a response body
  * @param body Raw response body
  * @remarks Yields `undefined` for a body that does not match `apiErrorSchema`
  */
-const serverMessage = (body: string): string | undefined => {
+const apiErrorOf = (body: string): ApiError | undefined => {
     const json = Result.try((): unknown => JSON.parse(body))
     if (!json.success) {
         return undefined
     }
     const apiError = apiErrorSchema.safeParse(json.value)
-    return apiError.success ? apiError.data.message : undefined
+    return apiError.success ? apiError.data : undefined
 }
 
 /**
@@ -55,9 +58,10 @@ export const createApiRequest =
         const text = await response.text()
 
         if (!response.ok) {
-            const detail = serverMessage(text)
-            throw new Error(
-                `${method.toUpperCase()} ${path} failed (${response.status})${detail === undefined ? "" : `: ${detail}`}`,
+            const apiError = apiErrorOf(text)
+            throw new ApiResponseError(
+                `${method.toUpperCase()} ${path} failed (${response.status})${apiError === undefined ? "" : `: ${apiError.message}`}`,
+                { status: response.status, apiError },
             )
         }
 

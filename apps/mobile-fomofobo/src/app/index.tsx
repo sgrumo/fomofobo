@@ -1,17 +1,19 @@
 import { useQuery } from "@tanstack/react-query"
 import { centerQueryOf, searchCenterOf } from "domain/map-center"
+import { placeQueryOf, textQueryOf } from "domain/map-search"
 import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
 import { Link } from "expo-router"
 import type { OccurrenceSummary } from "models"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { View } from "react-native"
+import { Keyboard, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { match } from "ts-pattern"
 
 import { EventMap } from "@/components/map/event-map"
 import { EventPreview } from "@/components/map/event-preview"
 import type { PreviewEntry, PreviewVenue } from "@/components/map/event-preview"
+import { PlaceSearch } from "@/components/map/place-search"
 import { useDeviceLocation } from "@/components/map/use-device-location"
 import { useMapQuery } from "@/components/map/use-map-query"
 import { Button } from "@/components/ui/button/button"
@@ -203,12 +205,34 @@ const MapScreen = () => {
                 onSelectVenue={venueId => {
                     setQuery({ event: undefined, occurrence: undefined, venue: venueId })
                 }}
+                onPress={() => {
+                    Keyboard.dismiss()
+                }}
             />
             <View
                 className="absolute inset-x-4 gap-2"
                 style={{ top: insets.top + 8 }}
                 pointerEvents="box-none"
             >
+                <PlaceSearch
+                    // A new place, or a recenter that clears it, resets the typed text
+                    key={query.place ?? ""}
+                    center={center}
+                    initialText={query.place ?? query.q ?? ""}
+                    onPlaceSelect={place => {
+                        setQuery(placeQueryOf(place))
+                    }}
+                    onEventSelect={ref => {
+                        setQuery({
+                            event: ref.eventId,
+                            occurrence: ref.date,
+                            venue: undefined,
+                        })
+                    }}
+                    onTextSubmit={text => {
+                        setQuery(textQueryOf(text))
+                    }}
+                />
                 {__DEV__ && (
                     <Link href="/showcase" asChild={true}>
                         <Button

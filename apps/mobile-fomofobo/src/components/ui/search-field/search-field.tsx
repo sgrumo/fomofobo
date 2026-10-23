@@ -21,6 +21,8 @@ interface SearchFieldProps {
     onValueChange: (value: string) => void
     placeholder?: string
     onSubmitEditing?: () => void
+    onFocus?: () => void
+    onBlur?: () => void
     className?: string
 }
 
@@ -46,9 +48,11 @@ const SearchField = (props: SearchFieldProps) => {
                     onSubmitEditing={props.onSubmitEditing}
                     onFocus={() => {
                         setFocused(true)
+                        props.onFocus?.()
                     }}
                     onBlur={() => {
                         setFocused(false)
+                        props.onBlur?.()
                     }}
                     returnKeyType="search"
                     autoCorrect={false}

@@ -67,6 +67,7 @@ interface EventMapProps {
     now: Date
     onSelect: (ref: OccurrenceRef) => void
     onSelectVenue: (venueId: string) => void
+    onPress: () => void
 }
 
 export const EventMap = (props: EventMapProps) => {
@@ -230,6 +231,7 @@ export const EventMap = (props: EventMapProps) => {
                 compass={false}
                 touchRotate={false}
                 touchPitch={false}
+                onPress={props.onPress}
                 onDidFinishLoadingMap={() => {
                     void readViewport()
                 }}
