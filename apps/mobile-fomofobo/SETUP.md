@@ -88,6 +88,12 @@ Keep the terminal open afterwards — it's the Metro dev server.
     brew install cocoapods
     ```
 
+    CocoaPods needs a UTF-8 locale. If `pod install` fails with `Unicode Normalization not appropriate for ASCII-8BIT`, put this in your shell rc:
+
+    ```sh
+    export LANG=en_US.UTF-8
+    ```
+
 3. **Physical iPhone**:
     - Free or paid Apple Developer account added to Xcode (Settings > Accounts); on first build failure open `ios/*.xcworkspace` of the app and pick your Team under Signing & Capabilities.
     - On the phone (iOS 16+): Settings > Privacy & Security > **Developer Mode** on, then trust the developer certificate when prompted (Settings > General > VPN & Device Management).
