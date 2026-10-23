@@ -16,6 +16,7 @@ import { lazyAsync } from "shared/function"
 
 import { Button } from "@/components/ui/button/button"
 import { Text } from "@/components/ui/text/text"
+import { ToastHost } from "@/components/ui/toast/toast-host"
 import { VersionGate } from "@/components/version-gate/version-gate"
 import { nativeI18n } from "@/lib/i18n/native-i18n"
 import { FONT_FAMILIES, THEME_COLORS } from "@/lib/theme/theme-tokens"
@@ -57,18 +58,12 @@ export const ErrorBoundary = (props: ErrorBoundaryProps) => {
     return (
         <View
             accessibilityRole="alert"
-            className="flex-1 items-center justify-center gap-4 bg-background px-6"
+            className="flex-1 items-center justify-center gap-4 bg-surface px-6"
         >
-            <Text
-                accessibilityRole="header"
-                className="text-center text-2xl font-semibold"
-            >
+            <Text accessibilityRole="header" variant="pixel-xl" className="text-center">
                 {copy.title}
             </Text>
-            <Text
-                accessibilityLiveRegion="polite"
-                className="text-center text-base text-muted-foreground"
-            >
+            <Text accessibilityLiveRegion="polite" className="text-center text-fg-muted">
                 {copy.message}
             </Text>
             <Button
@@ -77,7 +72,6 @@ export const ErrorBoundary = (props: ErrorBoundaryProps) => {
                 onPress={() => {
                     void props.retry()
                 }}
-                size="lg"
             >
                 <Text>{copy.retry}</Text>
             </Button>
@@ -115,6 +109,7 @@ const RootLayout = () => (
                             </Stack>
                         </BottomSheetModalProvider>
                     </VersionGate>
+                    <ToastHost />
                 </QueryClientProvider>
             </AppReadyGate>
         </Suspense>

@@ -1,8 +1,19 @@
 {
+    "BottomSheet": {
+        "Close": "Chiudi"
+    },
+    "DateRangePicker": {
+        "PreviousMonth": "Mese precedente",
+        "NextMonth": "Mese successivo"
+    },
+    "SearchField": {
+        "Clear": "Cancella la ricerca"
+    },
     "Select": {
         "Title": "Seleziona",
-        "Placeholder": "Seleziona...",
-        "Close": "Chiudi",
-        "Done": "Fatto"
+        "Placeholder": "Seleziona..."
+    },
+    "Toast": {
+        "DismissHint": "Tocca per chiudere"
     }
 }

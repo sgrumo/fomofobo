@@ -37,6 +37,16 @@ src/components/ui/
 - Use `Platform.select` for web/native differences - keep them in `.styles.ts`
 - Import `cn` from `@/lib/utils/class-names` - **NEVER** from `@/lib/utils`
 
+### Design system
+
+The primitives in `src/components/ui/` port the web look of `packages/ui-components` and keep its API: Button `variant` primary, accent, secondary or tertiary, Text `variant` from the `tp-*` scale. The dev showcase (`src/app/showcase.tsx`) renders each one.
+
+- Draw a hard shadow on a rectangle with the `hardShadow()` style of `src/lib/theme/hard-shadow.ts`. NativeWind maps `shadow-*` to iOS-only props
+- Draw the stepped outline of the web `pixel-corners` and `pixel-circle-*` with `PixelPanel` and `PixelCircle`. Their SVG carries the shadow too
+- NativeWind maps no `size-*` class. Use `h-*` and `w-*`
+- NativeWind drops a `style` function on a `Pressable` that has `className`. Keep the pressed state in React state and pass a plain style object
+- The content of a `BottomSheet` gets new props one render late. Keep a controlled value in state inside the sheet content, as `DateRangePicker` does
+
 ## Environment
 
 - App env vars flow: `.env` -> `app.config.ts` `extra` -> `expo-constants` -> `src/lib/env.ts`

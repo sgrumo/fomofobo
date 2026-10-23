@@ -1,9 +1,10 @@
 import { TextInput } from "react-native"
 import type { TextInputProps } from "react-native"
 
+import { THEME_COLORS } from "@/lib/theme/theme-tokens"
 import { cn } from "@/lib/utils/class-names"
 
-import { inputBaseStyles, inputDisabledStyles, inputWebStyles } from "./input.styles"
+import { inputDisabledStyles, inputStyles } from "./input.styles"
 
 const Input = ({
     className,
@@ -11,11 +12,12 @@ const Input = ({
 }: TextInputProps & React.RefAttributes<TextInput>) => (
     <TextInput
         className={cn(
-            inputBaseStyles,
+            inputStyles,
             props.editable === false && inputDisabledStyles,
-            inputWebStyles,
             className,
         )}
+        selectionColor={THEME_COLORS.live}
+        cursorColor={THEME_COLORS.live}
         {...props}
     />
 )

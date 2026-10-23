@@ -1,21 +1,5 @@
-import { Platform } from "react-native"
+// No line height: a line height shifts the text of an iOS `TextInput` off center
+export const inputStyles =
+    "min-h-11 w-full rounded-md border-2 border-line bg-surface px-3 font-sans text-[16px] text-fg placeholder:text-fg-muted focus:border-focus"
 
-import { cn } from "@/lib/utils/class-names"
-
-export const inputBaseStyles = cn(
-    "shadow-black/5 flex h-10 w-full min-w-0 flex-row items-center rounded-md border border-input bg-background px-3 py-1 text-base leading-5 text-foreground shadow-sm sm:h-9 dark:bg-input/30",
-)
-
-export const inputDisabledStyles = cn(
-    "opacity-50",
-    Platform.select({ web: "disabled:pointer-events-none disabled:cursor-not-allowed" }),
-)
-
-export const inputWebStyles = Platform.select({
-    web: cn(
-        "outline-none transition-[color,box-shadow] selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground md:text-sm",
-        "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
-        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-    ),
-    native: "placeholder:text-muted-foreground/50",
-})
+export const inputDisabledStyles = "opacity-50"

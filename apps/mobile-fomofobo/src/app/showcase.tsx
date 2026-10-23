@@ -1,31 +1,33 @@
+import type { BottomSheetModal } from "@gorhom/bottom-sheet"
 import { pixelIconNames } from "domain/pixel-icons"
+import { formatEuroCents } from "domain/price-summary"
 import { Redirect } from "expo-router"
-import { useState } from "react"
+import { useRef, useState } from "react"
+import type { ReactNode } from "react"
 import { ScrollView, View } from "react-native"
 
+import { Badge } from "@/components/ui/badge/badge"
+import { BottomSheet } from "@/components/ui/bottom-sheet/bottom-sheet"
 import { Button } from "@/components/ui/button/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card/card"
-import { Checkbox } from "@/components/ui/checkbox/checkbox"
+import { Chip, ChipRow } from "@/components/ui/chip/chip"
+import { DateRangePicker } from "@/components/ui/date-range-picker/date-range-picker"
+import type { DateRange } from "@/components/ui/date-range-picker/date-range-picker"
 import { DitheredPhoto } from "@/components/ui/dithered-photo/dithered-photo"
+import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { Input } from "@/components/ui/input/input"
+import { KeyValueList } from "@/components/ui/key-value-list/key-value-list"
+import { Notice } from "@/components/ui/notice/notice"
 import { PixelCircle } from "@/components/ui/pixel-circle/pixel-circle"
 import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
 import { PixelPanel } from "@/components/ui/pixel-panel/pixel-panel"
-import { RadioGroup } from "@/components/ui/radio-group/radio-group"
+import { SearchField } from "@/components/ui/search-field/search-field"
 import { MultiSelect } from "@/components/ui/select/multi-select"
 import { Select } from "@/components/ui/select/select"
 import type { Option } from "@/components/ui/select/select"
-import { Switch } from "@/components/ui/switch/switch"
-import { SegmentedTabs } from "@/components/ui/tabs/tabs"
-import type { TabItem } from "@/components/ui/tabs/tabs"
+import { Spinner } from "@/components/ui/spinner/spinner"
+import { StatGrid } from "@/components/ui/stat-grid/stat-grid"
 import { Text } from "@/components/ui/text/text"
+import { Timeline } from "@/components/ui/timeline/timeline"
 import { toast, toastError, toastSuccess } from "@/components/ui/toast/toast"
 import { env } from "@/lib/env"
 import { hardShadow } from "@/lib/theme/hard-shadow"
@@ -34,48 +36,55 @@ const noop = () => {
     // No operation
 }
 
-const FRUIT_OPTIONS: readonly Option[] = [
-    { label: "Apple", value: "apple" },
-    { label: "Banana", value: "banana" },
-    { label: "Orange", value: "orange" },
-    { label: "Strawberry", value: "strawberry" },
+// Disables the past days of the range picker
+const bundleLoadedAt = new Date()
+
+const CATEGORY_OPTIONS: readonly Option[] = [
+    { label: "Music", value: "music" },
+    { label: "Comedy", value: "comedy" },
+    { label: "Art", value: "art" },
+    { label: "Cinema", value: "cinema" },
 ]
 
-const SIZE_OPTIONS = [
-    { label: "Small", value: "sm" },
-    { label: "Medium", value: "md" },
-    { label: "Large", value: "lg" },
+const TYPE_SCALE_VARIANTS = [
+    "pixel-2xl",
+    "pixel-xl",
+    "pixel-lg",
+    "pixel-md",
+    "pixel-sm",
+    "body-lg",
+    "body-md",
+    "body-sm",
 ] as const
 
-const TAB_ITEMS: readonly TabItem[] = [
-    { value: "first", label: "First", content: <Text>First tab content</Text> },
-    { value: "second", label: "Second", content: <Text>Second tab content</Text> },
-    { value: "third", label: "Third", content: <Text>Third tab content</Text> },
-]
+/**
+ * @description Returns the UTF-16 code units of a string in hex, to tell a no-break space from a space
+ * @param text String read
+ */
+const codeUnits = (text: string) =>
+    Array.from({ length: text.length }, (_, index) =>
+        (text.codePointAt(index) ?? 0).toString(16).padStart(4, "0"),
+    ).join(" ")
 
-const ShowcaseSection = (props: { title: string; children: React.ReactNode }) => (
-    <View className="gap-3 border-b border-line-muted pb-6">
-        <Text variant="h3">{props.title}</Text>
+const ShowcaseSection = (props: { title: string; children: ReactNode }) => (
+    <View className="gap-3 border-b-2 border-line-muted pb-6">
+        <Text variant="pixel-lg" accessibilityRole="header">
+            {props.title}
+        </Text>
         {props.children}
     </View>
 )
 
 const TypographyShowcase = () => (
     <ShowcaseSection title="Typography">
-        <Text variant="h1">Heading 1</Text>
-        <Text variant="h2">Heading 2</Text>
-        <Text variant="h3">Heading 3</Text>
-        <Text variant="h4">Heading 4</Text>
-        <Text variant="p">
-            This is a paragraph. It demonstrates the default paragraph styling with proper
-            line height and spacing.
+        {TYPE_SCALE_VARIANTS.map(variant => (
+            <Text key={variant} variant={variant}>
+                {variant} fomofobo
+            </Text>
+        ))}
+        <Text variant="body-md" className="text-fg-muted">
+            fg-muted body text
         </Text>
-        <Text variant="lead">Lead text for introductions</Text>
-        <Text variant="large">Large text</Text>
-        <Text variant="small">Small text</Text>
-        <Text variant="muted">Muted text for secondary content</Text>
-        <Text variant="blockquote">This is a blockquote with italic styling</Text>
-        <Text variant="code">const x = &quot;inline code&quot;</Text>
     </ShowcaseSection>
 )
 
@@ -104,13 +113,13 @@ const PixelShowcase = () => (
             </PixelCircle>
         </View>
         <PixelPanel shadow="md" className="px-3 py-2.5">
-            <Text className="tp-pixel-md">Pixel corners panel</Text>
+            <Text variant="pixel-md">Pixel corners panel</Text>
         </PixelPanel>
         <View
             className="self-start rounded-md border-2 border-line bg-social px-3 py-2"
             style={hardShadow("md")}
         >
-            <Text className="tp-pixel-sm">Hard shadow</Text>
+            <Text variant="pixel-sm">Hard shadow</Text>
         </View>
         <DitheredPhoto
             uri={`${env.apiUrl}/fallbacks/music.png`}
@@ -122,47 +131,128 @@ const PixelShowcase = () => (
 
 const ButtonShowcase = () => (
     <ShowcaseSection title="Button">
-        <View className="flex-row flex-wrap gap-2">
-            <Button variant="default">
-                <Text>Default</Text>
+        <View className="flex-row flex-wrap gap-3">
+            <Button>
+                <Text>Primary</Text>
             </Button>
-            <Button variant="destructive">
-                <Text>Destructive</Text>
-            </Button>
-            <Button variant="outline">
-                <Text>Outline</Text>
+            <Button variant="accent">
+                <Text>Accent</Text>
             </Button>
             <Button variant="secondary">
                 <Text>Secondary</Text>
             </Button>
-            <Button variant="ghost">
-                <Text>Ghost</Text>
+            <Button variant="tertiary">
+                <Text>Tertiary</Text>
             </Button>
-            <Button variant="link">
-                <Text>Link</Text>
+            <Button destructive={true}>
+                <Text>Delete</Text>
             </Button>
         </View>
-        <View className="flex-row flex-wrap gap-2">
-            <Button size="sm">
+        <View className="flex-row flex-wrap items-center gap-3">
+            <Button size="sm" icon="share">
                 <Text>Small</Text>
             </Button>
-            <Button size="default">
-                <Text>Default</Text>
+            <Button icon="directions" variant="secondary">
+                <Text>Directions</Text>
             </Button>
-            <Button size="lg">
-                <Text>Large</Text>
+            <Button disabled={true}>
+                <Text>Disabled</Text>
             </Button>
         </View>
-        <Button disabled={true}>
-            <Text>Disabled</Text>
-        </Button>
     </ShowcaseSection>
 )
 
-const InputShowcase = () => {
-    const [text, setText] = useState("")
+const IconButtonShowcase = () => (
+    <ShowcaseSection title="IconButton">
+        <View className="flex-row flex-wrap items-center gap-4">
+            <IconButton icon="back" label="Back" size="sm" onPress={noop} />
+            <IconButton icon="share" label="Share" onPress={noop} />
+            <IconButton
+                icon="locate"
+                label="Locate"
+                size="lg"
+                tone="inverse"
+                onPress={noop}
+            />
+            <IconButton icon="save" label="Save" tone="live" onPress={noop} />
+            <IconButton icon="close" label="Close" disabled={true} onPress={noop} />
+        </View>
+    </ShowcaseSection>
+)
+
+const ChipShowcase = () => {
+    const [selected, setSelected] = useState<readonly string[]>(["music"])
+    const toggle = (value: string) => (pressed: boolean) => {
+        setSelected(current =>
+            pressed ? [...current, value] : current.filter(item => item !== value),
+        )
+    }
     return (
-        <ShowcaseSection title="Input">
+        <ShowcaseSection title="Chip">
+            <ChipRow label="Categories">
+                <Chip
+                    label="Music"
+                    icon="music"
+                    count={12}
+                    pressed={selected.includes("music")}
+                    onPressedChange={toggle("music")}
+                />
+                <Chip
+                    label="Comedy"
+                    icon="comedy"
+                    count={3}
+                    pressed={selected.includes("comedy")}
+                    onPressedChange={toggle("comedy")}
+                />
+                <Chip
+                    label="Today"
+                    pressed={selected.includes("today")}
+                    onPressedChange={toggle("today")}
+                />
+                <Chip
+                    label="Free"
+                    pressed={selected.includes("free")}
+                    onPressedChange={toggle("free")}
+                />
+                <Chip
+                    label="Disabled"
+                    pressed={false}
+                    disabled={true}
+                    onPressedChange={noop}
+                />
+            </ChipRow>
+        </ShowcaseSection>
+    )
+}
+
+const BadgeShowcase = () => (
+    <ShowcaseSection title="Badge">
+        <View className="flex-row flex-wrap gap-2">
+            <Badge tone="live" dot={true}>
+                Live
+            </Badge>
+            <Badge tone="upcoming">Upcoming</Badge>
+            <Badge tone="ended">Ended</Badge>
+            <Badge tone="permanent">Permanent</Badge>
+            <Badge dot={true}>Neutral</Badge>
+            <Badge tone="inverse">Inverse</Badge>
+        </View>
+    </ShowcaseSection>
+)
+
+const FieldShowcase = () => {
+    const [query, setQuery] = useState("")
+    const [text, setText] = useState("")
+    const [category, setCategory] = useState<Option>()
+    const [categories, setCategories] = useState<readonly Option[]>([])
+    return (
+        <ShowcaseSection title="Fields">
+            <SearchField
+                label="Search events"
+                placeholder="Search events or venues"
+                value={query}
+                onValueChange={setQuery}
+            />
             <Input
                 placeholder="Type something..."
                 value={text}
@@ -174,142 +264,71 @@ const InputShowcase = () => {
                 editable={false}
                 accessibilityLabel="Disabled input example"
             />
-        </ShowcaseSection>
-    )
-}
-
-const CardShowcase = () => (
-    <ShowcaseSection title="Card">
-        <Card>
-            <CardHeader>
-                <CardTitle>Card Title</CardTitle>
-                <CardDescription>Card description with supporting text</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Text>This is the card content area. It can contain any components.</Text>
-            </CardContent>
-            <CardFooter>
-                <Button size="sm">
-                    <Text>Action</Text>
-                </Button>
-            </CardFooter>
-        </Card>
-    </ShowcaseSection>
-)
-
-const CheckboxShowcase = () => {
-    const [checked, setChecked] = useState(false)
-    return (
-        <ShowcaseSection title="Checkbox">
-            <View className="flex-row items-center gap-3">
-                <Checkbox
-                    checked={checked}
-                    onToggle={() => {
-                        setChecked(prev => !prev)
-                    }}
-                    accessibilityLabel="Example checkbox"
-                />
-                <Text>{checked ? "Checked" : "Unchecked"}</Text>
-            </View>
-        </ShowcaseSection>
-    )
-}
-
-const SwitchShowcase = () => {
-    const [enabled, setEnabled] = useState(false)
-    return (
-        <ShowcaseSection title="Switch">
-            <View className="flex-row items-center gap-3">
-                <Switch
-                    checked={enabled}
-                    onToggle={() => {
-                        setEnabled(prev => !prev)
-                    }}
-                    accessibilityLabel="Example switch"
-                />
-                <Text>{enabled ? "On" : "Off"}</Text>
-            </View>
-            <View className="flex-row items-center gap-3">
-                <Switch
-                    checked={true}
-                    onToggle={noop}
-                    disabled={true}
-                    accessibilityLabel="Disabled switch"
-                />
-                <Text variant="muted">Disabled</Text>
-            </View>
-        </ShowcaseSection>
-    )
-}
-
-const SelectShowcase = () => {
-    const [selected, setSelected] = useState<Option | undefined>(undefined)
-    return (
-        <ShowcaseSection title="Select">
             <Select
-                value={selected}
-                onValueChange={setSelected}
-                options={FRUIT_OPTIONS}
-                placeholder="Select a fruit..."
-                title="Pick a fruit"
-                accessibilityLabel="Pick a fruit"
+                label="Category"
+                value={category}
+                onValueChange={setCategory}
+                options={CATEGORY_OPTIONS}
+                title="Pick a category"
             />
-            <Text variant="muted">Selected: {selected?.label ?? "None"}</Text>
-        </ShowcaseSection>
-    )
-}
-
-const MultiSelectShowcase = () => {
-    const [selected, setSelected] = useState<readonly Option[]>([])
-    return (
-        <ShowcaseSection title="MultiSelect">
             <MultiSelect
-                value={selected}
-                onValueChange={setSelected}
-                options={FRUIT_OPTIONS}
-                placeholder="Select fruits..."
-                title="Pick fruits"
-                accessibilityLabel="Pick fruits"
+                label="Categories"
+                value={categories}
+                onValueChange={setCategories}
+                options={CATEGORY_OPTIONS}
+                title="Pick categories"
             />
-            <Text variant="muted">
-                Selected:{" "}
-                {selected.length > 0 ? selected.map(o => o.label).join(", ") : "None"}
-            </Text>
         </ShowcaseSection>
     )
 }
 
-const RadioGroupShowcase = () => {
-    const [size, setSize] = useState<string | undefined>(undefined)
+const SheetShowcase = () => {
+    const sheetRef = useRef<BottomSheetModal>(null)
+    const [range, setRange] = useState<DateRange>({})
     return (
-        <ShowcaseSection title="RadioGroup">
-            <RadioGroup
-                value={size}
-                onValueChange={setSize}
-                options={SIZE_OPTIONS}
-                accessibilityLabel="Pick a size"
-            />
-            <Text variant="muted">Selected: {size ?? "None"}</Text>
+        <ShowcaseSection title="BottomSheet and DateRangePicker">
+            <Button
+                variant="secondary"
+                icon="calendar"
+                onPress={() => {
+                    sheetRef.current?.present()
+                }}
+            >
+                <Text>Pick dates</Text>
+            </Button>
+            <Text variant="body-md" className="text-fg-muted">
+                {range.from?.toDateString() ?? "No start"} -{" "}
+                {range.to?.toDateString() ?? "No end"}
+            </Text>
+            <BottomSheet ref={sheetRef} title="Dates">
+                <DateRangePicker
+                    defaultValue={range}
+                    onValueChange={setRange}
+                    minDate={bundleLoadedAt}
+                />
+                <Button
+                    onPress={() => {
+                        sheetRef.current?.dismiss()
+                    }}
+                >
+                    <Text>Apply</Text>
+                </Button>
+            </BottomSheet>
         </ShowcaseSection>
     )
 }
 
-const TabsShowcase = () => (
-    <ShowcaseSection title="SegmentedTabs">
-        <SegmentedTabs
-            items={TAB_ITEMS}
-            defaultValue="first"
-            accessibilityLabel="Example tabs"
-        />
-    </ShowcaseSection>
-)
-
-const ToastShowcase = () => (
-    <ShowcaseSection title="Toast">
-        <View className="flex-row flex-wrap gap-2">
+const FeedbackShowcase = () => (
+    <ShowcaseSection title="Notice, Toast, Spinner">
+        <Notice tone="loading" lines={["Loading the events"]} />
+        <Notice tone="info" lines={["Offline: showing the last results"]} />
+        <Notice tone="success" lines={["Saved"]} />
+        <Notice tone="warning" lines={["Too many searches", "Try again in a minute"]} />
+        <Notice tone="error" lines={["The events did not load"]} />
+        <View className="flex-row flex-wrap gap-3">
             <Button
-                variant="default"
                 size="sm"
+                variant="secondary"
                 onPress={() => {
                     toast({ title: "Info", message: "Something happened" })
                 }}
@@ -317,17 +336,17 @@ const ToastShowcase = () => (
                 <Text>Info</Text>
             </Button>
             <Button
-                variant="default"
                 size="sm"
+                variant="secondary"
                 onPress={() => {
-                    toastSuccess("Success", "Operation completed")
+                    toastSuccess("Saved", "The event is in your list")
                 }}
             >
                 <Text>Success</Text>
             </Button>
             <Button
-                variant="outline"
                 size="sm"
+                variant="secondary"
                 onPress={() => {
                     toastError("Error", "Something went wrong")
                 }}
@@ -335,6 +354,46 @@ const ToastShowcase = () => (
                 <Text>Error</Text>
             </Button>
         </View>
+        <View className="flex-row items-center gap-4">
+            <Spinner label="Loading" size="sm" />
+            <Spinner label="Loading" />
+            <Spinner label="Loading" size="lg" color="live" />
+        </View>
+    </ShowcaseSection>
+)
+
+const DataShowcase = () => (
+    <ShowcaseSection title="StatGrid, KeyValueList, Timeline">
+        <StatGrid
+            items={[
+                { label: "Price", value: formatEuroCents(550) },
+                { label: "Capacity", value: "120" },
+                { label: "Age", value: "18+" },
+            ]}
+        />
+        <KeyValueList
+            items={[
+                { key: "full", label: "Full price", value: formatEuroCents(500) },
+                { key: "reduced", label: "Students", value: formatEuroCents(550) },
+            ]}
+        />
+        <Text variant="body-sm" className="text-fg-muted">
+            formatEuroCents(500): {codeUnits(formatEuroCents(500))}
+        </Text>
+        <Text variant="body-sm" className="text-fg-muted">
+            formatEuroCents(550): {codeUnits(formatEuroCents(550))}
+        </Text>
+        <Timeline
+            label="Event progress"
+            value={40}
+            min={0}
+            max={100}
+            valueText="40%"
+            start="20:00"
+            now="Now"
+            end="23:00"
+            tone="live"
+        />
     </ShowcaseSection>
 )
 
@@ -342,21 +401,16 @@ const ToastShowcase = () => (
 const ShowcaseScreen = () =>
     __DEV__ ? (
         <ScrollView className="flex-1" contentContainerClassName="gap-6 px-4 py-4 pb-8">
-            <Text variant="h2" accessibilityRole="header">
-                UI Components
-            </Text>
             <TypographyShowcase />
             <PixelShowcase />
             <ButtonShowcase />
-            <InputShowcase />
-            <CardShowcase />
-            <CheckboxShowcase />
-            <SwitchShowcase />
-            <SelectShowcase />
-            <MultiSelectShowcase />
-            <RadioGroupShowcase />
-            <TabsShowcase />
-            <ToastShowcase />
+            <IconButtonShowcase />
+            <ChipShowcase />
+            <BadgeShowcase />
+            <FieldShowcase />
+            <SheetShowcase />
+            <FeedbackShowcase />
+            <DataShowcase />
         </ScrollView>
     ) : (
         <Redirect href="/" />

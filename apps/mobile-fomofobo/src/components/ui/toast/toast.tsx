@@ -1,37 +1,36 @@
-import { toast as burntToast } from "burnt"
+import { AccessibilityInfo } from "react-native"
 
-import { TOAST_DURATION, ToastHaptic, ToastPreset } from "./toast.styles"
-
-type ToastPresetKey = "Success" | "Error" | "Info"
+import type { ToastTone } from "./toast-store"
+import { showToast } from "./toast-store"
+import { TOAST_DURATION_MS } from "./toast.styles"
 
 interface ToastOptions {
     title: string
     message?: string
-    preset?: ToastPresetKey
-    duration?: number
+    tone?: ToastTone
+    durationMs?: number
 }
 
 /**
- * @description Shows a native toast with the preset matching the options
- * @param options Title, message, preset, and duration of the toast
+ * @description Shows an in-app toast in the tone of a notice and announces it to the screen reader
+ * @param options Copy, tone and time on screen of the toast
  */
 const toast = (options: ToastOptions) => {
-    const preset = options.preset ?? "Info"
-    burntToast({
-        title: options.title,
-        message: options.message,
-        preset: ToastPreset[preset],
-        haptic: ToastHaptic[preset],
-        duration: options.duration ?? TOAST_DURATION,
-    })
+    showToast(
+        { tone: options.tone ?? "info", title: options.title, message: options.message },
+        options.durationMs ?? TOAST_DURATION_MS,
+    )
+    AccessibilityInfo.announceForAccessibility(
+        [options.title, options.message].filter(line => line !== undefined).join(". "),
+    )
 }
 
 const toastSuccess = (title: string, message?: string) => {
-    toast({ title, message, preset: "Success" })
+    toast({ title, message, tone: "success" })
 }
 
 const toastError = (title: string, message?: string) => {
-    toast({ title, message, preset: "Error" })
+    toast({ title, message, tone: "error" })
 }
 
 export { toast, toastError, toastSuccess }
