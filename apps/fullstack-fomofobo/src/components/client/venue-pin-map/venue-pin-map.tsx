@@ -1,13 +1,12 @@
 "use client"
 
+import { mapStyle } from "domain/map-style"
+import { DEFAULT_CITY } from "domain/platform"
 import { Map as MapLibreMap, Marker, setWorkerUrl } from "maplibre-gl"
 import type { GeoPoint } from "models"
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Alert } from "ui-components/alert"
-
-import { mapStyle } from "@/lib/map/map-style"
-import { DEFAULT_CITY } from "@/lib/platform/platform"
 
 setWorkerUrl(
     new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).toString(),

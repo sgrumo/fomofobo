@@ -1,13 +1,12 @@
-import type { ComponentProps } from "react"
-import type { StrictOmit } from "shared/types"
-
-import type { PixelIconName } from "./pixel-icons.helper"
 import {
     PIXEL_ICON_GRID,
     pixelIconBitmaps,
     pixelIconCenteredViewBox,
     pixelIconPath,
-} from "./pixel-icons.helper"
+} from "domain/pixel-icons"
+import type { PixelIconName } from "domain/pixel-icons"
+import type { ComponentProps } from "react"
+import type { StrictOmit } from "shared/types"
 
 type PixelIconProps = StrictOmit<ComponentProps<"svg">, "name">
 

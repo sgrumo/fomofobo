@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { dateWindow, localDateOf } from "./date-window"
+import { dateWindow } from "./date-window"
 
 const ROME = "Europe/Rome"
 // Friday 2026-10-23, 12:00 in Rome
@@ -69,11 +69,5 @@ describe("dateWindow", () => {
             from: new Date("2026-10-23T22:00:00Z"),
             to: new Date("2026-10-24T22:00:00Z"),
         })
-    })
-})
-
-describe("localDateOf", () => {
-    it("returns the local date of the zone", () => {
-        expect(localDateOf(new Date("2026-10-23T22:30:00Z"), ROME)).toBe("2026-10-24")
     })
 })

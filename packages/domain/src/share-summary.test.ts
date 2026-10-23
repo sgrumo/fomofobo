@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { shareSummaryOf } from "./share-summary"
+import { shareSummaryOf, venueShareTextOf } from "./share-summary"
 
 describe("shareSummaryOf", () => {
     it("reads the date and the time in the platform zone", () => {
@@ -18,5 +18,16 @@ describe("shareSummaryOf", () => {
         expect(shareSummaryOf(occurrence, "it")).toBe(
             "gio 15/10 · 00:30 · Chiostro di San Francesco",
         )
+    })
+})
+
+describe("venueShareTextOf", () => {
+    it("reads the name and the address of the venue", () => {
+        expect(
+            venueShareTextOf({
+                name: "Chiostro di San Francesco",
+                address: "Via Emilia 1, Imola",
+            }),
+        ).toBe("Chiostro di San Francesco · Via Emilia 1, Imola")
     })
 })

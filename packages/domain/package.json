@@ -1,0 +1,52 @@
+{
+    "name": "domain",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        "./bounding-box": "./src/bounding-box.ts",
+        "./directions-url": "./src/directions-url.ts",
+        "./event-clusters": "./src/event-clusters.ts",
+        "./haversine-distance": "./src/haversine-distance.ts",
+        "./local-format": "./src/local-format.ts",
+        "./map-style": "./src/map-style.ts",
+        "./occurrence-progress": "./src/occurrence-progress.ts",
+        "./occurrence-status": "./src/occurrence-status.ts",
+        "./pin-tag": "./src/pin-tag.ts",
+        "./pixel-icons": "./src/pixel-icons.ts",
+        "./platform": "./src/platform.ts",
+        "./price-details": "./src/price-details.ts",
+        "./price-summary": "./src/price-summary.ts",
+        "./round-center": "./src/round-center.ts",
+        "./save-queue": "./src/save-queue.ts",
+        "./share-summary": "./src/share-summary.ts",
+        "./share-urls": "./src/share-urls.ts",
+        "./spot-entries": "./src/spot-entries.ts",
+        "./venue-history": "./src/venue-history.ts"
+    },
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "typecheck:watch": "tsc -b -w",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "test": "vitest --run",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "@date-fns/tz": "catalog:",
+        "date-fns": "catalog:",
+        "es-toolkit": "catalog:",
+        "models": "workspace:*",
+        "shared": "workspace:*",
+        "supercluster": "^9.1.0",
+        "ts-pattern": "catalog:"
+    },
+    "devDependencies": {
+        "@maplibre/maplibre-gl-style-spec": "^26.4.4",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:"
+    }
+}

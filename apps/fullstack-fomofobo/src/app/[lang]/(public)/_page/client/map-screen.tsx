@@ -1,6 +1,9 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
+import { DEFAULT_CITY } from "domain/platform"
+import { roundCenter } from "domain/round-center"
+import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
 import { cn } from "frontend-shared/styles"
 import type { GeoPoint, OccurrenceRef, OccurrenceSummary } from "models"
 import dynamic from "next/dynamic"
@@ -24,11 +27,9 @@ import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
-import { roundCenter } from "@/lib/geo/round-center"
 import { useGeolocation } from "@/lib/hooks/use-geolocation"
 import { useNow } from "@/lib/hooks/use-now"
 import { useOnline } from "@/lib/hooks/use-online"
-import { DEFAULT_CITY } from "@/lib/platform/platform"
 
 import { CategoryChips } from "./category-chips"
 import { DateChips } from "./date-chips"
@@ -69,25 +70,6 @@ const previewEntryOf = (
     }
     return venue === undefined ? undefined : { type: "venue", venue }
 }
-
-/**
- * @description True when both entries preview the same occurrence or the same venue
- * @param entry Entry of the spot
- * @param selected Entry the preview shows
- */
-const isSameEntry = (entry: PreviewEntry, selected: PreviewEntry | undefined): boolean =>
-    match([entry, selected])
-        .with(
-            [{ type: "occurrence" }, { type: "occurrence" }],
-            ([first, second]) =>
-                first.occurrence.eventId === second.occurrence.eventId &&
-                first.occurrence.date === second.occurrence.date,
-        )
-        .with(
-            [{ type: "venue" }, { type: "venue" }],
-            ([first, second]) => first.venue.id === second.venue.id,
-        )
-        .otherwise(() => false)
 
 /**
  * @description Returns the selection that opens the preview of an entry
@@ -204,22 +186,11 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
         selected?.type === "occurrence"
             ? selected.occurrence.venue.id
             : selected?.venue.id
-    // At one venue, the events come first and the permanent venue last.
     const sameSpot: PreviewEntry[] =
-        spotVenueId === undefined
+        spotVenueId === undefined || results === undefined
             ? []
-            : [
-                  ...(results?.occurrences ?? [])
-                      .filter(occurrence => occurrence.venue.id === spotVenueId)
-                      .map((occurrence): PreviewEntry => ({
-                          type: "occurrence",
-                          occurrence,
-                      })),
-                  ...(results?.permanentVenues ?? [])
-                      .filter(venue => venue.id === spotVenueId)
-                      .map((venue): PreviewEntry => ({ type: "venue", venue })),
-              ]
-    const spotIndex = sameSpot.findIndex(entry => isSameEntry(entry, selected))
+            : spotEntriesOf(results, spotVenueId)
+    const spotIndex = sameSpot.findIndex(entry => isSameSpotEntry(entry, selected))
 
     // True while the open preview owns the history entry that a close pops.
     const previewPushedRef = useRef(false)

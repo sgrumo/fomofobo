@@ -1,5 +1,7 @@
 "use client"
 
+import { pinTagOf } from "domain/pin-tag"
+import type { PinStart } from "domain/pin-tag"
 import { cn } from "frontend-shared/styles"
 import type { CategoryIcon, OccurrenceStatus } from "models"
 import { useTranslation } from "react-i18next"
@@ -13,9 +15,7 @@ import type { RouteClientComponentProps } from "@/framework/routes/routes"
 interface EventPinProps extends RouteClientComponentProps<"root"> {
     title: string
     status: OccurrenceStatus
-    startTime: string
-    // `dd/MM` of a start on another day than today, undefined for today
-    startDay: string | undefined
+    start: PinStart
     icon: CategoryIcon
     // Other results at the same venue
     moreCount: number
@@ -25,18 +25,18 @@ interface EventPinProps extends RouteClientComponentProps<"root"> {
 export const EventPin = (props: EventPinProps) => {
     const { t } = useTranslation("shared")
 
-    const badge = match(props.status)
-        .with("live", () => (
+    const badge = match(pinTagOf(props.status, props.start))
+        .with({ type: "live" }, () => (
             <Badge tone="live" className="rounded-none">
                 {t("Map.LiveBadge")}
             </Badge>
         ))
-        .with("upcoming", () => (
+        .with({ type: "start" }, start => (
             <Badge tone="upcoming" className="rounded-none">
-                {props.startDay ?? props.startTime}
+                {start.text}
             </Badge>
         ))
-        .with("ended", () => (
+        .with({ type: "ended" }, () => (
             <Badge tone="ended" className="rounded-none">
                 {t("Status.ended")}
             </Badge>
@@ -53,9 +53,9 @@ export const EventPin = (props: EventPinProps) => {
                     title: props.title,
                     status: t(`Status.${props.status}`),
                     time:
-                        props.startDay === undefined
-                            ? props.startTime
-                            : `${props.startDay} ${props.startTime}`,
+                        props.start.day === undefined
+                            ? props.start.time
+                            : `${props.start.day} ${props.start.time}`,
                 }),
                 props.moreCount === 0
                     ? undefined

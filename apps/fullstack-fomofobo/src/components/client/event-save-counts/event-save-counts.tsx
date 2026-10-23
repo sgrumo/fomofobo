@@ -1,6 +1,8 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
+import { formatLocalDate, localTimeOf } from "domain/local-format"
+import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { useTranslation } from "react-i18next"
 import { Alert } from "ui-components/alert"
 import { Spinner } from "ui-components/spinner"
@@ -14,8 +16,6 @@ import {
 } from "ui-components/table"
 
 import { api } from "@/lib/api/client-api"
-import { formatLocalDate, localTimeOf } from "@/lib/events/local-format"
-import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 interface EventSaveCountsProps {
     eventId: string

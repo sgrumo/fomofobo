@@ -1,9 +1,10 @@
 "use client"
 
+import { directionsUrl } from "domain/directions-url"
 import type { GeoPoint } from "models"
 import type { ReactNode } from "react"
 
-import { directionsUrl, mapsProviderOf } from "@/lib/geo/directions-url"
+import { mapsProviderOf } from "@/lib/geo/maps-provider"
 
 interface DirectionsLinkProps {
     coordinates: GeoPoint

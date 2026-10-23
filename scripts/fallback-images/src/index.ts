@@ -3,9 +3,9 @@ import path from "node:path"
 import { pathToFileURL } from "node:url"
 import { parseArgs } from "node:util"
 
+import { pixelIconBitmaps } from "domain/pixel-icons"
 import { categoryIconValues, PHOTO_DITHER_DARK, PHOTO_DITHER_LIGHT } from "models"
 import { encodeTwoColorPng } from "shared/image"
-import { pixelIconBitmaps } from "ui-components/pixel-icons/bitmaps"
 
 import { FALLBACK_GRID, fallbackGrid } from "./fallback-grid"
 

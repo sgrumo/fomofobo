@@ -1,5 +1,7 @@
 "use client"
 
+import { shareUrlOf } from "domain/share-urls"
+import type { ShareTarget } from "domain/share-urls"
 import type { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import { IconButton } from "ui-components/icon-button"
@@ -12,8 +14,6 @@ import {
 } from "ui-components/pixel-icons"
 
 import { useCopyLink } from "@/lib/hooks/use-copy-link"
-import { shareUrlOf } from "@/lib/share/share-urls"
-import type { ShareTarget } from "@/lib/share/share-urls"
 
 const shareTargets: ReadonlyArray<{ target: ShareTarget; icon: ReactNode }> = [
     { target: "whatsapp", icon: <PixelIconWhatsApp /> },

@@ -1,5 +1,7 @@
 "use client"
 
+import { PLATFORM_TIME_ZONE } from "domain/platform"
+import { EURO_LOCALE } from "domain/price-summary"
 import { identity } from "es-toolkit"
 import type { FormErrors } from "frontend-shared/types"
 import type { Category } from "models"
@@ -25,8 +27,6 @@ import { TimeInput } from "ui-components/time-input"
 
 import { PhotoGalleryEditor } from "@/components/client/photo-gallery-editor/photo-gallery-editor"
 import { expandOccurrences } from "@/lib/events/expand-occurrences"
-import { EURO_LOCALE } from "@/lib/events/price-summary"
-import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 import type {
     EventFormAction,

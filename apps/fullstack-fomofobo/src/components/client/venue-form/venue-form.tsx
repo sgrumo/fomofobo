@@ -1,5 +1,6 @@
 "use client"
 
+import { DEFAULT_CITY } from "domain/platform"
 import type { FormErrors } from "frontend-shared/types"
 import type { PlaceSuggestion, SearchSuggestions } from "models"
 import dynamic from "next/dynamic"
@@ -10,7 +11,6 @@ import { StringInput } from "ui-components/string-input"
 import { Textarea } from "ui-components/textarea"
 
 import { api } from "@/lib/api/client-api"
-import { DEFAULT_CITY } from "@/lib/platform/platform"
 
 import type { VenueFormAction, VenueFormState } from "./venue-form.state"
 import { coordinateOf, venueFormReducer } from "./venue-form.state"

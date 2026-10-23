@@ -10,6 +10,7 @@ const workspacePackages = [
     "api-client",
     "components-samples",
     "components-showcase",
+    "domain",
     "frontend-shared",
     "models",
     "react-shared",

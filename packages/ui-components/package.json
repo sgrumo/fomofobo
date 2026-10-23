@@ -35,7 +35,6 @@
         "./pagination": "./src/pagination/index.ts",
         "./password-input": "./src/password-input/index.ts",
         "./pixel-icons": "./src/pixel-icons/index.ts",
-        "./pixel-icons/bitmaps": "./src/pixel-icons/pixel-icons.helper.ts",
         "./popover": "./src/popover/index.ts",
         "./progress": "./src/progress/index.ts",
         "./provider": "./src/provider/index.ts",
@@ -72,6 +71,7 @@
     "dependencies": {
         "@base-ui/react": "^1.7.0",
         "date-fns": "catalog:",
+        "domain": "workspace:*",
         "es-toolkit": "catalog:",
         "frontend-shared": "workspace:*",
         "i18n": "workspace:*",

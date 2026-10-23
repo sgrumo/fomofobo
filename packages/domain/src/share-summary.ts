@@ -1,7 +1,7 @@
-import type { OccurrenceSummary } from "models"
+import type { OccurrenceSummary, PublicVenue } from "models"
 
-import { localTimeOf, weekdayDateOf } from "@/lib/events/local-format"
-import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
+import { localTimeOf, weekdayDateOf } from "./local-format"
+import { PLATFORM_TIME_ZONE } from "./platform"
 
 /**
  * @description Returns the weekday and date, the start time and the venue of an occurrence,
@@ -20,3 +20,10 @@ export const shareSummaryOf = (
         occurrence.venue.name,
     ].join(" · ")
 }
+
+/**
+ * @description Returns the share text of a venue: its name and its address
+ * @param venue Venue shared
+ */
+export const venueShareTextOf = (venue: Pick<PublicVenue, "name" | "address">): string =>
+    `${venue.name} · ${venue.address}`

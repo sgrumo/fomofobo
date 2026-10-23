@@ -1,22 +1,13 @@
 import { tz } from "@date-fns/tz"
-import { addDays, format, getDay, parseISO, startOfDay } from "date-fns"
+import { addDays, getDay, parseISO, startOfDay } from "date-fns"
+import { DEFAULT_WINDOW_DAYS } from "domain/platform"
 import type { PublicSearchQuery } from "models"
 import { match } from "ts-pattern"
-
-import { DEFAULT_WINDOW_DAYS } from "../platform/platform"
 
 export interface DateWindow {
     from: Date
     to: Date
 }
-
-/**
- * @description Returns the local `yyyy-MM-dd` date of an instant in the zone
- * @param instant Instant read
- * @param timeZone IANA zone of the wall clock
- */
-export const localDateOf = (instant: Date, timeZone: string): string =>
-    format(instant, "yyyy-MM-dd", { in: tz(timeZone) })
 
 /**
  * @description Returns the window of a date filter as instants, `to` excluded

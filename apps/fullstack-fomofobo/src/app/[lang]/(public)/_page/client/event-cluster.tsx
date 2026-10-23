@@ -1,5 +1,6 @@
 "use client"
 
+import { clusterArcs } from "domain/event-clusters"
 import { useTranslation } from "react-i18next"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
@@ -15,9 +16,9 @@ interface EventClusterProps extends RouteClientComponentProps<"root"> {
 
 export const EventCluster = (props: EventClusterProps) => {
     const { t } = useTranslation("shared")
-    const liveEnd = `${String((props.liveCount / props.count) * 100)}%`
-    const upcomingEnd = `${String(((props.liveCount + props.upcomingCount) / props.count) * 100)}%`
-    const endedEnd = `${String(((props.count - props.permanentCount) / props.count) * 100)}%`
+    const ring = clusterArcs(props)
+        .map(arc => `var(--color-${arc.kind}) ${String(arc.from)}% ${String(arc.to)}%`)
+        .join(", ")
 
     return (
         <button
@@ -36,7 +37,7 @@ export const EventCluster = (props: EventClusterProps) => {
                 aria-hidden={true}
                 className="absolute inset-0 [clip-path:var(--pixel-circle-inner-48)]"
                 style={{
-                    background: `conic-gradient(var(--color-live) 0 ${liveEnd}, var(--color-upcoming) ${liveEnd} ${upcomingEnd}, var(--color-ended) ${upcomingEnd} ${endedEnd}, var(--color-permanent) ${endedEnd} 100%)`,
+                    background: `conic-gradient(${ring})`,
                 }}
             />
             <span className="bg-surface text-fg tp-pixel-lg relative flex size-9 items-center justify-center [clip-path:var(--pixel-circle-outer-36)]">

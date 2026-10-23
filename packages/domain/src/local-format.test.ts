@@ -5,8 +5,17 @@ import {
     dayMonthOf,
     formatLocalDate,
     formatLocalDateTime,
+    localDateOf,
     weekdayDateOf,
 } from "./local-format"
+
+describe("localDateOf", () => {
+    it("returns the local date of the zone", () => {
+        expect(localDateOf(new Date("2026-10-23T22:30:00Z"), "Europe/Rome")).toBe(
+            "2026-10-24",
+        )
+    })
+})
 
 describe("dayMonthOf", () => {
     it("reads the day of the zone", () => {

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import {
     buildEventClusters,
+    clusterArcs,
     clusterLayer,
     firstLeafIndex,
     markerLayer,
@@ -121,6 +122,24 @@ describe("markerLayer and clusterLayer", () => {
             markerLayer("live"),
             markerLayer("ended"),
             markerLayer("permanent"),
+        ])
+    })
+})
+
+describe("clusterArcs", () => {
+    it("draws one arc per kind from live to permanent, sized by its share, over the whole ring", () => {
+        expect(
+            clusterArcs({
+                liveCount: 1,
+                upcomingCount: 2,
+                endedCount: 0,
+                permanentCount: 1,
+            }),
+        ).toStrictEqual([
+            { kind: "live", from: 0, to: 25 },
+            { kind: "upcoming", from: 25, to: 75 },
+            { kind: "ended", from: 75, to: 75 },
+            { kind: "permanent", from: 75, to: 100 },
         ])
     })
 })

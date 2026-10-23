@@ -18,7 +18,7 @@
         "fmt:check": "oxfmt --check"
     },
     "dependencies": {
-        "@date-fns/tz": "^1.5.0",
+        "@date-fns/tz": "catalog:",
         "@fontsource-variable/funnel-sans": "catalog:",
         "@fontsource/space-mono": "^5.3.0",
         "@hono/swagger-ui": "catalog:",
@@ -33,6 +33,7 @@
         "components-samples": "workspace:*",
         "components-showcase": "workspace:*",
         "date-fns": "catalog:",
+        "domain": "workspace:*",
         "es-toolkit": "catalog:",
         "frontend-shared": "workspace:*",
         "hono": "catalog:",
@@ -51,14 +52,12 @@
         "shared": "workspace:*",
         "storage": "workspace:*",
         "styles": "workspace:*",
-        "supercluster": "^9.1.0",
         "tailwindcss": "catalog:",
         "ts-pattern": "catalog:",
         "ui-components": "workspace:*",
         "zod": "catalog:"
     },
     "devDependencies": {
-        "@maplibre/maplibre-gl-style-spec": "^26.4.4",
         "@tailwindcss/postcss": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",

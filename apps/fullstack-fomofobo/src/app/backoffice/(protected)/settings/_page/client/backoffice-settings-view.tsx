@@ -1,6 +1,8 @@
 "use client"
 
 import { useMutation, useQuery } from "@tanstack/react-query"
+import { dateTimeOf } from "domain/local-format"
+import { PLATFORM_TIME_ZONE } from "domain/platform"
 import type { PlatformSettings } from "models"
 import { useTranslation } from "react-i18next"
 import { useForm } from "react-shared"
@@ -18,9 +20,7 @@ import {
 } from "@/components/client/settings-form/settings-form.state"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
-import { dateTimeOf } from "@/lib/events/local-format"
 import { useMutationFeedback } from "@/lib/hooks/use-mutation-feedback"
-import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 export const BackofficeSettingsView = (
     _props: RouteClientComponentProps<"backofficeSettings">,

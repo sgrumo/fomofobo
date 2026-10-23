@@ -1,7 +1,7 @@
 import type { SaveChange } from "models"
 import { describe, expect, it } from "vitest"
 
-import { dropSentSaveChange, queueSaveChange } from "./save-queue"
+import { dropSentSaveChange, isFinalSaveRefusal, queueSaveChange } from "./save-queue"
 
 const concert = { eventId: "7d0c1c3e-5f0a-4f39-9b8e-2f5b9f3d6a10", date: "2026-10-24" }
 const market = { eventId: "0b3e9a4d-8c21-4c6f-a1f7-6e2d5c4b3a29", date: "2026-10-25" }
@@ -52,5 +52,19 @@ describe("dropSentSaveChange", () => {
                 action: "save",
             }),
         ).toStrictEqual([{ ...concert, action: "unsave" }])
+    })
+})
+
+describe("isFinalSaveRefusal", () => {
+    it("drops a change the API refused with a client error", () => {
+        expect([400, 404, 409].map(isFinalSaveRefusal)).toStrictEqual([true, true, true])
+    })
+
+    it("keeps a change refused by a rate limit or a server error", () => {
+        expect([429, 500, 503].map(isFinalSaveRefusal)).toStrictEqual([
+            false,
+            false,
+            false,
+        ])
     })
 })

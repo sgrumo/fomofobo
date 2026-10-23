@@ -1,6 +1,7 @@
 import "server-only"
 import type { S3ObjectStorage } from "backend-shared"
 import { logger } from "backend-shared"
+import { PLATFORM_TIME_ZONE } from "domain/platform"
 import type {
     Account,
     Event,
@@ -12,7 +13,6 @@ import type {
 import type { EventsStorage, SavesStorage, StoredEvent } from "storage"
 
 import { expandOccurrences } from "@/lib/events/expand-occurrences"
-import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 import { eventTag, expireTags } from "../cache"
 import { appError } from "../errors"

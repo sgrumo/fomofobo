@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import { Button } from "ui-components/button"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
-import { mapsProviderOf } from "@/lib/geo/directions-url"
+import { mapsProviderOf } from "@/lib/geo/maps-provider"
 import { showInstallPrompt, useInstallPrompt } from "@/lib/pwa/install-prompt"
 
 type InstallContext = "installed" | "ios" | "other"
