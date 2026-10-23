@@ -116,6 +116,7 @@ lane, never the app on first launch.
 - Consume it as `api.${operation}`, e.g. `api.listCategoriesQuery(...)`, `api.deleteEventMutation` - **NEVER** re-export individual operations into app files
 - AsyncStorage keys: `src/lib/storage/storage-keys.ts`. **NEVER** write a key literal at an AsyncStorage call
 - Responses are validated and params/bodies typed by `api-client` from the route definitions - **NEVER** retype a body or interpolate a path by hand
+- A rule the web app also applies (status, time formats, map pins and clusters, prices, save queue, share and directions links, pixel icons) comes from `"domain/*"` - **NEVER** copy it into the app. A new shared rule goes into `packages/domain`
 
 ## Fastlane
 
