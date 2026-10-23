@@ -22,6 +22,7 @@ import { parseEnv } from "./config/env"
 import { GeoapifyProvider } from "./geocoding/geoapify-provider"
 import { AuthAccountsService } from "./services/auth-accounts-service"
 import { CategoriesService } from "./services/categories-service"
+import { ClientCompatibilityService } from "./services/client-compatibility-service"
 import { EventsService } from "./services/events-service"
 import { OrganizersService } from "./services/organizers-service"
 import { PhotosService } from "./services/photos-service"
@@ -38,6 +39,7 @@ export interface Container {
     auth: Auth
     authAccounts: AuthAccountsService
     categories: CategoriesService
+    clientCompatibility: ClientCompatibilityService
     venues: VenuesService
     organizers: OrganizersService
     events: EventsService
@@ -103,6 +105,20 @@ const buildContainer = (): Container => {
             photoStorage,
             env.PHOTOS_PUBLIC_BASE_URL,
         ),
+        clientCompatibility: new ClientCompatibilityService({
+            ios: {
+                minVersion: env.IOS_MIN_VERSION,
+                currentVersion: env.IOS_CURRENT_VERSION,
+                releaseLive: env.IOS_RELEASE_LIVE,
+                storeUrl: env.IOS_STORE_URL,
+            },
+            android: {
+                minVersion: env.ANDROID_MIN_VERSION,
+                currentVersion: env.ANDROID_CURRENT_VERSION,
+                releaseLive: env.ANDROID_RELEASE_LIVE,
+                storeUrl: env.ANDROID_STORE_URL,
+            },
+        }),
         venues: new VenuesService(
             new VenuesStorage(db),
             accountsStorage,

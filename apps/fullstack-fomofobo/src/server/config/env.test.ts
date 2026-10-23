@@ -112,6 +112,59 @@ describe("parseEnv", () => {
         expect(() => parseEnv(withoutBucket, true)).toThrow("S3_BUCKET: not set")
     })
 
+    it("should leave every version gate variable unset by default", () => {
+        const env = parseEnv(vercelEnv, true)
+
+        expect([
+            env.IOS_MIN_VERSION,
+            env.IOS_CURRENT_VERSION,
+            env.IOS_RELEASE_LIVE,
+            env.IOS_STORE_URL,
+            env.ANDROID_MIN_VERSION,
+            env.ANDROID_CURRENT_VERSION,
+            env.ANDROID_RELEASE_LIVE,
+            env.ANDROID_STORE_URL,
+        ]).toStrictEqual(Array.from({ length: 8 }, () => undefined))
+    })
+
+    it("should parse the versions and the release flags of the version gate", () => {
+        const env = parseEnv(
+            {
+                ...vercelEnv,
+                IOS_MIN_VERSION: "1.4.0",
+                IOS_RELEASE_LIVE: "false",
+                ANDROID_RELEASE_LIVE: "1",
+            },
+            true,
+        )
+
+        expect(env.IOS_MIN_VERSION).toBe("1.4.0")
+        expect(env.IOS_RELEASE_LIVE).toBe(false)
+        expect(env.ANDROID_RELEASE_LIVE).toBe(true)
+    })
+
+    it("should read an empty version gate variable as unset", () => {
+        const env = parseEnv(
+            {
+                ...vercelEnv,
+                IOS_MIN_VERSION: "",
+                IOS_RELEASE_LIVE: "",
+                IOS_STORE_URL: "",
+            },
+            true,
+        )
+
+        expect(env.IOS_MIN_VERSION).toBeUndefined()
+        expect(env.IOS_RELEASE_LIVE).toBeUndefined()
+        expect(env.IOS_STORE_URL).toBeUndefined()
+    })
+
+    it("should reject a version gate version that semver cannot compare", () => {
+        expect(() =>
+            parseEnv({ ...vercelEnv, ANDROID_MIN_VERSION: "1.4" }, true),
+        ).toThrow("ANDROID_MIN_VERSION")
+    })
+
     it("should reject an S3 endpoint without a scheme", () => {
         expect(() =>
             parseEnv(

@@ -43,4 +43,5 @@ One store stays outside the repository: the secrets of each GitHub environment. 
 The runtime configuration of the app is committed in `infra/vercel/env/<env>.env`, one file per deploy environment. The deploy writes it into the Vercel project of the environment.
 
 - The files hold no credential.
-- A variable left out of a file is unset in that environment. `infra/vercel/AGENTS.md` holds the rules for a new one.
+- A variable that a file never held is unset in that environment. The deploy writes values and never deletes one, so a line removed from a file keeps its last value in the project.
+- `infra/vercel/AGENTS.md` holds the rules for a new variable.

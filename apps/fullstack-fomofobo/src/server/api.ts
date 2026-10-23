@@ -22,6 +22,7 @@ import { buildBackofficeOrganizersRouter } from "./routers/backoffice-organizers
 import { buildBackofficeSessionRouter } from "./routers/backoffice-session-router"
 import { buildBackofficeSettingsRouter } from "./routers/backoffice-settings-router"
 import { buildBackofficeVenuesRouter } from "./routers/backoffice-venues-router"
+import { buildClientCompatibilityRouter } from "./routers/client-compatibility-router"
 import { buildPublicRouter } from "./routers/public-router"
 
 /**
@@ -92,6 +93,7 @@ const buildApi = (): OpenAPIHono => {
         auth,
         authAccounts,
         categories,
+        clientCompatibility,
         db,
         events,
         occurrences,
@@ -130,6 +132,8 @@ const buildApi = (): OpenAPIHono => {
             venues: publicVenues,
         }),
     )
+
+    app.route("/", buildClientCompatibilityRouter(clientCompatibility))
 
     app.use(`${apiBasePath}/backoffice/*`, backofficeSession(authAccounts))
     app.route("/", buildBackofficeSessionRouter())

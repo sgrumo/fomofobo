@@ -21,6 +21,10 @@ The upload leaves the git metadata out, so Vercel runs no check on the commit au
 
 `.github/workflows/purge-photos.yaml` runs `apps/photo-purge` every day for each environment. It reads `env/<env>.env` and the secrets `DATABASE_AUTH_TOKEN`, `S3_ACCESS_KEY` and `S3_SECRET_KEY` of the GitHub environment. It deletes the photos of each event whose occurrences all ended more than three days ago: first the rows, then the objects. If an object delete fails, the run fails and its log lists the key, and the object stays in the bucket with no row.
 
+## Mobile version gate
+
+`GET /api/client-compatibility` tells each build of the mobile app to go on, to update, or to wait for maintenance. Before a breaking change of the API, follow `mobile-version-gate.md`.
+
 ## Plan limits
 
 - Vercel Hobby is for non-commercial use only. Ads, paid listings or a paying client break its terms. See the [Hobby plan](https://vercel.com/docs/plans/hobby).
