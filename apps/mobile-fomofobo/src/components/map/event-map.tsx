@@ -1,7 +1,14 @@
 import { Camera, Map, Marker } from "@maplibre/maplibre-react-native"
-import type { CameraRef } from "@maplibre/maplibre-react-native"
-import { markerLayer, venueSpots } from "domain/event-clusters"
-import type { MapPointKind, MapSpot } from "domain/event-clusters"
+import type { CameraRef, MapRef, ViewState } from "@maplibre/maplibre-react-native"
+import {
+    buildEventClusters,
+    CLUSTER_MAX_ZOOM,
+    clusterLayer,
+    firstLeafIndex,
+    markerLayer,
+    venueSpots,
+} from "domain/event-clusters"
+import type { EventMapFeature, MapPointKind } from "domain/event-clusters"
 import { mapStyle } from "domain/map-style"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { pinStartOf } from "domain/pin-tag"
@@ -13,17 +20,41 @@ import type {
     OccurrenceSummary,
     PermanentVenueSummary,
 } from "models"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { View } from "react-native"
 
 import { hardShadow } from "@/lib/theme/hard-shadow"
 
+import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"
 import { MapAttribution } from "./map-attribution"
 import { VenuePin } from "./venue-pin"
 
 const INITIAL_ZOOM = 13
+
+interface Viewport {
+    bbox: [number, number, number, number]
+    zoom: number
+}
+
+/**
+ * @description Returns the bounds and the whole zoom level of a view of the map
+ * @param view View the map reported
+ */
+const viewportOf = (view: Pick<ViewState, "bounds" | "zoom">): Viewport => ({
+    bbox: view.bounds,
+    zoom: Math.floor(view.zoom),
+})
+
+/**
+ * @description Returns the layer of a cluster or of a single spot, higher on top
+ * @param feature Cluster or single spot
+ */
+const featureLayer = (feature: EventMapFeature): number =>
+    "cluster" in feature.properties
+        ? clusterLayer(feature.properties)
+        : markerLayer(feature.properties.kind)
 
 interface EventMapProps {
     center: GeoPoint
@@ -38,7 +69,9 @@ interface EventMapProps {
 
 export const EventMap = (props: EventMapProps) => {
     const { t } = useTranslation("shared")
+    const mapRef = useRef<MapRef>(null)
     const cameraRef = useRef<CameraRef>(null)
+    const [viewport, setViewport] = useState<Viewport>()
     const { latitude, longitude } = props.center
 
     useEffect(() => {
@@ -65,14 +98,75 @@ export const EventMap = (props: EventMapProps) => {
                 kind: "permanent",
             }),
         ),
-    ]).toSorted((first, second) => markerLayer(first.kind) - markerLayer(second.kind))
+    ])
+    const clusters = buildEventClusters(spots)
+    const features =
+        viewport === undefined
+            ? []
+            : clusters
+                  .getClusters(viewport.bbox, viewport.zoom)
+                  .toSorted((first, second) => featureLayer(first) - featureLayer(second))
 
-    const pinOf = (spot: MapSpot) => {
-        const lngLat: [number, number] = [
-            spot.coordinates.longitude,
-            spot.coordinates.latitude,
-        ]
-        const layerStyle = { zIndex: markerLayer(spot.kind) }
+    const readViewport = async () => {
+        const view = await mapRef.current?.getViewState()
+        if (view !== undefined) {
+            setViewport(viewportOf(view))
+        }
+    }
+
+    const selectIndex = (index: number) => {
+        const occurrence = props.occurrences.at(index)
+        if (occurrence !== undefined) {
+            props.onSelect({ eventId: occurrence.eventId, date: occurrence.date })
+            return
+        }
+        const venue = props.permanentVenues.at(index - props.occurrences.length)
+        if (venue !== undefined) {
+            props.onSelectVenue(venue.id)
+        }
+    }
+
+    const markerOf = (feature: EventMapFeature) => {
+        const [featureLongitude = 0, featureLatitude = 0] = feature.geometry.coordinates
+        const lngLat: [number, number] = [featureLongitude, featureLatitude]
+        const layerStyle = { zIndex: featureLayer(feature) }
+
+        if ("cluster" in feature.properties) {
+            const clusterId = feature.properties.cluster_id
+            return (
+                <Marker
+                    key={`cluster-${String(clusterId)}`}
+                    lngLat={lngLat}
+                    anchor="center"
+                    style={layerStyle}
+                >
+                    <EventCluster
+                        count={feature.properties.point_count}
+                        liveCount={feature.properties.liveCount}
+                        upcomingCount={feature.properties.upcomingCount}
+                        endedCount={feature.properties.endedCount}
+                        permanentCount={feature.properties.permanentCount}
+                        onExpand={() => {
+                            const zoom = clusters.getClusterExpansionZoom(clusterId)
+                            // Past the last cluster zoom the points share one spot, so no zoom splits them.
+                            const first =
+                                zoom > CLUSTER_MAX_ZOOM
+                                    ? firstLeafIndex(
+                                          clusters.getLeaves(clusterId, Infinity),
+                                      )
+                                    : undefined
+                            if (first !== undefined) {
+                                selectIndex(first)
+                                return
+                            }
+                            cameraRef.current?.easeTo({ center: lngLat, zoom })
+                        }}
+                    />
+                </Marker>
+            )
+        }
+
+        const spot = feature.properties
 
         if (spot.kind === "permanent") {
             const venue = props.permanentVenues.at(spot.index - props.occurrences.length)
@@ -129,12 +223,19 @@ export const EventMap = (props: EventMapProps) => {
             {/* `dot-dither` ground pattern draws on web only: MapLibre RN 11.5 on iOS never
                 passes an `Images` entry, bundled or embedded, to the style */}
             <Map
+                ref={mapRef}
                 mapStyle={mapStyle}
                 attribution={false}
                 logo={false}
                 compass={false}
                 touchRotate={false}
                 touchPitch={false}
+                onDidFinishLoadingMap={() => {
+                    void readViewport()
+                }}
+                onRegionDidChange={event => {
+                    setViewport(viewportOf(event.nativeEvent))
+                }}
             >
                 <Camera
                     ref={cameraRef}
@@ -143,7 +244,7 @@ export const EventMap = (props: EventMapProps) => {
                         zoom: INITIAL_ZOOM,
                     }}
                 />
-                {spots.map(pinOf)}
+                {features.map(markerOf)}
                 {props.position !== undefined && (
                     <Marker
                         lngLat={[props.position.longitude, props.position.latitude]}

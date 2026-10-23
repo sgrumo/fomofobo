@@ -24,7 +24,8 @@
         "Pin": "{{title}}, {{status}}, {{time}}",
         "VenuePin": "{{name}}, {{kind}}",
         "MoreHere_one": "{{count}} altro risultato qui",
-        "MoreHere_other": "{{count}} altri risultati qui"
+        "MoreHere_other": "{{count}} altri risultati qui",
+        "Cluster": "{{count}} luoghi: {{live}} con eventi in corso, {{upcoming}} con eventi in arrivo, {{ended}} con eventi finiti, {{permanent}} tra cinema, musei, teatri e gallerie. Ingrandisci"
     },
     "Status": {
         "live": "In corso",

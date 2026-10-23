@@ -12,6 +12,7 @@ import {
     PIXEL_RING_WIDTH,
     steppedPath,
     steppedPolygon,
+    wedgePath,
 } from "./pixel-shapes"
 
 const globalsCss = readFileSync(
@@ -94,5 +95,13 @@ describe("pixel shapes", () => {
 
         expect(path.split("M")).toHaveLength(13)
         expect(path).toMatch(/^M18 18 L18 -54 L36\.6\d* -51\.5\d* Z/u)
+    })
+
+    it("draw a full-turn wedge as a fan of 15 degree steps that closes at 12 o'clock", () => {
+        const path = wedgePath(48, 48, 0, 360)
+
+        expect(path.split(" L")).toHaveLength(26)
+        expect(path).toMatch(/^M24 24 L24 -72 L/u)
+        expect(path).toMatch(/ L23\.99\d* -72 Z$/u)
     })
 })

@@ -97,22 +97,47 @@ export const steppedPath = (
 const DASH_DEGREES = 15
 
 /**
- * @description Builds the SVG path data of the dash wedges of a dashed ring: one triangle per
- * dash, clockwise from 12 o'clock, reaching past the corners of the box
+ * @description Builds the SVG path data of a wedge from the center of a box, clockwise from 12
+ * o'clock, reaching past the corners of the box
+ * @param width Box width in points
+ * @param height Box height in points
+ * @param fromDegrees Start angle
+ * @param toDegrees End angle, at most 360 degrees past the start
+ * @param offset Distance moved right and down
+ */
+export const wedgePath = (
+    width: number,
+    height: number,
+    fromDegrees: number,
+    toDegrees: number,
+    offset = 0,
+): string => {
+    const centerX = width / 2 + offset
+    const centerY = height / 2 + offset
+    const reach = width + height
+    // Points at most one dash apart keep the far edge outside the box on a wide wedge
+    const steps = Math.max(1, Math.ceil((toDegrees - fromDegrees) / DASH_DEGREES))
+    const edge = Array.from({ length: steps + 1 }, (_, step) => {
+        const radians =
+            ((fromDegrees + ((toDegrees - fromDegrees) * step) / steps) * Math.PI) / 180
+        return `${String(centerX + reach * Math.sin(radians))} ${String(centerY - reach * Math.cos(radians))}`
+    })
+    return `M${String(centerX)} ${String(centerY)} L${edge.join(" L")} Z`
+}
+
+/**
+ * @description Builds the SVG path data of the dash wedges of a dashed ring, one per dash
  * @param width Box width in points
  * @param height Box height in points
  * @param offset Distance moved right and down
  */
-export const dashWedgesPath = (width: number, height: number, offset = 0): string => {
-    const centerX = width / 2 + offset
-    const centerY = height / 2 + offset
-    const reach = width + height
-    const pointAt = (degrees: number) => {
-        const radians = (degrees * Math.PI) / 180
-        return `${String(centerX + reach * Math.sin(radians))} ${String(centerY - reach * Math.cos(radians))}`
-    }
-    return Array.from({ length: 360 / (2 * DASH_DEGREES) }, (_, dash) => {
-        const from = dash * 2 * DASH_DEGREES
-        return `M${String(centerX)} ${String(centerY)} L${pointAt(from)} L${pointAt(from + DASH_DEGREES)} Z`
-    }).join(" ")
-}
+export const dashWedgesPath = (width: number, height: number, offset = 0): string =>
+    Array.from({ length: 360 / (2 * DASH_DEGREES) }, (_, dash) =>
+        wedgePath(
+            width,
+            height,
+            dash * 2 * DASH_DEGREES,
+            (dash * 2 + 1) * DASH_DEGREES,
+            offset,
+        ),
+    ).join(" ")
