@@ -1,4 +1,4 @@
-import { Camera, Map, Marker } from "@maplibre/maplibre-react-native"
+import { Camera, Images, Map, Marker } from "@maplibre/maplibre-react-native"
 import type { CameraRef, MapRef, ViewState } from "@maplibre/maplibre-react-native"
 import {
     buildEventClusters,
@@ -26,12 +26,14 @@ import { View } from "react-native"
 
 import { hardShadow } from "@/lib/theme/hard-shadow"
 
+import dotDitherPattern from "../../../assets/map/dot-dither.png"
 import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"
 import { MapAttribution } from "./map-attribution"
 import { VenuePin } from "./venue-pin"
 
 const INITIAL_ZOOM = 13
+const MAP_IMAGES = { "dot-dither": dotDitherPattern }
 
 interface Viewport {
     bbox: [number, number, number, number]
@@ -220,8 +222,6 @@ export const EventMap = (props: EventMapProps) => {
 
     return (
         <View accessibilityLabel={t("Map.Label")} className="flex-1 bg-map-ground">
-            {/* `dot-dither` ground pattern draws on web only: MapLibre RN 11.5 on iOS never
-                passes an `Images` entry, bundled or embedded, to the style */}
             <Map
                 ref={mapRef}
                 mapStyle={mapStyle}
@@ -237,6 +237,7 @@ export const EventMap = (props: EventMapProps) => {
                     setViewport(viewportOf(event.nativeEvent))
                 }}
             >
+                <Images images={MAP_IMAGES} />
                 <Camera
                     ref={cameraRef}
                     initialViewState={{

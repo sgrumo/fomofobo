@@ -101,3 +101,5 @@ minimumReleaseAgeExclude:
   - "@next/swc-win32-x64-msvc@16.4.1"
   # Renovate security update: hono@4.13.7
   - hono@4.13.7
+patchedDependencies:
+  "@maplibre/maplibre-react-native@11.5.0": patches/@maplibre__maplibre-react-native@11.5.0.patch
