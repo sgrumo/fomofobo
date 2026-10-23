@@ -1,9 +1,17 @@
 "use client"
 
-import { format, isBefore, parseISO } from "date-fns"
-import { localDateOf } from "domain/local-format"
-import { PLATFORM_TIME_ZONE } from "domain/platform"
-import type { DateFilterKind, LocalDate } from "models"
+import { isBefore, parseISO } from "date-fns"
+import {
+    earliestRangeDayOf,
+    freeQueryOf,
+    isValidRange,
+    NO_DATE_FILTER,
+    QUICK_DATE_KINDS,
+    quickDateQueryOf,
+    rangeLabelOf,
+    rangeQueryOf,
+} from "domain/map-filters"
+import type { MapQuery } from "domain/map-query"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import {
@@ -18,21 +26,10 @@ import { Field } from "ui-components/field"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
-interface DateFilter {
-    date: DateFilterKind | undefined
-    from: LocalDate | undefined
-    to: LocalDate | undefined
-}
-
-const NO_DATE_FILTER: DateFilter = { date: undefined, from: undefined, to: undefined }
-
-const QUICK_KINDS = ["today", "tomorrow", "weekend"] as const
-
-interface DateChipsProps extends RouteClientComponentProps<"root">, DateFilter {
+interface DateChipsProps extends RouteClientComponentProps<"root"> {
+    query: Pick<MapQuery, "date" | "from" | "to" | "free">
     now: Date
-    free: boolean
-    onChange: (filter: DateFilter) => void
-    onFreeChange: (free: boolean) => void
+    onChange: (change: MapQuery) => void
     className?: string
 }
 
@@ -42,22 +39,18 @@ export const DateChips = (props: DateChipsProps) => {
     const [draftFrom, setDraftFrom] = useState<Date>()
     const [draftTo, setDraftTo] = useState<Date>()
 
-    const rangeLabel =
-        props.date === "range" && props.from !== undefined && props.to !== undefined
-            ? `${format(parseISO(props.from), "dd/MM")}–${format(parseISO(props.to), "dd/MM")}`
-            : t("Filters.Range")
-    // PLACEHOLDER(OP-09): a range starts today at the earliest
-    // The range holds days of the platform zone, shown as midnights of the device.
-    const today = parseISO(localDateOf(props.now, PLATFORM_TIME_ZONE))
+    const rangeLabel = rangeLabelOf(props.query) ?? t("Filters.Range")
+    const today = earliestRangeDayOf(props.now)
     const draftValid =
         draftFrom !== undefined &&
         draftTo !== undefined &&
-        !isBefore(draftFrom, today) &&
-        !isBefore(draftTo, draftFrom)
+        isValidRange(draftFrom, draftTo, today)
 
     const openSheet = () => {
-        setDraftFrom(props.from === undefined ? undefined : parseISO(props.from))
-        setDraftTo(props.to === undefined ? undefined : parseISO(props.to))
+        setDraftFrom(
+            props.query.from === undefined ? undefined : parseISO(props.query.from),
+        )
+        setDraftTo(props.query.to === undefined ? undefined : parseISO(props.query.to))
         setSheetOpen(true)
     }
 
@@ -65,29 +58,27 @@ export const DateChips = (props: DateChipsProps) => {
         <>
             {/* The free chip shares the row: one more row covers more of the map. */}
             <ChipRow label={t("Filters.DatesAndPrice")} className={props.className}>
-                {QUICK_KINDS.map(kind => (
+                {QUICK_DATE_KINDS.map(kind => (
                     <Chip
                         key={kind}
                         label={t(`Filters.${kind}`)}
-                        pressed={props.date === kind}
+                        pressed={props.query.date === kind}
                         onPressedChange={pressed => {
-                            props.onChange(
-                                pressed
-                                    ? { ...NO_DATE_FILTER, date: kind }
-                                    : NO_DATE_FILTER,
-                            )
+                            props.onChange(quickDateQueryOf(kind, pressed))
                         }}
                     />
                 ))}
                 <Chip
                     label={rangeLabel}
-                    pressed={props.date === "range"}
+                    pressed={props.query.date === "range"}
                     onPressedChange={openSheet}
                 />
                 <Chip
                     label={t("Price.Free")}
-                    pressed={props.free}
-                    onPressedChange={props.onFreeChange}
+                    pressed={props.query.free === true}
+                    onPressedChange={free => {
+                        props.onChange(freeQueryOf(free))
+                    }}
                 />
             </ChipRow>
             <BottomSheetRoot open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -135,11 +126,7 @@ export const DateChips = (props: DateChipsProps) => {
                                         return
                                     }
                                     setSheetOpen(false)
-                                    props.onChange({
-                                        date: "range",
-                                        from: format(draftFrom, "yyyy-MM-dd"),
-                                        to: format(draftTo, "yyyy-MM-dd"),
-                                    })
+                                    props.onChange(rangeQueryOf(draftFrom, draftTo))
                                 }}
                             >
                                 {t("Filters.Apply")}

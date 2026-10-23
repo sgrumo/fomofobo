@@ -1,7 +1,13 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { identity, partition } from "es-toolkit"
+import {
+    isEmptySuggestions,
+    MIN_SUGGESTION_TEXT,
+    SUGGESTION_DELAY_MS,
+    venueSuggestionGroupsOf,
+} from "domain/map-search"
+import { identity } from "es-toolkit"
 import type { GeoPoint, OccurrenceRef, PlaceSuggestion } from "models"
 import { useRef, useState } from "react"
 import type { FocusEvent, MouseEvent } from "react"
@@ -18,15 +24,12 @@ import { routes } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
 import { useOnline } from "@/lib/hooks/use-online"
 
-const MIN_SUGGESTION_TEXT = 2
-const SUGGESTION_DELAY_MS = 300
-
 interface PlaceSearchProps extends RouteClientComponentProps<"root"> {
     center: GeoPoint
     initialText: string
     onPlaceSelect: (place: PlaceSuggestion) => void
     onEventSelect: (ref: OccurrenceRef) => void
-    onTextSubmit: (text: string | undefined) => void
+    onTextSubmit: (text: string) => void
 }
 
 export const PlaceSearch = (props: PlaceSearchProps) => {
@@ -53,10 +56,7 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
 
     const places = suggestions.data?.places ?? []
     const events = suggestions.data?.events ?? []
-    const [regularVenues, permanentVenues] = partition(
-        suggestions.data?.venues ?? [],
-        venue => venue.kind === "regular",
-    )
+    const venueGroups = venueSuggestionGroupsOf(suggestions.data?.venues ?? [])
     const closeWhenFocusLeaves = (event: FocusEvent) => {
         if (
             !(event.relatedTarget instanceof Node) ||
@@ -80,8 +80,7 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
             onSubmit={event => {
                 event.preventDefault()
                 setOpen(false)
-                const trimmed = text.trim()
-                props.onTextSubmit(trimmed === "" ? undefined : trimmed)
+                props.onTextSubmit(text)
             }}
         >
             <SearchField
@@ -101,7 +100,7 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                     setText(value)
                     setOpen(true)
                     if (value === "") {
-                        props.onTextSubmit(undefined)
+                        props.onTextSubmit(value)
                     }
                 }}
             />
@@ -120,11 +119,7 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                             }
                         />
                     ) : undefined}
-                    {suggestions.isSuccess &&
-                    places.length === 0 &&
-                    events.length === 0 &&
-                    regularVenues.length === 0 &&
-                    permanentVenues.length === 0 ? (
+                    {suggestions.isSuccess && isEmptySuggestions(suggestions.data) ? (
                         <p className="tp-body-md text-fg-muted px-2">
                             {t("Search.Empty")}
                         </p>
@@ -184,8 +179,11 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                         </section>
                     ) : undefined}
                     {[
-                        { label: t("Search.Venues"), venues: regularVenues },
-                        { label: t("Search.PermanentVenues"), venues: permanentVenues },
+                        { label: t("Search.Venues"), venues: venueGroups.regular },
+                        {
+                            label: t("Search.PermanentVenues"),
+                            venues: venueGroups.permanent,
+                        },
                     ].map(group =>
                         group.venues.length === 0 ? undefined : (
                             <section

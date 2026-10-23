@@ -2,6 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { centerQueryOf, searchCenterOf } from "domain/map-center"
+import { hasActiveFilters } from "domain/map-filters"
+import { placeQueryOf, textQueryOf } from "domain/map-search"
 import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
 import { cn } from "frontend-shared/styles"
 import type { OccurrenceRef, OccurrenceSummary } from "models"
@@ -83,8 +85,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
     const online = useOnline()
     const filtersId = useId()
     const [filtersOpen, setFiltersOpen] = useState(false)
-    const filtersActive =
-        query.category !== undefined || query.date !== undefined || query.free === true
+    const filtersActive = hasActiveFilters(query)
 
     const {
         center,
@@ -294,17 +295,13 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                             center={center}
                             initialText={query.place ?? query.q ?? ""}
                             onPlaceSelect={place => {
-                                setQuery({
-                                    ...centerQueryOf(place.coordinates),
-                                    place: place.label,
-                                    q: undefined,
-                                })
+                                setQuery(placeQueryOf(place))
                             }}
                             onEventSelect={ref => {
                                 openPreview({ type: "occurrence", ref })
                             }}
                             onTextSubmit={text => {
-                                setQuery({ q: text, place: undefined })
+                                setQuery(textQueryOf(text))
                             }}
                         />
                     </div>
@@ -340,35 +337,16 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                     <CategoryChips
                         route={props.route}
                         categories={categories.data ?? []}
-                        counts={
-                            results === undefined
-                                ? undefined
-                                : new Map(
-                                      results.categoryCounts.map(entry => [
-                                          entry.categoryId,
-                                          entry.count,
-                                      ]),
-                                  )
-                        }
+                        counts={results?.categoryCounts}
                         selected={query.category}
-                        onSelect={category => {
-                            setQuery({ category })
-                        }}
+                        onChange={setQuery}
                         className="max-md:flex-wrap"
                     />
                     <DateChips
                         route={props.route}
+                        query={query}
                         now={now}
-                        date={query.date}
-                        from={query.from}
-                        to={query.to}
-                        free={query.free === true}
-                        onChange={filter => {
-                            setQuery(filter)
-                        }}
-                        onFreeChange={free => {
-                            setQuery({ free: free ? true : undefined })
-                        }}
+                        onChange={setQuery}
                         className="max-md:flex-wrap"
                     />
                 </div>

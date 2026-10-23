@@ -1,6 +1,8 @@
 "use client"
 
-import type { Category } from "models"
+import { categoryCountOf, categoryQueryOf } from "domain/map-filters"
+import type { MapQuery } from "domain/map-query"
+import type { Category, PublicSearchResponse } from "models"
 import { useTranslation } from "react-i18next"
 import { Chip, ChipRow } from "ui-components/chip"
 import { PixelIcon } from "ui-components/pixel-icons"
@@ -9,9 +11,9 @@ import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
 interface CategoryChipsProps extends RouteClientComponentProps<"root"> {
     categories: Category[]
-    counts: ReadonlyMap<string, number> | undefined
+    counts: PublicSearchResponse["categoryCounts"] | undefined
     selected: string | undefined
-    onSelect: (categoryId: string | undefined) => void
+    onChange: (change: MapQuery) => void
     className?: string
 }
 
@@ -28,11 +30,11 @@ export const CategoryChips = (props: CategoryChipsProps) => {
                     count={
                         props.counts === undefined
                             ? undefined
-                            : (props.counts.get(category.id) ?? 0)
+                            : categoryCountOf(props.counts, category.id)
                     }
                     pressed={props.selected === category.id}
                     onPressedChange={pressed => {
-                        props.onSelect(pressed ? category.id : undefined)
+                        props.onChange(categoryQueryOf(category.id, pressed))
                     }}
                 />
             ))}
