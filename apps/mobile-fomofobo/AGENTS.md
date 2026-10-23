@@ -93,27 +93,27 @@ lane, never the app on first launch.
 - Google Sheets sync: the namespaces differ from the web apps, so this app uses its own sheet. `scripts/i18n-sheets` finds only `public/locales`, so pass the directory:
     - `pnpm -w i18n:export "$PWD/src/locales"`, from this directory
     - `pnpm -w i18n:download <spreadsheetId> "$PWD/src/locales"`, from this directory
-- **NEVER** hardcode user-facing text, `accessibilityLabel` and `placeholder` included. Add a key, also when both languages use the same text
-- Exception: a dev-only screen keeps plain English. The showcase tab shows only when `__DEV__` is set, and its route redirects to `/` in a production build
+- **NEVER** hardcode user-facing text, `accessibilityLabel` and `placeholder` included. Add a key
+- Exception: a dev-only screen or control keeps plain English. The showcase button shows only when `__DEV__` is set, and the showcase route redirects to `/` in a production build
 - New namespace: add one JSON file for each language. Then register the files in `src/lib/i18n/resources.ts`. If a file is not registered, `src/lib/i18n/locales.test.ts` fails
 - Keys are PascalCase. A key for a list value uses the value: ``t(`Fruits.${value}`)``
-- Keep the value in state, not the label. Get the label with `t()` at render, so it follows a language change
-- The root `ErrorBoundary` in `src/app/_layout.tsx` holds the only English copy in code, for an error before the i18n init completes. Keep it the same as `shared:AppError`
+- Keep the value in state, not the label. Get the label with `t()` at render
+- The root `ErrorBoundary` in `src/app/_layout.tsx` holds the only copy in code, for an error before the i18n init completes. Keep it the same as `shared:AppError`
 - After you add a language to `languageKeys` of the `i18n` package, run `prebuild:clean`. iOS reads the app languages from the `expo-localization` plugin in `app.config.ts`
-- **NEVER** declare an Android per-app language (`supportedLocales.android`). It would compete with the language switcher
+- **NEVER** declare an Android per-app language (`supportedLocales.android`). It adds a language setting to the system settings of the app
 
 ## TanStack Query
 
 - Call `useQuery`/`useMutation` directly at the component level, passing the exported `queryOptions`/`mutationOptions` object
-- **NEVER** wrap in custom `useXxx` hooks - pass the options straight from `api`, e.g. `useQuery(api.listTodosQuery({ params: {}, query: {} }))`, `useMutation(api.createTodoMutation)`
+- **NEVER** wrap in custom `useXxx` hooks - pass the options straight from `api`, e.g. `useQuery(api.listCategoriesQuery({ params: {}, query: {} }))`, `useMutation(api.createEventMutation)`
 - Destructure returns: `{ data: entities, isLoading: entitiesLoading }`, `{ mutate: createEntity }`
 - **NEVER** `query.data` or `mutation.mutate(…)` style
 
 ## API & Data
 
 - The API layer lives in `api-client` - **ALWAYS** add endpoints to `packages/api-client/src/requests.ts`, **NEVER** hand-roll endpoints, paths or bodies in the app
-- `packages/api-client/src/requests.ts` holds the **single** `createApi` function. It declares every request and every query/mutation option flat, then returns them all flat - **NO** namespaces, **NO** nesting. Every name carries the entity: `listTodosQuery`, `createTodoMutation`
-- Consume it as `api.${operation}`, e.g. `api.listTodosQuery(...)`, `api.deleteTodoMutation` - **NEVER** re-export individual operations into app files
+- `packages/api-client/src/requests.ts` holds the **single** `createApi` function. It declares every request and every query/mutation option flat, then returns them all flat - **NO** namespaces, **NO** nesting. Every name carries the entity: `listCategoriesQuery`, `createEventMutation`
+- Consume it as `api.${operation}`, e.g. `api.listCategoriesQuery(...)`, `api.deleteEventMutation` - **NEVER** re-export individual operations into app files
 - AsyncStorage keys: `src/lib/storage/storage-keys.ts`. **NEVER** write a key literal at an AsyncStorage call
 - Responses are validated and params/bodies typed by `api-client` from the route definitions - **NEVER** retype a body or interpolate a path by hand
 

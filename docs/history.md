@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-10-23 · A native app joins the web app
+
+### Changed
+
+The scope adds a native app for iOS and Android with the public features of the web app, no sign-in and no backoffice. It calls the API of the web app and ships through the stores.
+
+### Why
+
+A client request. The client asked for a native app with the features of the public web app, beside the web app that installs on the home screen.
+
+### Check next time
+
+Ask whether the product needs store apps before the estimate. They add the store accounts, a release path on a Mac and a second client to keep in step with the API.
+
 ## 2026-10-22 · Saves reach the server to count interest
 
 ### Changed

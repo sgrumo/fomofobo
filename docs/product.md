@@ -1,12 +1,12 @@
 ---
 standard: draft
 title: fomofobo
-summary: Mobile-first web app that shows events around a place on a map, with a backoffice where organizers publish them.
+summary: Mobile-first web app and native app that show events around a place on a map, with a backoffice where organizers publish them.
 ---
 
 ## Overview
 
-fomofobo is a responsive, mobile-first web app for finding events around a place. Visitors open it with no account, see the events of the coming days as pins on a map, and narrow them by name, place, category and date. Each event has a page that a visitor can open directly or share. Organizers publish their events through a backoffice in the same app, and publishing needs no approval. Admins supervise the organizers, block organizers or events, and manage the shared catalogue of categories. The app installs on the home screen and keeps the events already loaded viewable offline.
+fomofobo is a responsive, mobile-first web app, with a native app for iOS and Android, for finding events around a place. Visitors open it with no account, see the events of the coming days as pins on a map, and narrow them by name, place, category and date. Each event has a page that a visitor can open directly or share. Organizers publish their events through a backoffice in the same app, and publishing needs no approval. Admins supervise the organizers, block organizers or events, and manage the shared catalogue of categories. The web app installs on the home screen, and both apps keep the events already loaded viewable offline.
 
 ## Perimeter
 
@@ -98,6 +98,12 @@ Offline, the pages, events, photos and map areas that the device already loaded 
 
 The saved list works offline for every saved event that the device showed online at least once. The backoffice is not part of the installed app and always needs a connection.
 
+### Native app
+
+A native app for iOS and Android offers the features of the public web app: map, search and filters, preview, event and venue pages, saved events and offline reads (not built). It has no sign-in and no backoffice, and it speaks Italian alone.
+
+The stores install and update the app, in place of the install button and the update prompt of the web app. A version gate asks for a store update when the server marks the installed version as too old, and shows a maintenance notice when the server says so (not built).
+
 ### Backoffice access
 
 Organizers and Admins sign in with email and password, and nobody registers on their own. A blocked organizer cannot sign in and loses every open session at once.
@@ -130,6 +136,7 @@ The event page and the map preview show the count of saves of an occurrence once
 
 - One Next.js application serves the public app, the event pages and the backoffice, because the analysis keeps them in one program. The app speaks Italian alone. The public app keeps the language segment `/it/` in its URLs, so a second language needs no route move, and the backoffice lives under `/backoffice`.
 - Server Components and route handlers serve the public reads, and Server Actions carry the backoffice writes.
+- An Expo app for iOS and Android calls the same API under `/api/*`, with no backend layer of its own, because the API already serves every public read and the save counts.
 - Turso, a hosted libSQL database (SQLite), holds categories, venues, events, occurrences and accounts. Occurrences are stored as rows, because the map search filters them by time window and by area.
 - Cloudflare R2 holds the event photos in a public bucket, because shared and offline pages need a stable photo URL. The backoffice resizes and dithers each photo in the browser, then uploads the 1-bit PNG straight to the bucket, because a dither on the server would spend the CPU budget of the free plan.
 - A daily GitHub workflow runs the photo purge job against the database and the bucket of each environment, on the branch of that environment. The job is a program of its own, so it lives in its own app and not in the Next.js application.
@@ -138,4 +145,4 @@ The event page and the map preview show the count of saves of an occurrence once
 - A service worker of the public app keeps what a visitor loaded and serves it offline. It sends the backoffice, the sign-in and every write straight to the network, because a worker at the root of the site controls the backoffice pages too.
 - The Next data cache holds the shared public reads: the categories, the event pages and the place suggestions. Every backoffice write expires its entries at once, because a block must hide an event on the next request. The save counts stay out of it, because each save would expire the event page.
 - Authentication runs inside the app with database sessions, because Admins create accounts and a block must end every open session at once. Every backoffice API call reads the session from the database, so a block applies on the next call.
-- Deploy: the app runs on Vercel, in the region of its Turso database. Every service runs on its free plan. The Vercel Hobby plan admits non-commercial use only.
+- Deploy: the app runs on Vercel, in the region of its Turso database. Every service runs on its free plan. The Vercel Hobby plan admits non-commercial use only. A person builds the native app with Fastlane on a Mac, with no CI workflow: testers get it from Firebase App Distribution, and users from the App Store and Google Play.
