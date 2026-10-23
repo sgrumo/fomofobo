@@ -27,7 +27,8 @@
         "MoreHere_other": "{{count}} altri risultati qui",
         "Cluster": "{{count}} luoghi: {{live}} con eventi in corso, {{upcoming}} con eventi in arrivo, {{ended}} con eventi finiti, {{permanent}} tra cinema, musei, teatri e gallerie. Ingrandisci",
         "Error": "Non è stato possibile caricare gli eventi. Mostro gli ultimi risultati.",
-        "Truncated": "Troppi eventi per mostrarli tutti. Restringi la ricerca."
+        "Truncated": "Troppi eventi per mostrarli tutti. Restringi la ricerca.",
+        "PastDateRange": "Le date scelte iniziano prima di oggi. Scegline di nuove."
     },
     "Search": {
         "Label": "Cerca eventi o luoghi",
@@ -44,7 +45,15 @@
         "NeedsConnection": "La ricerca dei luoghi richiede la connessione."
     },
     "Filters": {
-        "Categories": "Categorie"
+        "Categories": "Categorie",
+        "DatesAndPrice": "Date e prezzo",
+        "today": "Oggi",
+        "tomorrow": "Domani",
+        "weekend": "Weekend",
+        "Range": "Date…",
+        "RangeTitle": "Scegli le date",
+        "Apply": "Applica",
+        "Clear": "Cancella"
     },
     "Status": {
         "live": "In corso",

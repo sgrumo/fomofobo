@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { match } from "ts-pattern"
 
 import { CategoryChips } from "@/components/map/category-chips"
+import { DateChips } from "@/components/map/date-chips"
 import { EventMap } from "@/components/map/event-map"
 import { EventPreview } from "@/components/map/event-preview"
 import type { PreviewEntry, PreviewVenue } from "@/components/map/event-preview"
@@ -23,6 +24,7 @@ import { Notice } from "@/components/ui/notice/notice"
 import { Spinner } from "@/components/ui/spinner/spinner"
 import { Text } from "@/components/ui/text/text"
 import { showToast } from "@/components/ui/toast/toast-store"
+import { ApiResponseError } from "@/lib/api/api-response-error"
 import { api } from "@/lib/api/client"
 import { useNow } from "@/lib/hooks/use-now"
 
@@ -78,7 +80,7 @@ const MapScreen = () => {
     const {
         data: search,
         isFetching: searchFetching,
-        isError: searchFailed,
+        error: searchError,
     } = useQuery({
         ...api.searchOccurrencesQuery({
             params: {},
@@ -240,6 +242,7 @@ const MapScreen = () => {
                     selected={query.category}
                     onChange={setQuery}
                 />
+                <DateChips query={query} now={now} onChange={setQuery} />
                 {__DEV__ && (
                     <Link href="/showcase" asChild={true}>
                         <Button
@@ -268,7 +271,17 @@ const MapScreen = () => {
                         </Button>
                     </View>
                 )}
-                {searchFailed && <Notice tone="error" lines={[t("Map.Error")]} />}
+                {searchError !== null && (
+                    <Notice
+                        tone="error"
+                        lines={[
+                            searchError instanceof ApiResponseError &&
+                            searchError.apiError?.code === "PastDateRange"
+                                ? t("Map.PastDateRange")
+                                : t("Map.Error"),
+                        ]}
+                    />
+                )}
                 {results?.truncated === true && (
                     <Notice tone="warning" lines={[t("Map.Truncated")]} />
                 )}
