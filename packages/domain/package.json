@@ -1,0 +1,33 @@
+{
+    "name": "domain",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        "./local-format": "./src/local-format.ts",
+        "./occurrence-progress": "./src/occurrence-progress.ts",
+        "./occurrence-status": "./src/occurrence-status.ts",
+        "./platform": "./src/platform.ts"
+    },
+    "scripts": {
+        "clean": "rm -rf *.tsbuildinfo",
+        "typecheck": "tsc -b",
+        "typecheck:watch": "tsc -b -w",
+        "lint": "oxlint --config oxlint.config.ts",
+        "lint:fix": "oxlint --config oxlint.config.ts --fix",
+        "test": "vitest --run",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "@date-fns/tz": "catalog:",
+        "date-fns": "catalog:",
+        "es-toolkit": "catalog:",
+        "models": "workspace:*"
+    },
+    "devDependencies": {
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:"
+    }
+}

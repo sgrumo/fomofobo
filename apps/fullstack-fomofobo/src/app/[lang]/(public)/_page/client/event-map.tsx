@@ -1,5 +1,8 @@
 "use client"
 
+import { dayMonthOf, localDateOf, localTimeOf } from "domain/local-format"
+import { occurrenceStatus } from "domain/occurrence-status"
+import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { Map as MapLibreMap, setWorkerUrl } from "maplibre-gl"
 import type {
     CategoryIcon,
@@ -13,9 +16,6 @@ import { useTranslation } from "react-i18next"
 import { Alert } from "ui-components/alert"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
-import { localDateOf } from "@/lib/events/date-window"
-import { dayMonthOf, localTimeOf } from "@/lib/events/local-format"
-import { occurrenceStatus } from "@/lib/events/occurrence-status"
 import {
     buildEventClusters,
     CLUSTER_MAX_ZOOM,
@@ -26,7 +26,6 @@ import {
 } from "@/lib/map/event-clusters"
 import type { EventMapFeature, MapPointKind } from "@/lib/map/event-clusters"
 import { mapStyle } from "@/lib/map/map-style"
-import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"

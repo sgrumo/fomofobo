@@ -1,6 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
+import { formatLocalDateTime } from "domain/local-format"
 import { identity } from "es-toolkit"
 import type { EventListItem } from "models"
 import { useRouter } from "next/navigation"
@@ -28,7 +29,6 @@ import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
 import { BACKOFFICE_PAGE_SIZE, ORGANIZER_PICKER_SIZE } from "@/lib/backoffice/lists"
-import { formatLocalDateTime } from "@/lib/events/local-format"
 import { useMutationFeedback } from "@/lib/hooks/use-mutation-feedback"
 
 const STATE_FILTERS = ["blocked", "active"] as const

@@ -1,6 +1,8 @@
 "use client"
 
 import { format, isBefore, parseISO } from "date-fns"
+import { localDateOf } from "domain/local-format"
+import { PLATFORM_TIME_ZONE } from "domain/platform"
 import type { DateFilterKind, LocalDate } from "models"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -15,8 +17,6 @@ import { DateInput } from "ui-components/date-input"
 import { Field } from "ui-components/field"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
-import { localDateOf } from "@/lib/events/date-window"
-import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 interface DateFilter {
     date: DateFilterKind | undefined

@@ -1,6 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
+import { DEFAULT_CITY } from "domain/platform"
 import { cn } from "frontend-shared/styles"
 import type { GeoPoint, OccurrenceRef, OccurrenceSummary } from "models"
 import dynamic from "next/dynamic"
@@ -28,7 +29,6 @@ import { roundCenter } from "@/lib/geo/round-center"
 import { useGeolocation } from "@/lib/hooks/use-geolocation"
 import { useNow } from "@/lib/hooks/use-now"
 import { useOnline } from "@/lib/hooks/use-online"
-import { DEFAULT_CITY } from "@/lib/platform/platform"
 
 import { CategoryChips } from "./category-chips"
 import { DateChips } from "./date-chips"

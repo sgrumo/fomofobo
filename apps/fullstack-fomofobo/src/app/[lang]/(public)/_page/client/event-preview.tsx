@@ -1,5 +1,9 @@
 "use client"
 
+import { localTimeOf } from "domain/local-format"
+import { occurrenceProgress } from "domain/occurrence-progress"
+import { occurrenceStatus } from "domain/occurrence-status"
+import { PLATFORM_TIME_ZONE } from "domain/platform"
 import type { Category, OccurrenceSummary, PublicVenue } from "models"
 import Image from "next/image"
 import type { ReactNode } from "react"
@@ -23,11 +27,7 @@ import { SaveToggle } from "@/components/client/save-toggle/save-toggle"
 import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
-import { localTimeOf } from "@/lib/events/local-format"
-import { occurrenceProgress } from "@/lib/events/occurrence-progress"
-import { occurrenceStatus } from "@/lib/events/occurrence-status"
 import { usePriceSummary } from "@/lib/hooks/use-price-summary"
-import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 
 interface PreviewPaging {
     index: number

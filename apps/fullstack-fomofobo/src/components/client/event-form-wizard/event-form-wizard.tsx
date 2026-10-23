@@ -1,5 +1,6 @@
 "use client"
 
+import { formatLocalDateTime } from "domain/local-format"
 import type { Category } from "models"
 import { priceSchemeSchema } from "models"
 import { useState } from "react"
@@ -22,7 +23,6 @@ import {
     localDateTimeOf,
     priceSchemeOf,
 } from "@/components/client/event-form/event-form.state"
-import { formatLocalDateTime } from "@/lib/events/local-format"
 import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 
 import type { EventFormStep } from "./event-form-wizard.steps"

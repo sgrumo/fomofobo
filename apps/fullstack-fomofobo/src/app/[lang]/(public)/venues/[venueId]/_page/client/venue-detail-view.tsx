@@ -1,6 +1,9 @@
 "use client"
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { formatLocalDate, localTimeOf, weekdayDateOf } from "domain/local-format"
+import { occurrenceStatus } from "domain/occurrence-status"
+import { PLATFORM_TIME_ZONE } from "domain/platform"
 import type { LanguageKey } from "i18n/i18n"
 import type { OccurrenceSummary, VenueHistoryItem } from "models"
 import Image from "next/image"
@@ -26,11 +29,8 @@ import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
-import { formatLocalDate, localTimeOf, weekdayDateOf } from "@/lib/events/local-format"
-import { occurrenceStatus } from "@/lib/events/occurrence-status"
 import { useBackToMap } from "@/lib/hooks/use-back-to-map"
 import { useNow } from "@/lib/hooks/use-now"
-import { PLATFORM_TIME_ZONE } from "@/lib/platform/platform"
 import { VENUE_HISTORY_PAGE_SIZE } from "@/lib/venues/history"
 
 const CLOCK_TICK_MS = 60_000

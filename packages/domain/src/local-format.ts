@@ -3,6 +3,14 @@ import { format } from "date-fns"
 import type { LocalDate, LocalDateTime } from "models"
 
 /**
+ * @description Returns the local `yyyy-MM-dd` date of an instant in the zone
+ * @param instant Instant read
+ * @param timeZone IANA zone of the wall clock
+ */
+export const localDateOf = (instant: Date, timeZone: string): string =>
+    format(instant, "yyyy-MM-dd", { in: tz(timeZone) })
+
+/**
  * @description Returns the `HH:mm` wall-clock time of an instant in the zone
  * @param instant Instant read
  * @param timeZone IANA zone of the wall clock
