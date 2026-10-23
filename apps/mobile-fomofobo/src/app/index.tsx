@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { centerQueryOf, searchCenterOf } from "domain/map-center"
 import { Link } from "expo-router"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -17,8 +17,11 @@ import { Spinner } from "@/components/ui/spinner/spinner"
 import { Text } from "@/components/ui/text/text"
 import { showToast } from "@/components/ui/toast/toast-store"
 import { api } from "@/lib/api/client"
+import { useNow } from "@/lib/hooks/use-now"
 
 const TOAST_DURATION_MS = 5000
+
+const CLOCK_TICK_MS = 60_000
 
 // Clears the attribution line at the bottom edge
 const CONTROLS_BOTTOM_OFFSET = 32
@@ -28,6 +31,7 @@ const MapScreen = () => {
     const insets = useSafeAreaInsets()
     const { query, setQuery } = useMapQuery()
     const location = useDeviceLocation()
+    const now = useNow(CLOCK_TICK_MS)
     const { center, hasQueryCenter, locationOff, searchReady } = searchCenterOf(
         query,
         location.state.status,
@@ -44,7 +48,10 @@ const MapScreen = () => {
         }
     }, [fixLatitude, fixLongitude, hasQueryCenter, setQuery])
 
-    const { isFetching: searchFetching } = useQuery({
+    const { data: categories } = useQuery(
+        api.listCategoriesQuery({ params: {}, query: {} }),
+    )
+    const { data: search, isFetching: searchFetching } = useQuery({
         ...api.searchOccurrencesQuery({
             params: {},
             query: {
@@ -60,6 +67,15 @@ const MapScreen = () => {
         }),
         enabled: searchReady,
     })
+
+    // A failed search keeps the last results on the map.
+    const [results, setResults] = useState(search)
+    if (search !== undefined && search !== results) {
+        setResults(search)
+    }
+
+    const categoriesById = new Map(categories?.map(category => [category.id, category]))
+    const iconOf = (categoryId: string) => categoriesById.get(categoryId)?.icon ?? "other"
 
     const locate = async () => {
         const result = await location.locate()
@@ -83,7 +99,24 @@ const MapScreen = () => {
 
     return (
         <View className="flex-1 bg-map-ground">
-            <EventMap center={center} position={position} />
+            <EventMap
+                center={center}
+                position={position}
+                occurrences={results?.occurrences ?? []}
+                permanentVenues={results?.permanentVenues ?? []}
+                iconOf={iconOf}
+                now={now}
+                onSelect={ref => {
+                    setQuery({
+                        event: ref.eventId,
+                        occurrence: ref.date,
+                        venue: undefined,
+                    })
+                }}
+                onSelectVenue={venueId => {
+                    setQuery({ event: undefined, occurrence: undefined, venue: venueId })
+                }}
+            />
             <View
                 className="absolute inset-x-4 gap-2"
                 style={{ top: insets.top + 8 }}

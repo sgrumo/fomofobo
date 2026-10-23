@@ -90,6 +90,11 @@ lane, never the app on first launch.
 - The app reads `env.appEnv`. Gate environment-dependent behaviour on it with an exhaustive
   `match`, never on `__DEV__`, which is about the JS bundle and not the target environment.
 
+## Hermes
+
+- Hermes lacks `Object.groupBy`, `Map.groupBy` and `Array.prototype.toSorted`. `src/app/_layout.tsx` imports their `core-js` polyfills before any other module. Before app code uses another built-in that Hermes lacks, add its polyfill there
+- Check a built-in on the simulator with `typeof`: the Node unit tests have every built-in
+
 ## Config stack
 
 - The app imports `appEnvValues` from `config/target.ts`, so that file **MUST NOT** import a Node module

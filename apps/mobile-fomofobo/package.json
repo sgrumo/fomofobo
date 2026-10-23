@@ -35,6 +35,7 @@
         "api-client": "workspace:*",
         "class-variance-authority": "^0.7.1",
         "clsx": "catalog:",
+        "core-js": "~3.50.0",
         "date-fns": "catalog:",
         "domain": "workspace:*",
         "expo": "~57.0.7",

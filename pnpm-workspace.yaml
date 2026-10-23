@@ -81,6 +81,7 @@ minimumReleaseAgeExcludePrune: true
 
 allowBuilds:
   "@swc/core": false
+  core-js: false
   cpu-features: false
   esbuild: false
   protobufjs: false

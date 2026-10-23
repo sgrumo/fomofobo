@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
 
 import {
+    dashWedgesPath,
     innerProfile,
     PIXEL_CIRCLE_PROFILES,
     PIXEL_CORNER_PROFILE,
@@ -86,5 +87,12 @@ describe("pixel shapes", () => {
         expect(steppedPath(10, 10, [1], 3)).toBe(
             "M3 4 L4 4 L4 3 L12 3 L12 4 L13 4 L13 12 L12 12 L12 13 L4 13 L4 12 L3 12 Z",
         )
+    })
+
+    it("draw twelve dash wedges, the first from 12 o'clock to 15 degrees clockwise", () => {
+        const path = dashWedgesPath(36, 36)
+
+        expect(path.split("M")).toHaveLength(13)
+        expect(path).toMatch(/^M18 18 L18 -54 L36\.6\d* -51\.5\d* Z/u)
     })
 })

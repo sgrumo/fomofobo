@@ -1,3 +1,7 @@
+// Built-ins that the repo code style relies on and that Hermes lacks
+import "core-js/actual/array/to-sorted"
+import "core-js/actual/map/group-by"
+import "core-js/actual/object/group-by"
 import "@/lib/env"
 import "@/lib/api/app-focus"
 import "../global.css"

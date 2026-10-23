@@ -92,3 +92,27 @@ export const steppedPath = (
     `M${steppedPolygon(width, height, profile)
         .map(([x, y]) => `${String(x + offset)} ${String(y + offset)}`)
         .join(" L")} Z`
+
+// Degrees of one dash and of one gap of a dashed ring, the `repeating-conic-gradient` of the web
+const DASH_DEGREES = 15
+
+/**
+ * @description Builds the SVG path data of the dash wedges of a dashed ring: one triangle per
+ * dash, clockwise from 12 o'clock, reaching past the corners of the box
+ * @param width Box width in points
+ * @param height Box height in points
+ * @param offset Distance moved right and down
+ */
+export const dashWedgesPath = (width: number, height: number, offset = 0): string => {
+    const centerX = width / 2 + offset
+    const centerY = height / 2 + offset
+    const reach = width + height
+    const pointAt = (degrees: number) => {
+        const radians = (degrees * Math.PI) / 180
+        return `${String(centerX + reach * Math.sin(radians))} ${String(centerY - reach * Math.cos(radians))}`
+    }
+    return Array.from({ length: 360 / (2 * DASH_DEGREES) }, (_, dash) => {
+        const from = dash * 2 * DASH_DEGREES
+        return `M${String(centerX)} ${String(centerY)} L${pointAt(from)} L${pointAt(from + DASH_DEGREES)} Z`
+    }).join(" ")
+}

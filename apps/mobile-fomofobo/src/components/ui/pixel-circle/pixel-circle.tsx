@@ -15,6 +15,7 @@ interface PixelCircleProps {
     fill?: ThemeColor
     ink?: ThemeColor
     shadow?: HardShadowSize
+    dashed?: boolean
     className?: string
     children?: ReactNode
 }
@@ -34,6 +35,7 @@ const PixelCircle = (props: PixelCircleProps) => (
             fill={props.fill ?? "surface"}
             ink={props.ink ?? "line"}
             shadow={props.shadow}
+            dashed={props.dashed}
         />
         {props.children}
     </View>

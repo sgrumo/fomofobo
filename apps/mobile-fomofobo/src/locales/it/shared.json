@@ -19,6 +19,23 @@
         "LocationUnavailable": {
             "Title": "Posizione non disponibile",
             "Description": "Il dispositivo non riesce a rilevare la posizione. Cerca un luogo."
-        }
+        },
+        "LiveBadge": "Live",
+        "Pin": "{{title}}, {{status}}, {{time}}",
+        "VenuePin": "{{name}}, {{kind}}",
+        "MoreHere_one": "{{count}} altro risultato qui",
+        "MoreHere_other": "{{count}} altri risultati qui"
+    },
+    "Status": {
+        "live": "In corso",
+        "upcoming": "In arrivo",
+        "ended": "Finito"
+    },
+    "VenueKind": {
+        "regular": "Locale",
+        "cinema": "Cinema",
+        "museum": "Museo",
+        "theatre": "Teatro",
+        "gallery": "Galleria"
     }
 }
