@@ -1,3 +1,4 @@
+import { pixelIconNames } from "domain/pixel-icons"
 import { Redirect } from "expo-router"
 import { useState } from "react"
 import { ScrollView, View } from "react-native"
@@ -12,7 +13,11 @@ import {
     CardTitle,
 } from "@/components/ui/card/card"
 import { Checkbox } from "@/components/ui/checkbox/checkbox"
+import { DitheredPhoto } from "@/components/ui/dithered-photo/dithered-photo"
 import { Input } from "@/components/ui/input/input"
+import { PixelCircle } from "@/components/ui/pixel-circle/pixel-circle"
+import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
+import { PixelPanel } from "@/components/ui/pixel-panel/pixel-panel"
 import { RadioGroup } from "@/components/ui/radio-group/radio-group"
 import { MultiSelect } from "@/components/ui/select/multi-select"
 import { Select } from "@/components/ui/select/select"
@@ -22,6 +27,8 @@ import { SegmentedTabs } from "@/components/ui/tabs/tabs"
 import type { TabItem } from "@/components/ui/tabs/tabs"
 import { Text } from "@/components/ui/text/text"
 import { toast, toastError, toastSuccess } from "@/components/ui/toast/toast"
+import { env } from "@/lib/env"
+import { hardShadow } from "@/lib/theme/hard-shadow"
 
 const noop = () => {
     // No operation
@@ -69,6 +76,47 @@ const TypographyShowcase = () => (
         <Text variant="muted">Muted text for secondary content</Text>
         <Text variant="blockquote">This is a blockquote with italic styling</Text>
         <Text variant="code">const x = &quot;inline code&quot;</Text>
+    </ShowcaseSection>
+)
+
+const PixelShowcase = () => (
+    <ShowcaseSection title="Pixel">
+        <View className="flex-row flex-wrap gap-3">
+            {pixelIconNames.map(name => (
+                <PixelIcon key={name} name={name} size={24} />
+            ))}
+        </View>
+        <View className="flex-row flex-wrap items-center gap-4">
+            <PixelCircle size={32} fill="live" shadow="md">
+                <PixelIcon name="music" centered={true} />
+            </PixelCircle>
+            <PixelCircle size={36} fill="upcoming" shadow="md">
+                <PixelIcon name="comedy" centered={true} />
+            </PixelCircle>
+            <PixelCircle size={40} fill="ended" shadow="md">
+                <PixelIcon name="art" centered={true} />
+            </PixelCircle>
+            <PixelCircle size={48} fill="permanent" shadow="md">
+                <PixelIcon name="cinema" size={20} centered={true} />
+            </PixelCircle>
+            <PixelCircle size={48} fill="surface-inverse">
+                <PixelIcon name="locate" size={20} color="fg-inverse" centered={true} />
+            </PixelCircle>
+        </View>
+        <PixelPanel shadow="md" className="px-3 py-2.5">
+            <Text className="tp-pixel-md">Pixel corners panel</Text>
+        </PixelPanel>
+        <View
+            className="self-start rounded-md border-2 border-line bg-social px-3 py-2"
+            style={hardShadow("md")}
+        >
+            <Text className="tp-pixel-sm">Hard shadow</Text>
+        </View>
+        <DitheredPhoto
+            uri={`${env.apiUrl}/fallbacks/music.png`}
+            label="Dithered fallback photo"
+            className="aspect-video w-full border-2 border-line"
+        />
     </ShowcaseSection>
 )
 
@@ -298,6 +346,7 @@ const ShowcaseScreen = () =>
                 UI Components
             </Text>
             <TypographyShowcase />
+            <PixelShowcase />
             <ButtonShowcase />
             <InputShowcase />
             <CardShowcase />
