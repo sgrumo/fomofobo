@@ -8,6 +8,7 @@ const APP_DIR = path.resolve(ROOT_DIR, "apps/fullstack-fomofobo")
 const SUITE_DIR = import.meta.dirname
 const STORAGE_DIR = path.resolve(ROOT_DIR, "packages/storage")
 const DATABASE_DIR = path.resolve(ROOT_DIR, ".ignored/e2e-databases")
+const DATA_CACHE_DIR = path.resolve(APP_DIR, ".next/cache/fetch-cache")
 
 export const LOCALES_DIR = path.resolve(APP_DIR, "public/locales")
 
@@ -27,9 +28,11 @@ export const VERSION_GATE_ENV = {
 }
 
 /**
- * @description Builds the production bundle of the app with `next build`
+ * @description Builds the production bundle of the app with `next build`, on an empty data cache
  */
 export const buildApp = () => {
+    // `next start` keeps `unstable_cache` reads here across runs, each run on a fresh database file.
+    rmSync(DATA_CACHE_DIR, { recursive: true, force: true })
     exec("pnpm build", "Next build", APP_DIR)
 }
 
