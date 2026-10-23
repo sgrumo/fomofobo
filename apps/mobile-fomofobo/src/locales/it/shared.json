@@ -45,6 +45,8 @@
         "NeedsConnection": "La ricerca dei luoghi richiede la connessione."
     },
     "Filters": {
+        "Label": "Filtri",
+        "LabelActive": "Filtri, alcuni attivi",
         "Categories": "Categorie",
         "DatesAndPrice": "Date e prezzo",
         "today": "Oggi",

@@ -1,6 +1,6 @@
 import type { PixelIconName } from "domain/pixel-icons"
 import type { ReactNode } from "react"
-import { Pressable, ScrollView } from "react-native"
+import { Pressable, ScrollView, View } from "react-native"
 
 import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
 import { Text } from "@/components/ui/text/text"
@@ -13,26 +13,38 @@ import {
     chipCountVariants,
     chipLabelVariants,
     chipRowStyles,
+    chipRowWrapStyles,
     chipVariants,
 } from "./chip.styles"
 
 interface ChipRowProps {
     label: string
+    // Wraps the chips onto more lines instead of scrolling them sideways
+    wrap?: boolean
     children?: ReactNode
     className?: string
 }
 
-const ChipRow = (props: ChipRowProps) => (
-    <ScrollView
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        role="group"
-        accessibilityLabel={props.label}
-        contentContainerClassName={cn(chipRowStyles, props.className)}
-    >
-        {props.children}
-    </ScrollView>
-)
+const ChipRow = (props: ChipRowProps) =>
+    props.wrap === true ? (
+        <View
+            role="group"
+            accessibilityLabel={props.label}
+            className={cn(chipRowStyles, chipRowWrapStyles, props.className)}
+        >
+            {props.children}
+        </View>
+    ) : (
+        <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            role="group"
+            accessibilityLabel={props.label}
+            contentContainerClassName={cn(chipRowStyles, props.className)}
+        >
+            {props.children}
+        </ScrollView>
+    )
 
 interface ChipProps {
     label: string

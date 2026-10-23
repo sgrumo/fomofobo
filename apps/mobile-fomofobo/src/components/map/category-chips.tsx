@@ -16,7 +16,7 @@ export const CategoryChips = (props: CategoryChipsProps) => {
     const { t } = useTranslation("shared")
 
     return (
-        <ChipRow label={t("Filters.Categories")}>
+        <ChipRow label={t("Filters.Categories")} wrap={true}>
             {props.categories.map(category => (
                 <Chip
                     key={category.id}

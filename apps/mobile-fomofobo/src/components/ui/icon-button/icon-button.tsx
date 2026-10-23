@@ -23,6 +23,7 @@ interface IconButtonProps {
     // Flips the icon left to right, for a forward arrow drawn from `back`
     mirrored?: boolean
     disabled?: boolean
+    expanded?: boolean
     className?: string
 }
 
@@ -35,7 +36,10 @@ const IconButton = (props: IconButtonProps) => {
         <Pressable
             accessibilityRole="button"
             accessibilityLabel={props.label}
-            accessibilityState={{ disabled: props.disabled === true }}
+            accessibilityState={{
+                disabled: props.disabled === true,
+                expanded: props.expanded,
+            }}
             disabled={props.disabled}
             hitSlop={Math.max(0, (ICON_BUTTON_TARGET - size.circle) / 2)}
             onPress={props.onPress}

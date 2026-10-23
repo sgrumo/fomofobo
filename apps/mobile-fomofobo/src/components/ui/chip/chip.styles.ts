@@ -2,6 +2,8 @@ import { cva } from "class-variance-authority"
 
 export const chipRowStyles = "flex-row items-center gap-1.5 px-0.5 pb-1 pt-0.5"
 
+export const chipRowWrapStyles = "flex-wrap gap-y-2"
+
 export const chipVariants = cva(
     "h-7 flex-row items-center gap-1.5 rounded-md border-2 border-line px-2.5",
     {

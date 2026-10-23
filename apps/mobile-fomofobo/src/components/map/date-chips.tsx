@@ -82,7 +82,7 @@ export const DateChips = (props: DateChipsProps) => {
     return (
         <>
             {/* The free chip shares the row: one more row covers more of the map */}
-            <ChipRow label={t("Filters.DatesAndPrice")}>
+            <ChipRow label={t("Filters.DatesAndPrice")} wrap={true}>
                 {QUICK_DATE_KINDS.map(kind => (
                     <Chip
                         key={kind}

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { centerQueryOf, searchCenterOf } from "domain/map-center"
+import { hasActiveFilters } from "domain/map-filters"
 import { placeQueryOf, textQueryOf } from "domain/map-search"
 import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
 import { Link } from "expo-router"
@@ -21,6 +22,7 @@ import { useMapQuery } from "@/components/map/use-map-query"
 import { Button } from "@/components/ui/button/button"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { Notice } from "@/components/ui/notice/notice"
+import { PixelPanel } from "@/components/ui/pixel-panel/pixel-panel"
 import { Spinner } from "@/components/ui/spinner/spinner"
 import { Text } from "@/components/ui/text/text"
 import { showToast } from "@/components/ui/toast/toast-store"
@@ -58,6 +60,8 @@ const MapScreen = () => {
     const { query, setQuery } = useMapQuery()
     const location = useDeviceLocation()
     const now = useNow(CLOCK_TICK_MS)
+    const [filtersOpen, setFiltersOpen] = useState(false)
+    const filtersActive = hasActiveFilters(query)
     const { center, hasQueryCenter, locationOff, searchReady } = searchCenterOf(
         query,
         location.state.status,
@@ -217,32 +221,63 @@ const MapScreen = () => {
                 style={{ top: insets.top + 8 }}
                 pointerEvents="box-none"
             >
-                <PlaceSearch
-                    // A new place, or a recenter that clears it, resets the typed text
-                    key={query.place ?? ""}
-                    center={center}
-                    initialText={query.place ?? query.q ?? ""}
-                    onPlaceSelect={place => {
-                        setQuery(placeQueryOf(place))
-                    }}
-                    onEventSelect={ref => {
-                        setQuery({
-                            event: ref.eventId,
-                            occurrence: ref.date,
-                            venue: undefined,
-                        })
-                    }}
-                    onTextSubmit={text => {
-                        setQuery(textQueryOf(text))
-                    }}
-                />
-                <CategoryChips
-                    categories={categories ?? []}
-                    counts={results?.categoryCounts}
-                    selected={query.category}
-                    onChange={setQuery}
-                />
-                <DateChips query={query} now={now} onChange={setQuery} />
+                <View className="flex-row items-start gap-2">
+                    <View className="min-w-0 flex-1">
+                        <PlaceSearch
+                            // A new place, or a recenter that clears it, resets the typed text
+                            key={query.place ?? ""}
+                            center={center}
+                            initialText={query.place ?? query.q ?? ""}
+                            onPlaceSelect={place => {
+                                setQuery(placeQueryOf(place))
+                            }}
+                            onEventSelect={ref => {
+                                setQuery({
+                                    event: ref.eventId,
+                                    occurrence: ref.date,
+                                    venue: undefined,
+                                })
+                            }}
+                            onTextSubmit={text => {
+                                setQuery(textQueryOf(text))
+                            }}
+                        />
+                    </View>
+                    <View className="h-11 justify-center">
+                        <IconButton
+                            icon="filter"
+                            label={
+                                filtersActive
+                                    ? t("Filters.LabelActive")
+                                    : t("Filters.Label")
+                            }
+                            tone={filtersOpen ? "inverse" : "surface"}
+                            expanded={filtersOpen}
+                            onPress={() => {
+                                setFiltersOpen(open => !open)
+                            }}
+                        />
+                        {filtersActive && (
+                            <View
+                                pointerEvents="none"
+                                className="absolute -right-0.5 top-0 h-3 w-3 border-2 border-line bg-live"
+                            />
+                        )}
+                    </View>
+                </View>
+                {filtersOpen && (
+                    <PixelPanel shadow="md">
+                        <View className="gap-2 p-2">
+                            <CategoryChips
+                                categories={categories ?? []}
+                                counts={results?.categoryCounts}
+                                selected={query.category}
+                                onChange={setQuery}
+                            />
+                            <DateChips query={query} now={now} onChange={setQuery} />
+                        </View>
+                    </PixelPanel>
+                )}
                 {__DEV__ && (
                     <Link href="/showcase" asChild={true}>
                         <Button
