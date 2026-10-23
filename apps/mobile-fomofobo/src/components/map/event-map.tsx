@@ -1,10 +1,13 @@
-import { Camera, Map } from "@maplibre/maplibre-react-native"
+import { Camera, Map, Marker } from "@maplibre/maplibre-react-native"
 import type { CameraRef } from "@maplibre/maplibre-react-native"
+import { markerLayer } from "domain/event-clusters"
 import { mapStyle } from "domain/map-style"
 import type { GeoPoint } from "models"
 import { useEffect, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import { View } from "react-native"
+
+import { hardShadow } from "@/lib/theme/hard-shadow"
 
 import { MapAttribution } from "./map-attribution"
 
@@ -12,6 +15,7 @@ const INITIAL_ZOOM = 13
 
 interface EventMapProps {
     center: GeoPoint
+    position: GeoPoint | undefined
 }
 
 export const EventMap = (props: EventMapProps) => {
@@ -42,6 +46,21 @@ export const EventMap = (props: EventMapProps) => {
                         zoom: INITIAL_ZOOM,
                     }}
                 />
+                {props.position !== undefined && (
+                    <Marker
+                        lngLat={[props.position.longitude, props.position.latitude]}
+                        anchor="center"
+                        style={{ zIndex: markerLayer("live") + 1 }}
+                    >
+                        <View
+                            accessible={true}
+                            accessibilityRole="image"
+                            accessibilityLabel={t("Map.Position")}
+                            className="h-4 w-4 rounded-full border-2 border-line bg-position"
+                            style={hardShadow("sm")}
+                        />
+                    </Marker>
+                )}
             </Map>
             <MapAttribution />
         </View>

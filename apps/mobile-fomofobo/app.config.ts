@@ -83,9 +83,14 @@ const config: ExpoConfig = {
     web: {
         favicon: "./assets/favicon.png",
     },
+    // Copy of the native permission prompts
+    locales: Object.fromEntries(
+        languageKeys.map(language => [language, `./native-locales/${language}.json`]),
+    ),
     plugins: [
         "expo-router",
         "@maplibre/maplibre-react-native",
+        "expo-location",
         // iOS reads the app languages for its native UI and its store listing
         ["expo-localization", { supportedLocales: { ios: languageKeys } }],
         [

@@ -1,11 +1,10 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { DEFAULT_CITY } from "domain/platform"
-import { roundCenter } from "domain/round-center"
+import { centerQueryOf, searchCenterOf } from "domain/map-center"
 import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
 import { cn } from "frontend-shared/styles"
-import type { GeoPoint, OccurrenceRef, OccurrenceSummary } from "models"
+import type { OccurrenceRef, OccurrenceSummary } from "models"
 import dynamic from "next/dynamic"
 import { useEffect, useId, useRef, useState } from "react"
 import { useLanguage } from "react-i18n/hooks"
@@ -42,15 +41,6 @@ const EventMap = dynamic(() => import("./event-map").then(module => module.Event
 })
 
 const CLOCK_TICK_MS = 60_000
-
-/**
- * @description Returns the query keys that make the point the search center
- * @param point Point that becomes the center
- */
-const centerQuery = (point: GeoPoint) => {
-    const { latitude, longitude } = roundCenter(point)
-    return { lat: latitude, lng: longitude }
-}
 
 type PreviewTarget =
     | { type: "occurrence"; ref: OccurrenceRef }
@@ -96,22 +86,19 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
     const filtersActive =
         query.category !== undefined || query.date !== undefined || query.free === true
 
-    const urlCenter =
-        query.lat === undefined || query.lng === undefined
-            ? undefined
-            : { latitude: query.lat, longitude: query.lng }
-    const hasUrlCenter = urlCenter !== undefined
-    const center = urlCenter ?? DEFAULT_CITY.center
+    const {
+        center,
+        hasQueryCenter: hasUrlCenter,
+        locationOff,
+        searchReady,
+    } = searchCenterOf(query, geolocation.state.status)
     const position =
         geolocation.state.status === "granted" ? geolocation.state.position : undefined
-    const locationOff =
-        geolocation.state.status === "denied" ||
-        geolocation.state.status === "unavailable"
 
     // The first position becomes the center, unless the URL already names one.
     useEffect(() => {
         if (position !== undefined && !hasUrlCenter) {
-            setQuery(centerQuery(position))
+            setQuery(centerQueryOf(position))
         }
     }, [position, hasUrlCenter, setQuery])
 
@@ -130,8 +117,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 to: query.to,
             },
         }),
-        // Waits for the first answer of the browser, so the default city never flashes by.
-        enabled: hasUrlCenter || locationOff,
+        enabled: searchReady,
     })
 
     // A failed search keeps the last results on the map.
@@ -230,7 +216,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
         const result = await geolocation.locate()
         match(result)
             .with({ status: "granted" }, granted => {
-                setQuery({ ...centerQuery(granted.position), place: undefined })
+                setQuery({ ...centerQueryOf(granted.position), place: undefined })
             })
             .with({ status: "denied" }, () => {
                 toast.add({
@@ -309,7 +295,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                             initialText={query.place ?? query.q ?? ""}
                             onPlaceSelect={place => {
                                 setQuery({
-                                    ...centerQuery(place.coordinates),
+                                    ...centerQueryOf(place.coordinates),
                                     place: place.label,
                                     q: undefined,
                                 })

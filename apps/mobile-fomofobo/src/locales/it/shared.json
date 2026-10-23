@@ -10,6 +10,15 @@
             "OpenFreeMap": "OpenFreeMap",
             "OpenMapTiles": "© OpenMapTiles",
             "OpenStreetMap": "© OpenStreetMap"
+        },
+        "Loading": "Caricamento eventi",
+        "Position": "La tua posizione",
+        "Locate": "Centra sulla mia posizione",
+        "LocationOff": "La posizione è disattivata. Consentila per vedere gli eventi intorno a te, oppure cerca un luogo.",
+        "AllowLocation": "Consenti la posizione",
+        "LocationUnavailable": {
+            "Title": "Posizione non disponibile",
+            "Description": "Il dispositivo non riesce a rilevare la posizione. Cerca un luogo."
         }
     }
 }

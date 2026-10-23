@@ -60,6 +60,15 @@ describe("app.config", () => {
         expect(config.ios?.infoPlist?.CFBundleAllowMixedLocalizations).toBe(true)
     })
 
+    it("points every app language at a native locale file that exists", () => {
+        const files = Object.fromEntries(
+            languageKeys.map(language => [language, `./native-locales/${language}.json`]),
+        )
+
+        expect(config.locales).toStrictEqual(files)
+        expect(Object.values(files).map(file => existsSync(file))).not.toContain(false)
+    })
+
     it("enables R8 and resource shrinking on Android release builds", () => {
         expect(config.plugins).toContainEqual([
             "expo-build-properties",
