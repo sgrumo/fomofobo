@@ -6,7 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import type { ErrorBoundaryProps } from "expo-router"
 import { Stack } from "expo-router"
 import { hideAsync, preventAutoHideAsync } from "expo-splash-screen"
-import type { PropsWithChildren } from "react"
+import { StatusBar } from "expo-status-bar"
+import type { ComponentProps, PropsWithChildren } from "react"
 import { Suspense, use } from "react"
 import { useTranslation } from "react-i18next"
 import { View } from "react-native"
@@ -15,8 +16,10 @@ import { lazyAsync } from "shared/function"
 
 import { Button } from "@/components/ui/button/button"
 import { Text } from "@/components/ui/text/text"
+import { ToastHost } from "@/components/ui/toast/toast-host"
 import { VersionGate } from "@/components/version-gate/version-gate"
 import { nativeI18n } from "@/lib/i18n/native-i18n"
+import { FONT_FAMILIES, THEME_COLORS } from "@/lib/theme/theme-tokens"
 
 void preventAutoHideAsync()
 
@@ -55,18 +58,12 @@ export const ErrorBoundary = (props: ErrorBoundaryProps) => {
     return (
         <View
             accessibilityRole="alert"
-            className="bg-background flex-1 items-center justify-center gap-4 px-6"
+            className="flex-1 items-center justify-center gap-4 bg-surface px-6"
         >
-            <Text
-                accessibilityRole="header"
-                className="text-center text-2xl font-semibold"
-            >
+            <Text accessibilityRole="header" variant="pixel-xl" className="text-center">
                 {copy.title}
             </Text>
-            <Text
-                accessibilityLiveRegion="polite"
-                className="text-muted-foreground text-center text-base"
-            >
+            <Text accessibilityLiveRegion="polite" className="text-center text-fg-muted">
                 {copy.message}
             </Text>
             <Button
@@ -75,7 +72,6 @@ export const ErrorBoundary = (props: ErrorBoundaryProps) => {
                 onPress={() => {
                     void props.retry()
                 }}
-                size="lg"
             >
                 <Text>{copy.retry}</Text>
             </Button>
@@ -83,14 +79,25 @@ export const ErrorBoundary = (props: ErrorBoundaryProps) => {
     )
 }
 
+const stackScreenOptions: ComponentProps<typeof Stack>["screenOptions"] = {
+    headerStyle: { backgroundColor: THEME_COLORS.surface },
+    headerTintColor: THEME_COLORS.fg,
+    headerTitleStyle: { fontFamily: FONT_FAMILIES.display, fontWeight: "700" },
+    headerShadowVisible: false,
+    headerBackButtonDisplayMode: "minimal",
+    contentStyle: { backgroundColor: THEME_COLORS.surface },
+}
+
 const RootLayout = () => (
     <GestureHandlerRootView className="flex-1">
+        {/* oxlint-disable-next-line react/style-prop-object -- `style` names the bar text color */}
+        <StatusBar style="dark" />
         <Suspense fallback={null}>
             <AppReadyGate>
                 <QueryClientProvider client={queryClient}>
                     <VersionGate>
                         <BottomSheetModalProvider>
-                            <Stack>
+                            <Stack screenOptions={stackScreenOptions}>
                                 <Stack.Screen
                                     name="index"
                                     options={{ headerShown: false }}
@@ -102,6 +109,7 @@ const RootLayout = () => (
                             </Stack>
                         </BottomSheetModalProvider>
                     </VersionGate>
+                    <ToastHost />
                 </QueryClientProvider>
             </AppReadyGate>
         </Suspense>

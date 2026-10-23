@@ -18,7 +18,8 @@ config.resolver.nodeModulesPaths = [
 
 config.resolver.unstable_enablePackageExports = true
 
-const singletons = ["@tanstack/react-query"]
+// Resolved from the app: a workspace package otherwise gets its own copy, outside the context of the app
+const singletons = ["@tanstack/react-query", "i18next", "react-i18next"]
 const appOrigin = path.join(projectRoot, "package.json")
 
 config.resolver.resolveRequest = (context, moduleName, platform) =>
@@ -30,4 +31,5 @@ config.resolver.resolveRequest = (context, moduleName, platform) =>
           )
         : context.resolveRequest(context, moduleName, platform)
 
-module.exports = withNativeWind(config, { input: "./src/global.css" })
+// A rem of 16 points keeps the spacing scale equal to the web app, `h-11` a 44 pt target included
+module.exports = withNativeWind(config, { input: "./src/global.css", inlineRem: 16 })

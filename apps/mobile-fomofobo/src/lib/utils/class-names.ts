@@ -1,9 +1,19 @@
 import type { ClassValue } from "clsx"
 import { clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { extendTailwindMerge } from "tailwind-merge"
+
+import { TYPE_SCALE } from "../theme/theme-tokens"
+
+const twMerge = extendTailwindMerge<"typography">({
+    extend: {
+        classGroups: {
+            typography: [{ tp: Object.keys(TYPE_SCALE) }],
+        },
+    },
+})
 
 /**
- * @description Returns the class values merged into one Tailwind class string
+ * @description Returns the class values merged into one Tailwind class string, aware of the `tp-*` type scale
  * @param classes Class values merged
  */
 export const cn = (...classes: ClassValue[]) => twMerge(clsx(classes))

@@ -1,25 +1,26 @@
+import { cva } from "class-variance-authority"
+
 export const selectTriggerStyles =
-    "border-input bg-background flex h-10 flex-row items-center justify-between gap-2 rounded-md border px-3 py-2 shadow-sm shadow-black/5"
+    "min-h-11 flex-row items-center justify-between gap-2 rounded-md border-2 border-line bg-surface px-3"
 
-export const selectTriggerSmStyles = "h-8 py-1.5"
+export const selectValueStyles = "tp-body-lg flex-1 text-fg"
 
-export const selectValueStyles = "text-foreground text-sm"
+export const selectPlaceholderStyles = "tp-body-lg flex-1 text-fg-muted"
 
-export const selectPlaceholderStyles = "text-muted-foreground text-sm"
+export const SELECT_CHEVRON_SIZE = 16
 
-export const selectChevronStyles = "text-muted-foreground size-4"
+export const selectOptionVariants = cva(
+    "min-h-11 flex-row items-center justify-between gap-3 rounded-md px-2",
+    {
+        variants: {
+            selected: {
+                true: "bg-surface-muted",
+                false: "",
+            },
+        },
+    },
+)
 
-export const selectHeaderStyles =
-    "flex-row items-center justify-between border-b border-neutral-200 px-4 py-3"
+export const selectOptionTextStyles = "tp-body-lg flex-1 text-fg"
 
-export const selectHeaderTitleStyles = "text-base font-semibold"
-
-export const selectHeaderDoneStyles = "text-primary text-base"
-
-export const selectItemStyles = "flex-row items-center justify-between px-4 py-3"
-
-export const selectItemActiveStyles = "bg-accent"
-
-export const selectItemTextStyles = "text-foreground text-base"
-
-export const selectCheckStyles = "text-primary text-base font-bold"
+export const SELECT_CHECK_SIZE = 16

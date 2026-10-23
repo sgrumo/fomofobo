@@ -5,6 +5,7 @@ import { FlatList, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { Button } from "@/components/ui/button/button"
+import { Notice } from "@/components/ui/notice/notice"
 import { Text } from "@/components/ui/text/text"
 import { api } from "@/lib/api/client"
 
@@ -19,20 +20,16 @@ const HomeScreen = () => {
     return (
         <SafeAreaView className="flex-1">
             <View className="flex-1 gap-4 px-4 pt-4">
-                <Text className="text-2xl font-bold" accessibilityRole="header">
+                <Text variant="pixel-xl" accessibilityRole="header">
                     {t("Categories.Title")}
                 </Text>
 
                 {categoriesLoading && (
-                    <Text className="text-muted-foreground">
-                        {t("Categories.Loading")}
-                    </Text>
+                    <Notice tone="loading" lines={[t("Categories.Loading")]} />
                 )}
 
                 {categoriesError && (
-                    <Text className="text-destructive" accessibilityLiveRegion="polite">
-                        {t("Categories.Error")}
-                    </Text>
+                    <Notice tone="error" lines={[t("Categories.Error")]} />
                 )}
 
                 {categories !== undefined && (
@@ -46,7 +43,10 @@ const HomeScreen = () => {
 
                 {__DEV__ && (
                     <Link href="/showcase" asChild={true}>
-                        <Button variant="outline" accessibilityLabel="Open the showcase">
+                        <Button
+                            variant="secondary"
+                            accessibilityLabel="Open the showcase"
+                        >
                             <Text>Showcase</Text>
                         </Button>
                     </Link>

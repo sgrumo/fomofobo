@@ -1,100 +1,62 @@
 import { cva } from "class-variance-authority"
-import { Platform } from "react-native"
 
-import { cn } from "@/lib/utils/class-names"
+import type { ThemeColor } from "@/lib/theme/theme-tokens"
 
-export const buttonVariants = cva(
-    cn(
-        "group shrink-0 flex-row items-center justify-center gap-2 rounded-md shadow-none",
-        Platform.select({
-            web: "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive whitespace-nowrap outline-none transition-all focus-visible:ring-[3px] disabled:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-        }),
-    ),
-    {
-        variants: {
-            variant: {
-                default: cn(
-                    "bg-primary active:bg-primary/90 shadow-sm shadow-black/5",
-                    Platform.select({ web: "hover:bg-primary/90" }),
-                ),
-                destructive: cn(
-                    "bg-destructive active:bg-destructive/90 dark:bg-destructive/60 shadow-sm shadow-black/5",
-                    Platform.select({
-                        web: "hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
-                    }),
-                ),
-                outline: cn(
-                    "border-border bg-background active:bg-accent dark:bg-input/30 dark:border-input dark:active:bg-input/50 border shadow-sm shadow-black/5",
-                    Platform.select({
-                        web: "hover:bg-accent dark:hover:bg-input/50",
-                    }),
-                ),
-                secondary: cn(
-                    "bg-secondary active:bg-secondary/80 shadow-sm shadow-black/5",
-                    Platform.select({ web: "hover:bg-secondary/80" }),
-                ),
-                ghost: cn(
-                    "active:bg-accent dark:active:bg-accent/50",
-                    Platform.select({ web: "hover:bg-accent dark:hover:bg-accent/50" }),
-                ),
-                link: "",
-            },
-            size: {
-                default: cn(
-                    "h-10 px-4 py-2 sm:h-9",
-                    Platform.select({ web: "has-[>svg]:px-3" }),
-                ),
-                sm: cn(
-                    "h-9 gap-1.5 rounded-md px-3 sm:h-8",
-                    Platform.select({ web: "has-[>svg]:px-2.5" }),
-                ),
-                lg: cn(
-                    "h-11 rounded-md px-6 sm:h-10",
-                    Platform.select({ web: "has-[>svg]:px-4" }),
-                ),
-                icon: "h-10 w-10 sm:h-9 sm:w-9",
-            },
+export const buttonVariants = cva("flex-row items-center justify-center rounded-md", {
+    variants: {
+        variant: {
+            primary: "border-2 border-line bg-surface-inverse",
+            accent: "border-2 border-line bg-social",
+            secondary: "border-2 border-line bg-surface",
+            tertiary: "bg-transparent",
         },
-        defaultVariants: {
-            variant: "default",
-            size: "default",
+        size: {
+            sm: "min-h-9 gap-1 px-3 py-1",
+            md: "min-h-11 gap-2 px-4 py-2.5",
+        },
+        destructive: {
+            true: "",
+            false: "",
         },
     },
-)
+    compoundVariants: [{ variant: "primary", destructive: true, className: "bg-danger" }],
+    defaultVariants: { variant: "primary", size: "md", destructive: false },
+})
 
-export const buttonTextVariants = cva(
-    cn(
-        "text-foreground text-sm font-medium",
-        Platform.select({ web: "pointer-events-none transition-colors" }),
-    ),
-    {
-        variants: {
-            variant: {
-                default: "text-primary-foreground",
-                destructive: "text-white",
-                outline: cn(
-                    "group-active:text-accent-foreground",
-                    Platform.select({ web: "group-hover:text-accent-foreground" }),
-                ),
-                secondary: "text-secondary-foreground",
-                ghost: "group-active:text-accent-foreground",
-                link: cn(
-                    "text-primary group-active:underline",
-                    Platform.select({
-                        web: "underline-offset-4 hover:underline group-hover:underline",
-                    }),
-                ),
-            },
-            size: {
-                default: "",
-                sm: "",
-                lg: "",
-                icon: "",
-            },
+export const buttonTextVariants = cva("", {
+    variants: {
+        variant: {
+            primary: "text-fg-inverse",
+            accent: "text-fg",
+            secondary: "text-fg",
+            tertiary: "text-fg",
         },
-        defaultVariants: {
-            variant: "default",
-            size: "default",
+        size: {
+            sm: "tp-pixel-sm",
+            md: "tp-pixel-md",
         },
     },
-)
+    defaultVariants: { variant: "primary", size: "md" },
+})
+
+export const buttonIconColors = {
+    primary: "fg-inverse",
+    accent: "fg",
+    secondary: "fg",
+    tertiary: "fg",
+} as const satisfies Record<string, ThemeColor>
+
+export const buttonIconSizes = { sm: 12, md: 16 } as const
+
+// Brings `sm` (36 pt) to the 44 pt target
+export const buttonHitSlops = { sm: 4, md: undefined } as const
+
+/**
+ * @description Returns the shadow color of a button, red under the primary button as on the web
+ * @param variant Button variant
+ * @param destructive True when the button deletes or discards
+ */
+export const buttonShadowColor = (
+    variant: keyof typeof buttonIconColors,
+    destructive: boolean,
+): ThemeColor => (variant === "primary" && !destructive ? "live" : "line")

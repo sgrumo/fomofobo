@@ -1,82 +1,50 @@
+const plugin = require("tailwindcss/plugin")
+
+// Tailwind loads this file through jiti, which also resolves the TypeScript token module
+const {
+    FONT_FAMILIES,
+    RADII,
+    THEME_COLORS,
+    TYPE_SCALE,
+} = require("./src/lib/theme/theme-tokens.ts")
+
+const px = value => `${String(value)}px`
+
+const typeScaleUtilities = Object.fromEntries(
+    Object.entries(TYPE_SCALE).map(([name, step]) => [
+        `.tp-${name}`,
+        {
+            fontFamily: `"${FONT_FAMILIES[step.family]}"`,
+            fontSize: px(step.size),
+            lineHeight: px(step.lineHeight),
+            fontWeight: String(step.weight),
+            letterSpacing: px(step.tracking),
+            textTransform: step.upper ? "uppercase" : "none",
+        },
+    ]),
+)
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     content: ["./src/**/*.{js,jsx,ts,tsx}"],
     presets: [require("nativewind/preset")],
     theme: {
-        colors: {
-            primary: {
-                100: "#d3eefd",
-                200: "#a7cbfb",
-                300: "#7b98fa",
-                400: "#4f54f8",
-                500: "#4421f6",
-                600: "#0910d8",
-                700: "#072ba2",
-                800: "#04316c",
+        colors: THEME_COLORS,
+        borderRadius: Object.fromEntries(
+            Object.entries(RADII).map(([name, value]) => [name, px(value)]),
+        ),
+        // `extend`, since the NativeWind preset sets the system families there
+        extend: {
+            fontFamily: {
+                sans: [`"${FONT_FAMILIES.sans}"`],
+                display: [`"${FONT_FAMILIES.display}"`],
+                mono: [`"${FONT_FAMILIES.display}"`],
             },
-            secondary: {
-                100: "#b5d5f7",
-                200: "#67a9ef",
-                300: "#1d7fe7",
-                400: "#1157a1",
-                500: "#4421f6",
-                600: "#072545",
-                700: "#051b33",
-                800: "#031120",
-            },
-            purple: {
-                100: "#efe0fb",
-                200: "#dec0f6",
-                300: "#cea1f2",
-                400: "#bf86ee",
-                500: "#af65ea",
-                600: "#902ce2",
-                700: "#6b18af",
-                800: "#471075",
-            },
-            white: "#ffffff",
-            neutral: {
-                50: "#f8fafc",
-                100: "#f1f5f9",
-                200: "#e2e8f0",
-                300: "#cbd5e1",
-                400: "#94a3b8",
-                500: "#64748b",
-                600: "#475569",
-                800: "#1e293b",
-            },
-            black: "#000000",
-            info: {
-                100: "#e1fdfe",
-                200: "#c3f8fd",
-                400: "#8cddf4",
-                600: "#4b9ecb",
-                800: "#205689",
-            },
-            success: {
-                100: "#dbfbd8",
-                200: "#b2f8b3",
-                400: "#65d67c",
-                600: "#28a159",
-                800: "#116d48",
-            },
-            warning: {
-                100: "#fcf7cf",
-                200: "#faed9f",
-                400: "#e6c949",
-                600: "#b8910e",
-                800: "#7c5c06",
-            },
-            danger: {
-                100: "#ffefe6",
-                200: "#fcb5b5",
-                400: "#f07c71",
-                600: "#c6313e",
-                800: "#851532",
-            },
-            transparent: "transparent",
         },
-        extend: {},
     },
-    plugins: [],
+    plugins: [
+        plugin(api => {
+            api.addUtilities(typeScaleUtilities)
+        }),
+    ],
 }

@@ -1,16 +1,7 @@
-/**
- * @remarks Holds seconds, the unit `burnt` expects, not milliseconds
- */
-export const TOAST_DURATION = 2
+export const TOAST_DURATION_MS = 3000
 
-export const ToastPreset = {
-    Success: "done",
-    Error: "error",
-    Info: "none",
-} as const
+export const TOAST_GAP = 16
 
-export const ToastHaptic = {
-    Success: "success",
-    Error: "error",
-    Info: "none",
-} as const
+export const toastHostStyles = "pointer-events-box-none absolute inset-x-4 gap-2"
+
+export const toastItemStyles = "rounded-lg"
