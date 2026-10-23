@@ -25,7 +25,9 @@
         "VenuePin": "{{name}}, {{kind}}",
         "MoreHere_one": "{{count}} altro risultato qui",
         "MoreHere_other": "{{count}} altri risultati qui",
-        "Cluster": "{{count}} luoghi: {{live}} con eventi in corso, {{upcoming}} con eventi in arrivo, {{ended}} con eventi finiti, {{permanent}} tra cinema, musei, teatri e gallerie. Ingrandisci"
+        "Cluster": "{{count}} luoghi: {{live}} con eventi in corso, {{upcoming}} con eventi in arrivo, {{ended}} con eventi finiti, {{permanent}} tra cinema, musei, teatri e gallerie. Ingrandisci",
+        "Error": "Non è stato possibile caricare gli eventi. Mostro gli ultimi risultati.",
+        "Truncated": "Troppi eventi per mostrarli tutti. Restringi la ricerca."
     },
     "Status": {
         "live": "In corso",
@@ -38,5 +40,34 @@
         "museum": "Museo",
         "theatre": "Teatro",
         "gallery": "Galleria"
+    },
+    "Preview": {
+        "Title": "Evento",
+        "Close": "Chiudi",
+        "Loading": "Caricamento evento",
+        "Unavailable": "Questo evento non è più disponibile.",
+        "Elapsed": "Tempo trascorso",
+        "Open": "Apri l'evento",
+        "OpenVenue": "Apri il locale",
+        "Programme": "Programmazione",
+        "Previous": "Precedente qui",
+        "Next": "Successivo qui",
+        "Position": "{{index}}/{{total}} qui"
+    },
+    "Detail": {
+        "Interested_one": "{{count}} interessato",
+        "Interested_other": "{{count}} interessati"
+    },
+    "Price": {
+        "Free": "Gratis",
+        "From": "da {{price}}",
+        "Paid": "A pagamento",
+        "Membership": "Tessera richiesta",
+        "MinimumAge": "{{age}}+"
+    },
+    "Pending": {
+        "Event": "Evento",
+        "Venue": "Locale",
+        "Soon": "Questa pagina arriva presto."
     }
 }

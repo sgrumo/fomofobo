@@ -94,4 +94,4 @@ const BottomSheet = ({ ref, ...props }: BottomSheetProps) => {
     )
 }
 
-export { BottomSheet }
+export { BottomSheet, PixelBackground as BottomSheetBackground }
