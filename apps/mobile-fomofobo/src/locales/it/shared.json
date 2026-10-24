@@ -151,6 +151,8 @@
     "Venue": {
         "Loading": "Caricamento del locale",
         "NotFound": "Questo locale non esiste o non è più visibile.",
-        "LoadFailed": "Non è stato possibile caricare il locale."
+        "LoadFailed": "Non è stato possibile caricare il locale.",
+        "Cover": "Foto di {{name}}",
+        "Website": "Sito web"
     }
 }

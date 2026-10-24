@@ -1,12 +1,48 @@
+import type { PixelIconName } from "domain/pixel-icons"
+import { venuePageUrlOf } from "domain/public-page-urls"
+import { venueShareTextOf } from "domain/share-summary"
 import type { PublicVenue } from "models"
+import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
-import { ScrollView, View } from "react-native"
+import { Linking, ScrollView, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
+import { DirectionsButton } from "@/components/links/directions-button"
+import { ShareRow } from "@/components/links/share-row"
 import { Badge } from "@/components/ui/badge/badge"
+import { Button } from "@/components/ui/button/button"
+import { DitheredPhoto } from "@/components/ui/dithered-photo/dithered-photo"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { Text } from "@/components/ui/text/text"
+import { env } from "@/lib/env"
 import { backToMap } from "@/lib/navigation/back-to-map"
+
+interface VenueLinkButtonProps {
+    url: string
+    label: string
+    icon: PixelIconName
+}
+
+const VenueLinkButton = (props: VenueLinkButtonProps) => (
+    <Button
+        variant="accent"
+        size="sm"
+        icon={props.icon}
+        accessibilityRole="link"
+        accessibilityLabel={props.label}
+        onPress={() => {
+            void Linking.openURL(props.url)
+        }}
+    >
+        <Text>{props.label}</Text>
+    </Button>
+)
+
+interface VenueLink {
+    url: string | null
+    label: string
+    icon: PixelIconName
+}
 
 interface VenueDetailProps {
     venue: PublicVenue
@@ -14,8 +50,19 @@ interface VenueDetailProps {
 
 export const VenueDetail = (props: VenueDetailProps) => {
     const { t } = useTranslation("shared")
+    const language = useLanguage()
     const insets = useSafeAreaInsets()
     const venue = props.venue
+    const programmeUrl = venue.programmeUrl
+    const links: readonly VenueLink[] = [
+        { url: venue.links.websiteUrl, label: t("Venue.Website"), icon: "link" },
+        {
+            url: venue.links.instagramUrl,
+            label: t("Detail.Instagram"),
+            icon: "instagram",
+        },
+        { url: venue.links.facebookUrl, label: t("Detail.Facebook"), icon: "facebook" },
+    ]
 
     return (
         <View className="flex-1 bg-surface">
@@ -34,6 +81,13 @@ export const VenueDetail = (props: VenueDetailProps) => {
                         onPress={backToMap}
                     />
                 </View>
+                {venue.coverPhotoUrl !== null && (
+                    <DitheredPhoto
+                        uri={venue.coverPhotoUrl}
+                        label={t("Venue.Cover", { name: venue.name })}
+                        className="aspect-[4/3] w-full rounded-md border-2 border-line"
+                    />
+                )}
                 <View className="gap-2">
                     {venue.kind !== "regular" && (
                         <Badge tone="permanent" className="self-start">
@@ -50,7 +104,41 @@ export const VenueDetail = (props: VenueDetailProps) => {
                     <Text variant="body-md" className="text-fg-muted">
                         {venue.address}
                     </Text>
+                    {venue.description !== null && (
+                        <Text variant="body-lg">{venue.description}</Text>
+                    )}
                 </View>
+                <View className="flex-row flex-wrap gap-3">
+                    {programmeUrl !== null && (
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            className="bg-permanent"
+                            accessibilityRole="link"
+                            accessibilityLabel={t("Preview.Programme")}
+                            onPress={() => {
+                                void Linking.openURL(programmeUrl)
+                            }}
+                        >
+                            <Text>{t("Preview.Programme")}</Text>
+                        </Button>
+                    )}
+                    <DirectionsButton coordinates={venue.coordinates} />
+                    {links.map(link =>
+                        link.url === null ? undefined : (
+                            <VenueLinkButton
+                                key={link.icon}
+                                url={link.url}
+                                label={link.label}
+                                icon={link.icon}
+                            />
+                        ),
+                    )}
+                </View>
+                <ShareRow
+                    url={venuePageUrlOf(env.apiUrl, language, venue.id)}
+                    text={venueShareTextOf(venue)}
+                />
             </ScrollView>
             <View
                 className="absolute inset-x-0 top-0 bg-surface"

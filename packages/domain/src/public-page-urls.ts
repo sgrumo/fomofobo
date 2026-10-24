@@ -13,3 +13,15 @@ export const eventPageUrlOf = (
     occurrence: OccurrenceRef,
 ): string =>
     new URL(`/${language}/events/${occurrence.eventId}/${occurrence.date}`, baseUrl).href
+
+/**
+ * @description Builds the URL of the public web page of a venue, which every shared link opens
+ * @param baseUrl Origin of the web app
+ * @param language Language segment of the path
+ * @param venueId Id of the venue
+ */
+export const venuePageUrlOf = (
+    baseUrl: string,
+    language: string,
+    venueId: string,
+): string => new URL(`/${language}/venues/${venueId}`, baseUrl).href

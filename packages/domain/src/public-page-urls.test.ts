@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { eventPageUrlOf } from "./public-page-urls"
+import { eventPageUrlOf, venuePageUrlOf } from "./public-page-urls"
 
 describe("eventPageUrlOf", () => {
     it("builds the path of the web event page under the origin", () => {
@@ -12,5 +12,15 @@ describe("eventPageUrlOf", () => {
                 date: "2026-10-24",
             }),
         ).toBe(`https://fomofobo-dev.vercel.app/it/events/${eventId}/2026-10-24`)
+    })
+})
+
+describe("venuePageUrlOf", () => {
+    it("builds the path of the web venue page under the origin", () => {
+        const venueId = crypto.randomUUID()
+
+        expect(venuePageUrlOf("https://fomofobo-dev.vercel.app", "it", venueId)).toBe(
+            `https://fomofobo-dev.vercel.app/it/venues/${venueId}`,
+        )
     })
 })
