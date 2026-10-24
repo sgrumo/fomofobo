@@ -6,7 +6,7 @@ import type { OccurrenceRef, SaveChange } from "models"
  * @param left First ref
  * @param right Second ref
  */
-const isSameOccurrence = (left: OccurrenceRef, right: OccurrenceRef): boolean =>
+export const isSameOccurrence = (left: OccurrenceRef, right: OccurrenceRef): boolean =>
     left.eventId === right.eventId && left.date === right.date
 
 /**

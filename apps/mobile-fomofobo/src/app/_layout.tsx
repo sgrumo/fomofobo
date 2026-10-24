@@ -23,6 +23,7 @@ import { Text } from "@/components/ui/text/text"
 import { ToastHost } from "@/components/ui/toast/toast-host"
 import { VersionGate } from "@/components/version-gate/version-gate"
 import { nativeI18n } from "@/lib/i18n/native-i18n"
+import { hydrateDeviceStorage } from "@/lib/storage/device-storage"
 import { FONT_FAMILIES, THEME_COLORS } from "@/lib/theme/theme-tokens"
 
 void preventAutoHideAsync()
@@ -30,8 +31,9 @@ void preventAutoHideAsync()
 const queryClient = new QueryClient()
 
 // One stable promise for `use()`. A rejected one is dropped, so a retry starts a new init.
+// The device storage reads from memory, so it loads before the first screen.
 const appReady = lazyAsync(() =>
-    nativeI18n.init().finally(() => {
+    Promise.all([nativeI18n.init(), hydrateDeviceStorage()]).finally(() => {
         void hideAsync()
     }),
 )
