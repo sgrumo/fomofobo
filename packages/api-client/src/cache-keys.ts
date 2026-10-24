@@ -11,6 +11,7 @@ export const specifier = {
     detail: "detail",
     list: "list",
     lookup: "lookup",
+    pages: "pages",
     saves: "saves",
     search: "search",
 }
@@ -60,6 +61,10 @@ export const cacheKeys = (() => {
     const publicVenueHistory = (
         variables: QueryVariables<typeof PublicRoutes.listVenueHistory>,
     ) => [...basePublicVenues, specifier.list, variables]
+    const publicVenueHistoryPages = (variables: {
+        params: QueryVariables<typeof PublicRoutes.listVenueHistory>["params"]
+        pageSize: number
+    }) => [...basePublicVenues, specifier.pages, variables]
     const placeSearch = (variables: QueryVariables<typeof PublicRoutes.searchPlaces>) => [
         ...basePlaces,
         variables,
@@ -107,6 +112,7 @@ export const cacheKeys = (() => {
         publicOccurrence,
         publicVenue,
         publicVenueHistory,
+        publicVenueHistoryPages,
         placeSearch,
         backofficeEventList,
         backofficeEvent,

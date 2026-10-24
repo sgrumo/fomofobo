@@ -1,4 +1,9 @@
-import { keepPreviousData, mutationOptions, queryOptions } from "@tanstack/react-query"
+import {
+    infiniteQueryOptions,
+    keepPreviousData,
+    mutationOptions,
+    queryOptions,
+} from "@tanstack/react-query"
 import type { QueryClient } from "@tanstack/react-query"
 import {
     BackofficeCategoriesRoutes,
@@ -114,6 +119,21 @@ export const createApi = (options: ApiClientOptions) => {
             queryFn: () => listVenueHistory(variables),
             queryKey: cacheKeys.publicVenueHistory(variables),
             placeholderData: keepPreviousData,
+        })
+    const listVenueHistoryInfiniteQuery = (variables: {
+        params: QueryVariables<typeof PublicRoutes.listVenueHistory>["params"]
+        pageSize: number
+    }) =>
+        infiniteQueryOptions({
+            queryFn: ({ pageParam }) =>
+                listVenueHistory({
+                    params: variables.params,
+                    query: { page: pageParam, pageSize: variables.pageSize },
+                }),
+            queryKey: cacheKeys.publicVenueHistoryPages(variables),
+            initialPageParam: 1,
+            getNextPageParam: lastPage =>
+                lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
         })
 
     const getOccurrence = bodylessQueryEndpoint(PublicRoutes.getOccurrence, 200)
@@ -417,6 +437,7 @@ export const createApi = (options: ApiClientOptions) => {
         getPublicVenueQuery,
         listVenueHistory,
         listVenueHistoryQuery,
+        listVenueHistoryInfiniteQuery,
         searchPlaces,
         searchPlacesQuery,
         getMe,

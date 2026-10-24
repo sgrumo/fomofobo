@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button/button"
 import { DitheredPhoto } from "@/components/ui/dithered-photo/dithered-photo"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { Text } from "@/components/ui/text/text"
+import { VenueHistory } from "@/components/venue/venue-history"
 import { VenueUpcoming } from "@/components/venue/venue-upcoming"
 import { env } from "@/lib/env"
 import { backToMap } from "@/lib/navigation/back-to-map"
@@ -137,6 +138,7 @@ export const VenueDetail = (props: VenueDetailProps) => {
                     )}
                 </View>
                 <VenueUpcoming upcoming={venue.upcoming} />
+                <VenueHistory venueId={venue.id} />
                 <ShareRow
                     url={venuePageUrlOf(env.apiUrl, language, venue.id)}
                     text={venueShareTextOf(venue)}

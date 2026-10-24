@@ -240,3 +240,34 @@ describe("lookupOccurrences", () => {
         ])
     })
 })
+
+describe("listVenueHistoryInfiniteQuery", () => {
+    it("requests the first page with the page size", async () => {
+        const firstPage = { items: [], total: 0, page: 1, pageSize: 20, totalPages: 0 }
+        const { client, request, api } = apiReturning(firstPage)
+
+        await client.infiniteQuery(
+            api.listVenueHistoryInfiniteQuery({
+                params: { venueId: venue.id },
+                pageSize: 20,
+            }),
+        )
+
+        expect(request.mock.calls.map(([call]) => call.query)).toStrictEqual([
+            { page: 1, pageSize: 20 },
+        ])
+    })
+
+    it("asks for the next page until the last one", () => {
+        const { api } = apiReturning(undefined)
+        const options = api.listVenueHistoryInfiniteQuery({
+            params: { venueId: venue.id },
+            pageSize: 20,
+        })
+        const middle = { items: [], total: 45, page: 2, pageSize: 20, totalPages: 3 }
+        const last = { items: [], total: 45, page: 3, pageSize: 20, totalPages: 3 }
+
+        expect(options.getNextPageParam(middle, [middle], 2, [2])).toBe(3)
+        expect(options.getNextPageParam(last, [last], 3, [3])).toBeUndefined()
+    })
+})

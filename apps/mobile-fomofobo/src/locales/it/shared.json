@@ -155,6 +155,11 @@
         "Cover": "Foto di {{name}}",
         "Website": "Sito web",
         "Upcoming": "Prossimi eventi",
-        "NoUpcoming": "Nessun evento in programma."
+        "NoUpcoming": "Nessun evento in programma.",
+        "History": "Eventi passati",
+        "HistoryLoading": "Caricamento eventi passati",
+        "HistoryError": "Non è stato possibile caricare gli eventi passati.",
+        "NoHistory": "Nessun evento passato.",
+        "More": "Mostra altri"
     }
 }

@@ -1,11 +1,11 @@
 "use client"
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
-import { formatLocalDate, localTimeOf, weekdayDateOf } from "domain/local-format"
+import { localTimeOf, weekdayDateOf } from "domain/local-format"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { venueShareTextOf } from "domain/share-summary"
-import { VENUE_HISTORY_PAGE_SIZE } from "domain/venue-history"
+import { historyDatesOf, VENUE_HISTORY_PAGE_SIZE } from "domain/venue-history"
 import type { LanguageKey } from "i18n/i18n"
 import type { OccurrenceSummary, VenueHistoryItem } from "models"
 import Image from "next/image"
@@ -240,13 +240,11 @@ interface HistoryItemProps {
 
 const HistoryItem = (props: HistoryItemProps) => {
     const { item } = props
-    const firstDate = formatLocalDate(item.firstDate)
-    const lastDate = formatLocalDate(item.lastDate)
 
     return (
         <li className="border-line flex flex-col gap-1 border-b-2 border-dashed pb-2">
             <span className="tp-pixel-sm text-fg-muted uppercase">
-                {firstDate === lastDate ? firstDate : `${firstDate} → ${lastDate}`}
+                {historyDatesOf(item)}
             </span>
             <span className="tp-body-md">{item.title}</span>
         </li>
