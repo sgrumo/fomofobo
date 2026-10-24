@@ -147,7 +147,8 @@
         "NoneVisible": "I tuoi eventi salvati non sono più disponibili.",
         "Loading": "Caricamento eventi salvati",
         "Error": "Non è stato possibile caricare gli eventi salvati.",
-        "Retry": "Riprova"
+        "Retry": "Riprova",
+        "Offline": "Sei offline. La lista mostra gli eventi dell'ultimo aggiornamento."
     },
     "Venue": {
         "Loading": "Caricamento del locale",

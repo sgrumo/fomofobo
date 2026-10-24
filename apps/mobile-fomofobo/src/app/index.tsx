@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { centerQueryOf, searchCenterOf } from "domain/map-center"
 import { hasActiveFilters } from "domain/map-filters"
 import { placeQueryOf, textQueryOf } from "domain/map-search"
@@ -27,6 +27,7 @@ import { Spinner } from "@/components/ui/spinner/spinner"
 import { Text } from "@/components/ui/text/text"
 import { showToast } from "@/components/ui/toast/toast-store"
 import { ApiResponseError } from "@/lib/api/api-response-error"
+import { isSameSearchFilters, latestQueryData } from "@/lib/api/cached-answers"
 import { api } from "@/lib/api/client"
 import { useNow } from "@/lib/hooks/use-now"
 import { useOnline } from "@/lib/hooks/use-online"
@@ -58,6 +59,7 @@ const previewEntryOf = (
 const MapScreen = () => {
     const { t } = useTranslation("shared")
     const insets = useSafeAreaInsets()
+    const queryClient = useQueryClient()
     const { query, setQuery } = useMapQuery()
     const location = useDeviceLocation()
     const now = useNow(CLOCK_TICK_MS)
@@ -83,26 +85,30 @@ const MapScreen = () => {
     const { data: categories } = useQuery(
         api.listCategoriesQuery({ params: {}, query: {} }),
     )
+    const searchQuery = {
+        lat: center.latitude,
+        lng: center.longitude,
+        q: query.q,
+        categoryIds: query.category === undefined ? undefined : [query.category],
+        free: query.free,
+        date: query.date ?? "default",
+        from: query.from,
+        to: query.to,
+    }
+    const searchOptions = api.searchOccurrencesQuery({ params: {}, query: searchQuery })
     const {
-        data: search,
+        data: searchAnswer,
         isFetching: searchFetching,
         error: searchError,
-    } = useQuery({
-        ...api.searchOccurrencesQuery({
-            params: {},
-            query: {
-                lat: center.latitude,
-                lng: center.longitude,
-                q: query.q,
-                categoryIds: query.category === undefined ? undefined : [query.category],
-                free: query.free,
-                date: query.date ?? "default",
-                from: query.from,
-                to: query.to,
-            },
-        }),
-        enabled: searchReady,
-    })
+    } = useQuery({ ...searchOptions, enabled: searchReady })
+    // With no answer, offline or failed, the last search of the same filters stands in, whatever its center
+    const search =
+        searchAnswer ??
+        (searchError !== null || !online
+            ? latestQueryData(queryClient, searchOptions.queryKey, cachedKey =>
+                  isSameSearchFilters(cachedKey, searchQuery),
+              )
+            : undefined)
 
     // A failed search keeps the last results on the map.
     const [results, setResults] = useState(search)

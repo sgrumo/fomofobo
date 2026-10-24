@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query"
 import { localTimeOf, weekdayDateOf } from "domain/local-format"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
@@ -16,8 +16,10 @@ import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { Notice } from "@/components/ui/notice/notice"
 import { PixelPanel } from "@/components/ui/pixel-panel/pixel-panel"
 import { Text } from "@/components/ui/text/text"
+import { latestQueryData } from "@/lib/api/cached-answers"
 import { api } from "@/lib/api/client"
 import { useNow } from "@/lib/hooks/use-now"
+import { useOnline } from "@/lib/hooks/use-online"
 import { useSavedEvents } from "@/lib/hooks/use-saved-events"
 import { backToMap } from "@/lib/navigation/back-to-map"
 
@@ -79,24 +81,33 @@ const SavedScreen = () => {
     const { t } = useTranslation("shared")
     const insets = useSafeAreaInsets()
     const now = useNow(CLOCK_TICK_MS)
+    const online = useOnline()
+    const queryClient = useQueryClient()
     const savedEvents = useSavedEvents()
 
     const newestFirst = savedEvents.events.toSorted((first, second) =>
         second.savedAt.localeCompare(first.savedAt),
     )
+    const lookupOptions = api.lookupOccurrencesQuery({
+        params: {},
+        query: { ref: newestFirst.map(saved => `${saved.eventId}:${saved.date}`) },
+    })
     const {
-        data: lookup,
+        data: lookupAnswer,
         isPending: lookupPending,
         isError: lookupFailed,
         refetch,
     } = useQuery({
-        ...api.lookupOccurrencesQuery({
-            params: {},
-            query: { ref: newestFirst.map(saved => `${saved.eventId}:${saved.date}`) },
-        }),
+        ...lookupOptions,
         enabled: newestFirst.length > 0,
         placeholderData: keepPreviousData,
     })
+    // With no answer, offline or failed, the last answer of the server stands in
+    const lastAnswer =
+        lookupAnswer === undefined && (lookupFailed || !online)
+            ? latestQueryData(queryClient, lookupOptions.queryKey, () => true)
+            : undefined
+    const lookup = lookupAnswer ?? lastAnswer
     // An unsaved event leaves the list at once, before the next lookup answers.
     const savedIds = new Set(newestFirst.map(saved => saved.eventId))
     const occurrences = (lookup ?? []).filter(occurrence =>
@@ -122,7 +133,7 @@ const SavedScreen = () => {
                     <Text>{t("Saved.Retry")}</Text>
                 </Button>
             </View>
-        ) : lookupPending ? (
+        ) : lookupPending && lookup === undefined ? (
             <Notice tone="loading" lines={[t("Saved.Loading")]} />
         ) : occurrences.length === 0 ? (
             <Text variant="body-md" className="text-fg-muted">
@@ -130,6 +141,9 @@ const SavedScreen = () => {
             </Text>
         ) : (
             <View className="gap-3">
+                {lastAnswer !== undefined && (
+                    <Notice tone="info" lines={[t("Saved.Offline")]} />
+                )}
                 {occurrences.map(occurrence => (
                     <SavedRow
                         key={`${occurrence.eventId}:${occurrence.date}`}
