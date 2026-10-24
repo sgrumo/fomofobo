@@ -18,6 +18,7 @@ import { PriceDetails } from "@/components/event/price-details"
 import { DirectionsButton } from "@/components/links/directions-button"
 import { ShareButton } from "@/components/links/share-button"
 import { ShareRow } from "@/components/links/share-row"
+import { SaveToggle } from "@/components/saves/save-toggle"
 import { Badge } from "@/components/ui/badge/badge"
 import { Button } from "@/components/ui/button/button"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
@@ -96,7 +97,10 @@ export const EventDetail = (props: EventDetailProps) => {
                                 label={t("Detail.Back")}
                                 onPress={backToMap}
                             />
-                            <ShareButton url={shareUrl} text={shareText} />
+                            <View className="flex-row gap-2">
+                                <SaveToggle occurrence={occurrence} />
+                                <ShareButton url={shareUrl} text={shareText} />
+                            </View>
                         </>
                     }
                 />

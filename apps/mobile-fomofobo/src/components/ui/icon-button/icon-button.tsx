@@ -24,6 +24,7 @@ interface IconButtonProps {
     mirrored?: boolean
     disabled?: boolean
     expanded?: boolean
+    selected?: boolean
     className?: string
 }
 
@@ -39,6 +40,7 @@ const IconButton = (props: IconButtonProps) => {
             accessibilityState={{
                 disabled: props.disabled === true,
                 expanded: props.expanded,
+                selected: props.selected,
             }}
             disabled={props.disabled}
             hitSlop={Math.max(0, (ICON_BUTTON_TARGET - size.circle) / 2)}

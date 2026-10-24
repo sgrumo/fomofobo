@@ -139,5 +139,10 @@
     "Pending": {
         "Venue": "Locale",
         "Soon": "Questa pagina arriva presto."
+    },
+    "Saved": {
+        "Toggle": "Salva",
+        "Added": "Evento salvato. Lo trovi tra gli eventi salvati.",
+        "Removed": "Evento rimosso dagli eventi salvati."
     }
 }

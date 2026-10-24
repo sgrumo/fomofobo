@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next"
 import { Linking, Pressable, View } from "react-native"
 import { isDefined } from "shared/values"
 
+import { SaveToggle } from "@/components/saves/save-toggle"
 import { Badge } from "@/components/ui/badge/badge"
 import { BottomSheetPanel } from "@/components/ui/bottom-sheet-panel/bottom-sheet-panel"
 import { Button } from "@/components/ui/button/button"
@@ -128,7 +129,10 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                 <Badge tone={status} dot={true}>
                     {t(`Status.${status}`)}
                 </Badge>
-                {props.closeButton}
+                <View className="flex-row items-center gap-2">
+                    <SaveToggle occurrence={occurrence} size="sm" />
+                    {props.closeButton}
+                </View>
             </View>
             {props.paging !== undefined && <PagingControls paging={props.paging} />}
             <View className="flex-row gap-3 border-t-2 border-line pt-3">

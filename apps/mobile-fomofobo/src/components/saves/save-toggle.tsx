@@ -1,0 +1,38 @@
+import type { OccurrenceRef } from "models"
+import { useTranslation } from "react-i18next"
+
+import { IconButton } from "@/components/ui/icon-button/icon-button"
+import { toastSuccess } from "@/components/ui/toast/toast"
+import { useSavedEvents } from "@/lib/hooks/use-saved-events"
+import { syncSaveChange } from "@/lib/saves/device-save-sync"
+
+interface SaveToggleProps {
+    occurrence: OccurrenceRef
+    size?: "sm" | "md"
+}
+
+export const SaveToggle = (props: SaveToggleProps) => {
+    const { t } = useTranslation("shared")
+    const savedEvents = useSavedEvents()
+    const ref = { eventId: props.occurrence.eventId, date: props.occurrence.date }
+    const saved = savedEvents.isSaved(ref)
+
+    return (
+        <IconButton
+            icon={saved ? "saved" : "save"}
+            label={t("Saved.Toggle")}
+            selected={saved}
+            tone={saved ? "live" : "surface"}
+            size={props.size}
+            onPress={() => {
+                if (saved) {
+                    savedEvents.unsave(ref)
+                } else {
+                    savedEvents.save(ref)
+                }
+                void syncSaveChange({ ...ref, action: saved ? "unsave" : "save" })
+                toastSuccess(saved ? t("Saved.Removed") : t("Saved.Added"))
+            }}
+        />
+    )
+}
