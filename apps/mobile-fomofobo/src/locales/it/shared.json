@@ -128,7 +128,8 @@
             "facebook": "Condividi su Facebook",
             "x": "Condividi su X",
             "Copy": "Copia il link"
-        }
+        },
+        "Offline": "Sei offline e questo evento non è ancora stato caricato."
     },
     "Price": {
         "Free": "Gratis",
@@ -162,6 +163,8 @@
         "HistoryLoading": "Caricamento eventi passati",
         "HistoryError": "Non è stato possibile caricare gli eventi passati.",
         "NoHistory": "Nessun evento passato.",
-        "More": "Mostra altri"
+        "More": "Mostra altri",
+        "Offline": "Sei offline e questo locale non è ancora stato caricato.",
+        "HistoryOffline": "Sei offline: gli eventi passati non sono ancora stati caricati."
     }
 }

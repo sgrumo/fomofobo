@@ -4,10 +4,12 @@ import { venueSchema } from "models"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
+import { OfflineScreenNotice } from "@/components/screen-notice/offline-screen-notice"
 import { ScreenNotice } from "@/components/screen-notice/screen-notice"
 import { VenueDetail } from "@/components/venue/venue-detail"
 import { isNotFoundError, retryUnlessNotFound } from "@/lib/api/api-response-error"
 import { api } from "@/lib/api/client"
+import { useOnline } from "@/lib/hooks/use-online"
 import { backToMap } from "@/lib/navigation/back-to-map"
 
 const venueParamsSchema = z.object({ venueId: venueSchema.shape.id })
@@ -18,6 +20,7 @@ interface PublicVenueScreenProps {
 
 const PublicVenueScreen = (props: PublicVenueScreenProps) => {
     const { t } = useTranslation("shared")
+    const online = useOnline()
     const {
         data: venue,
         error: venueError,
@@ -30,6 +33,9 @@ const PublicVenueScreen = (props: PublicVenueScreenProps) => {
     if (venue !== undefined) {
         return <VenueDetail venue={venue} />
     }
+    if (!online) {
+        return <OfflineScreenNotice message={t("Venue.Offline")} />
+    }
     if (venueError === null) {
         return <ScreenNotice tone="loading" message={t("Venue.Loading")} />
     }
@@ -37,18 +43,20 @@ const PublicVenueScreen = (props: PublicVenueScreenProps) => {
         <ScreenNotice
             tone="info"
             message={t("Venue.NotFound")}
-            action={{ label: t("Detail.BackToMap"), onPress: backToMap }}
+            actions={[{ label: t("Detail.BackToMap"), onPress: backToMap }]}
         />
     ) : (
         <ScreenNotice
             tone="error"
             message={t("Venue.LoadFailed")}
-            action={{
-                label: t("Detail.Retry"),
-                onPress: () => {
-                    void refetch()
+            actions={[
+                {
+                    label: t("Detail.Retry"),
+                    onPress: () => {
+                        void refetch()
+                    },
                 },
-            }}
+            ]}
         />
     )
 }
@@ -66,7 +74,7 @@ const VenueScreen = () => {
                 <ScreenNotice
                     tone="info"
                     message={t("Venue.NotFound")}
-                    action={{ label: t("Detail.BackToMap"), onPress: backToMap }}
+                    actions={[{ label: t("Detail.BackToMap"), onPress: backToMap }]}
                 />
             )}
         </>

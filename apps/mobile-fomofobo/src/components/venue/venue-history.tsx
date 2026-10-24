@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button/button"
 import { Notice } from "@/components/ui/notice/notice"
 import { Text } from "@/components/ui/text/text"
 import { api } from "@/lib/api/client"
+import { useOnline } from "@/lib/hooks/use-online"
 
 interface HistoryRowProps {
     item: VenueHistoryItem
@@ -28,6 +29,7 @@ interface VenueHistoryProps {
 
 export const VenueHistory = (props: VenueHistoryProps) => {
     const { t } = useTranslation("shared")
+    const online = useOnline()
     const {
         data: history,
         isPending: historyPending,
@@ -45,50 +47,53 @@ export const VenueHistory = (props: VenueHistoryProps) => {
     )
     const items = (history?.pages ?? []).flatMap(page => page.items)
 
-    const body = historyPending ? (
-        <Notice tone="loading" lines={[t("Venue.HistoryLoading")]} />
-    ) : historyFailed && history === undefined ? (
-        <View className="gap-3">
-            <Notice tone="error" lines={[t("Venue.HistoryError")]} />
-            <Button
-                variant="secondary"
-                className="self-start"
-                accessibilityLabel={t("Detail.Retry")}
-                onPress={() => {
-                    void refetch()
-                }}
-            >
-                <Text>{t("Detail.Retry")}</Text>
-            </Button>
-        </View>
-    ) : items.length === 0 ? (
-        <Text variant="body-md" className="text-fg-muted">
-            {t("Venue.NoHistory")}
-        </Text>
-    ) : (
-        <View className="gap-2">
-            {items.map(item => (
-                <HistoryRow key={item.eventId} item={item} />
-            ))}
-            {moreFailed && <Notice tone="error" lines={[t("Venue.HistoryError")]} />}
-            {hasMore && (
+    const body =
+        historyPending && !online ? (
+            <Notice tone="info" lines={[t("Venue.HistoryOffline")]} />
+        ) : historyPending ? (
+            <Notice tone="loading" lines={[t("Venue.HistoryLoading")]} />
+        ) : historyFailed && history === undefined ? (
+            <View className="gap-3">
+                <Notice tone="error" lines={[t("Venue.HistoryError")]} />
                 <Button
                     variant="secondary"
-                    size="sm"
                     className="self-start"
-                    disabled={moreLoading}
-                    accessibilityLabel={t("Venue.More")}
+                    accessibilityLabel={t("Detail.Retry")}
                     onPress={() => {
-                        void fetchNextPage()
+                        void refetch()
                     }}
                 >
-                    <Text>
-                        {moreLoading ? t("Venue.HistoryLoading") : t("Venue.More")}
-                    </Text>
+                    <Text>{t("Detail.Retry")}</Text>
                 </Button>
-            )}
-        </View>
-    )
+            </View>
+        ) : items.length === 0 ? (
+            <Text variant="body-md" className="text-fg-muted">
+                {t("Venue.NoHistory")}
+            </Text>
+        ) : (
+            <View className="gap-2">
+                {items.map(item => (
+                    <HistoryRow key={item.eventId} item={item} />
+                ))}
+                {moreFailed && <Notice tone="error" lines={[t("Venue.HistoryError")]} />}
+                {hasMore && (
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        className="self-start"
+                        disabled={moreLoading || !online}
+                        accessibilityLabel={t("Venue.More")}
+                        onPress={() => {
+                            void fetchNextPage()
+                        }}
+                    >
+                        <Text>
+                            {moreLoading ? t("Venue.HistoryLoading") : t("Venue.More")}
+                        </Text>
+                    </Button>
+                )}
+            </View>
+        )
 
     return (
         <View className="gap-3">

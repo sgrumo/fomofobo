@@ -6,15 +6,19 @@ import { Notice } from "@/components/ui/notice/notice"
 import type { NoticeTone } from "@/components/ui/notice/notice"
 import { Text } from "@/components/ui/text/text"
 
+interface ScreenNoticeAction {
+    label: string
+    onPress: () => void
+}
+
 interface ScreenNoticeProps {
     tone: NoticeTone
     message: string
-    action?: { label: string; onPress: () => void }
+    actions?: readonly ScreenNoticeAction[]
 }
 
 export const ScreenNotice = (props: ScreenNoticeProps) => {
     const insets = useSafeAreaInsets()
-    const action = props.action
 
     return (
         <View
@@ -22,8 +26,10 @@ export const ScreenNotice = (props: ScreenNoticeProps) => {
             style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
         >
             <Notice tone={props.tone} lines={[props.message]} />
-            {action !== undefined && (
+            {props.actions?.map((action, index) => (
                 <Button
+                    key={action.label}
+                    variant={index === 0 ? "primary" : "secondary"}
                     accessibilityLabel={action.label}
                     onPress={() => {
                         action.onPress()
@@ -31,7 +37,7 @@ export const ScreenNotice = (props: ScreenNoticeProps) => {
                 >
                     <Text>{action.label}</Text>
                 </Button>
-            )}
+            ))}
         </View>
     )
 }

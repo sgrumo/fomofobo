@@ -114,7 +114,7 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                 lng: props.center.longitude,
             },
         }),
-        enabled: showsSuggestions,
+        enabled: showsSuggestions && online,
         // The route allows 30 calls a minute per IP: a retry spends the budget of every phone behind it
         retry: false,
     })
@@ -168,8 +168,11 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                         {suggestionsFetching && (
                             <Spinner label={t("Search.Loading")} size="sm" />
                         )}
-                        {suggestionsError !== null && (
-                            <Notice tone="error" lines={[errorText]} />
+                        {(suggestionsError !== null || !online) && (
+                            <Notice
+                                tone={online ? "error" : "info"}
+                                lines={[errorText]}
+                            />
                         )}
                         {suggestionsLoaded && isEmptySuggestions(suggestions) && (
                             <Text variant="body-md" className="px-2 text-fg-muted">

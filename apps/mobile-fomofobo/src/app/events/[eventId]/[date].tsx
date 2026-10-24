@@ -5,9 +5,11 @@ import type { OccurrenceRef } from "models"
 import { useTranslation } from "react-i18next"
 
 import { EventDetail } from "@/components/event/event-detail"
+import { OfflineScreenNotice } from "@/components/screen-notice/offline-screen-notice"
 import { ScreenNotice } from "@/components/screen-notice/screen-notice"
 import { isNotFoundError, retryUnlessNotFound } from "@/lib/api/api-response-error"
 import { api } from "@/lib/api/client"
+import { useOnline } from "@/lib/hooks/use-online"
 import { backToMap } from "@/lib/navigation/back-to-map"
 
 interface OccurrenceScreenProps {
@@ -16,6 +18,7 @@ interface OccurrenceScreenProps {
 
 const OccurrenceScreen = (props: OccurrenceScreenProps) => {
     const { t } = useTranslation("shared")
+    const online = useOnline()
     const {
         data: occurrence,
         error: occurrenceError,
@@ -28,6 +31,9 @@ const OccurrenceScreen = (props: OccurrenceScreenProps) => {
     if (occurrence !== undefined) {
         return <EventDetail occurrence={occurrence} />
     }
+    if (!online) {
+        return <OfflineScreenNotice message={t("Detail.Offline")} />
+    }
     if (occurrenceError === null) {
         return <ScreenNotice tone="loading" message={t("Detail.Loading")} />
     }
@@ -35,18 +41,20 @@ const OccurrenceScreen = (props: OccurrenceScreenProps) => {
         <ScreenNotice
             tone="info"
             message={t("Detail.NotFound")}
-            action={{ label: t("Detail.BackToMap"), onPress: backToMap }}
+            actions={[{ label: t("Detail.BackToMap"), onPress: backToMap }]}
         />
     ) : (
         <ScreenNotice
             tone="error"
             message={t("Detail.LoadFailed")}
-            action={{
-                label: t("Detail.Retry"),
-                onPress: () => {
-                    void refetch()
+            actions={[
+                {
+                    label: t("Detail.Retry"),
+                    onPress: () => {
+                        void refetch()
+                    },
                 },
-            }}
+            ]}
         />
     )
 }
@@ -64,7 +72,7 @@ const EventScreen = () => {
                 <ScreenNotice
                     tone="info"
                     message={t("Detail.NotFound")}
-                    action={{ label: t("Detail.BackToMap"), onPress: backToMap }}
+                    actions={[{ label: t("Detail.BackToMap"), onPress: backToMap }]}
                 />
             )}
         </>
