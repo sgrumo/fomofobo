@@ -136,10 +136,6 @@
         "Membership": "Tessera richiesta",
         "MinimumAge": "{{age}}+"
     },
-    "Pending": {
-        "Venue": "Locale",
-        "Soon": "Questa pagina arriva presto."
-    },
     "Saved": {
         "Toggle": "Salva",
         "Added": "Evento salvato. Lo trovi tra gli eventi salvati.",
@@ -151,5 +147,10 @@
         "Loading": "Caricamento eventi salvati",
         "Error": "Non è stato possibile caricare gli eventi salvati.",
         "Retry": "Riprova"
+    },
+    "Venue": {
+        "Loading": "Caricamento del locale",
+        "NotFound": "Questo locale non esiste o non è più visibile.",
+        "LoadFailed": "Non è stato possibile caricare il locale."
     }
 }
