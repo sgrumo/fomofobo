@@ -23,6 +23,7 @@ import { Text } from "@/components/ui/text/text"
 import { ToastHost } from "@/components/ui/toast/toast-host"
 import { VersionGate } from "@/components/version-gate/version-gate"
 import { nativeI18n } from "@/lib/i18n/native-i18n"
+import { startDeviceSaveSync } from "@/lib/saves/device-save-sync"
 import { hydrateDeviceStorage } from "@/lib/storage/device-storage"
 import { FONT_FAMILIES, THEME_COLORS } from "@/lib/theme/theme-tokens"
 
@@ -32,8 +33,13 @@ const queryClient = new QueryClient()
 
 // One stable promise for `use()`. A rejected one is dropped, so a retry starts a new init.
 // The device storage reads from memory, so it loads before the first screen.
+// Its own lazy promise starts the save sync once, even when the i18n init is retried.
+const deviceStorageReady = lazyAsync(() =>
+    hydrateDeviceStorage().then(startDeviceSaveSync),
+)
+
 const appReady = lazyAsync(() =>
-    Promise.all([nativeI18n.init(), hydrateDeviceStorage()]).finally(() => {
+    Promise.all([nativeI18n.init(), deviceStorageReady()]).finally(() => {
         void hideAsync()
     }),
 )
