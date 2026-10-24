@@ -3,6 +3,8 @@ import { occurrenceFactsOf } from "domain/occurrence-facts"
 import { occurrenceProgress } from "domain/occurrence-progress"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
+import { eventPageUrlOf } from "domain/public-page-urls"
+import { occurrenceShareTextOf } from "domain/share-summary"
 import { router } from "expo-router"
 import type { OccurrenceDetail } from "models"
 import { useLanguage } from "react-i18n/hooks"
@@ -14,12 +16,15 @@ import { match } from "ts-pattern"
 import { PhotoGallery } from "@/components/event/photo-gallery"
 import { PriceDetails } from "@/components/event/price-details"
 import { DirectionsButton } from "@/components/links/directions-button"
+import { ShareButton } from "@/components/links/share-button"
+import { ShareRow } from "@/components/links/share-row"
 import { Badge } from "@/components/ui/badge/badge"
 import { Button } from "@/components/ui/button/button"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { StatGrid } from "@/components/ui/stat-grid/stat-grid"
 import { Text } from "@/components/ui/text/text"
 import { Timeline } from "@/components/ui/timeline/timeline"
+import { env } from "@/lib/env"
 import { useNow } from "@/lib/hooks/use-now"
 import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 import { backToMap } from "@/lib/navigation/back-to-map"
@@ -39,6 +44,8 @@ export const EventDetail = (props: EventDetailProps) => {
 
     const occurrence = props.occurrence
     const { instagramUrl, facebookUrl } = occurrence.externalLinks
+    const shareUrl = eventPageUrlOf(env.apiUrl, language, occurrence)
+    const shareText = occurrenceShareTextOf(occurrence, language)
     const span = {
         startsAt: new Date(occurrence.startsAt),
         endsAt: new Date(occurrence.endsAt),
@@ -83,11 +90,14 @@ export const EventDetail = (props: EventDetailProps) => {
                     photos={occurrence.photos}
                     coverPhotoUrl={occurrence.coverPhotoUrl}
                     controls={
-                        <IconButton
-                            icon="back"
-                            label={t("Detail.Back")}
-                            onPress={backToMap}
-                        />
+                        <>
+                            <IconButton
+                                icon="back"
+                                label={t("Detail.Back")}
+                                onPress={backToMap}
+                            />
+                            <ShareButton url={shareUrl} text={shareText} />
+                        </>
                     }
                 />
                 <View className="gap-3">
@@ -154,6 +164,7 @@ export const EventDetail = (props: EventDetailProps) => {
                         {occurrence.venue.address}
                     </Text>
                 </View>
+                <ShareRow url={shareUrl} text={shareText} />
             </ScrollView>
             <View
                 accessibilityLabel={t("Detail.Actions")}

@@ -115,7 +115,19 @@
         "Actions": "Azioni dell'evento",
         "Directions": "Indicazioni",
         "Instagram": "Instagram",
-        "Facebook": "Facebook"
+        "Facebook": "Facebook",
+        "Share": "Condividi",
+        "ShareFailed": "Non è stato possibile aprire la condivisione.",
+        "LinkCopied": "Link copiato",
+        "CopyFailed": "Non è stato possibile copiare il link.",
+        "ShareOn": {
+            "Label": "Condividi su",
+            "whatsapp": "Condividi su WhatsApp",
+            "telegram": "Condividi su Telegram",
+            "facebook": "Condividi su Facebook",
+            "x": "Condividi su X",
+            "Copy": "Copia il link"
+        }
     },
     "Price": {
         "Free": "Gratis",
