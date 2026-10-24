@@ -153,6 +153,8 @@
         "NotFound": "Questo locale non esiste o non è più visibile.",
         "LoadFailed": "Non è stato possibile caricare il locale.",
         "Cover": "Foto di {{name}}",
-        "Website": "Sito web"
+        "Website": "Sito web",
+        "Upcoming": "Prossimi eventi",
+        "NoUpcoming": "Nessun evento in programma."
     }
 }
