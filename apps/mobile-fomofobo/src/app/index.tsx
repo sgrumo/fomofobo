@@ -3,7 +3,7 @@ import { centerQueryOf, searchCenterOf } from "domain/map-center"
 import { hasActiveFilters } from "domain/map-filters"
 import { placeQueryOf, textQueryOf } from "domain/map-search"
 import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
-import { Link } from "expo-router"
+import { Link, router } from "expo-router"
 import type { OccurrenceSummary } from "models"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -326,6 +326,13 @@ const MapScreen = () => {
                 style={{ bottom: insets.bottom + CONTROLS_BOTTOM_OFFSET }}
             >
                 {searchFetching && <Spinner label={t("Map.Loading")} size="sm" />}
+                <IconButton
+                    icon="saved"
+                    label={t("Saved.Open")}
+                    onPress={() => {
+                        router.push("/saved")
+                    }}
+                />
                 <IconButton
                     icon="locate"
                     label={t("Map.Locate")}

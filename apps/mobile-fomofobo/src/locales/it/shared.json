@@ -143,6 +143,13 @@
     "Saved": {
         "Toggle": "Salva",
         "Added": "Evento salvato. Lo trovi tra gli eventi salvati.",
-        "Removed": "Evento rimosso dagli eventi salvati."
+        "Removed": "Evento rimosso dagli eventi salvati.",
+        "Open": "Eventi salvati",
+        "Title": "Eventi salvati",
+        "Empty": "Nessun evento salvato. Salvane uno dalla sua anteprima o dalla sua pagina.",
+        "NoneVisible": "I tuoi eventi salvati non sono più disponibili.",
+        "Loading": "Caricamento eventi salvati",
+        "Error": "Non è stato possibile caricare gli eventi salvati.",
+        "Retry": "Riprova"
     }
 }
