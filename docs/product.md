@@ -100,7 +100,7 @@ The saved list works offline for every saved event that the device showed online
 
 ### Native app
 
-A native app for iOS and Android offers the features of the public web app: the map with its preview, search and filters, event and venue pages (not built), saved events (not built) and offline reads (not built). It has no sign-in and no backoffice, and it speaks Italian alone.
+A native app for iOS and Android offers the features of the public web app: the map with its preview, search and filters, event pages, venue pages (not built), saved events (not built) and offline reads (not built). It has no sign-in and no backoffice, and it speaks Italian alone.
 
 The stores install and update the app, in place of the install button and the update prompt of the web app. A version gate asks for a store update when the server marks the installed version as too old, and shows a maintenance notice when the server says so.
 
@@ -140,7 +140,7 @@ The event page and the map preview show the count of saves of an occurrence once
 - Turso, a hosted libSQL database (SQLite), holds categories, venues, events, occurrences and accounts. Occurrences are stored as rows, because the map search filters them by time window and by area.
 - Cloudflare R2 holds the event photos in a public bucket, because shared and offline pages need a stable photo URL. The backoffice resizes and dithers each photo in the browser, then uploads the 1-bit PNG straight to the bucket, because a dither on the server would spend the CPU budget of the free plan.
 - A daily GitHub workflow runs the photo purge job against the database and the bucket of each environment, on the branch of that environment. The job is a program of its own, so it lives in its own app and not in the Next.js application.
-- One package holds the rules that the web app and the native app both apply: status, time formats, the map query and its search center, the search and filter rules, map pins, prices, the save queue and the share links. It holds no text and no screens, because each app owns its translations and its UI. The apps share it because two copies of a rule drift apart.
+- One package holds the rules that the web app and the native app both apply: status, time formats, the map query and its search center, the search and filter rules, map pins, prices, the facts of the event page, the save queue and the share links. It holds no text and no screens, because each app owns its translations and its UI. The apps share it because two copies of a rule drift apart.
 - Geoapify: place suggestions of the search field, from all of Italy, with the places nearest to the search center first. Each client gets 30 calls a minute, because the free plan has a daily credit limit. Phones on mobile data often share one public address, so the native app tells the visitor to retry in a minute when the limit answers.
 - OpenFreeMap: the tiles of the event map. The device keeps at most 500 viewed tiles, because the provider caps an offline download at 3,000 tiles.
 - A service worker of the public app keeps what a visitor loaded and serves it offline. It sends the backoffice, the sign-in and every write straight to the network, because a worker at the root of the site controls the backoffice pages too.
