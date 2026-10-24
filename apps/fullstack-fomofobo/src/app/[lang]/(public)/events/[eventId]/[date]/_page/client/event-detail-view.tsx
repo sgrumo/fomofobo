@@ -8,7 +8,7 @@ import { occurrenceStatus } from "domain/occurrence-status"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { priceDetailRows } from "domain/price-details"
 import { formatEuroCents } from "domain/price-summary"
-import { shareSummaryOf } from "domain/share-summary"
+import { occurrenceShareTextOf } from "domain/share-summary"
 import type { LanguageKey } from "i18n/i18n"
 import type { OccurrenceDetail, PriceScheme } from "models"
 import { useLanguage } from "react-i18n/hooks"
@@ -113,7 +113,7 @@ export const EventDetailView = (props: EventDetailViewProps) => {
             <OccurrenceBody occurrence={occurrence} now={now} language={language} />
             <ShareRow
                 url={props.url}
-                text={`${occurrence.title} · ${shareSummaryOf(occurrence, language)}`}
+                text={occurrenceShareTextOf(occurrence, language)}
             />
             <nav
                 aria-label={t("Detail.Actions")}

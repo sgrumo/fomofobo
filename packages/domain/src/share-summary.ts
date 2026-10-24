@@ -22,6 +22,16 @@ export const shareSummaryOf = (
 }
 
 /**
+ * @description Returns the share text of an occurrence: its title, then its summary
+ * @param occurrence Occurrence shared
+ * @param language BCP 47 language of the weekday
+ */
+export const occurrenceShareTextOf = (
+    occurrence: Pick<OccurrenceSummary, "title" | "startsAt" | "venue">,
+    language: string,
+): string => `${occurrence.title} · ${shareSummaryOf(occurrence, language)}`
+
+/**
  * @description Returns the share text of a venue: its name and its address
  * @param venue Venue shared
  */
