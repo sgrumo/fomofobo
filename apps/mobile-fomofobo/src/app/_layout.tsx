@@ -4,9 +4,15 @@ import "core-js/actual/map/group-by"
 import "core-js/actual/object/group-by"
 import "@/lib/env"
 import "@/lib/api/app-focus"
+import "@/lib/api/app-online"
 import "../global.css"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister"
+import { QueryClient } from "@tanstack/react-query"
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client"
+import type { PersistQueryClientProviderProps } from "@tanstack/react-query-persist-client"
+import { nativeApplicationVersion } from "expo-application"
 import type { ErrorBoundaryProps } from "expo-router"
 import { Stack } from "expo-router"
 import { hideAsync, preventAutoHideAsync } from "expo-splash-screen"
@@ -22,14 +28,32 @@ import { Button } from "@/components/ui/button/button"
 import { Text } from "@/components/ui/text/text"
 import { ToastHost } from "@/components/ui/toast/toast-host"
 import { VersionGate } from "@/components/version-gate/version-gate"
+import { isPersistedQuery, PERSISTED_CACHE_MAX_AGE_MS } from "@/lib/api/persisted-queries"
 import { nativeI18n } from "@/lib/i18n/native-i18n"
 import { startDeviceSaveSync } from "@/lib/saves/device-save-sync"
 import { hydrateDeviceStorage } from "@/lib/storage/device-storage"
+import { QUERY_CACHE_STORAGE_KEY } from "@/lib/storage/storage-keys"
 import { FONT_FAMILIES, THEME_COLORS } from "@/lib/theme/theme-tokens"
 
 void preventAutoHideAsync()
 
-const queryClient = new QueryClient()
+// A query leaves the cache, and the persisted copy with it, once it ages past the persisted window.
+const queryClient = new QueryClient({
+    defaultOptions: { queries: { gcTime: PERSISTED_CACHE_MAX_AGE_MS } },
+})
+
+// A new app version drops the persisted cache, since its response shapes can differ.
+const persistOptions: PersistQueryClientProviderProps["persistOptions"] = {
+    persister: createAsyncStoragePersister({
+        storage: AsyncStorage,
+        key: QUERY_CACHE_STORAGE_KEY,
+    }),
+    maxAge: PERSISTED_CACHE_MAX_AGE_MS,
+    buster: nativeApplicationVersion ?? "",
+    dehydrateOptions: {
+        shouldDehydrateQuery: query => isPersistedQuery(query, Date.now()),
+    },
+}
 
 // One stable promise for `use()`. A rejected one is dropped, so a retry starts a new init.
 // The device storage reads from memory, so it loads before the first screen.
@@ -106,7 +130,10 @@ const RootLayout = () => (
         <StatusBar style="dark" />
         <Suspense fallback={null}>
             <AppReadyGate>
-                <QueryClientProvider client={queryClient}>
+                <PersistQueryClientProvider
+                    client={queryClient}
+                    persistOptions={persistOptions}
+                >
                     <VersionGate>
                         <BottomSheetModalProvider>
                             <Stack screenOptions={stackScreenOptions}>
@@ -122,7 +149,7 @@ const RootLayout = () => (
                         </BottomSheetModalProvider>
                     </VersionGate>
                     <ToastHost />
-                </QueryClientProvider>
+                </PersistQueryClientProvider>
             </AppReadyGate>
         </Suspense>
     </GestureHandlerRootView>

@@ -29,6 +29,7 @@ import { showToast } from "@/components/ui/toast/toast-store"
 import { ApiResponseError } from "@/lib/api/api-response-error"
 import { api } from "@/lib/api/client"
 import { useNow } from "@/lib/hooks/use-now"
+import { useOnline } from "@/lib/hooks/use-online"
 
 const TOAST_DURATION_MS = 5000
 
@@ -60,6 +61,7 @@ const MapScreen = () => {
     const { query, setQuery } = useMapQuery()
     const location = useDeviceLocation()
     const now = useNow(CLOCK_TICK_MS)
+    const online = useOnline()
     const [filtersOpen, setFiltersOpen] = useState(false)
     const filtersActive = hasActiveFilters(query)
     const { center, hasQueryCenter, locationOff, searchReady } = searchCenterOf(
@@ -306,7 +308,8 @@ const MapScreen = () => {
                         </Button>
                     </View>
                 )}
-                {searchError !== null && (
+                {!online && <Notice tone="info" lines={[t("Map.Offline")]} />}
+                {online && searchError !== null && (
                     <Notice
                         tone="error"
                         lines={[

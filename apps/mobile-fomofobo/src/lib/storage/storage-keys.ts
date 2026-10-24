@@ -1,3 +1,4 @@
+import { storagePrefix } from "frontend-shared/storage"
 import { savedEventsStorageSchema, saveSyncStorageSchema } from "models"
 import { z } from "zod"
 
@@ -15,3 +16,6 @@ export const deviceStorageDefaults: {
     "save-sync": { version: 1, queuedStoredSaves: false, pending: [] },
     "device-id": null,
 }
+
+// The persister of TanStack Query owns this key and its serialization, outside the device storage
+export const QUERY_CACHE_STORAGE_KEY = `${storagePrefix}:query-cache`
