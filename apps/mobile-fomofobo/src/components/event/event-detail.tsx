@@ -7,13 +7,15 @@ import { router } from "expo-router"
 import type { OccurrenceDetail } from "models"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
-import { ScrollView, View } from "react-native"
+import { Linking, ScrollView, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { match } from "ts-pattern"
 
 import { PhotoGallery } from "@/components/event/photo-gallery"
 import { PriceDetails } from "@/components/event/price-details"
+import { DirectionsButton } from "@/components/links/directions-button"
 import { Badge } from "@/components/ui/badge/badge"
+import { Button } from "@/components/ui/button/button"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { StatGrid } from "@/components/ui/stat-grid/stat-grid"
 import { Text } from "@/components/ui/text/text"
@@ -36,6 +38,7 @@ export const EventDetail = (props: EventDetailProps) => {
     const priceSummary = usePriceSummary()
 
     const occurrence = props.occurrence
+    const { instagramUrl, facebookUrl } = occurrence.externalLinks
     const span = {
         startsAt: new Date(occurrence.startsAt),
         endsAt: new Date(occurrence.endsAt),
@@ -72,7 +75,7 @@ export const EventDetail = (props: EventDetailProps) => {
         <View className="flex-1 bg-surface">
             <ScrollView
                 className="flex-1"
-                contentContainerClassName="gap-5 p-4"
+                contentContainerClassName="gap-5 p-4 pb-8"
                 contentContainerStyle={{ paddingTop: insets.top + 8 }}
             >
                 <PhotoGallery
@@ -152,6 +155,46 @@ export const EventDetail = (props: EventDetailProps) => {
                     </Text>
                 </View>
             </ScrollView>
+            <View
+                accessibilityLabel={t("Detail.Actions")}
+                className="flex-row gap-3 border-t-2 border-line bg-surface px-4 pt-4"
+                style={{ paddingBottom: insets.bottom + 16 }}
+            >
+                <DirectionsButton
+                    coordinates={occurrence.venue.coordinates}
+                    className="flex-1"
+                />
+                {instagramUrl !== null && (
+                    <Button
+                        variant="accent"
+                        size="sm"
+                        icon="instagram"
+                        accessibilityRole="link"
+                        accessibilityLabel={t("Detail.Instagram")}
+                        className="flex-1"
+                        onPress={() => {
+                            void Linking.openURL(instagramUrl)
+                        }}
+                    >
+                        <Text>{t("Detail.Instagram")}</Text>
+                    </Button>
+                )}
+                {facebookUrl !== null && (
+                    <Button
+                        variant="accent"
+                        size="sm"
+                        icon="facebook"
+                        accessibilityRole="link"
+                        accessibilityLabel={t("Detail.Facebook")}
+                        className="flex-1"
+                        onPress={() => {
+                            void Linking.openURL(facebookUrl)
+                        }}
+                    >
+                        <Text>{t("Detail.Facebook")}</Text>
+                    </Button>
+                )}
+            </View>
             <View
                 className="absolute inset-x-0 top-0 bg-surface"
                 style={{ height: insets.top }}
