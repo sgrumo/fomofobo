@@ -1,4 +1,4 @@
-import type { PixelCircleSize } from "@/lib/pixel/pixel-shapes"
+import type { PixelCircleSize } from "domain/pixel-shapes"
 
 export const pixelCircleStyles = "items-center justify-center"
 

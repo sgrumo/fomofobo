@@ -2,13 +2,16 @@
 // oxlint-disable-next-line import/no-nodejs-modules
 import { readFileSync } from "node:fs"
 
+import {
+    PIXEL_CIRCLE_PROFILES,
+    PIXEL_CIRCLE_SIZES,
+    PIXEL_CORNER_PROFILE,
+} from "domain/pixel-shapes"
 import { describe, expect, it } from "vitest"
 
 import {
     dashWedgesPath,
     innerProfile,
-    PIXEL_CIRCLE_PROFILES,
-    PIXEL_CORNER_PROFILE,
     PIXEL_RING_WIDTH,
     steppedPath,
     steppedPolygon,
@@ -53,8 +56,6 @@ const sorted = (points: ReadonlyArray<readonly [number, number]>, offset = 0) =>
         .map(([x, y]) => [x + offset, y + offset])
         .toSorted(([x1 = 0, y1 = 0], [x2 = 0, y2 = 0]) => x1 - x2 || y1 - y2)
 
-const circleSizes = [32, 36, 40, 48] as const
-
 describe("pixel shapes", () => {
     it("match the outer pixel corners of the web on any box", () => {
         expect(sorted(steppedPolygon(100, 60, PIXEL_CORNER_PROFILE))).toStrictEqual(
@@ -68,13 +69,13 @@ describe("pixel shapes", () => {
         ).toStrictEqual(cssPolygon("pixel-corners-inner", 96, 56))
     })
 
-    it.each(circleSizes)("match the outer pixel circle %i of the web", size => {
+    it.each(PIXEL_CIRCLE_SIZES)("match the outer pixel circle %i of the web", size => {
         expect(
             sorted(steppedPolygon(size, size, PIXEL_CIRCLE_PROFILES[size])),
         ).toStrictEqual(cssPolygon(`pixel-circle-outer-${String(size)}`, size, size))
     })
 
-    it.each(circleSizes)("match the inner pixel circle %i of the web", size => {
+    it.each(PIXEL_CIRCLE_SIZES)("match the inner pixel circle %i of the web", size => {
         const inner = size - 2 * PIXEL_RING_WIDTH
         expect(
             sorted(

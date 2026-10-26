@@ -1,9 +1,9 @@
+import { PIXEL_CORNER_PROFILE } from "domain/pixel-shapes"
 import { useState } from "react"
 import type { ReactNode } from "react"
 import { View } from "react-native"
 
 import { PixelShape } from "@/components/ui/pixel-shape/pixel-shape"
-import { PIXEL_CORNER_PROFILE } from "@/lib/pixel/pixel-shapes"
 import type { HardShadowSize } from "@/lib/theme/hard-shadow"
 import type { ThemeColor } from "@/lib/theme/theme-tokens"
 import { cn } from "@/lib/utils/class-names"

@@ -1,4 +1,5 @@
 import { clusterArcs } from "domain/event-clusters"
+import { PIXEL_CIRCLE_PROFILES } from "domain/pixel-shapes"
 import { useId } from "react"
 import { useTranslation } from "react-i18next"
 import { Pressable, View } from "react-native"
@@ -7,7 +8,6 @@ import Svg, { ClipPath, Defs, G, Path } from "react-native-svg"
 import { Text } from "@/components/ui/text/text"
 import {
     innerProfile,
-    PIXEL_CIRCLE_PROFILES,
     PIXEL_RING_WIDTH,
     steppedPath,
     wedgePath,

@@ -1,17 +1,3 @@
-// Row insets of one stepped corner, from the edge row inward, on a 1 pt grid. They mirror the
-// `--pixel-*-outer` polygons of `packages/styles/src/globals.css`.
-
-export const PIXEL_CORNER_PROFILE = [5, 3, 2, 1, 1] as const
-
-export const PIXEL_CIRCLE_PROFILES = {
-    32: [12, 9, 7, 6, 5, 4, 3, 2, 2, 1, 1, 1],
-    36: [14, 11, 9, 7, 6, 5, 4, 3, 3, 2, 2, 1, 1, 1],
-    40: [16, 12, 10, 9, 7, 6, 5, 4, 4, 3, 2, 2, 1, 1, 1, 1],
-    48: [19, 16, 13, 12, 10, 9, 8, 7, 6, 5, 4, 4, 3, 2, 2, 2, 1, 1, 1],
-} as const
-
-export type PixelCircleSize = keyof typeof PIXEL_CIRCLE_PROFILES
-
 export const PIXEL_RING_WIDTH = 2
 
 type Point = readonly [number, number]

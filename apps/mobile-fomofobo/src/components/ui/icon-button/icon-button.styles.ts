@@ -1,4 +1,5 @@
-import type { PixelCircleSize } from "@/lib/pixel/pixel-shapes"
+import type { PixelCircleSize } from "domain/pixel-shapes"
+
 import type { ThemeColor } from "@/lib/theme/theme-tokens"
 
 export const iconButtonSizes = {
