@@ -15,6 +15,15 @@ import type { EventMapFeature, MapPointKind, MarkerEmphasis } from "domain/event
 import { mapFlightOf } from "domain/map-center"
 import type { LocateRequest } from "domain/map-center"
 import { mapStyle } from "domain/map-style"
+import {
+    enterMoveOf,
+    leaveMoveOf,
+    MARKER_MOTION_MS,
+    markerTransitions,
+    NO_MARKER_TRANSITIONS,
+    shownMarkersOf,
+} from "domain/marker-motion"
+import type { MarkerMove, MarkerTransitions, ShownMarker } from "domain/marker-motion"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { pinStartOf } from "domain/pin-tag"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
@@ -33,6 +42,7 @@ import dotDitherPattern from "../../../assets/map/dot-dither.png"
 import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"
 import { MapAttribution } from "./map-attribution"
+import { MarkerMotion } from "./marker-motion"
 import { PositionMarker } from "./position-marker"
 import { VenuePin } from "./venue-pin"
 
@@ -42,6 +52,17 @@ const MAP_IMAGES = { "dot-dither": dotDitherPattern }
 interface Viewport {
     bbox: [number, number, number, number]
     zoom: number
+    exactZoom: number
+}
+
+interface MarkerScene {
+    viewport: Viewport
+    occurrences: readonly OccurrenceSummary[]
+    permanentVenues: readonly PermanentVenueSummary[]
+    markers: ShownMarker[]
+    transitions: MarkerTransitions
+    // Counts the scenes, so a timer drops the leaving markers of its own scene alone
+    generation: number
 }
 
 /**
@@ -51,6 +72,7 @@ interface Viewport {
 const viewportOf = (view: Pick<ViewState, "bounds" | "zoom">): Viewport => ({
     bbox: view.bounds,
     zoom: Math.floor(view.zoom),
+    exactZoom: view.zoom,
 })
 
 /**
@@ -125,16 +147,63 @@ export const EventMap = (props: EventMapProps) => {
     const selectedIndex = spots.find(
         spot => spot.venueId === props.selectedVenueId,
     )?.index
-    const features =
+    const markers =
         viewport === undefined
             ? []
-            : clusters
-                  .getClusters(viewport.bbox, viewport.zoom)
-                  .map(feature => {
-                      const emphasis = markerEmphasis(feature, clusters, selectedIndex)
-                      return { feature, emphasis, layer: featureLayer(feature, emphasis) }
-                  })
-                  .toSorted((first, second) => first.layer - second.layer)
+            : shownMarkersOf(clusters.getClusters(viewport.bbox, viewport.zoom), clusters)
+
+    const [scene, setScene] = useState<MarkerScene>()
+    const sameResults =
+        scene?.occurrences === props.occurrences &&
+        scene.permanentVenues === props.permanentVenues
+    if (viewport !== undefined && (scene?.viewport !== viewport || !sameResults)) {
+        // Markers move only between two zoom levels of the same results
+        const zoomed = sameResults && scene.viewport.zoom !== viewport.zoom
+        setScene({
+            viewport,
+            occurrences: props.occurrences,
+            permanentVenues: props.permanentVenues,
+            markers,
+            transitions: zoomed
+                ? markerTransitions(scene.markers, markers)
+                : NO_MARKER_TRANSITIONS,
+            generation: (scene?.generation ?? 0) + 1,
+        })
+    }
+    const generation = scene?.generation
+    const transitions = scene?.transitions ?? NO_MARKER_TRANSITIONS
+    const leaving = transitions.leaving
+    const hasLeaving = leaving.length > 0
+    useEffect(() => {
+        if (!hasLeaving) {
+            return undefined
+        }
+        const timer = setTimeout(() => {
+            setScene(current =>
+                current === undefined || current.generation !== generation
+                    ? current
+                    : {
+                          ...current,
+                          transitions: { ...current.transitions, leaving: [] },
+                      },
+            )
+        }, MARKER_MOTION_MS)
+        return () => {
+            clearTimeout(timer)
+        }
+    }, [generation, hasLeaving])
+
+    const exactZoom = viewport?.exactZoom ?? 0
+    const entryOf = (marker: ShownMarker, move: MarkerMove | undefined) => {
+        const emphasis = markerEmphasis(marker.feature, clusters, selectedIndex)
+        return { marker, move, emphasis, layer: featureLayer(marker.feature, emphasis) }
+    }
+    const shown = [
+        ...markers.map(marker =>
+            entryOf(marker, enterMoveOf(marker, transitions, exactZoom)),
+        ),
+        ...leaving.map(left => entryOf(left.marker, leaveMoveOf(left, exactZoom))),
+    ].toSorted((first, second) => first.layer - second.layer)
 
     const readViewport = async () => {
         const view = await mapRef.current?.getViewState()
@@ -155,48 +224,47 @@ export const EventMap = (props: EventMapProps) => {
         }
     }
 
-    const markerOf = (marker: {
-        feature: EventMapFeature
+    const markerOf = (entry: {
+        marker: ShownMarker
+        move: MarkerMove | undefined
         emphasis: MarkerEmphasis
         layer: number
     }) => {
-        const { feature, emphasis, layer } = marker
-        const [featureLongitude = 0, featureLatitude = 0] = feature.geometry.coordinates
-        const lngLat: [number, number] = [featureLongitude, featureLatitude]
+        const { marker, move, emphasis, layer } = entry
+        const { feature, coordinates } = marker
+        const lngLat: [number, number] = [coordinates.longitude, coordinates.latitude]
         const layerStyle = { zIndex: layer }
+        const key = `${move?.type === "leave" ? "leaving" : "shown"}:${marker.key}`
 
         if ("cluster" in feature.properties) {
             const clusterId = feature.properties.cluster_id
             return (
-                <Marker
-                    key={`cluster-${String(clusterId)}`}
-                    lngLat={lngLat}
-                    anchor="center"
-                    style={layerStyle}
-                >
-                    <EventCluster
-                        count={feature.properties.point_count}
-                        liveCount={feature.properties.liveCount}
-                        upcomingCount={feature.properties.upcomingCount}
-                        endedCount={feature.properties.endedCount}
-                        permanentCount={feature.properties.permanentCount}
-                        emphasis={emphasis}
-                        onExpand={() => {
-                            const zoom = clusters.getClusterExpansionZoom(clusterId)
-                            // Past the last cluster zoom the points share one spot, so no zoom splits them.
-                            const first =
-                                zoom > CLUSTER_MAX_ZOOM
-                                    ? firstLeafIndex(
-                                          clusters.getLeaves(clusterId, Infinity),
-                                      )
-                                    : undefined
-                            if (first !== undefined) {
-                                selectIndex(first)
-                                return
-                            }
-                            cameraRef.current?.easeTo({ center: lngLat, zoom })
-                        }}
-                    />
+                <Marker key={key} lngLat={lngLat} anchor="center" style={layerStyle}>
+                    <MarkerMotion move={move}>
+                        <EventCluster
+                            count={feature.properties.point_count}
+                            liveCount={feature.properties.liveCount}
+                            upcomingCount={feature.properties.upcomingCount}
+                            endedCount={feature.properties.endedCount}
+                            permanentCount={feature.properties.permanentCount}
+                            emphasis={emphasis}
+                            onExpand={() => {
+                                const zoom = clusters.getClusterExpansionZoom(clusterId)
+                                // Past the last cluster zoom the points share one spot, so no zoom splits them.
+                                const first =
+                                    zoom > CLUSTER_MAX_ZOOM
+                                        ? firstLeafIndex(
+                                              clusters.getLeaves(clusterId, Infinity),
+                                          )
+                                        : undefined
+                                if (first !== undefined) {
+                                    selectIndex(first)
+                                    return
+                                }
+                                cameraRef.current?.easeTo({ center: lngLat, zoom })
+                            }}
+                        />
+                    </MarkerMotion>
                 </Marker>
             )
         }
@@ -206,51 +274,45 @@ export const EventMap = (props: EventMapProps) => {
         if (spot.kind === "permanent") {
             const venue = props.permanentVenues.at(spot.index - props.occurrences.length)
             return venue === undefined ? undefined : (
-                <Marker
-                    key={`venue-${venue.id}`}
-                    lngLat={lngLat}
-                    anchor="bottom"
-                    style={layerStyle}
-                >
-                    <VenuePin
-                        name={venue.name}
-                        kind={venue.kind}
-                        icon={props.iconOf(venue.categoryId)}
-                        emphasis={emphasis}
-                        onSelect={() => {
-                            props.onSelectVenue(venue.id)
-                        }}
-                    />
+                <Marker key={key} lngLat={lngLat} anchor="bottom" style={layerStyle}>
+                    <MarkerMotion move={move}>
+                        <VenuePin
+                            name={venue.name}
+                            kind={venue.kind}
+                            icon={props.iconOf(venue.categoryId)}
+                            emphasis={emphasis}
+                            onSelect={() => {
+                                props.onSelectVenue(venue.id)
+                            }}
+                        />
+                    </MarkerMotion>
                 </Marker>
             )
         }
 
         const occurrence = props.occurrences.at(spot.index)
         return occurrence === undefined ? undefined : (
-            <Marker
-                key={`${occurrence.eventId}:${occurrence.date}`}
-                lngLat={lngLat}
-                anchor="bottom"
-                style={layerStyle}
-            >
-                <EventPin
-                    title={occurrence.title}
-                    status={spot.kind}
-                    start={pinStartOf(
-                        new Date(occurrence.startsAt),
-                        props.now,
-                        PLATFORM_TIME_ZONE,
-                    )}
-                    icon={props.iconOf(occurrence.primaryCategoryId)}
-                    moreCount={spot.moreCount}
-                    emphasis={emphasis}
-                    onSelect={() => {
-                        props.onSelect({
-                            eventId: occurrence.eventId,
-                            date: occurrence.date,
-                        })
-                    }}
-                />
+            <Marker key={key} lngLat={lngLat} anchor="bottom" style={layerStyle}>
+                <MarkerMotion move={move}>
+                    <EventPin
+                        title={occurrence.title}
+                        status={spot.kind}
+                        start={pinStartOf(
+                            new Date(occurrence.startsAt),
+                            props.now,
+                            PLATFORM_TIME_ZONE,
+                        )}
+                        icon={props.iconOf(occurrence.primaryCategoryId)}
+                        moreCount={spot.moreCount}
+                        emphasis={emphasis}
+                        onSelect={() => {
+                            props.onSelect({
+                                eventId: occurrence.eventId,
+                                date: occurrence.date,
+                            })
+                        }}
+                    />
+                </MarkerMotion>
             </Marker>
         )
     }
@@ -281,7 +343,7 @@ export const EventMap = (props: EventMapProps) => {
                         zoom: INITIAL_ZOOM,
                     }}
                 />
-                {features.map(markerOf)}
+                {shown.map(markerOf)}
                 {props.position !== undefined && (
                     <Marker
                         lngLat={[props.position.longitude, props.position.latitude]}
