@@ -30,12 +30,13 @@ import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
 import { useGeolocation } from "@/lib/hooks/use-geolocation"
+import { useMediaQuery } from "@/lib/hooks/use-media-query"
 import { useNow } from "@/lib/hooks/use-now"
 import { useOnline } from "@/lib/hooks/use-online"
 
 import { CategoryChips } from "./category-chips"
 import { DateChips } from "./date-chips"
-import { EventPreview } from "./event-preview"
+import { EventPreview, EventPreviewCard } from "./event-preview"
 import type { PreviewEntry, PreviewVenue } from "./event-preview"
 import { PlaceSearch } from "./place-search"
 
@@ -88,6 +89,9 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
     const [filtersOpen, setFiltersOpen] = useState(false)
     const [locateRequest, setLocateRequest] = useState<LocateRequest>()
     const filtersActive = hasActiveFilters(query)
+    const overlayRef = useRef<HTMLDivElement>(null)
+    // The `md` breakpoint of the filter panel
+    const wide = useMediaQuery("(min-width: 48rem)")
 
     const {
         center,
@@ -215,6 +219,40 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
         }
     }
 
+    const paging =
+        sameSpot.length > 1 && spotIndex !== -1
+            ? {
+                  index: spotIndex,
+                  total: sameSpot.length,
+                  onPrevious: () => {
+                      showSpotEntry(spotIndex - 1)
+                  },
+                  onNext: () => {
+                      showSpotEntry(spotIndex + 1)
+                  },
+              }
+            : undefined
+    // A wide screen shows the preview above its pin, once the entry and its place are known
+    const previewCard =
+        wide && selected !== undefined
+            ? {
+                  coordinates:
+                      selected.type === "occurrence"
+                          ? selected.occurrence.venue.coordinates
+                          : selected.venue.coordinates,
+                  content: (
+                      <EventPreviewCard
+                          route={props.route}
+                          entry={selected}
+                          categories={categoriesById}
+                          now={now}
+                          paging={paging}
+                          onClose={closePreview}
+                      />
+                  ),
+              }
+            : undefined
+
     const locate = async () => {
         const result = await geolocation.locate()
         match(result)
@@ -284,6 +322,8 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 permanentVenues={results?.permanentVenues ?? []}
                 iconOf={iconOf}
                 selectedVenueId={spotVenueId}
+                previewCard={previewCard}
+                overlayRef={overlayRef}
                 now={now}
                 onSelect={ref => {
                     openPreview({ type: "occurrence", ref })
@@ -292,7 +332,10 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                     openPreview({ type: "venue", venueId })
                 }}
             />
-            <div className="pointer-events-none absolute inset-x-4 top-4 flex flex-col gap-2 [&>*]:pointer-events-auto">
+            <div
+                ref={overlayRef}
+                className="pointer-events-none absolute inset-x-4 top-4 flex flex-col gap-2 [&>*]:pointer-events-auto"
+            >
                 <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
                         <PlaceSearch
@@ -383,27 +426,17 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
             </div>
             <EventPreview
                 route={props.route}
-                open={selectedRef !== undefined || selectedVenueId !== undefined}
+                open={
+                    previewCard === undefined &&
+                    (selectedRef !== undefined || selectedVenueId !== undefined)
+                }
                 entry={selected}
                 loadFailed={
                     selectedRef === undefined ? venueDetail.isError : detail.isError
                 }
                 categories={categoriesById}
                 now={now}
-                paging={
-                    sameSpot.length > 1 && spotIndex !== -1
-                        ? {
-                              index: spotIndex,
-                              total: sameSpot.length,
-                              onPrevious: () => {
-                                  showSpotEntry(spotIndex - 1)
-                              },
-                              onNext: () => {
-                                  showSpotEntry(spotIndex + 1)
-                              },
-                          }
-                        : undefined
-                }
+                paging={paging}
                 onClose={closePreview}
             />
         </section>

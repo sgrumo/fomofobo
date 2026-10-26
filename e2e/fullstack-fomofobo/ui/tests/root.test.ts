@@ -662,6 +662,39 @@ test.describe("map", () => {
         ).toBeVisible({ timeout: MAP_TIMEOUT_MS })
     })
 
+    test("opens the preview of a pin from the keyboard on a wide screen, and Escape gives the focus back to the pin", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const event = await seedPublicEvent(
+            {
+                venue: await seedVenue(
+                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+                ),
+                category: await seedCategory(),
+            },
+            { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
+        )
+
+        await gotoPage(page, mapPath(center))
+        const pin = page.getByRole("button", {
+            name: t("shared", "Map.Pin", {
+                title: event.title,
+                status: t("shared", "Status.live"),
+                time: "11:00",
+            }),
+        })
+        await pin.focus({ timeout: MAP_TIMEOUT_MS })
+        await pin.press("Enter")
+
+        const preview = page.getByRole("dialog", { name: event.title, exact: true })
+        await expect(preview).toBeFocused()
+        await preview.press("Escape")
+
+        await expect(preview).toBeHidden()
+        await expect(pin).toBeFocused()
+    })
+
     test("opens the preview of a pin, free when it has no price, and its page", async ({
         page,
     }) => {

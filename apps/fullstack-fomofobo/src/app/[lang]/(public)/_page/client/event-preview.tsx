@@ -8,6 +8,7 @@ import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { cn } from "frontend-shared/styles"
 import type { Category, OccurrenceSummary, PublicVenue } from "models"
 import type { ReactNode } from "react"
+import { useEffect, useEffectEvent, useId, useRef } from "react"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import type { StrictOmit } from "shared/types"
@@ -40,20 +41,22 @@ interface PreviewPaging {
 
 export type PreviewVenue = Pick<
     PublicVenue,
-    "id" | "name" | "address" | "coverPhotoUrl" | "kind" | "programmeUrl"
+    "id" | "name" | "address" | "coordinates" | "coverPhotoUrl" | "kind" | "programmeUrl"
 >
 
 export type PreviewEntry =
     | { type: "occurrence"; occurrence: OccurrenceSummary }
     | { type: "venue"; venue: PreviewVenue }
 
-interface EventPreviewProps extends RouteClientComponentProps<"root"> {
-    open: boolean
+type RenderTitle = (text: string, className?: string) => ReactNode
+
+interface PreviewPanelProps extends RouteClientComponentProps<"root"> {
     entry: PreviewEntry | undefined
     loadFailed: boolean
     categories: ReadonlyMap<string, Category>
     now: Date
     paging: PreviewPaging | undefined
+    renderTitle: RenderTitle
     onClose: () => void
 }
 
@@ -96,8 +99,8 @@ const PagingControls = (props: PagingControlsProps) => {
 }
 
 interface PreviewBodyProps extends StrictOmit<
-    EventPreviewProps,
-    "open" | "entry" | "loadFailed" | "onClose"
+    PreviewPanelProps,
+    "entry" | "loadFailed" | "onClose"
 > {
     occurrence: OccurrenceSummary
     closeButton: ReactNode
@@ -147,9 +150,7 @@ const PreviewBody = (props: PreviewBodyProps) => {
                     className="size-24 shrink-0 rounded-sm object-cover"
                 />
                 <div className="flex min-w-0 flex-col gap-1">
-                    <BottomSheetTitle className="tp-pixel-xl uppercase">
-                        {occurrence.title}
-                    </BottomSheetTitle>
+                    {props.renderTitle(occurrence.title, "tp-pixel-xl uppercase")}
                     {occurrence.venue.isBlocked ? (
                         <span className="tp-body-md text-fg-muted">
                             {occurrence.venue.name}
@@ -209,6 +210,7 @@ const PreviewBody = (props: PreviewBodyProps) => {
 interface VenuePreviewBodyProps {
     venue: PreviewVenue
     paging: PreviewPaging | undefined
+    renderTitle: RenderTitle
     closeButton: ReactNode
 }
 
@@ -240,9 +242,7 @@ const VenuePreviewBody = (props: VenuePreviewBodyProps) => {
                     />
                 )}
                 <div className="flex min-w-0 flex-col gap-1">
-                    <BottomSheetTitle className="tp-pixel-xl uppercase">
-                        {venue.name}
-                    </BottomSheetTitle>
+                    {props.renderTitle(venue.name, "tp-pixel-xl uppercase")}
                     <span className="tp-body-md text-fg-muted">{venue.address}</span>
                 </div>
             </div>
@@ -271,7 +271,7 @@ const VenuePreviewBody = (props: VenuePreviewBodyProps) => {
     )
 }
 
-export const EventPreview = (props: EventPreviewProps) => {
+const PreviewPanel = (props: PreviewPanelProps) => {
     const { t } = useTranslation("shared")
 
     const closeButton = (
@@ -283,45 +283,149 @@ export const EventPreview = (props: EventPreviewProps) => {
         />
     )
 
-    return (
-        <BottomSheetRoot
-            open={props.open}
-            onOpenChange={open => {
-                if (!open) {
-                    props.onClose()
-                }
-            }}
-        >
-            <BottomSheetContent>
-                {props.entry === undefined ? (
-                    <div className="flex flex-col gap-3">
-                        <div className="flex items-center justify-between gap-2">
-                            <BottomSheetTitle>{t("Preview.Title")}</BottomSheetTitle>
-                            {closeButton}
-                        </div>
-                        {props.loadFailed ? (
-                            <Alert type="error" text={t("Preview.Unavailable")} />
-                        ) : (
-                            <Spinner title={t("Preview.Loading")} />
-                        )}
-                    </div>
-                ) : props.entry.type === "occurrence" ? (
-                    <PreviewBody
-                        route={props.route}
-                        occurrence={props.entry.occurrence}
-                        categories={props.categories}
-                        now={props.now}
-                        paging={props.paging}
-                        closeButton={closeButton}
-                    />
+    if (props.entry === undefined) {
+        return (
+            <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between gap-2">
+                    {props.renderTitle(t("Preview.Title"))}
+                    {closeButton}
+                </div>
+                {props.loadFailed ? (
+                    <Alert type="error" text={t("Preview.Unavailable")} />
                 ) : (
-                    <VenuePreviewBody
-                        venue={props.entry.venue}
-                        paging={props.paging}
-                        closeButton={closeButton}
-                    />
+                    <Spinner title={t("Preview.Loading")} />
                 )}
-            </BottomSheetContent>
-        </BottomSheetRoot>
+            </div>
+        )
+    }
+
+    return props.entry.type === "occurrence" ? (
+        <PreviewBody
+            route={props.route}
+            occurrence={props.entry.occurrence}
+            categories={props.categories}
+            now={props.now}
+            paging={props.paging}
+            renderTitle={props.renderTitle}
+            closeButton={closeButton}
+        />
+    ) : (
+        <VenuePreviewBody
+            venue={props.entry.venue}
+            paging={props.paging}
+            renderTitle={props.renderTitle}
+            closeButton={closeButton}
+        />
+    )
+}
+
+interface EventPreviewProps extends StrictOmit<PreviewPanelProps, "renderTitle"> {
+    open: boolean
+}
+
+export const EventPreview = (props: EventPreviewProps) => (
+    <BottomSheetRoot
+        open={props.open}
+        onOpenChange={open => {
+            if (!open) {
+                props.onClose()
+            }
+        }}
+    >
+        <BottomSheetContent>
+            <PreviewPanel
+                route={props.route}
+                entry={props.entry}
+                loadFailed={props.loadFailed}
+                categories={props.categories}
+                now={props.now}
+                paging={props.paging}
+                renderTitle={(text, className) => (
+                    <BottomSheetTitle className={className}>{text}</BottomSheetTitle>
+                )}
+                onClose={props.onClose}
+            />
+        </BottomSheetContent>
+    </BottomSheetRoot>
+)
+
+// Native events a press on the card would hand to the map below it
+const MAP_GESTURE_EVENTS = ["mousedown", "touchstart", "wheel", "dblclick"] as const
+
+interface EventPreviewCardProps extends StrictOmit<
+    PreviewPanelProps,
+    "entry" | "loadFailed" | "renderTitle"
+> {
+    entry: PreviewEntry
+}
+
+export const EventPreviewCard = (props: EventPreviewCardProps) => {
+    const titleId = useId()
+    const cardRef = useRef<HTMLElement>(null)
+    const close = useEffectEvent(() => {
+        props.onClose()
+    })
+
+    // The card takes the focus when it opens, gives it back when it closes, and closes on Escape
+    useEffect(() => {
+        const card = cardRef.current
+        if (card === null) {
+            return undefined
+        }
+        const previous = document.activeElement
+        // The marker that holds the card, and the one of the pin, attach after this effect
+        const focusFrame = requestAnimationFrame(() => {
+            card.focus()
+        })
+        const keepFromMap = (event: Event) => {
+            event.stopPropagation()
+        }
+        const closeOnEscape = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                close()
+            }
+        }
+        for (const type of MAP_GESTURE_EVENTS) {
+            card.addEventListener(type, keepFromMap)
+        }
+        card.addEventListener("keydown", closeOnEscape)
+        return () => {
+            cancelAnimationFrame(focusFrame)
+            card.removeEventListener("keydown", closeOnEscape)
+            for (const type of MAP_GESTURE_EVENTS) {
+                card.removeEventListener(type, keepFromMap)
+            }
+            requestAnimationFrame(() => {
+                if (previous instanceof HTMLElement && previous.isConnected) {
+                    previous.focus()
+                }
+            })
+        }
+    }, [])
+
+    return (
+        <section
+            ref={cardRef}
+            role="dialog"
+            aria-modal={false}
+            aria-labelledby={titleId}
+            tabIndex={-1}
+            className="pixel-corners drop-shadow-hard-lg relative w-[23.75rem] cursor-auto p-4 outline-none"
+        >
+            <PreviewPanel
+                route={props.route}
+                entry={props.entry}
+                loadFailed={false}
+                categories={props.categories}
+                now={props.now}
+                paging={props.paging}
+                renderTitle={(text, className) => (
+                    <h2 id={titleId} className={cn("text-fg tp-pixel-lg", className)}>
+                        {text}
+                    </h2>
+                )}
+                onClose={props.onClose}
+            />
+        </section>
     )
 }

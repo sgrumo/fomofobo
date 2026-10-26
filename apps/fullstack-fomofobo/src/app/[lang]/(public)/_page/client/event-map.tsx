@@ -35,6 +35,7 @@ import type {
     OccurrenceSummary,
     PermanentVenueSummary,
 } from "models"
+import type { ReactNode, RefObject } from "react"
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Alert } from "ui-components/alert"
@@ -101,6 +102,33 @@ const addDotDither = async (map: MapLibreMap): Promise<void> => {
     map.addImage(DOT_DITHER_IMAGE, image.data)
 }
 
+const PREVIEW_CARD_LAYER = POSITION_MARKER_LAYER + 1
+
+// Lifts the card above the pin and its tag
+const PREVIEW_CARD_OFFSET: [number, number] = [0, -72]
+
+// Space kept between the card and the edges of the free part of the map
+const PREVIEW_CARD_MARGIN = 16
+
+interface PreviewCard {
+    coordinates: GeoPoint
+    content: ReactNode
+}
+
+/**
+ * @description Returns how far the map pans so a box fits inside a frame, zero on an axis where it fits
+ * @param box Box drawn on the map
+ * @param frame Part of the map free of the controls, less the margin
+ */
+const fitPanOf = (box: DOMRect, frame: DOMRect): [number, number] => {
+    const across = (start: number, end: number, frameStart: number, frameEnd: number) =>
+        start < frameStart ? start - frameStart : Math.max(0, end - frameEnd)
+    return [
+        across(box.left, box.right, frame.left, frame.right),
+        across(box.top, box.bottom, frame.top, frame.bottom),
+    ]
+}
+
 interface EventMapProps extends RouteClientComponentProps<"root"> {
     center: GeoPoint
     locateRequest: LocateRequest | undefined
@@ -109,6 +137,9 @@ interface EventMapProps extends RouteClientComponentProps<"root"> {
     permanentVenues: PermanentVenueSummary[]
     iconOf: (categoryId: string) => CategoryIcon
     selectedVenueId: string | undefined
+    previewCard: PreviewCard | undefined
+    // Controls drawn over the top of the map, which the card keeps clear of
+    overlayRef: RefObject<HTMLElement | null>
     now: Date
     onSelect: (ref: OccurrenceRef) => void
     onSelectVenue: (venueId: string) => void
@@ -165,6 +196,43 @@ export const EventMap = (props: EventMapProps) => {
         const center: [number, number] = [flight.center.longitude, flight.center.latitude]
         map?.flyTo(flight.zoom === undefined ? { center } : { center, zoom: flight.zoom })
     }, [map, latitude, longitude, locateCount])
+
+    const cardRef = useRef<HTMLDivElement>(null)
+    const readOverlay = useEffectEvent(() => props.overlayRef.current)
+    const cardPlace =
+        props.previewCard === undefined
+            ? undefined
+            : `${String(props.previewCard.coordinates.latitude)} ${String(props.previewCard.coordinates.longitude)}`
+    // A card that opens past the edges, or under the controls, pans into view
+    useEffect(() => {
+        const card = cardRef.current
+        const container = containerRef.current
+        if (
+            map === undefined ||
+            cardPlace === undefined ||
+            card === null ||
+            container === null
+        ) {
+            return
+        }
+        const bounds = container.getBoundingClientRect()
+        const top = Math.max(
+            bounds.top,
+            readOverlay()?.getBoundingClientRect().bottom ?? 0,
+        )
+        const [x, y] = fitPanOf(
+            card.getBoundingClientRect(),
+            new DOMRect(
+                bounds.left + PREVIEW_CARD_MARGIN,
+                top + PREVIEW_CARD_MARGIN,
+                bounds.width - 2 * PREVIEW_CARD_MARGIN,
+                bounds.bottom - top - 2 * PREVIEW_CARD_MARGIN,
+            ),
+        )
+        if (x !== 0 || y !== 0) {
+            map.panBy([x, y])
+        }
+    }, [map, cardPlace])
 
     // The result index of a permanent venue follows every occurrence.
     const spots = venueSpots([
@@ -407,6 +475,18 @@ export const EventMap = (props: EventMapProps) => {
                           ),
                       ),
                   ]}
+            {map === undefined || props.previewCard === undefined ? undefined : (
+                <MapMarker
+                    route={props.route}
+                    map={map}
+                    coordinates={props.previewCard.coordinates}
+                    anchor="bottom"
+                    offset={PREVIEW_CARD_OFFSET}
+                    layer={PREVIEW_CARD_LAYER}
+                >
+                    <div ref={cardRef}>{props.previewCard.content}</div>
+                </MapMarker>
+            )}
             {map === undefined || props.position === undefined ? undefined : (
                 <MapMarker
                     route={props.route}
