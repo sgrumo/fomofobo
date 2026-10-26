@@ -71,6 +71,14 @@ export const EventDetailView = (props: EventDetailViewProps) => {
         return undefined
     }
 
+    const status = occurrenceStatus(
+        {
+            startsAt: new Date(occurrence.startsAt),
+            endsAt: new Date(occurrence.endsAt),
+        },
+        now,
+    )
+
     const share = () => {
         const data = { title: occurrence.title, url: globalThis.location.href }
         // Both calls run first in the click: Safari drops the user gesture after an await.
@@ -92,6 +100,7 @@ export const EventDetailView = (props: EventDetailViewProps) => {
                 title={occurrence.title}
                 photos={occurrence.photos}
                 coverPhotoUrl={occurrence.coverPhotoUrl}
+                tone={status}
                 controls={
                     <>
                         <IconButton

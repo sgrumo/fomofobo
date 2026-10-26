@@ -18,6 +18,7 @@
         "./occurrence-facts": "./src/occurrence-facts.ts",
         "./occurrence-progress": "./src/occurrence-progress.ts",
         "./occurrence-status": "./src/occurrence-status.ts",
+        "./photo-tone": "./src/photo-tone.ts",
         "./pin-tag": "./src/pin-tag.ts",
         "./pixel-icons": "./src/pixel-icons.ts",
         "./pixel-shapes": "./src/pixel-shapes.ts",

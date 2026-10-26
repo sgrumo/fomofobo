@@ -3,9 +3,10 @@
 import { localTimeOf } from "domain/local-format"
 import { occurrenceProgress } from "domain/occurrence-progress"
 import { occurrenceStatus } from "domain/occurrence-status"
+import { venuePhotoToneOf } from "domain/photo-tone"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
+import { cn } from "frontend-shared/styles"
 import type { Category, OccurrenceSummary, PublicVenue } from "models"
-import Image from "next/image"
 import type { ReactNode } from "react"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
@@ -24,6 +25,7 @@ import { Spinner } from "ui-components/spinner"
 import { TickProgress } from "ui-components/tick-progress"
 
 import { SaveToggle } from "@/components/client/save-toggle/save-toggle"
+import { TonedImage } from "@/components/client/toned-image/toned-image"
 import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
@@ -136,11 +138,11 @@ const PreviewBody = (props: PreviewBodyProps) => {
                 <PagingControls paging={props.paging} />
             )}
             <div className="border-line flex gap-3 border-t-2 pt-3">
-                <Image
+                <TonedImage
                     src={occurrence.coverPhotoUrl}
+                    tone={status}
                     width={96}
                     height={96}
-                    unoptimized={true}
                     alt=""
                     className="size-24 shrink-0 rounded-sm object-cover"
                 />
@@ -188,7 +190,14 @@ const PreviewBody = (props: PreviewBodyProps) => {
                     }}
                     query={{}}
                     aria-label={t("Preview.Open")}
-                    className="pixel-circle-48 drop-shadow-hard-sm text-fg relative flex size-12 items-center justify-center rounded-full [--pixel-fill:var(--color-live)] [&>svg]:size-5"
+                    className={cn(
+                        "pixel-circle-48 drop-shadow-hard-sm text-fg relative flex size-12 items-center justify-center rounded-full [&>svg]:size-5",
+                        {
+                            "[--pixel-fill:var(--color-live)]": status === "live",
+                            "[--pixel-fill:var(--color-upcoming)]": status === "upcoming",
+                            "[--pixel-fill:var(--color-ended)]": status === "ended",
+                        },
+                    )}
                 >
                     <PixelIconArrow />
                 </RouteLink>
@@ -221,11 +230,11 @@ const VenuePreviewBody = (props: VenuePreviewBodyProps) => {
             )}
             <div className="border-line flex gap-3 border-t-2 pt-3">
                 {venue.coverPhotoUrl === null ? undefined : (
-                    <Image
+                    <TonedImage
                         src={venue.coverPhotoUrl}
+                        tone={venuePhotoToneOf(venue.kind)}
                         width={96}
                         height={96}
-                        unoptimized={true}
                         alt=""
                         className="size-24 shrink-0 rounded-sm object-cover"
                     />

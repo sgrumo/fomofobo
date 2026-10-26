@@ -1,6 +1,8 @@
+import type { MapPointKind } from "domain/event-clusters"
 import { localTimeOf } from "domain/local-format"
 import { occurrenceProgress } from "domain/occurrence-progress"
 import { occurrenceStatus } from "domain/occurrence-status"
+import { venuePhotoToneOf } from "domain/photo-tone"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { router } from "expo-router"
 import type { Category, OccurrenceSummary, PublicVenue } from "models"
@@ -13,13 +15,13 @@ import { SaveToggle } from "@/components/saves/save-toggle"
 import { Badge } from "@/components/ui/badge/badge"
 import { BottomSheetPanel } from "@/components/ui/bottom-sheet-panel/bottom-sheet-panel"
 import { Button } from "@/components/ui/button/button"
-import { DitheredPhoto } from "@/components/ui/dithered-photo/dithered-photo"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { Notice } from "@/components/ui/notice/notice"
 import { PixelCircle } from "@/components/ui/pixel-circle/pixel-circle"
 import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
 import { Text } from "@/components/ui/text/text"
 import { TickProgress } from "@/components/ui/tick-progress/tick-progress"
+import { TonedPhoto } from "@/components/ui/toned-photo/toned-photo"
 import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 
 const OPEN_ICON_SIZE = 20
@@ -80,7 +82,7 @@ const PagingControls = (props: PagingControlsProps) => {
 
 interface OpenLinkProps {
     label: string
-    fill: "live" | "permanent"
+    fill: MapPointKind
     onPress: () => void
 }
 
@@ -136,8 +138,9 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
             </View>
             {props.paging !== undefined && <PagingControls paging={props.paging} />}
             <View className="flex-row gap-3 border-t-2 border-line pt-3">
-                <DitheredPhoto
+                <TonedPhoto
                     uri={occurrence.coverPhotoUrl}
+                    tone={status}
                     className="h-24 w-24 rounded-sm"
                 />
                 <View className="min-w-0 flex-1 gap-1">
@@ -181,7 +184,7 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                 </Text>
                 <OpenLink
                     label={t("Preview.Open")}
-                    fill="live"
+                    fill={status}
                     onPress={() => {
                         router.push({
                             pathname: "/events/[eventId]/[date]",
@@ -221,8 +224,9 @@ const VenueBody = (props: VenueBodyProps) => {
             {props.paging !== undefined && <PagingControls paging={props.paging} />}
             <View className="flex-row gap-3 border-t-2 border-line pt-3">
                 {venue.coverPhotoUrl !== null && (
-                    <DitheredPhoto
+                    <TonedPhoto
                         uri={venue.coverPhotoUrl}
+                        tone={venuePhotoToneOf(venue.kind)}
                         className="h-24 w-24 rounded-sm"
                     />
                 )}

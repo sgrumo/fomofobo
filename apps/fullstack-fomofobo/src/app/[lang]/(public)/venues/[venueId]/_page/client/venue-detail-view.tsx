@@ -3,12 +3,12 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { localTimeOf, weekdayDateOf } from "domain/local-format"
 import { occurrenceStatus } from "domain/occurrence-status"
+import { venuePhotoToneOf } from "domain/photo-tone"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { venueShareTextOf } from "domain/share-summary"
 import { historyDatesOf, VENUE_HISTORY_PAGE_SIZE } from "domain/venue-history"
 import type { LanguageKey } from "i18n/i18n"
 import type { OccurrenceSummary, VenueHistoryItem } from "models"
-import Image from "next/image"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import { Alert } from "ui-components/alert"
@@ -26,6 +26,7 @@ import { Spinner } from "ui-components/spinner"
 
 import { DirectionsLink } from "@/components/client/directions-link/directions-link"
 import { ShareRow } from "@/components/client/share-row/share-row"
+import { TonedImage } from "@/components/client/toned-image/toned-image"
 import { useDynamicRoute } from "@/framework/routes/route-hooks/use-dynamic-route"
 import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
@@ -93,11 +94,11 @@ export const VenueDetailView = (props: VenueDetailViewProps) => {
                 />
             </header>
             {venue.coverPhotoUrl === null ? undefined : (
-                <Image
+                <TonedImage
                     src={venue.coverPhotoUrl}
+                    tone={venuePhotoToneOf(venue.kind)}
                     width={1200}
                     height={900}
-                    unoptimized={true}
                     alt={t("Venue.Cover", { name: venue.name })}
                     className="border-line aspect-[4/3] w-full rounded-md border-2 object-cover"
                 />

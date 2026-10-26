@@ -89,6 +89,7 @@ export const EventDetail = (props: EventDetailProps) => {
                 <PhotoGallery
                     title={occurrence.title}
                     photos={occurrence.photos}
+                    tone={status}
                     coverPhotoUrl={occurrence.coverPhotoUrl}
                     controls={
                         <>

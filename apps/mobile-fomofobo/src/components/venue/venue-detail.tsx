@@ -1,3 +1,4 @@
+import { venuePhotoToneOf } from "domain/photo-tone"
 import type { PixelIconName } from "domain/pixel-icons"
 import { venuePageUrlOf } from "domain/public-page-urls"
 import { venueShareTextOf } from "domain/share-summary"
@@ -11,9 +12,9 @@ import { DirectionsButton } from "@/components/links/directions-button"
 import { ShareRow } from "@/components/links/share-row"
 import { Badge } from "@/components/ui/badge/badge"
 import { Button } from "@/components/ui/button/button"
-import { DitheredPhoto } from "@/components/ui/dithered-photo/dithered-photo"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { Text } from "@/components/ui/text/text"
+import { TonedPhoto } from "@/components/ui/toned-photo/toned-photo"
 import { VenueHistory } from "@/components/venue/venue-history"
 import { VenueUpcoming } from "@/components/venue/venue-upcoming"
 import { env } from "@/lib/env"
@@ -84,8 +85,9 @@ export const VenueDetail = (props: VenueDetailProps) => {
                     />
                 </View>
                 {venue.coverPhotoUrl !== null && (
-                    <DitheredPhoto
+                    <TonedPhoto
                         uri={venue.coverPhotoUrl}
+                        tone={venuePhotoToneOf(venue.kind)}
                         label={t("Venue.Cover", { name: venue.name })}
                         className="aspect-[4/3] w-full rounded-md border-2 border-line"
                     />
