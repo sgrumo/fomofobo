@@ -5,7 +5,10 @@ import {
     CLUSTER_MAX_ZOOM,
     clusterLayer,
     firstLeafIndex,
+    markerEmphasis,
     markerLayer,
+    POSITION_MARKER_LAYER,
+    SELECTED_MARKER_LAYER,
     venueSpots,
 } from "domain/event-clusters"
 import type { EventMapFeature, MapPointKind } from "domain/event-clusters"
@@ -90,6 +93,7 @@ interface EventMapProps extends RouteClientComponentProps<"root"> {
     occurrences: OccurrenceSummary[]
     permanentVenues: PermanentVenueSummary[]
     iconOf: (categoryId: string) => CategoryIcon
+    selectedVenueId: string | undefined
     now: Date
     onSelect: (ref: OccurrenceRef) => void
     onSelectVenue: (venueId: string) => void
@@ -140,30 +144,30 @@ export const EventMap = (props: EventMapProps) => {
     }, [map, latitude, longitude])
 
     // The result index of a permanent venue follows every occurrence.
-    const clusters = buildEventClusters(
-        venueSpots([
-            ...props.occurrences.map(occurrence => ({
-                venueId: occurrence.venue.id,
-                coordinates: occurrence.venue.coordinates,
-                kind: occurrenceStatus(
-                    {
-                        startsAt: new Date(occurrence.startsAt),
-                        endsAt: new Date(occurrence.endsAt),
-                    },
-                    props.now,
-                ),
-            })),
-            ...props.permanentVenues.map(
-                (
-                    venue,
-                ): { venueId: string; coordinates: GeoPoint; kind: MapPointKind } => ({
-                    venueId: venue.id,
-                    coordinates: venue.coordinates,
-                    kind: "permanent",
-                }),
+    const spots = venueSpots([
+        ...props.occurrences.map(occurrence => ({
+            venueId: occurrence.venue.id,
+            coordinates: occurrence.venue.coordinates,
+            kind: occurrenceStatus(
+                {
+                    startsAt: new Date(occurrence.startsAt),
+                    endsAt: new Date(occurrence.endsAt),
+                },
+                props.now,
             ),
-        ]),
-    )
+        })),
+        ...props.permanentVenues.map(
+            (venue): { venueId: string; coordinates: GeoPoint; kind: MapPointKind } => ({
+                venueId: venue.id,
+                coordinates: venue.coordinates,
+                kind: "permanent",
+            }),
+        ),
+    ])
+    const clusters = buildEventClusters(spots)
+    const selectedIndex = spots.find(
+        spot => spot.venueId === props.selectedVenueId,
+    )?.index
     const selectIndex = (index: number) => {
         const occurrence = props.occurrences.at(index)
         if (occurrence !== undefined) {
@@ -211,6 +215,7 @@ export const EventMap = (props: EventMapProps) => {
                           return undefined
                       }
 
+                      const emphasis = markerEmphasis(feature, clusters, selectedIndex)
                       if ("cluster" in feature.properties) {
                           const clusterId = feature.properties.cluster_id
                           return (
@@ -229,6 +234,7 @@ export const EventMap = (props: EventMapProps) => {
                                       upcomingCount={feature.properties.upcomingCount}
                                       endedCount={feature.properties.endedCount}
                                       permanentCount={feature.properties.permanentCount}
+                                      emphasis={emphasis}
                                       onExpand={() => {
                                           const zoom =
                                               clusters.getClusterExpansionZoom(clusterId)
@@ -257,6 +263,10 @@ export const EventMap = (props: EventMapProps) => {
                       }
 
                       const { index, kind, moreCount } = feature.properties
+                      const layer =
+                          emphasis === "selected"
+                              ? SELECTED_MARKER_LAYER
+                              : markerLayer(kind)
                       if (kind === "permanent") {
                           const venue = props.permanentVenues.at(
                               index - props.occurrences.length,
@@ -268,13 +278,14 @@ export const EventMap = (props: EventMapProps) => {
                                   map={map}
                                   coordinates={point}
                                   anchor="bottom"
-                                  layer={markerLayer(kind)}
+                                  layer={layer}
                               >
                                   <VenuePin
                                       route={props.route}
                                       name={venue.name}
                                       kind={venue.kind}
                                       icon={props.iconOf(venue.categoryId)}
+                                      emphasis={emphasis}
                                       onSelect={() => {
                                           props.onSelectVenue(venue.id)
                                       }}
@@ -294,7 +305,7 @@ export const EventMap = (props: EventMapProps) => {
                               map={map}
                               coordinates={point}
                               anchor="bottom"
-                              layer={markerLayer(kind)}
+                              layer={layer}
                           >
                               <EventPin
                                   route={props.route}
@@ -307,6 +318,7 @@ export const EventMap = (props: EventMapProps) => {
                                   )}
                                   icon={props.iconOf(occurrence.primaryCategoryId)}
                                   moreCount={moreCount}
+                                  emphasis={emphasis}
                                   onSelect={() => {
                                       props.onSelect({
                                           eventId: occurrence.eventId,
@@ -323,7 +335,7 @@ export const EventMap = (props: EventMapProps) => {
                     map={map}
                     coordinates={props.position}
                     anchor="center"
-                    layer={markerLayer("live") + 1}
+                    layer={POSITION_MARKER_LAYER}
                 >
                     <span
                         role="img"

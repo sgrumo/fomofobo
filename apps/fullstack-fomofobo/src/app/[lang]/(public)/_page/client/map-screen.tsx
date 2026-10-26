@@ -277,6 +277,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 occurrences={results?.occurrences ?? []}
                 permanentVenues={results?.permanentVenues ?? []}
                 iconOf={iconOf}
+                selectedVenueId={spotVenueId}
                 now={now}
                 onSelect={ref => {
                     openPreview({ type: "occurrence", ref })

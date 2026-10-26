@@ -1,3 +1,4 @@
+import type { MarkerEmphasis } from "domain/event-clusters"
 import { pinTagOf } from "domain/pin-tag"
 import type { PinStart } from "domain/pin-tag"
 import type { CategoryIcon, OccurrenceStatus } from "models"
@@ -38,6 +39,7 @@ interface EventPinProps {
     icon: CategoryIcon
     // Other results at the same venue
     moreCount: number
+    emphasis: MarkerEmphasis
     onSelect: () => void
 }
 
@@ -82,12 +84,17 @@ export const EventPin = (props: EventPinProps) => {
                 .filter(isDefined)
                 .join(", ")}
             onPress={props.onSelect}
-            className="items-center gap-1"
+            className={cn("items-center gap-1", {
+                "opacity-35": props.emphasis === "dimmed",
+            })}
         >
             <View className="flex-row">
                 {tag}
                 {props.moreCount !== 0 && (
-                    <Badge tone="inverse" className="rounded-none">
+                    <Badge
+                        tone="inverse"
+                        className="min-w-6 justify-center rounded-none px-0"
+                    >
                         {`+${String(props.moreCount)}`}
                     </Badge>
                 )}
@@ -111,7 +118,7 @@ export const EventPin = (props: EventPinProps) => {
                 <PixelCircle
                     size={36}
                     fill={props.status}
-                    shadow="sm"
+                    shadow={props.emphasis === "selected" ? "md" : undefined}
                     dashed={props.status === "ended"}
                 >
                     <PixelIcon name={props.icon} size={PIN_ICON_SIZE} centered={true} />

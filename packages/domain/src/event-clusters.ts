@@ -15,6 +15,7 @@ export interface EventPointProperties {
 }
 
 export interface MapSpot extends EventPointProperties {
+    venueId: string
     coordinates: GeoPoint
 }
 
@@ -37,6 +38,10 @@ const LAYER_ORDER: readonly MapPointKind[] = ["permanent", "ended", "upcoming", 
  * @param kind Kind of the point
  */
 export const markerLayer = (kind: MapPointKind): number => LAYER_ORDER.indexOf(kind)
+
+export const SELECTED_MARKER_LAYER = LAYER_ORDER.length
+
+export const POSITION_MARKER_LAYER = SELECTED_MARKER_LAYER + 1
 
 /**
  * @description Groups the results into one spot per venue, marked by its result of the highest
@@ -63,6 +68,7 @@ export const venueSpots = (
                 markerLayer(result.kind) > markerLayer(best.kind) ? result : best,
             )
             return {
+                venueId: top.venueId,
                 coordinates: top.coordinates,
                 kind: top.kind,
                 index: top.index,
@@ -165,3 +171,30 @@ export const firstLeafIndex = (
     leaves.length === 0
         ? undefined
         : Math.min(...leaves.map(leaf => leaf.properties.index))
+
+export type MarkerEmphasis = "selected" | "dimmed" | "normal"
+
+/**
+ * @description Returns the emphasis of a marker while a spot is selected: the selected spot
+ * stands out, the cluster that holds it stays as it is, every other marker dims
+ * @param feature Cluster or single spot
+ * @param clusters Cluster index of the feature
+ * @param selectedIndex Result index of the selected spot, if any
+ */
+export const markerEmphasis = (
+    feature: EventMapFeature,
+    clusters: Supercluster<EventPointProperties, EventClusterProperties>,
+    selectedIndex: number | undefined,
+): MarkerEmphasis => {
+    if (selectedIndex === undefined) {
+        return "normal"
+    }
+    if ("cluster" in feature.properties) {
+        return clusters
+            .getLeaves(feature.properties.cluster_id, Infinity)
+            .some(leaf => leaf.properties.index === selectedIndex)
+            ? "normal"
+            : "dimmed"
+    }
+    return feature.properties.index === selectedIndex ? "selected" : "dimmed"
+}

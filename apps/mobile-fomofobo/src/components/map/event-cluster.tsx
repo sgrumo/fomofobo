@@ -1,4 +1,5 @@
 import { clusterArcs } from "domain/event-clusters"
+import type { MarkerEmphasis } from "domain/event-clusters"
 import { PIXEL_CIRCLE_PROFILES } from "domain/pixel-shapes"
 import { useId } from "react"
 import { useTranslation } from "react-i18next"
@@ -12,11 +13,11 @@ import {
     steppedPath,
     wedgePath,
 } from "@/lib/pixel/pixel-shapes"
-import { HARD_SHADOW_OFFSETS, THEME_COLORS } from "@/lib/theme/theme-tokens"
+import { THEME_COLORS } from "@/lib/theme/theme-tokens"
+import { cn } from "@/lib/utils/class-names"
 
 const CLUSTER_SIZE = 48
 const CORE_SIZE = 36
-const SHADOW_OFFSET = HARD_SHADOW_OFFSETS.md
 const DEGREES_PER_PERCENT = 3.6
 
 interface EventClusterProps {
@@ -25,6 +26,7 @@ interface EventClusterProps {
     upcomingCount: number
     endedCount: number
     permanentCount: number
+    emphasis: MarkerEmphasis
     onExpand: () => void
 }
 
@@ -45,13 +47,12 @@ export const EventCluster = (props: EventClusterProps) => {
                 permanent: props.permanentCount,
             })}
             onPress={props.onExpand}
-            className="h-12 w-12 items-center justify-center"
+            className={cn("h-12 w-12 items-center justify-center", {
+                "opacity-35": props.emphasis === "dimmed",
+            })}
         >
             <View className="absolute left-0 top-0" pointerEvents="none">
-                <Svg
-                    width={CLUSTER_SIZE + SHADOW_OFFSET}
-                    height={CLUSTER_SIZE + SHADOW_OFFSET}
-                >
+                <Svg width={CLUSTER_SIZE} height={CLUSTER_SIZE}>
                     <Defs>
                         <ClipPath id={`${id}-ring`}>
                             <Path
@@ -64,15 +65,6 @@ export const EventCluster = (props: EventClusterProps) => {
                             />
                         </ClipPath>
                     </Defs>
-                    <Path
-                        fill={THEME_COLORS.line}
-                        d={steppedPath(
-                            CLUSTER_SIZE,
-                            CLUSTER_SIZE,
-                            profile,
-                            SHADOW_OFFSET,
-                        )}
-                    />
                     <Path
                         fill={THEME_COLORS.line}
                         d={steppedPath(CLUSTER_SIZE, CLUSTER_SIZE, profile)}

@@ -1,5 +1,6 @@
 "use client"
 
+import type { MarkerEmphasis } from "domain/event-clusters"
 import { pinTagOf } from "domain/pin-tag"
 import type { PinStart } from "domain/pin-tag"
 import { cn } from "frontend-shared/styles"
@@ -19,6 +20,7 @@ interface EventPinProps extends RouteClientComponentProps<"root"> {
     icon: CategoryIcon
     // Other results at the same venue
     moreCount: number
+    emphasis: MarkerEmphasis
     onSelect: () => void
 }
 
@@ -64,12 +66,18 @@ export const EventPin = (props: EventPinProps) => {
                 .filter(isDefined)
                 .join(", ")}
             onClick={props.onSelect}
-            className="flex cursor-pointer flex-col items-center gap-1"
+            className={cn(
+                "flex cursor-pointer flex-col items-center gap-1 transition-opacity",
+                { "opacity-35": props.emphasis === "dimmed" },
+            )}
         >
             <span className="flex items-center">
                 {badge}
                 {props.moreCount === 0 ? undefined : (
-                    <Badge tone="inverse" className="rounded-none">
+                    <Badge
+                        tone="inverse"
+                        className="min-w-6 justify-center rounded-none px-0"
+                    >
                         +{props.moreCount}
                     </Badge>
                 )}
@@ -89,8 +97,9 @@ export const EventPin = (props: EventPinProps) => {
                 ) : undefined}
                 <span
                     className={cn(
-                        "pixel-circle-36 drop-shadow-hard-sm text-fg relative flex size-9 items-center justify-center",
+                        "pixel-circle-36 text-fg relative flex size-9 items-center justify-center",
                         {
+                            "drop-shadow-hard-md": props.emphasis === "selected",
                             "[--pixel-fill:var(--color-live)]": props.status === "live",
                             "[--pixel-fill:var(--color-upcoming)]":
                                 props.status === "upcoming",

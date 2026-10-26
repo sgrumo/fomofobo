@@ -5,6 +5,7 @@ import {
     clusterArcs,
     clusterLayer,
     firstLeafIndex,
+    markerEmphasis,
     markerLayer,
     venueSpots,
 } from "./event-clusters"
@@ -18,12 +19,48 @@ describe("buildEventClusters", () => {
 
     it("merges close spots into one cluster that counts its spots per kind", () => {
         const index = buildEventClusters([
-            { coordinates: venue, kind: "live", index: 0, moreCount: 0 },
-            { coordinates: nextDoor, kind: "upcoming", index: 1, moreCount: 2 },
-            { coordinates: venue, kind: "live", index: 2, moreCount: 0 },
-            { coordinates: nextDoor, kind: "ended", index: 3, moreCount: 0 },
-            { coordinates: farAway, kind: "live", index: 4, moreCount: 1 },
-            { coordinates: venue, kind: "permanent", index: 5, moreCount: 0 },
+            {
+                venueId: "venue-0",
+                coordinates: venue,
+                kind: "live",
+                index: 0,
+                moreCount: 0,
+            },
+            {
+                venueId: "venue-1",
+                coordinates: nextDoor,
+                kind: "upcoming",
+                index: 1,
+                moreCount: 2,
+            },
+            {
+                venueId: "venue-2",
+                coordinates: venue,
+                kind: "live",
+                index: 2,
+                moreCount: 0,
+            },
+            {
+                venueId: "venue-3",
+                coordinates: nextDoor,
+                kind: "ended",
+                index: 3,
+                moreCount: 0,
+            },
+            {
+                venueId: "venue-4",
+                coordinates: farAway,
+                kind: "live",
+                index: 4,
+                moreCount: 1,
+            },
+            {
+                venueId: "venue-5",
+                coordinates: venue,
+                kind: "permanent",
+                index: 5,
+                moreCount: 0,
+            },
         ])
 
         const properties = index.getClusters(world, 12).map(feature => feature.properties)
@@ -46,8 +83,20 @@ describe("buildEventClusters", () => {
 
     it("keeps the result index and the count of other results of each single spot", () => {
         const index = buildEventClusters([
-            { coordinates: venue, kind: "ended", index: 0, moreCount: 3 },
-            { coordinates: farAway, kind: "permanent", index: 1, moreCount: 0 },
+            {
+                venueId: "venue-0",
+                coordinates: venue,
+                kind: "ended",
+                index: 0,
+                moreCount: 3,
+            },
+            {
+                venueId: "venue-1",
+                coordinates: farAway,
+                kind: "permanent",
+                index: 1,
+                moreCount: 0,
+            },
         ])
 
         const properties = index.getClusters(world, 17).map(feature => feature.properties)
@@ -75,8 +124,20 @@ describe("venueSpots", () => {
                 { venueId: "chiostro", coordinates: venue, kind: "permanent" },
             ]),
         ).toStrictEqual([
-            { coordinates: venue, kind: "live", index: 2, moreCount: 2 },
-            { coordinates: farAway, kind: "ended", index: 1, moreCount: 0 },
+            {
+                venueId: "chiostro",
+                coordinates: venue,
+                kind: "live",
+                index: 2,
+                moreCount: 2,
+            },
+            {
+                venueId: "rocca",
+                coordinates: farAway,
+                kind: "ended",
+                index: 1,
+                moreCount: 0,
+            },
         ])
     })
 
@@ -87,7 +148,13 @@ describe("venueSpots", () => {
                 { venueId: "chiostro", coordinates: venue, kind: "upcoming" },
             ]),
         ).toStrictEqual([
-            { coordinates: venue, kind: "upcoming", index: 0, moreCount: 1 },
+            {
+                venueId: "chiostro",
+                coordinates: venue,
+                kind: "upcoming",
+                index: 0,
+                moreCount: 1,
+            },
         ])
     })
 })
@@ -101,6 +168,55 @@ describe("firstLeafIndex", () => {
                 { properties: { index: 2 } },
             ]),
         ).toBe(1)
+    })
+})
+
+describe("markerEmphasis", () => {
+    const venue = { latitude: 44.3533, longitude: 11.7147 }
+    const nextDoor = { latitude: 44.3534, longitude: 11.7148 }
+    const farAway = { latitude: 44.5, longitude: 11.9 }
+    const world: [number, number, number, number] = [-180, -85, 180, 85]
+    const clusters = buildEventClusters([
+        { venueId: "chiostro", coordinates: venue, kind: "live", index: 0, moreCount: 0 },
+        {
+            venueId: "rocca",
+            coordinates: nextDoor,
+            kind: "ended",
+            index: 1,
+            moreCount: 0,
+        },
+        {
+            venueId: "teatro",
+            coordinates: farAway,
+            kind: "upcoming",
+            index: 2,
+            moreCount: 0,
+        },
+    ])
+    const features = clusters
+        .getClusters(world, 12)
+        .toSorted(
+            (first, second) =>
+                Number("cluster" in second.properties) -
+                Number("cluster" in first.properties),
+        )
+
+    it("leaves every marker as it is with no selection", () => {
+        expect(
+            features.map(feature => markerEmphasis(feature, clusters, undefined)),
+        ).toStrictEqual(["normal", "normal"])
+    })
+
+    it("keeps the cluster that holds the selected spot and dims the other spot", () => {
+        expect(
+            features.map(feature => markerEmphasis(feature, clusters, 1)),
+        ).toStrictEqual(["normal", "dimmed"])
+    })
+
+    it("marks the selected spot and dims the cluster that does not hold it", () => {
+        expect(
+            features.map(feature => markerEmphasis(feature, clusters, 2)),
+        ).toStrictEqual(["dimmed", "selected"])
     })
 })
 

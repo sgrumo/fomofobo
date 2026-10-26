@@ -5,10 +5,13 @@ import {
     CLUSTER_MAX_ZOOM,
     clusterLayer,
     firstLeafIndex,
+    markerEmphasis,
     markerLayer,
+    POSITION_MARKER_LAYER,
+    SELECTED_MARKER_LAYER,
     venueSpots,
 } from "domain/event-clusters"
-import type { EventMapFeature, MapPointKind } from "domain/event-clusters"
+import type { EventMapFeature, MapPointKind, MarkerEmphasis } from "domain/event-clusters"
 import { mapStyle } from "domain/map-style"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { pinStartOf } from "domain/pin-tag"
@@ -52,11 +55,14 @@ const viewportOf = (view: Pick<ViewState, "bounds" | "zoom">): Viewport => ({
 /**
  * @description Returns the layer of a cluster or of a single spot, higher on top
  * @param feature Cluster or single spot
+ * @param emphasis Emphasis of the marker
  */
-const featureLayer = (feature: EventMapFeature): number =>
+const featureLayer = (feature: EventMapFeature, emphasis: MarkerEmphasis): number =>
     "cluster" in feature.properties
         ? clusterLayer(feature.properties)
-        : markerLayer(feature.properties.kind)
+        : emphasis === "selected"
+          ? SELECTED_MARKER_LAYER
+          : markerLayer(feature.properties.kind)
 
 interface EventMapProps {
     center: GeoPoint
@@ -64,6 +70,7 @@ interface EventMapProps {
     occurrences: readonly OccurrenceSummary[]
     permanentVenues: readonly PermanentVenueSummary[]
     iconOf: (categoryId: string) => CategoryIcon
+    selectedVenueId: string | undefined
     now: Date
     onSelect: (ref: OccurrenceRef) => void
     onSelectVenue: (venueId: string) => void
@@ -103,12 +110,19 @@ export const EventMap = (props: EventMapProps) => {
         ),
     ])
     const clusters = buildEventClusters(spots)
+    const selectedIndex = spots.find(
+        spot => spot.venueId === props.selectedVenueId,
+    )?.index
     const features =
         viewport === undefined
             ? []
             : clusters
                   .getClusters(viewport.bbox, viewport.zoom)
-                  .toSorted((first, second) => featureLayer(first) - featureLayer(second))
+                  .map(feature => {
+                      const emphasis = markerEmphasis(feature, clusters, selectedIndex)
+                      return { feature, emphasis, layer: featureLayer(feature, emphasis) }
+                  })
+                  .toSorted((first, second) => first.layer - second.layer)
 
     const readViewport = async () => {
         const view = await mapRef.current?.getViewState()
@@ -129,10 +143,15 @@ export const EventMap = (props: EventMapProps) => {
         }
     }
 
-    const markerOf = (feature: EventMapFeature) => {
+    const markerOf = (marker: {
+        feature: EventMapFeature
+        emphasis: MarkerEmphasis
+        layer: number
+    }) => {
+        const { feature, emphasis, layer } = marker
         const [featureLongitude = 0, featureLatitude = 0] = feature.geometry.coordinates
         const lngLat: [number, number] = [featureLongitude, featureLatitude]
-        const layerStyle = { zIndex: featureLayer(feature) }
+        const layerStyle = { zIndex: layer }
 
         if ("cluster" in feature.properties) {
             const clusterId = feature.properties.cluster_id
@@ -149,6 +168,7 @@ export const EventMap = (props: EventMapProps) => {
                         upcomingCount={feature.properties.upcomingCount}
                         endedCount={feature.properties.endedCount}
                         permanentCount={feature.properties.permanentCount}
+                        emphasis={emphasis}
                         onExpand={() => {
                             const zoom = clusters.getClusterExpansionZoom(clusterId)
                             // Past the last cluster zoom the points share one spot, so no zoom splits them.
@@ -184,6 +204,7 @@ export const EventMap = (props: EventMapProps) => {
                         name={venue.name}
                         kind={venue.kind}
                         icon={props.iconOf(venue.categoryId)}
+                        emphasis={emphasis}
                         onSelect={() => {
                             props.onSelectVenue(venue.id)
                         }}
@@ -210,6 +231,7 @@ export const EventMap = (props: EventMapProps) => {
                     )}
                     icon={props.iconOf(occurrence.primaryCategoryId)}
                     moreCount={spot.moreCount}
+                    emphasis={emphasis}
                     onSelect={() => {
                         props.onSelect({
                             eventId: occurrence.eventId,
@@ -252,7 +274,7 @@ export const EventMap = (props: EventMapProps) => {
                     <Marker
                         lngLat={[props.position.longitude, props.position.latitude]}
                         anchor="center"
-                        style={{ zIndex: markerLayer("live") + 1 }}
+                        style={{ zIndex: POSITION_MARKER_LAYER }}
                     >
                         <View
                             accessible={true}

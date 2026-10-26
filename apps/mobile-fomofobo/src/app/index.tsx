@@ -209,6 +209,7 @@ const MapScreen = () => {
                 occurrences={results?.occurrences ?? []}
                 permanentVenues={results?.permanentVenues ?? []}
                 iconOf={iconOf}
+                selectedVenueId={spotVenueId}
                 now={now}
                 onSelect={ref => {
                     setQuery({

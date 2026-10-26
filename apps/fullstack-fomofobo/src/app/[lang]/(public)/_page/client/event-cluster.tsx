@@ -1,6 +1,8 @@
 "use client"
 
 import { clusterArcs } from "domain/event-clusters"
+import type { MarkerEmphasis } from "domain/event-clusters"
+import { cn } from "frontend-shared/styles"
 import { useTranslation } from "react-i18next"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
@@ -11,6 +13,7 @@ interface EventClusterProps extends RouteClientComponentProps<"root"> {
     upcomingCount: number
     endedCount: number
     permanentCount: number
+    emphasis: MarkerEmphasis
     onExpand: () => void
 }
 
@@ -31,7 +34,10 @@ export const EventCluster = (props: EventClusterProps) => {
                 permanent: props.permanentCount,
             })}
             onClick={props.onExpand}
-            className="pixel-circle-48 drop-shadow-hard-md relative flex size-12 cursor-pointer items-center justify-center"
+            className={cn(
+                "pixel-circle-48 relative flex size-12 cursor-pointer items-center justify-center transition-opacity",
+                { "opacity-35": props.emphasis === "dimmed" },
+            )}
         >
             <span
                 aria-hidden={true}
