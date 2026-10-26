@@ -30,6 +30,8 @@ An event has a title, one or more categories, one venue, a start and an end, an 
 
 The price scheme says whether the event is free or paid. A paid event has a full price, reduced prices with a label each, or notes alone. Free or paid, an event can require a membership card with an optional cost, and a minimum age. Amounts are in euro. The public app sums the scheme up in one line, such as "da 5 €" or "Gratis · Tessera richiesta · 18+", and a paid event with no amount shows its notes. The capacity is the number of places, shown and never enforced. The end is later than the start and can fall on the next day. An event holds up to ten photos, none at all included, and the account that writes the event uploads them. An event with no photo takes the cover of its venue, else the image of its primary category, else a generated image of the category icon, in the preview, on its page and in link previews. Each photo is stored as a two-color dither, at most 1200 pixels wide.
 
+The public app draws each photo in ink and the color of the status of its event: red when live, yellow when upcoming, gray when ended. The cover of a permanent venue takes the color of permanent venues. The stored photo stays red, so a change of status needs no new upload.
+
 ### Recurrence and occurrences
 
 An event is single or repeating. A repeating event follows a weekly or monthly rule from its first date up to an end date, plus added dates outside the rule, minus removed dates of the rule. Each resulting date is an occurrence with the start and end times of the event, and status, date filters and countdowns work per occurrence.

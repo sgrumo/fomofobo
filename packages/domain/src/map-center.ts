@@ -49,7 +49,7 @@ export const centerQueryOf = (point: GeoPoint): Pick<MapQuery, "lat" | "lng"> =>
 }
 
 // Zoom after a locate: a few blocks around the visitor
-export const LOCATE_ZOOM = 15
+export const LOCATE_ZOOM = 14
 
 // Exact position of the last locate, and how many locates ran
 export interface LocateRequest {
