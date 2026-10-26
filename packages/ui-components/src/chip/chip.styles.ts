@@ -4,6 +4,11 @@ export const chipRowStyles = styles(
     () => "hidden-scrollbar flex items-center gap-1.5 overflow-x-auto px-0.5 pt-0.5 pb-1",
 )
 
+export const chipBarStyles = styles(
+    () =>
+        "border-line bg-surface shadow-hard-sm inline-flex shrink-0 items-stretch overflow-hidden rounded-md border-2 [&>*]:h-6 [&>*]:rounded-none [&>*]:border-0 [&>*]:shadow-none [&>*+*]:border-l-2",
+)
+
 export const chipStyles = styles(
     () =>
         "group tp-pixel-sm border-line bg-surface text-fg shadow-hard-sm focus-visible:outline-focus data-[pressed]:bg-surface-inverse data-[pressed]:text-fg-inverse not-data-[pressed]:enabled:hover:bg-surface-muted inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md border-2 px-2.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50",

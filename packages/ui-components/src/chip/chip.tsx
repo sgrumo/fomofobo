@@ -4,7 +4,13 @@ import type { ComponentProps, ReactNode } from "react"
 import type { StrictOmit } from "shared/types"
 import { isDefined } from "shared/values"
 
-import { chipCountStyles, chipIconStyles, chipRowStyles, chipStyles } from "./chip.styles"
+import {
+    chipBarStyles,
+    chipCountStyles,
+    chipIconStyles,
+    chipRowStyles,
+    chipStyles,
+} from "./chip.styles"
 
 interface ChipRowProps {
     label: string
@@ -17,6 +23,16 @@ export const ChipRow = (props: ChipRowProps) => (
         aria-label={props.label}
         className={cn(chipRowStyles(), props.className)}
     >
+        {props.children}
+    </div>
+)
+
+interface ChipBarProps {
+    label: string
+    children?: ReactNode
+}
+export const ChipBar = (props: ChipBarProps) => (
+    <div role="group" aria-label={props.label} className={chipBarStyles()}>
         {props.children}
     </div>
 )

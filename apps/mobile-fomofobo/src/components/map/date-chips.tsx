@@ -17,7 +17,7 @@ import { View } from "react-native"
 
 import { BottomSheet } from "@/components/ui/bottom-sheet/bottom-sheet"
 import { Button } from "@/components/ui/button/button"
-import { Chip, ChipRow } from "@/components/ui/chip/chip"
+import { Chip, ChipBar, ChipRow } from "@/components/ui/chip/chip"
 import { DateRangePicker } from "@/components/ui/date-range-picker/date-range-picker"
 import type { DateRange } from "@/components/ui/date-range-picker/date-range-picker"
 import { Text } from "@/components/ui/text/text"
@@ -83,23 +83,25 @@ export const DateChips = (props: DateChipsProps) => {
         <>
             {/* The free chip shares the row: one more row covers more of the map */}
             <ChipRow label={t("Filters.DatesAndPrice")} wrap={true}>
-                {QUICK_DATE_KINDS.map(kind => (
+                <ChipBar label={t("Filters.Dates")}>
+                    {QUICK_DATE_KINDS.map(kind => (
+                        <Chip
+                            key={kind}
+                            label={t(`Filters.${kind}`)}
+                            pressed={props.query.date === kind}
+                            onPressedChange={pressed => {
+                                props.onChange(quickDateQueryOf(kind, pressed))
+                            }}
+                        />
+                    ))}
                     <Chip
-                        key={kind}
-                        label={t(`Filters.${kind}`)}
-                        pressed={props.query.date === kind}
-                        onPressedChange={pressed => {
-                            props.onChange(quickDateQueryOf(kind, pressed))
+                        label={rangeLabelOf(props.query) ?? t("Filters.Range")}
+                        pressed={props.query.date === "range"}
+                        onPressedChange={() => {
+                            sheetRef.current?.present()
                         }}
                     />
-                ))}
-                <Chip
-                    label={rangeLabelOf(props.query) ?? t("Filters.Range")}
-                    pressed={props.query.date === "range"}
-                    onPressedChange={() => {
-                        sheetRef.current?.present()
-                    }}
-                />
+                </ChipBar>
                 {/* PLACEHOLDER(TQ-37): a "Gratis" chip beside the date chips, with no count */}
                 <Chip
                     label={t("Price.Free")}

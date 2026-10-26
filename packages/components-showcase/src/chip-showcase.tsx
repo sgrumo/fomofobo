@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Chip, ChipRow } from "ui-components/chip"
+import { Chip, ChipBar, ChipRow } from "ui-components/chip"
 import { PixelIconArt, PixelIconComedy, PixelIconMusic } from "ui-components/pixel-icons"
 
 const categories = [
@@ -10,6 +10,7 @@ const categories = [
 
 export const ChipShowcase = () => {
     const [selected, setSelected] = useState<string | undefined>(undefined)
+    const [day, setDay] = useState<string>()
 
     return (
         <div className="bg-map-ground w-full max-w-[24rem] p-3">
@@ -34,6 +35,21 @@ export const ChipShowcase = () => {
                     />
                 ))}
                 <Chip label="Disabled" disabled={true} />
+            </ChipRow>
+            <ChipRow label="Dates">
+                <ChipBar label="Days">
+                    {["Today", "Tomorrow", "Weekend", "Dates…"].map(label => (
+                        <Chip
+                            key={label}
+                            label={label}
+                            pressed={day === label}
+                            onPressedChange={pressed => {
+                                setDay(pressed ? label : undefined)
+                            }}
+                        />
+                    ))}
+                </ChipBar>
+                <Chip label="Free" />
             </ChipRow>
         </div>
     )

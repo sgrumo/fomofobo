@@ -9,7 +9,7 @@ import { ScrollView, View } from "react-native"
 import { Badge } from "@/components/ui/badge/badge"
 import { BottomSheet } from "@/components/ui/bottom-sheet/bottom-sheet"
 import { Button } from "@/components/ui/button/button"
-import { Chip, ChipRow } from "@/components/ui/chip/chip"
+import { Chip, ChipBar, ChipRow } from "@/components/ui/chip/chip"
 import { DateRangePicker } from "@/components/ui/date-range-picker/date-range-picker"
 import type { DateRange } from "@/components/ui/date-range-picker/date-range-picker"
 import { DitheredPhoto } from "@/components/ui/dithered-photo/dithered-photo"
@@ -219,6 +219,23 @@ const ChipShowcase = () => {
                     pressed={false}
                     disabled={true}
                     onPressedChange={noop}
+                />
+            </ChipRow>
+            <ChipRow label="Dates">
+                <ChipBar label="Days">
+                    {["Today", "Tomorrow", "Weekend", "Dates…"].map(label => (
+                        <Chip
+                            key={label}
+                            label={label}
+                            pressed={selected.includes(label)}
+                            onPressedChange={toggle(label)}
+                        />
+                    ))}
+                </ChipBar>
+                <Chip
+                    label="Free"
+                    pressed={selected.includes("free")}
+                    onPressedChange={toggle("free")}
                 />
             </ChipRow>
         </ShowcaseSection>

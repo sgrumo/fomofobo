@@ -20,6 +20,14 @@ export const getChipRow = (scope: Scope, label: string): Locator =>
     scope.getByRole("group", { name: label, exact: true })
 
 /**
+ * @description Returns the chip bar locator
+ * @param scope Search root
+ * @param label Accessible label of the bar
+ */
+export const getChipBar = (scope: Scope, label: string): Locator =>
+    scope.getByRole("group", { name: label, exact: true })
+
+/**
  * @description Presses the chip and waits until it reads pressed
  * @param scope Search root
  * @param name Accessible name

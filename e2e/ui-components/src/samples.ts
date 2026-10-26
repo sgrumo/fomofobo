@@ -42,6 +42,7 @@ import {
 import {
     expectChipNotPressed,
     expectChipPressed,
+    getChipBar,
     getChipRow,
     pressChip,
     unpressChip,
@@ -355,6 +356,11 @@ export const defineUiSamplesTests = (app: UiSamplesApp) => {
             await expectChipNotPressed(row, "Sample Comedy Chip")
             await unpressChip(row, "Sample Music Chip 12")
             await expectChipNotPressed(row, "Sample Music Chip 12")
+
+            const bar = getChipBar(row, "Sample chip bar")
+            await pressChip(bar, "Sample Today Chip")
+            await pressChip(bar, "Sample Tomorrow Chip")
+            await expectChipNotPressed(bar, "Sample Today Chip")
         })
 
         test("collapsible", async ({ page }) => {

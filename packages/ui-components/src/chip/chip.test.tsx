@@ -3,7 +3,7 @@ import { useState } from "react"
 import { describe, expect, it } from "vitest"
 
 import { render, screen } from "../test/test-utils"
-import { Chip, ChipRow } from "./chip"
+import { Chip, ChipBar, ChipRow } from "./chip"
 
 const ControlledChip = () => {
     const [pressed, setPressed] = useState(false)
@@ -38,5 +38,21 @@ describe("ChipRow", () => {
         expect(screen.getByRole("group", { name: "Categories" })).toContainElement(
             screen.getByRole("button", { name: "Music" }),
         )
+    })
+})
+
+describe("ChipBar", () => {
+    it("groups its chips under its own label, inside a row", () => {
+        render(
+            <ChipRow label="Dates and price">
+                <ChipBar label="Dates">
+                    <Chip label="Today" />
+                </ChipBar>
+                <Chip label="Free" />
+            </ChipRow>,
+        )
+        const bar = screen.getByRole("group", { name: "Dates" })
+        expect(bar).toContainElement(screen.getByRole("button", { name: "Today" }))
+        expect(bar).not.toContainElement(screen.getByRole("button", { name: "Free" }))
     })
 })

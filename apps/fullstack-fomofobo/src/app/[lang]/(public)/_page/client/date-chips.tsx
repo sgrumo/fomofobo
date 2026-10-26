@@ -20,7 +20,7 @@ import {
     BottomSheetTitle,
 } from "ui-components/bottom-sheet"
 import { Button } from "ui-components/button"
-import { Chip, ChipRow } from "ui-components/chip"
+import { Chip, ChipBar, ChipRow } from "ui-components/chip"
 import { DateInput } from "ui-components/date-input"
 import { Field } from "ui-components/field"
 
@@ -58,21 +58,23 @@ export const DateChips = (props: DateChipsProps) => {
         <>
             {/* The free chip shares the row: one more row covers more of the map. */}
             <ChipRow label={t("Filters.DatesAndPrice")} className={props.className}>
-                {QUICK_DATE_KINDS.map(kind => (
+                <ChipBar label={t("Filters.Dates")}>
+                    {QUICK_DATE_KINDS.map(kind => (
+                        <Chip
+                            key={kind}
+                            label={t(`Filters.${kind}`)}
+                            pressed={props.query.date === kind}
+                            onPressedChange={pressed => {
+                                props.onChange(quickDateQueryOf(kind, pressed))
+                            }}
+                        />
+                    ))}
                     <Chip
-                        key={kind}
-                        label={t(`Filters.${kind}`)}
-                        pressed={props.query.date === kind}
-                        onPressedChange={pressed => {
-                            props.onChange(quickDateQueryOf(kind, pressed))
-                        }}
+                        label={rangeLabel}
+                        pressed={props.query.date === "range"}
+                        onPressedChange={openSheet}
                     />
-                ))}
-                <Chip
-                    label={rangeLabel}
-                    pressed={props.query.date === "range"}
-                    onPressedChange={openSheet}
-                />
+                </ChipBar>
                 <Chip
                     label={t("Price.Free")}
                     pressed={props.query.free === true}

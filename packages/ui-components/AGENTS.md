@@ -32,7 +32,7 @@ Headless, app-agnostic React UI primitives built on `@base-ui/react`. Consumed b
 
 - `button` - button primitive (variants/sizes)
 - `icon-button` - round icon-only button, `aria-label` required by type
-- `chip` - toggle with an icon, a label and a count, plus `ChipRow`, a scrolling labelled group
+- `chip` - toggle with an icon, a label and a count, plus `ChipRow`, a scrolling labelled group, and `ChipBar`, a labelled bar that joins its chips
 - `dialog` - modal dialog
 - `alert-dialog` - confirmation dialog (+ typed-text "type to confirm" variant)
 - `drawer` - edge-anchored sheet
