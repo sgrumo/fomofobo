@@ -1,7 +1,8 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { centerQueryOf, searchCenterOf } from "domain/map-center"
+import { centerQueryOf, nextLocateRequest, searchCenterOf } from "domain/map-center"
+import type { LocateRequest } from "domain/map-center"
 import { hasActiveFilters } from "domain/map-filters"
 import { placeQueryOf, textQueryOf } from "domain/map-search"
 import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
@@ -85,6 +86,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
     const online = useOnline()
     const filtersId = useId()
     const [filtersOpen, setFiltersOpen] = useState(false)
+    const [locateRequest, setLocateRequest] = useState<LocateRequest>()
     const filtersActive = hasActiveFilters(query)
 
     const {
@@ -218,6 +220,9 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
         match(result)
             .with({ status: "granted" }, granted => {
                 setQuery({ ...centerQueryOf(granted.position), place: undefined })
+                setLocateRequest(previous =>
+                    nextLocateRequest(granted.position, previous),
+                )
             })
             .with({ status: "denied" }, () => {
                 toast.add({
@@ -273,6 +278,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
             <EventMap
                 route={props.route}
                 center={center}
+                locateRequest={locateRequest}
                 position={position}
                 occurrences={results?.occurrences ?? []}
                 permanentVenues={results?.permanentVenues ?? []}

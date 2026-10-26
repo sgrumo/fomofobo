@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { centerQueryOf, searchCenterOf } from "domain/map-center"
+import { centerQueryOf, nextLocateRequest, searchCenterOf } from "domain/map-center"
+import type { LocateRequest } from "domain/map-center"
 import { hasActiveFilters } from "domain/map-filters"
 import { placeQueryOf, textQueryOf } from "domain/map-search"
 import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
@@ -65,6 +66,7 @@ const MapScreen = () => {
     const now = useNow(CLOCK_TICK_MS)
     const online = useOnline()
     const [filtersOpen, setFiltersOpen] = useState(false)
+    const [locateRequest, setLocateRequest] = useState<LocateRequest>()
     const filtersActive = hasActiveFilters(query)
     const { center, hasQueryCenter, locationOff, searchReady } = searchCenterOf(
         query,
@@ -186,6 +188,9 @@ const MapScreen = () => {
         match(result)
             .with({ status: "granted" }, granted => {
                 setQuery({ ...centerQueryOf(granted.position), place: undefined })
+                setLocateRequest(previous =>
+                    nextLocateRequest(granted.position, previous),
+                )
             })
             .with({ status: "unavailable" }, () => {
                 showToast(
@@ -205,6 +210,7 @@ const MapScreen = () => {
         <View className="flex-1 bg-map-ground">
             <EventMap
                 center={center}
+                locateRequest={locateRequest}
                 position={position}
                 occurrences={results?.occurrences ?? []}
                 permanentVenues={results?.permanentVenues ?? []}

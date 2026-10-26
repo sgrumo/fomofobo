@@ -12,6 +12,8 @@ import {
     venueSpots,
 } from "domain/event-clusters"
 import type { EventMapFeature, MapPointKind, MarkerEmphasis } from "domain/event-clusters"
+import { mapFlightOf } from "domain/map-center"
+import type { LocateRequest } from "domain/map-center"
 import { mapStyle } from "domain/map-style"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { pinStartOf } from "domain/pin-tag"
@@ -23,7 +25,7 @@ import type {
     OccurrenceSummary,
     PermanentVenueSummary,
 } from "models"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useEffectEvent, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { View } from "react-native"
 
@@ -65,6 +67,7 @@ const featureLayer = (feature: EventMapFeature, emphasis: MarkerEmphasis): numbe
 
 interface EventMapProps {
     center: GeoPoint
+    locateRequest: LocateRequest | undefined
     position: GeoPoint | undefined
     occurrences: readonly OccurrenceSummary[]
     permanentVenues: readonly PermanentVenueSummary[]
@@ -83,9 +86,19 @@ export const EventMap = (props: EventMapProps) => {
     const [viewport, setViewport] = useState<Viewport>()
     const { latitude, longitude } = props.center
 
+    const readLocateRequest = useEffectEvent(() => props.locateRequest)
+    // Each locate flies, an unchanged center too
+    const locateCount = props.locateRequest?.count
     useEffect(() => {
-        cameraRef.current?.flyTo({ center: [longitude, latitude] })
-    }, [latitude, longitude])
+        const flight = mapFlightOf(
+            { latitude, longitude },
+            locateCount === undefined ? undefined : readLocateRequest(),
+        )
+        const center: [number, number] = [flight.center.longitude, flight.center.latitude]
+        cameraRef.current?.flyTo(
+            flight.zoom === undefined ? { center } : { center, zoom: flight.zoom },
+        )
+    }, [latitude, longitude, locateCount])
 
     // The result index of a permanent venue follows every occurrence.
     const spots = venueSpots([

@@ -47,3 +47,46 @@ export const centerQueryOf = (point: GeoPoint): Pick<MapQuery, "lat" | "lng"> =>
     const { latitude, longitude } = roundCenter(point)
     return { lat: latitude, lng: longitude }
 }
+
+// Zoom after a locate: a few blocks around the visitor
+export const LOCATE_ZOOM = 15
+
+// Exact position of the last locate, and how many locates ran
+export interface LocateRequest {
+    position: GeoPoint
+    count: number
+}
+
+/**
+ * @description Builds the request of a new locate at a position
+ * @param position Position of the device
+ * @param previous Request of the last locate, if any
+ */
+export const nextLocateRequest = (
+    position: GeoPoint,
+    previous: LocateRequest | undefined,
+): LocateRequest => ({ position, count: (previous?.count ?? 0) + 1 })
+
+interface MapFlight {
+    center: GeoPoint
+    zoom: number | undefined
+}
+
+/**
+ * @description Returns where the map flies for a search center: to the exact position at the
+ * locate zoom when the last locate set this center, else to the center at the current zoom
+ * @param center Search center, rounded
+ * @param locate Request of the last locate, if any
+ */
+export const mapFlightOf = (
+    center: GeoPoint,
+    locate: LocateRequest | undefined,
+): MapFlight => {
+    if (locate === undefined) {
+        return { center, zoom: undefined }
+    }
+    const located = roundCenter(locate.position)
+    return located.latitude === center.latitude && located.longitude === center.longitude
+        ? { center: locate.position, zoom: LOCATE_ZOOM }
+        : { center, zoom: undefined }
+}

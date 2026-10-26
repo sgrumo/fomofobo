@@ -12,6 +12,8 @@ import {
     venueSpots,
 } from "domain/event-clusters"
 import type { EventMapFeature, MapPointKind } from "domain/event-clusters"
+import { mapFlightOf } from "domain/map-center"
+import type { LocateRequest } from "domain/map-center"
 import { mapStyle } from "domain/map-style"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { pinStartOf } from "domain/pin-tag"
@@ -90,6 +92,7 @@ const featurePoint = (feature: EventMapFeature): GeoPoint | undefined => {
 
 interface EventMapProps extends RouteClientComponentProps<"root"> {
     center: GeoPoint
+    locateRequest: LocateRequest | undefined
     position: GeoPoint | undefined
     occurrences: OccurrenceSummary[]
     permanentVenues: PermanentVenueSummary[]
@@ -140,9 +143,17 @@ export const EventMap = (props: EventMapProps) => {
     }, [supported])
 
     const { latitude, longitude } = props.center
+    const readLocateRequest = useEffectEvent(() => props.locateRequest)
+    // Each locate flies, an unchanged center too
+    const locateCount = props.locateRequest?.count
     useEffect(() => {
-        map?.flyTo({ center: [longitude, latitude] })
-    }, [map, latitude, longitude])
+        const flight = mapFlightOf(
+            { latitude, longitude },
+            locateCount === undefined ? undefined : readLocateRequest(),
+        )
+        const center: [number, number] = [flight.center.longitude, flight.center.latitude]
+        map?.flyTo(flight.zoom === undefined ? { center } : { center, zoom: flight.zoom })
+    }, [map, latitude, longitude, locateCount])
 
     // The result index of a permanent venue follows every occurrence.
     const spots = venueSpots([

@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest"
 
-import { centerQueryOf, searchCenterOf } from "./map-center"
+import {
+    centerQueryOf,
+    LOCATE_ZOOM,
+    mapFlightOf,
+    nextLocateRequest,
+    searchCenterOf,
+} from "./map-center"
 import { DEFAULT_CITY } from "./platform"
 
 describe("searchCenterOf", () => {
@@ -55,5 +61,45 @@ describe("centerQueryOf", () => {
             lat: 44.353,
             lng: 11.714,
         })
+    })
+})
+
+describe("mapFlightOf", () => {
+    const position = { latitude: 44.35281, longitude: 11.71204 }
+    const rounded = { latitude: 44.353, longitude: 11.712 }
+
+    it("flies to the exact position at the locate zoom when the locate set the center", () => {
+        expect(
+            mapFlightOf(rounded, nextLocateRequest(position, undefined)),
+        ).toStrictEqual({
+            center: position,
+            zoom: LOCATE_ZOOM,
+        })
+    })
+
+    it("flies to the center at the current zoom when another center replaced the locate", () => {
+        const elsewhere = { latitude: 44.36, longitude: 11.69 }
+
+        expect(
+            mapFlightOf(elsewhere, nextLocateRequest(position, undefined)),
+        ).toStrictEqual({
+            center: elsewhere,
+            zoom: undefined,
+        })
+    })
+
+    it("flies to the center at the current zoom before any locate", () => {
+        expect(mapFlightOf(rounded, undefined)).toStrictEqual({
+            center: rounded,
+            zoom: undefined,
+        })
+    })
+})
+
+describe("nextLocateRequest", () => {
+    it("counts each locate, so a locate at the same position still moves the map", () => {
+        const first = nextLocateRequest({ latitude: 44.35, longitude: 11.71 }, undefined)
+
+        expect(nextLocateRequest(first.position, first).count).toBe(2)
     })
 })
