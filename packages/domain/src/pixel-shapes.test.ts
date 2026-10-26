@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import {
     cellsPath,
+    ditherHalo,
     dottedRing,
     LIVE_WAVE_RINGS,
     PIXEL_CELL,
@@ -102,5 +103,37 @@ describe("LIVE_WAVE_RINGS", () => {
         expect(LIVE_WAVE_RINGS.map(ring => ring.delayMs)).toStrictEqual([
             -1000, -750, -500, -250,
         ])
+    })
+})
+
+describe("ditherHalo", () => {
+    const middleDistance = ([x, y]: CellCorner) =>
+        Math.hypot(x + PIXEL_CELL / 2, y + PIXEL_CELL / 2)
+    const keys = (corners: readonly CellCorner[]) =>
+        new Set(corners.map(([x, y]) => `${String(x)} ${String(y)}`))
+
+    it("ends at the radius", () => {
+        expect(Math.max(...ditherHalo(18, 8).map(middleDistance))).toBeLessThan(18)
+    })
+
+    it("fills every cell of the core", () => {
+        // Six cells a quadrant have their middle within 8 px of the center
+        expect(ditherHalo(18, 8).filter(cell => middleDistance(cell) <= 8)).toHaveLength(
+            24,
+        )
+    })
+
+    it("holds a smaller halo of the same core inside a wider one", () => {
+        const wide = keys(ditherHalo(27, 8))
+
+        expect([...keys(ditherHalo(18, 8))].every(key => wide.has(key))).toBe(true)
+    })
+
+    it("thins out from the core to the edge", () => {
+        const halo = ditherHalo(27, 8)
+
+        expect(halo.filter(cell => middleDistance(cell) < 15).length).toBeGreaterThan(
+            halo.filter(cell => middleDistance(cell) >= 21).length,
+        )
     })
 })

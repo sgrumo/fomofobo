@@ -33,6 +33,7 @@ import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"
 import { MapMarker } from "./map-marker"
+import { PositionMarker } from "./position-marker"
 import { VenuePin } from "./venue-pin"
 
 setWorkerUrl(
@@ -337,11 +338,7 @@ export const EventMap = (props: EventMapProps) => {
                     anchor="center"
                     layer={POSITION_MARKER_LAYER}
                 >
-                    <span
-                        role="img"
-                        aria-label={t("Map.Position")}
-                        className="bg-position border-line shadow-hard-sm block size-4 rounded-full border-2"
-                    />
+                    <PositionMarker route={props.route} />
                 </MapMarker>
             )}
         </>

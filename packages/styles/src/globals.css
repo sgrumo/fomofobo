@@ -732,6 +732,7 @@
     --animate-backdrop-blur-out: backdrop-blur-out var(--tw-duration, 150ms) ease-out;
     --animate-cursor-blink: cursor-blink 1s steps(1) infinite;
     --animate-wave-ring: wave-ring 1s step-end infinite;
+    --animate-halo-breath: halo-breath 3s step-end infinite;
     --animate-live-pulse: live-pulse 1s ease-in-out infinite;
 
     @keyframes cursor-blink {
@@ -754,6 +755,17 @@
         }
         25% {
             opacity: 0.5;
+        }
+        50%,
+        to {
+            opacity: 0;
+        }
+    }
+
+    /* Shown for the first half of the period, hidden for the second */
+    @keyframes halo-breath {
+        from {
+            opacity: 1;
         }
         50%,
         to {

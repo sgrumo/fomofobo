@@ -83,6 +83,13 @@ export const cellsPath = (corners: readonly CellCorner[]): string =>
         )
         .join("")
 
+/**
+ * @description Returns the SVG view box of a square around the origin
+ * @param reach Distance from the origin to each side
+ */
+const centeredViewBox = (reach: number): string =>
+    `${String(-reach)} ${String(-reach)} ${String(2 * reach)} ${String(2 * reach)}`
+
 export const LIVE_WAVE_PERIOD_MS = 1000
 
 // Rings of the live wave, inner first. Each radius is a whole number of cells plus 1 px, so the
@@ -101,9 +108,61 @@ export const LIVE_WAVE_RINGS = LIVE_WAVE.map(({ radius, fade }, index) => {
         radius,
         fade,
         reach,
-        viewBox: `${String(-reach)} ${String(-reach)} ${String(2 * reach)} ${String(2 * reach)}`,
+        viewBox: centeredViewBox(reach),
         path: cellsPath(dottedRing(radius)),
         // Negative, so every ring starts mid cycle and the wave runs from the first frame
         delayMs: (index / LIVE_WAVE.length - 1) * LIVE_WAVE_PERIOD_MS,
     }
 })
+
+// Thresholds of a 4×4 ordered dither, in sixteenths
+const BAYER_4 = [
+    [0, 8, 2, 10],
+    [12, 4, 14, 6],
+    [3, 11, 1, 9],
+    [15, 7, 13, 5],
+] as const
+
+/**
+ * @description Returns the ordered-dither threshold of a grid cell, between 0 and 1
+ * @param column Cell column, any integer
+ * @param row Cell row, any integer
+ */
+const bayerThreshold = (column: number, row: number): number =>
+    // `at` counts a negative remainder from the end, as a true modulo would
+    ((BAYER_4.at(row % 4)?.at(column % 4) ?? 0) + 0.5) / 16
+
+/**
+ * @description Builds the top-left corners of the cells of a dithered disc around a center, solid at the core and thinning out to nothing at the radius
+ * @param radius Distance from the center where the disc ends
+ * @param coreRadius Distance from the center up to which every cell is on
+ */
+export const ditherHalo = (radius: number, coreRadius: number): CellCorner[] => {
+    const span = Math.ceil(radius / PIXEL_CELL)
+    const indexes = Array.from({ length: 2 * span }, (_, index) => index - span)
+    return indexes.flatMap(row =>
+        indexes
+            .filter(column => {
+                const distance = Math.hypot(
+                    (column + 0.5) * PIXEL_CELL,
+                    (row + 0.5) * PIXEL_CELL,
+                )
+                const density = (radius - distance) / (radius - coreRadius)
+                return density > bayerThreshold(column, row)
+            })
+            .map((column): CellCorner => [column * PIXEL_CELL, row * PIXEL_CELL]),
+    )
+}
+
+export const POSITION_BREATH_MS = 3000
+
+// Halo of the position dot, 16 px wide: the inner halo stays, the outer one comes and goes
+const POSITION_CORE_RADIUS = 8
+const POSITION_HALO_REACH = 27
+
+export const POSITION_HALO = {
+    size: 2 * POSITION_HALO_REACH,
+    viewBox: centeredViewBox(POSITION_HALO_REACH),
+    innerPath: cellsPath(ditherHalo(18, POSITION_CORE_RADIUS)),
+    outerPath: cellsPath(ditherHalo(POSITION_HALO_REACH, POSITION_CORE_RADIUS)),
+}

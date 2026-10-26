@@ -27,12 +27,11 @@ import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { View } from "react-native"
 
-import { hardShadow } from "@/lib/theme/hard-shadow"
-
 import dotDitherPattern from "../../../assets/map/dot-dither.png"
 import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"
 import { MapAttribution } from "./map-attribution"
+import { PositionMarker } from "./position-marker"
 import { VenuePin } from "./venue-pin"
 
 const INITIAL_ZOOM = 13
@@ -276,13 +275,7 @@ export const EventMap = (props: EventMapProps) => {
                         anchor="center"
                         style={{ zIndex: POSITION_MARKER_LAYER }}
                     >
-                        <View
-                            accessible={true}
-                            accessibilityRole="image"
-                            accessibilityLabel={t("Map.Position")}
-                            className="h-4 w-4 rounded-full border-2 border-line bg-position"
-                            style={hardShadow("sm")}
-                        />
+                        <PositionMarker />
                     </Marker>
                 )}
             </Map>
