@@ -7,7 +7,6 @@ export const spinnerSizes = {
     lg: 48,
 } as const
 
-// Eight steps a turn, the stepped motion of the web radar
 export const stepSpin: CSSAnimationProperties = {
     animationName: { to: { transform: [{ rotate: "360deg" }] } },
     animationDuration: "1s",

@@ -731,7 +731,7 @@
     --animate-backdrop-blur-in: backdrop-blur-in var(--tw-duration, 150ms) ease-out;
     --animate-backdrop-blur-out: backdrop-blur-out var(--tw-duration, 150ms) ease-out;
     --animate-cursor-blink: cursor-blink 1s steps(1) infinite;
-    --animate-radar: radar 2s steps(8) infinite;
+    --animate-wave-ring: wave-ring 1s step-end infinite;
     --animate-live-pulse: live-pulse 1s ease-in-out infinite;
 
     @keyframes cursor-blink {
@@ -747,14 +747,16 @@
         }
     }
 
-    /* Grows the inset, not the scale, so the ring keeps its 2 px stroke */
-    @keyframes radar {
+    /* Lit, then half lit, then dark for the second half of the period: rings lit in turn read as a wave */
+    @keyframes wave-ring {
         from {
-            inset: 0;
             opacity: 1;
         }
+        25% {
+            opacity: 0.5;
+        }
+        50%,
         to {
-            inset: -1.5rem;
             opacity: 0;
         }
     }

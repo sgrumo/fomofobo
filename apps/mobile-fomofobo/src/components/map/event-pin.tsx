@@ -1,36 +1,38 @@
 import type { MarkerEmphasis } from "domain/event-clusters"
 import { pinTagOf } from "domain/pin-tag"
 import type { PinStart } from "domain/pin-tag"
+import { LIVE_WAVE_PERIOD_MS, LIVE_WAVE_RINGS } from "domain/pixel-shapes"
 import type { CategoryIcon, OccurrenceStatus } from "models"
 import { useTranslation } from "react-i18next"
 import { Pressable, View } from "react-native"
-import Animated, { steps, useReducedMotion } from "react-native-reanimated"
+import Animated, { useReducedMotion } from "react-native-reanimated"
 import type { CSSAnimationProperties } from "react-native-reanimated"
+import Svg, { Path } from "react-native-svg"
 import { isDefined } from "shared/values"
 import { match } from "ts-pattern"
 
 import { Badge } from "@/components/ui/badge/badge"
 import { PixelCircle } from "@/components/ui/pixel-circle/pixel-circle"
 import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
+import { THEME_COLORS } from "@/lib/theme/theme-tokens"
 import { cn } from "@/lib/utils/class-names"
 
 const PIN_ICON_SIZE = 20
 
-// Grows the inset, not the scale, so the ring keeps its 2 pt stroke, as the web `radar` keyframes
-const radarRing: CSSAnimationProperties = {
-    animationName: {
-        from: { top: 0, right: 0, bottom: 0, left: 0, opacity: 1 },
-        to: { top: -24, right: -24, bottom: -24, left: -24, opacity: 0 },
-    },
-    animationDuration: "2s",
-    animationIterationCount: "infinite",
-    animationTimingFunction: steps(8),
-}
+const PIN_SIZE = 36
 
-const RADAR_RINGS = [
-    { key: "inner", restInset: "-inset-1.5", delay: "0s" },
-    { key: "outer", restInset: "-inset-4", delay: "1s" },
-] as const
+// Lit, then half lit, then dark for the second half of the period, as the web `wave-ring` keyframes
+const waveRing: CSSAnimationProperties = {
+    animationName: {
+        "0%": { opacity: 1 },
+        "25%": { opacity: 0.5 },
+        "50%": { opacity: 0 },
+        "100%": { opacity: 0 },
+    },
+    animationDuration: LIVE_WAVE_PERIOD_MS,
+    animationIterationCount: "infinite",
+    animationTimingFunction: "step-end",
+}
 
 interface EventPinProps {
     title: string
@@ -101,22 +103,37 @@ export const EventPin = (props: EventPinProps) => {
             </View>
             <View className="h-9 w-9">
                 {props.status === "live" &&
-                    RADAR_RINGS.map(ring => (
+                    LIVE_WAVE_RINGS.filter(
+                        // Reduced motion keeps the inner ring of each wave, still
+                        (_, index) => !reducedMotion || index % 2 === 0,
+                    ).map(ring => (
                         <Animated.View
-                            key={ring.key}
-                            className={cn(
-                                "absolute rounded-full border-2 border-dashed border-live",
-                                reducedMotion ? ring.restInset : "inset-0",
-                            )}
-                            style={
-                                reducedMotion
+                            key={ring.radius}
+                            pointerEvents="none"
+                            className="absolute"
+                            style={{
+                                left: PIN_SIZE / 2 - ring.reach,
+                                top: PIN_SIZE / 2 - ring.reach,
+                                ...(reducedMotion
                                     ? undefined
-                                    : { ...radarRing, animationDelay: ring.delay }
-                            }
-                        />
+                                    : { ...waveRing, animationDelay: ring.delayMs }),
+                            }}
+                        >
+                            <Svg
+                                width={2 * ring.reach}
+                                height={2 * ring.reach}
+                                viewBox={ring.viewBox}
+                            >
+                                <Path
+                                    d={ring.path}
+                                    fill={THEME_COLORS.live}
+                                    fillOpacity={ring.fade}
+                                />
+                            </Svg>
+                        </Animated.View>
                     ))}
                 <PixelCircle
-                    size={36}
+                    size={PIN_SIZE}
                     fill={props.status}
                     shadow={props.emphasis === "selected" ? "md" : undefined}
                     dashed={props.status === "ended"}

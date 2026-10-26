@@ -3,6 +3,7 @@
 import type { MarkerEmphasis } from "domain/event-clusters"
 import { pinTagOf } from "domain/pin-tag"
 import type { PinStart } from "domain/pin-tag"
+import { LIVE_WAVE_PERIOD_MS, LIVE_WAVE_RINGS } from "domain/pixel-shapes"
 import { cn } from "frontend-shared/styles"
 import type { CategoryIcon, OccurrenceStatus } from "models"
 import { useTranslation } from "react-i18next"
@@ -44,8 +45,6 @@ export const EventPin = (props: EventPinProps) => {
             </Badge>
         ))
         .exhaustive()
-    const radarRing =
-        "border-live animate-radar pointer-events-none absolute rounded-full border-2 border-dashed motion-reduce:animate-none"
 
     return (
         <button
@@ -83,18 +82,33 @@ export const EventPin = (props: EventPinProps) => {
                 )}
             </span>
             <span className="relative flex size-9 items-center justify-center">
-                {props.status === "live" ? (
-                    <>
-                        <span
-                            aria-hidden={true}
-                            className={cn(radarRing, "-inset-1.5")}
-                        />
-                        <span
-                            aria-hidden={true}
-                            className={cn(radarRing, "-inset-4 [animation-delay:1s]")}
-                        />
-                    </>
-                ) : undefined}
+                {props.status === "live"
+                    ? LIVE_WAVE_RINGS.map((ring, index) => (
+                          <svg
+                              key={ring.radius}
+                              aria-hidden={true}
+                              width={2 * ring.reach}
+                              height={2 * ring.reach}
+                              viewBox={ring.viewBox}
+                              shapeRendering="crispEdges"
+                              className={cn(
+                                  "text-live animate-wave-ring pointer-events-none absolute top-1/2 left-1/2 -translate-1/2 motion-reduce:animate-none",
+                                  // Reduced motion keeps the inner ring of each wave, still
+                                  { "motion-reduce:hidden": index % 2 === 1 },
+                              )}
+                              style={{
+                                  animationDuration: `${String(LIVE_WAVE_PERIOD_MS)}ms`,
+                                  animationDelay: `${String(ring.delayMs)}ms`,
+                              }}
+                          >
+                              <path
+                                  d={ring.path}
+                                  fill="currentColor"
+                                  fillOpacity={ring.fade}
+                              />
+                          </svg>
+                      ))
+                    : undefined}
                 <span
                     className={cn(
                         "pixel-circle-36 text-fg relative flex size-9 items-center justify-center",
