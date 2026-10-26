@@ -84,7 +84,22 @@ const BlockVenueDialogContent = (props: BlockVenueDialogContentProps) => {
         blockEventFormStateToBlock,
         i18n,
     )
-    const { mutate, isPending } = useMutation(api.blockVenueMutation)
+    // Callbacks of `useMutation` still run once the block swaps the row action and unmounts this
+    // dialog. Callbacks of `mutate` would not.
+    const { mutate, isPending } = useMutation({
+        ...api.blockVenueMutation,
+        onSuccess: async (data, variables, result, context) => {
+            await api.blockVenueMutation.onSuccess?.(data, variables, result, context)
+            feedback.succeeded(
+                t("Backoffice.Venues.Toast.Blocked", {
+                    name: props.venue.name,
+                }),
+            )
+            props.onSuccess()
+        },
+        onError: feedback.failed,
+        onSettled: props.onSettled,
+    })
 
     const handleSubmit = () => {
         const result = convert(form)
@@ -93,21 +108,7 @@ const BlockVenueDialogContent = (props: BlockVenueDialogContentProps) => {
             return
         }
         props.onMutate()
-        mutate(
-            { id: props.venue.id, body: result.value },
-            {
-                onSettled: props.onSettled,
-                onSuccess: () => {
-                    feedback.succeeded(
-                        t("Backoffice.Venues.Toast.Blocked", {
-                            name: props.venue.name,
-                        }),
-                    )
-                    props.onSuccess()
-                },
-                onError: feedback.failed,
-            },
-        )
+        mutate({ id: props.venue.id, body: result.value })
     }
 
     return (

@@ -2,7 +2,7 @@ import type { MutateOptions, MutationOptions } from "@tanstack/react-query"
 import { useMutation } from "@tanstack/react-query"
 import { cn } from "frontend-shared/styles"
 import type { ReactElement } from "react"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { match, P } from "ts-pattern"
 
 import { Button } from "../button/button"
@@ -117,16 +117,40 @@ const MutationAlertConfirmationDialog = <D, E, V, R>(
 ) => {
     const [open, setOpen] = useState(false)
     const toast = useToast()
-    const { mutate, isPending } = useMutation(props.mutationOptions)
+    // The options of the confirmed write: a refetch can re-render the dialog with the options of
+    // another write, as an Unblock in place of a Block, before the confirmed one settles
+    const confirmedRef = useRef(props)
+    // Callbacks of `useMutation` still run once the dialog unmounts, as when the write moves its
+    // row out of the list. Callbacks of `mutate` would not.
+    const { mutate, isPending } = useMutation({
+        ...props.mutationOptions,
+        onSuccess: async (data, variables, result, context) => {
+            const confirmed = confirmedRef.current
+            await confirmed.mutationOptions.onSuccess?.(data, variables, result, context)
+            confirmed.mutateOptions.onSuccess?.(data, variables, result, context)
+            setOpen(false)
+        },
+        onError: async (error, variables, result, context) => {
+            const confirmed = confirmedRef.current
+            await confirmed.mutationOptions.onError?.(error, variables, result, context)
+            confirmed.mutateOptions.onError?.(error, variables, result, context)
+        },
+        onSettled: async (data, error, variables, result, context) => {
+            const confirmed = confirmedRef.current
+            await confirmed.mutationOptions.onSettled?.(
+                data,
+                error,
+                variables,
+                result,
+                context,
+            )
+            confirmed.mutateOptions.onSettled?.(data, error, variables, result, context)
+        },
+    })
 
     const onConfirm = () => {
-        mutate(props.variables, {
-            ...props.mutateOptions,
-            onSuccess: (data, variables, result, context) => {
-                props.mutateOptions.onSuccess?.(data, variables, result, context)
-                setOpen(false)
-            },
-        })
+        confirmedRef.current = props
+        mutate(props.variables)
     }
 
     const onOpenChange = (nextOpen: boolean) => {

@@ -84,7 +84,22 @@ const BlockEventDialogContent = (props: BlockEventDialogContentProps) => {
         blockEventFormStateToBlock,
         i18n,
     )
-    const { mutate, isPending } = useMutation(api.blockEventMutation)
+    // Callbacks of `useMutation` still run once the block swaps the row action and unmounts this
+    // dialog. Callbacks of `mutate` would not.
+    const { mutate, isPending } = useMutation({
+        ...api.blockEventMutation,
+        onSuccess: async (data, variables, result, context) => {
+            await api.blockEventMutation.onSuccess?.(data, variables, result, context)
+            feedback.succeeded(
+                t("Backoffice.Events.Toast.Blocked", {
+                    title: props.event.title,
+                }),
+            )
+            props.onSuccess()
+        },
+        onError: feedback.failed,
+        onSettled: props.onSettled,
+    })
 
     const handleSubmit = () => {
         const result = convert(form)
@@ -93,21 +108,7 @@ const BlockEventDialogContent = (props: BlockEventDialogContentProps) => {
             return
         }
         props.onMutate()
-        mutate(
-            { id: props.event.id, body: result.value },
-            {
-                onSettled: props.onSettled,
-                onSuccess: () => {
-                    feedback.succeeded(
-                        t("Backoffice.Events.Toast.Blocked", {
-                            title: props.event.title,
-                        }),
-                    )
-                    props.onSuccess()
-                },
-                onError: feedback.failed,
-            },
-        )
+        mutate({ id: props.event.id, body: result.value })
     }
 
     return (

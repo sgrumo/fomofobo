@@ -448,6 +448,74 @@ describe("AlertConfirmationDialog", () => {
             })
         })
 
+        it("runs the mutateOptions onSuccess after the dialog unmounts", async () => {
+            const user = userEvent.setup()
+            const onSuccess = vi.fn<() => void>()
+            const { promise, resolve } = Promise.withResolvers<undefined>()
+            const mutationFn = vi
+                .fn<(variables: string) => Promise<undefined>>()
+                .mockReturnValue(promise)
+
+            const { unmount } = render(
+                <AlertConfirmationDialog
+                    type="mutation"
+                    pendingWarning="Deletion still pending"
+                    trigger={trigger}
+                    title="Delete user?"
+                    description="This cannot be undone."
+                    mutationOptions={{ mutationFn }}
+                    mutateOptions={{ onSuccess }}
+                    variables="user-1"
+                />,
+            )
+
+            await user.click(screen.getByRole("button", { name: "Open" }))
+            await user.click(
+                screen.getByRole("button", { name: t("Shared.Confirm", undefined) }),
+            )
+            unmount()
+            resolve(undefined)
+
+            await waitFor(() => {
+                expect(onSuccess).toHaveBeenCalledOnce()
+            })
+        })
+
+        it("reports the confirmed write when a refetch re-renders it as another", async () => {
+            const user = userEvent.setup()
+            const onBlocked = vi.fn<() => void>()
+            const onUnblocked = vi.fn<() => void>()
+            const { promise, resolve } = Promise.withResolvers<undefined>()
+            const mutationFn = vi
+                .fn<(variables: string) => Promise<undefined>>()
+                .mockReturnValue(promise)
+            const dialog = (onSuccess: () => void) => (
+                <AlertConfirmationDialog
+                    type="mutation"
+                    pendingWarning="Still saving"
+                    trigger={trigger}
+                    title="Block user?"
+                    description="The user can no longer sign in."
+                    mutationOptions={{ mutationFn }}
+                    mutateOptions={{ onSuccess }}
+                    variables="user-1"
+                />
+            )
+
+            const { rerender } = render(dialog(onBlocked))
+            await user.click(screen.getByRole("button", { name: "Open" }))
+            await user.click(
+                screen.getByRole("button", { name: t("Shared.Confirm", undefined) }),
+            )
+            rerender(dialog(onUnblocked))
+            resolve(undefined)
+
+            await waitFor(() => {
+                expect(onBlocked).toHaveBeenCalledOnce()
+            })
+            expect(onUnblocked).not.toHaveBeenCalled()
+        })
+
         it("gates the mutation behind enterToConfirm", async () => {
             const user = userEvent.setup()
             const mutationFn = vi
