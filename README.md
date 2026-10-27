@@ -52,18 +52,19 @@ The CLI runs inside `scripts/admin-accounts`, so a `file:` URL is relative to th
 
 ### Scripts & Test
 
-| Package                  | Description                                                                                                  |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| `i18n-sheets`            | Google Sheets translation download/export tooling                                                            |
-| `admin-accounts`         | CLI that creates an Admin, or sets a new password of any account. See [Database](#database)                  |
-| `obfuscate`              | CLI that obfuscates a string via the `obfuscation` package                                                   |
-| `dither-photos`          | CLI that replaces every stored event photo with its dithered PNG, once per environment                       |
-| `fallback-images`        | CLI that draws the fallback image of each category icon into `public/fallbacks/` of the app                  |
-| `with-env`               | Bin that loads the env file of a Next or Expo dev script, then runs its command. See [Env files](#env-files) |
-| `e2e-kit`                | Harness the E2E suites share: containers, servers, lifecycle, Playwright config                              |
-| `e2e-ui-components`      | E2E helpers of every `ui-components` primitive, and the tests that drive them                                |
-| `e2e-fullstack-fomofobo` | E2E suites of the fullstack app: the API (Vitest) and the pages (Playwright)                                 |
-| `e2e-photo-purge`        | E2E suite of the photo purge job, on a database file and the object store                                    |
+| Package                  | Description                                                                                                                  |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `i18n-sheets`            | Google Sheets translation download/export tooling                                                                            |
+| `admin-accounts`         | CLI that creates an Admin, or sets a new password of any account. See [Database](#database)                                  |
+| `backoffice-cli`         | CLI that calls the backoffice API as the account of its env file, and uploads dithered photos. The `add-event` skill runs it |
+| `obfuscate`              | CLI that obfuscates a string via the `obfuscation` package                                                                   |
+| `dither-photos`          | CLI that replaces every stored event photo with its dithered PNG, once per environment                                       |
+| `fallback-images`        | CLI that draws the fallback image of each category icon into `public/fallbacks/` of the app                                  |
+| `with-env`               | Bin that loads the env file of a Next or Expo dev script, then runs its command. See [Env files](#env-files)                 |
+| `e2e-kit`                | Harness the E2E suites share: containers, servers, lifecycle, Playwright config                                              |
+| `e2e-ui-components`      | E2E helpers of every `ui-components` primitive, and the tests that drive them                                                |
+| `e2e-fullstack-fomofobo` | E2E suites of the fullstack app: the API (Vitest) and the pages (Playwright)                                                 |
+| `e2e-photo-purge`        | E2E suite of the photo purge job, on a database file and the object store                                                    |
 
 ## Commands
 

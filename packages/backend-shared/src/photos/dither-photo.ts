@@ -10,7 +10,7 @@ import sharp from "sharp"
 const PNG_SIGNATURE = [137, 80, 78, 71, 13, 10, 26, 10] as const
 
 /**
- * @description True when the bytes are a photo this CLI or the backoffice already stored: a 1-bit indexed PNG no wider than the stored width
+ * @description True when the bytes are an already stored photo: a 1-bit indexed PNG no wider than the stored width
  * @param bytes Object bytes read from the bucket
  */
 export const isDitheredPng = (bytes: Uint8Array): boolean => {

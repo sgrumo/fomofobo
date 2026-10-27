@@ -7,7 +7,8 @@
     "exports": {
         ".": "./src/index.ts",
         "./config": "./src/config/index.ts",
-        "./http": "./src/http/index.ts"
+        "./http": "./src/http/index.ts",
+        "./photos": "./src/photos/index.ts"
     },
     "scripts": {
         "clean": "rm -rf *.tsbuildinfo",
@@ -24,6 +25,7 @@
         "hono": "catalog:",
         "models": "workspace:*",
         "shared": "workspace:*",
+        "sharp": "^0.35.5",
         "ts-pattern": "catalog:",
         "zod": "catalog:"
     },

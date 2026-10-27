@@ -1,9 +1,9 @@
 import { parseArgs } from "node:util"
 
 import { S3ObjectStorage } from "backend-shared"
+import { ditherPhoto, isDitheredPng } from "backend-shared/photos"
 import { buildDbInstance, EventsStorage } from "storage"
 
-import { ditherPhoto, isDitheredPng } from "./dither-photo"
 import { parseEnv } from "./env"
 
 const USAGE = `Usage:

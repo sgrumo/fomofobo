@@ -9,7 +9,7 @@ import {
 
 export default defineConfig({
     extends: [nodeConfig],
-    ignorePatterns: ["oxlint.config.ts", "vitest.config.ts"],
+    ignorePatterns: ["oxlint.config.ts"],
     rules: {
         "eslint/no-restricted-imports": ["error", { paths: [restrictedZodImport] }],
     },

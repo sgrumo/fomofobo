@@ -2,7 +2,8 @@
 
 The shared backend layer. Every app that serves an API mounts it: the logger and the
 object storage at the root, the HTTP layer under `/http`, and the env schema builders under
-`/config`.
+`/config`. `/photos` holds the `sharp` dither of a stored photo, for the Node scripts that
+write photos. The Next app never imports it: the backoffice dithers in the browser.
 
 ## The HTTP layer
 

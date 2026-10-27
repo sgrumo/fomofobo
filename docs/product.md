@@ -122,6 +122,8 @@ Organizers see, create, edit and delete only their own events, and the event of 
 
 A deleted event leaves the app and the backoffice, and its photos leave the public bucket.
 
+An account can also write events and venues from Claude Code, with a flyer, a photo or a text as the source. Claude calls the backoffice API as that account, so the roles and the rules of the backoffice apply unchanged. Claude shows a summary before each write.
+
 The backoffice page of an event lists each occurrence that has not ended with its count of saves, under the participant threshold too. The organizer of the event and every Admin see it.
 
 The event form opens as a wizard of five steps: basics, place and time, photos, details, and a review that saves. A later step opens only once every step before it is complete, and the user can always go back. The user can switch to the full form at any time, and the device remembers the choice.
@@ -143,6 +145,7 @@ The event page and the map preview show the count of saves of an occurrence once
 - An Expo app for iOS and Android calls the same API under `/api/*`, with no backend layer of its own, because the API already serves every public read and the save counts.
 - Turso, a hosted libSQL database (SQLite), holds categories, venues, events, occurrences and accounts. Occurrences are stored as rows, because the map search filters them by time window and by area.
 - Cloudflare R2 holds the event photos in a public bucket, because shared and offline pages need a stable photo URL. The backoffice resizes and dithers each photo in the browser, then uploads the 1-bit PNG straight to the bucket, because a dither on the server would spend the CPU budget of the free plan.
+- A command-line helper signs in like the backoffice and calls its API from the machine of the user, for the event writes from Claude Code. It dithers each photo on that machine before the upload, for the same reason as the backoffice.
 - A daily GitHub workflow runs the photo purge job against the database and the bucket of each environment, on the branch of that environment. The job is a program of its own, so it lives in its own app and not in the Next.js application.
 - One package holds the rules that the web app and the native app both apply: status, time formats, the map query and its search center, the search and filter rules, map pins, prices, the facts of the event page, the save queue and the share links. It holds no text and no screens, because each app owns its translations and its UI. The apps share it because two copies of a rule drift apart.
 - Geoapify: place suggestions of the search field, from all of Italy, with the places nearest to the search center first. Each client gets 30 calls a minute, because the free plan has a daily credit limit. Phones on mobile data often share one public address, so the native app tells the visitor to retry in a minute when the limit answers.

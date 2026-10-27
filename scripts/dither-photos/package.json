@@ -7,7 +7,6 @@
         "typecheck": "tsc -b",
         "lint": "oxlint --config oxlint.config.ts",
         "lint:fix": "oxlint --config oxlint.config.ts --fix",
-        "test": "vitest --run",
         "dither-photos": "DISABLE_DRIZZLE_LOGS=true tsx src/index.ts"
     },
     "dependencies": {
@@ -15,7 +14,6 @@
         "backend-shared": "workspace:*",
         "models": "workspace:*",
         "shared": "workspace:*",
-        "sharp": "^0.35.5",
         "storage": "workspace:*"
     },
     "devDependencies": {
@@ -23,7 +21,6 @@
         "oxlint": "catalog:",
         "oxlint-tsgolint": "catalog:",
         "tsx": "catalog:",
-        "typescript": "catalog:",
-        "vitest": "catalog:"
+        "typescript": "catalog:"
     }
 }
