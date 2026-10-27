@@ -13,6 +13,9 @@ const POSITION_OPTIONS: PositionOptions = {
     maximumAge: 60_000,
 }
 
+// A browser with no answer leaves the request open with no timeout
+const LOCATE_OPTIONS: PositionOptions = { ...POSITION_OPTIONS, timeout: 10_000 }
+
 /**
  * @description Maps a position of the browser to the granted state
  * @param position Position the browser reported
@@ -46,7 +49,7 @@ const stateAfterError = (
 
 /**
  * @description Returns the position of the device, watched while the caller is mounted, and
- * a `locate` call that asks for it again
+ * a `locate` call that answers the watched position, else asks the browser for one
  * @remarks Reads the permission from the position calls alone: Safari reports `prompt` to
  * `navigator.permissions` until the page has called the Geolocation API
  */
@@ -77,6 +80,11 @@ export const useGeolocation = () => {
     // A granted answer after a denial sets `watching` again, which restarts the watch.
     const locate = () =>
         new Promise<GeolocationState>(resolve => {
+            // The watch keeps a granted position fresh
+            if (state.status === "granted") {
+                resolve(state)
+                return
+            }
             if (!("geolocation" in navigator)) {
                 setState({ status: "unavailable" })
                 resolve({ status: "unavailable" })
@@ -93,7 +101,7 @@ export const useGeolocation = () => {
                     setState(previous => stateAfterError(error, previous))
                     resolve(failedState(error))
                 },
-                POSITION_OPTIONS,
+                LOCATE_OPTIONS,
             )
         })
 

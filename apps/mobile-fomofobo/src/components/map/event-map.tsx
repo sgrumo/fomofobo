@@ -26,7 +26,7 @@ import {
 import type { MarkerMove, MarkerTransitions, ShownMarker } from "domain/marker-motion"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { pinStartOf } from "domain/pin-tag"
-import { PLATFORM_TIME_ZONE } from "domain/platform"
+import { MAP_BOUNDS, MAP_MIN_ZOOM, PLATFORM_TIME_ZONE } from "domain/platform"
 import type {
     CategoryIcon,
     GeoPoint,
@@ -144,9 +144,11 @@ export const EventMap = (props: EventMapProps) => {
         ),
     ])
     const clusters = buildEventClusters(spots)
-    const selectedIndex = spots.find(
-        spot => spot.venueId === props.selectedVenueId,
-    )?.index
+    const selectedVenueId = props.selectedVenueId
+    const selectedIndex =
+        selectedVenueId === undefined
+            ? undefined
+            : spots.find(spot => spot.venueIds.includes(selectedVenueId))?.index
     const markers =
         viewport === undefined
             ? []
@@ -338,6 +340,8 @@ export const EventMap = (props: EventMapProps) => {
                 <Images images={MAP_IMAGES} />
                 <Camera
                     ref={cameraRef}
+                    minZoom={MAP_MIN_ZOOM}
+                    maxBounds={MAP_BOUNDS}
                     initialViewState={{
                         center: [longitude, latitude],
                         zoom: INITIAL_ZOOM,

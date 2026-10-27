@@ -1,10 +1,11 @@
 import { sum } from "es-toolkit"
 import type { GeoPoint, OccurrenceStatus } from "models"
-import { isDefined } from "shared/values"
 import Supercluster from "supercluster"
 import type { ClusterFeature, PointFeature } from "supercluster"
 
 export const CLUSTER_MAX_ZOOM = 17
+
+const CLUSTER_RADIUS = 48
 
 export type MapPointKind = OccurrenceStatus | "permanent"
 
@@ -15,6 +16,11 @@ export interface EventPointProperties {
 }
 
 export interface MapSpot extends EventPointProperties {
+    venueIds: string[]
+    coordinates: GeoPoint
+}
+
+export interface VenuePoint {
     venueId: string
     coordinates: GeoPoint
 }
@@ -44,48 +50,82 @@ export const SELECTED_MARKER_LAYER = LAYER_ORDER.length
 export const POSITION_MARKER_LAYER = SELECTED_MARKER_LAYER + 1
 
 /**
- * @description Groups the results into one spot per venue, marked by its result of the highest
- * layer, the first in result order among equals
+ * @description Groups the venues that the cluster index still merges at its last zoom, one
+ * group of venue ids per spot
+ * @param venues Venue of each result, a venue repeated once per result
+ */
+export const sharedSpotsOf = (venues: readonly VenuePoint[]): string[][] => {
+    const unique = [...new Map(venues.map(venue => [venue.venueId, venue])).values()]
+    const index = new Supercluster<Pick<VenuePoint, "venueId">>({
+        radius: CLUSTER_RADIUS,
+        maxZoom: CLUSTER_MAX_ZOOM,
+    }).load(
+        unique.map(venue => ({
+            type: "Feature",
+            geometry: {
+                type: "Point",
+                coordinates: [venue.coordinates.longitude, venue.coordinates.latitude],
+            },
+            properties: { venueId: venue.venueId },
+        })),
+    )
+    return index
+        .getClusters([-180, -90, 180, 90], CLUSTER_MAX_ZOOM)
+        .map(feature =>
+            "cluster" in feature.properties
+                ? index
+                      .getLeaves(feature.properties.cluster_id, Infinity)
+                      .map(leaf => leaf.properties.venueId)
+                : [feature.properties.venueId],
+        )
+}
+
+/**
+ * @description Groups the results into one spot per group of venues too close to tell apart,
+ * marked by its result of the highest layer, the first in result order among equals
  * @param results Venue and kind of each result, in result order: occurrences first, then
  * permanent venues
  */
 export const venueSpots = (
-    results: ReadonlyArray<{
-        venueId: string
-        coordinates: GeoPoint
-        kind: MapPointKind
-    }>,
-): MapSpot[] =>
-    Object.values(
-        Object.groupBy(
-            results.map((result, index) => ({ ...result, index })),
-            result => result.venueId,
-        ),
+    results: ReadonlyArray<VenuePoint & { kind: MapPointKind }>,
+): MapSpot[] => {
+    const byVenue = Map.groupBy(
+        results.map((result, index) => ({ ...result, index })),
+        result => result.venueId,
     )
-        .filter(isDefined)
-        .map(group => {
+    const firstIndexOf = (venueIds: readonly string[]) =>
+        Math.min(...venueIds.map(venueId => byVenue.get(venueId)?.[0]?.index ?? Infinity))
+    return sharedSpotsOf(results)
+        .toSorted((first, second) => firstIndexOf(first) - firstIndexOf(second))
+        .map(venueIds => {
+            const group = venueIds
+                .flatMap(venueId => byVenue.get(venueId) ?? [])
+                .toSorted((first, second) => first.index - second.index)
             const top = group.reduce((best, result) =>
                 markerLayer(result.kind) > markerLayer(best.kind) ? result : best,
             )
             return {
-                venueId: top.venueId,
+                venueIds: venueIds.toSorted(
+                    (first, second) => firstIndexOf([first]) - firstIndexOf([second]),
+                ),
                 coordinates: top.coordinates,
                 kind: top.kind,
                 index: top.index,
                 moreCount: group.length - 1,
             }
         })
+}
 
 /**
  * @description Builds the cluster index of the venue spots, each cluster counting its spots
  * per kind
- * @param spots One spot per venue
+ * @param spots One spot per group of venues too close to tell apart
  */
 export const buildEventClusters = (
     spots: readonly MapSpot[],
 ): Supercluster<EventPointProperties, EventClusterProperties> =>
     new Supercluster<EventPointProperties, EventClusterProperties>({
-        radius: 48,
+        radius: CLUSTER_RADIUS,
         maxZoom: CLUSTER_MAX_ZOOM,
         map: properties => ({
             liveCount: properties.kind === "live" ? 1 : 0,

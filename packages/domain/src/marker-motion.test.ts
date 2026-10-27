@@ -15,15 +15,27 @@ describe("markerTransitions", () => {
     const nextDoor = { latitude: 44.3536, longitude: 11.715 }
     const farther = { latitude: 44.36, longitude: 11.72 }
     const clusters = buildEventClusters([
-        { venueId: "piazza", coordinates: venue, kind: "live", index: 0, moreCount: 0 },
         {
-            venueId: "chiostro",
+            venueIds: ["piazza"],
+            coordinates: venue,
+            kind: "live",
+            index: 0,
+            moreCount: 0,
+        },
+        {
+            venueIds: ["chiostro"],
             coordinates: nextDoor,
             kind: "upcoming",
             index: 1,
             moreCount: 0,
         },
-        { venueId: "rocca", coordinates: farther, kind: "ended", index: 2, moreCount: 0 },
+        {
+            venueIds: ["rocca"],
+            coordinates: farther,
+            kind: "ended",
+            index: 2,
+            moreCount: 0,
+        },
     ])
     const markersAt = (zoom: number) =>
         shownMarkersOf(clusters.getClusters(world, zoom), clusters)

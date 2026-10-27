@@ -41,6 +41,7 @@ import { useTranslation } from "react-i18next"
 import { Alert } from "ui-components/alert"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
+import { FIXED_MAP_OPTIONS, fixMapGestures } from "@/lib/map/fixed-map"
 
 import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"
@@ -165,10 +166,12 @@ export const EventMap = (props: EventMapProps) => {
             style: mapStyle,
             center: [longitude, latitude],
             zoom: INITIAL_ZOOM,
+            ...FIXED_MAP_OPTIONS,
             // The expanded control wraps over the bottom controls on a phone, so the map
             // draws its own one-line credit below.
             attributionControl: false,
         })
+        const releaseGestures = fixMapGestures(instance)
         const publishViewport = () => {
             setViewport(viewportOf(instance))
         }
@@ -180,6 +183,7 @@ export const EventMap = (props: EventMapProps) => {
         void addDotDither(instance)
 
         return () => {
+            releaseGestures()
             instance.remove()
         }
     }, [supported])
@@ -256,9 +260,11 @@ export const EventMap = (props: EventMapProps) => {
         ),
     ])
     const clusters = buildEventClusters(spots)
-    const selectedIndex = spots.find(
-        spot => spot.venueId === props.selectedVenueId,
-    )?.index
+    const selectedVenueId = props.selectedVenueId
+    const selectedIndex =
+        selectedVenueId === undefined
+            ? undefined
+            : spots.find(spot => spot.venueIds.includes(selectedVenueId))?.index
     const selectIndex = (index: number) => {
         const occurrence = props.occurrences.at(index)
         if (occurrence !== undefined) {

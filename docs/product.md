@@ -62,11 +62,13 @@ The search center is the position of the device when the visitor grants location
 
 Each venue with results is one pin. The pin shows the result of the venue with the highest status, in the order live, upcoming, ended, permanent. It takes the icon of that category and the look of that status. A tag above the pin reads live for a live result, the start time for an upcoming result of today, and the date for an upcoming result of another day. When the venue holds more results, the tag adds their count as "+N".
 
-Venues too close to tell apart merge into a cluster that counts the venues. Its ring shows the share of venues whose pin is live, upcoming, ended or permanent. Live pins draw above every other pin, and permanent venues below every event. The position of the visitor draws above every pin and cluster.
+Venues within about 20 meters of each other share one pin, because no zoom draws their pins apart. The pin counts the results of every venue it holds. Venues farther apart but too close to tell apart merge into a cluster that counts the venues. Its ring shows the share of venues whose pin is live, upcoming, ended or permanent. Live pins draw above every other pin, and permanent venues below every event. The position of the visitor draws above every pin and cluster.
 
 Every permanent venue inside the search area is a pin of its own color, whatever the date filter, with the icon of its category and its kind as the tag. Its preview shows the kind, the cover, the name and the address, with a link to the programme and one to the venue page. When a permanent venue also holds events, the preview pages through the events first and the venue last.
 
-A tap on a pin opens a preview of the occurrence. The preview shows status, venue, categories, price and times, with the elapsed time when live and a link to the event page. The pin of a venue with more results opens the preview of its result, which pages through every result of the venue.
+A tap on a pin opens a preview of the occurrence. The preview shows status, venue, categories, price and times, with the elapsed time when live and a link to the event page. The pin of a venue with more results opens the preview of its result, which pages through every result of the pin.
+
+The map stays inside Italy, and it never turns or tilts, because it draws no compass to undo a turn. A right click on the web map opens no browser menu.
 
 ### Search and filters
 

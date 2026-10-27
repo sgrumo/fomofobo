@@ -8,6 +8,8 @@ import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Alert } from "ui-components/alert"
 
+import { FIXED_MAP_OPTIONS, fixMapGestures } from "@/lib/map/fixed-map"
+
 setWorkerUrl(
     new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).toString(),
 )
@@ -51,7 +53,9 @@ export const VenuePinMap = (props: VenuePinMapProps) => {
             style: mapStyle,
             center: [longitude, latitude],
             zoom: PIN_ZOOM,
+            ...FIXED_MAP_OPTIONS,
         })
+        const releaseGestures = fixMapGestures(instance)
         instance.on("load", () => {
             setMap(instance)
         })
@@ -67,6 +71,7 @@ export const VenuePinMap = (props: VenuePinMapProps) => {
         return () => {
             marker.off("dragend", publishDrag)
             marker.remove()
+            releaseGestures()
             instance.remove()
         }
     }, [supported, marker])

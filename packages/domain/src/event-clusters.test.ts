@@ -7,6 +7,7 @@ import {
     firstLeafIndex,
     markerEmphasis,
     markerLayer,
+    sharedSpotsOf,
     venueSpots,
 } from "./event-clusters"
 import type { MapPointKind } from "./event-clusters"
@@ -20,42 +21,42 @@ describe("buildEventClusters", () => {
     it("merges close spots into one cluster that counts its spots per kind", () => {
         const index = buildEventClusters([
             {
-                venueId: "venue-0",
+                venueIds: ["venue-0"],
                 coordinates: venue,
                 kind: "live",
                 index: 0,
                 moreCount: 0,
             },
             {
-                venueId: "venue-1",
+                venueIds: ["venue-1"],
                 coordinates: nextDoor,
                 kind: "upcoming",
                 index: 1,
                 moreCount: 2,
             },
             {
-                venueId: "venue-2",
+                venueIds: ["venue-2"],
                 coordinates: venue,
                 kind: "live",
                 index: 2,
                 moreCount: 0,
             },
             {
-                venueId: "venue-3",
+                venueIds: ["venue-3"],
                 coordinates: nextDoor,
                 kind: "ended",
                 index: 3,
                 moreCount: 0,
             },
             {
-                venueId: "venue-4",
+                venueIds: ["venue-4"],
                 coordinates: farAway,
                 kind: "live",
                 index: 4,
                 moreCount: 1,
             },
             {
-                venueId: "venue-5",
+                venueIds: ["venue-5"],
                 coordinates: venue,
                 kind: "permanent",
                 index: 5,
@@ -84,14 +85,14 @@ describe("buildEventClusters", () => {
     it("keeps the result index and the count of other results of each single spot", () => {
         const index = buildEventClusters([
             {
-                venueId: "venue-0",
+                venueIds: ["venue-0"],
                 coordinates: venue,
                 kind: "ended",
                 index: 0,
                 moreCount: 3,
             },
             {
-                venueId: "venue-1",
+                venueIds: ["venue-1"],
                 coordinates: farAway,
                 kind: "permanent",
                 index: 1,
@@ -125,17 +126,44 @@ describe("venueSpots", () => {
             ]),
         ).toStrictEqual([
             {
-                venueId: "chiostro",
+                venueIds: ["chiostro"],
                 coordinates: venue,
                 kind: "live",
                 index: 2,
                 moreCount: 2,
             },
             {
-                venueId: "rocca",
+                venueIds: ["rocca"],
                 coordinates: farAway,
                 kind: "ended",
                 index: 1,
+                moreCount: 0,
+            },
+        ])
+    })
+
+    it("merges venues too close to tell apart into one spot that counts every result", () => {
+        const sameCourtyard = { latitude: 44.35331, longitude: 11.71472 }
+
+        expect(
+            venueSpots([
+                { venueId: "chiostro", coordinates: venue, kind: "upcoming" },
+                { venueId: "loggia", coordinates: sameCourtyard, kind: "live" },
+                { venueId: "rocca", coordinates: farAway, kind: "ended" },
+            ]),
+        ).toStrictEqual([
+            {
+                venueIds: ["chiostro", "loggia"],
+                coordinates: sameCourtyard,
+                kind: "live",
+                index: 1,
+                moreCount: 1,
+            },
+            {
+                venueIds: ["rocca"],
+                coordinates: farAway,
+                kind: "ended",
+                index: 2,
                 moreCount: 0,
             },
         ])
@@ -149,13 +177,36 @@ describe("venueSpots", () => {
             ]),
         ).toStrictEqual([
             {
-                venueId: "chiostro",
+                venueIds: ["chiostro"],
                 coordinates: venue,
                 kind: "upcoming",
                 index: 0,
                 moreCount: 1,
             },
         ])
+    })
+})
+
+describe("sharedSpotsOf", () => {
+    it("groups the venues that the last cluster zoom cannot split, and keeps a venue a block away apart", () => {
+        const venue = { latitude: 44.3533, longitude: 11.7147 }
+
+        expect(
+            sharedSpotsOf([
+                { venueId: "chiostro", coordinates: venue },
+                {
+                    venueId: "loggia",
+                    coordinates: { latitude: 44.35331, longitude: 11.71472 },
+                },
+                { venueId: "chiostro", coordinates: venue },
+                {
+                    venueId: "rocca",
+                    coordinates: { latitude: 44.3543, longitude: 11.7147 },
+                },
+            ])
+                .map(venueIds => venueIds.toSorted())
+                .toSorted((first, second) => first.length - second.length),
+        ).toStrictEqual([["rocca"], ["chiostro", "loggia"]])
     })
 })
 
@@ -177,16 +228,22 @@ describe("markerEmphasis", () => {
     const farAway = { latitude: 44.5, longitude: 11.9 }
     const world: [number, number, number, number] = [-180, -85, 180, 85]
     const clusters = buildEventClusters([
-        { venueId: "chiostro", coordinates: venue, kind: "live", index: 0, moreCount: 0 },
         {
-            venueId: "rocca",
+            venueIds: ["chiostro"],
+            coordinates: venue,
+            kind: "live",
+            index: 0,
+            moreCount: 0,
+        },
+        {
+            venueIds: ["rocca"],
             coordinates: nextDoor,
             kind: "ended",
             index: 1,
             moreCount: 0,
         },
         {
-            venueId: "teatro",
+            venueIds: ["teatro"],
             coordinates: farAway,
             kind: "upcoming",
             index: 2,

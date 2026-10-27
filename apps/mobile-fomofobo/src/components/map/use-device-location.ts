@@ -51,7 +51,7 @@ const readinessOf = async (permission: PermissionStatus): Promise<DeviceLocation
 
 /**
  * @description Returns the position of the device, watched while the caller is mounted, and a
- * `locate` call that asks for it again
+ * `locate` call that answers the watched position, else asks the device for one
  * @remarks Opens the app settings from `locate` when the system no longer shows the prompt
  */
 export const useDeviceLocation = () => {
@@ -121,6 +121,10 @@ export const useDeviceLocation = () => {
     }, [denied])
 
     const locate = async (): Promise<DeviceLocation> => {
+        // The watch keeps a granted position fresh
+        if (state.status === "granted") {
+            return state
+        }
         const permission = await requestForegroundPermissionsAsync()
         if (permission.status !== PermissionStatus.GRANTED && !permission.canAskAgain) {
             void Linking.openSettings()

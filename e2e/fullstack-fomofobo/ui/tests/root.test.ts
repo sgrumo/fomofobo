@@ -273,6 +273,48 @@ test.describe("map", () => {
         ).toBeVisible()
     })
 
+    test("joins venues too close to tell apart in one pin, whose preview pages through the events of both", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const category = await seedCategory()
+        const [courtyard, loggia] = await Promise.all([
+            seedVenue(offsetPoint(center, { latitude: 0.01, longitude: 0 })),
+            seedVenue(offsetPoint(center, { latitude: 0.01002, longitude: 0.00002 })),
+        ])
+        const [live, upcoming] = await Promise.all([
+            seedPublicEvent(
+                { venue: courtyard, category },
+                { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
+            ),
+            seedPublicEvent(
+                { venue: loggia, category },
+                { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+            ),
+        ])
+
+        await gotoPage(page, mapPath(center))
+        await page
+            .getByRole("button", {
+                name: `${t("shared", "Map.Pin", {
+                    title: live.title,
+                    status: t("shared", "Status.live"),
+                    time: "11:00",
+                })}, ${t("shared", "Map.MoreHere_one", { count: 1 })}`,
+                exact: true,
+            })
+            .click({ timeout: MAP_TIMEOUT_MS })
+
+        await expect(getBottomSheet(page, live.title)).toContainText(
+            t("shared", "Preview.Position", { index: 1, total: 2 }),
+        )
+        await clickIconButton(page, t("shared", "Preview.Next"))
+
+        await expect(getBottomSheet(page, upcoming.title)).toContainText(
+            t("shared", "Preview.Position", { index: 2, total: 2 }),
+        )
+    })
+
     test("narrows the pins to the pressed category, with the count of each chip, and shows every category again once unpressed", async ({
         page,
     }) => {
