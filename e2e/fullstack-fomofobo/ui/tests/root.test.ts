@@ -371,7 +371,9 @@ test.describe("map", () => {
         await expect(page).not.toHaveURL(/category=/u)
     })
 
-    test("opens the filters from the filter button on a phone", async ({ page }) => {
+    test("opens the filters from the filter button on a phone, and Escape closes them", async ({
+        page,
+    }) => {
         await page.setViewportSize({ width: 375, height: 812 })
         const center = buildArea()
         const category = await seedCategory()
@@ -423,6 +425,12 @@ test.describe("map", () => {
 
         await expect(tomorrowChip).toBeHidden()
         await expect(tomorrowPin).toBeVisible()
+
+        await clickIconButton(page, t("shared", "Filters.Label"))
+        await expect(tomorrowChip).toBeVisible()
+        await page.keyboard.press("Escape")
+
+        await expect(tomorrowChip).toBeHidden()
     })
 
     test("keeps tomorrow's results alone under the tomorrow chip, with the date on their pins", async ({
@@ -735,6 +743,48 @@ test.describe("map", () => {
 
         await expect(preview).toBeHidden()
         await expect(pin).toBeFocused()
+    })
+
+    test("closes the preview of a wide screen on a click on the map, and on Escape with the focus outside it", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const event = await seedPublicEvent(
+            {
+                venue: await seedVenue(
+                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+                ),
+                category: await seedCategory(),
+            },
+            { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
+        )
+        const pin = page.getByRole("button", {
+            name: t("shared", "Map.Pin", {
+                title: event.title,
+                status: t("shared", "Status.live"),
+                time: "11:00",
+            }),
+        })
+        const preview = page.getByRole("dialog", { name: event.title, exact: true })
+
+        await gotoPage(page, mapPath(center))
+        await pin.click({ timeout: MAP_TIMEOUT_MS })
+        await expect(preview).toBeVisible()
+        // The left edge of the map, clear of the controls and of the pin at the center
+        await page
+            .getByRole("region", { name: t("shared", "Map.Label") })
+            .click({ position: { x: 40, y: 400 } })
+
+        await expect(preview).toBeHidden()
+        await expect(page).not.toHaveURL(/event=/u)
+
+        await pin.click()
+        await expect(preview).toBeVisible()
+        await page.getByLabel(t("shared", "Search.Label")).focus()
+        await page.keyboard.press("Escape")
+
+        await expect(preview).toBeHidden()
+        await expect(page).not.toHaveURL(/event=/u)
     })
 
     test("opens the preview of a pin, free when it has no price, and its page", async ({

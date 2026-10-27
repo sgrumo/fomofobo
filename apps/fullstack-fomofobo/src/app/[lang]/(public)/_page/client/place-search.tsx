@@ -92,7 +92,9 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                 }}
                 onBlur={closeWhenFocusLeaves}
                 onKeyDown={event => {
-                    if (event.key === "Escape") {
+                    if (event.key === "Escape" && showsSuggestions) {
+                        // The suggestions take the Escape, so the preview stays open
+                        event.preventDefault()
                         setOpen(false)
                     }
                 }}

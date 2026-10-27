@@ -36,7 +36,7 @@ import { useOnline } from "@/lib/hooks/use-online"
 
 import { CategoryChips } from "./category-chips"
 import { DateChips } from "./date-chips"
-import { EventPreview, EventPreviewCard } from "./event-preview"
+import { EventPreview, EventPreviewPanel } from "./event-preview"
 import type { PreviewEntry, PreviewVenue } from "./event-preview"
 import { PlaceSearch } from "./place-search"
 
@@ -90,6 +90,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
     const [locateRequest, setLocateRequest] = useState<LocateRequest>()
     const filtersActive = hasActiveFilters(query)
     const overlayRef = useRef<HTMLDivElement>(null)
+    const panelRef = useRef<HTMLDivElement>(null)
     // The `md` breakpoint of the filter panel
     const wide = useMediaQuery("(min-width: 48rem)")
 
@@ -232,26 +233,29 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                   },
               }
             : undefined
-    // A wide screen shows the preview above its pin, once the entry and its place are known
-    const previewCard =
-        wide && selected !== undefined
-            ? {
-                  coordinates:
-                      selected.type === "occurrence"
-                          ? selected.occurrence.venue.coordinates
-                          : selected.venue.coordinates,
-                  content: (
-                      <EventPreviewCard
-                          route={props.route}
-                          entry={selected}
-                          categories={categoriesById}
-                          now={now}
-                          paging={paging}
-                          onClose={closePreview}
-                      />
-                  ),
-              }
-            : undefined
+    const previewOpen = selectedRef !== undefined || selectedVenueId !== undefined
+    // A wide screen docks the preview on the right, once the entry is known
+    const panelEntry = wide ? selected : undefined
+    const panelPoint =
+        panelEntry?.type === "occurrence"
+            ? panelEntry.occurrence.venue.coordinates
+            : panelEntry?.venue.coordinates
+
+    // Escape closes the filter panel of a phone
+    useEffect(() => {
+        if (!filtersOpen) {
+            return undefined
+        }
+        const closeOnEscape = (event: KeyboardEvent) => {
+            if (event.key === "Escape" && !event.defaultPrevented) {
+                setFiltersOpen(false)
+            }
+        }
+        document.addEventListener("keydown", closeOnEscape)
+        return () => {
+            document.removeEventListener("keydown", closeOnEscape)
+        }
+    }, [filtersOpen])
 
     const locate = async () => {
         const result = await geolocation.locate()
@@ -322,8 +326,9 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 permanentVenues={results?.permanentVenues ?? []}
                 iconOf={iconOf}
                 selectedVenueId={spotVenueId}
-                previewCard={previewCard}
+                revealedPoint={panelPoint}
                 overlayRef={overlayRef}
+                panelRef={panelRef}
                 now={now}
                 onSelect={ref => {
                     openPreview({ type: "occurrence", ref })
@@ -331,10 +336,19 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 onSelectVenue={venueId => {
                     openPreview({ type: "venue", venueId })
                 }}
+                onBackgroundClick={() => {
+                    // The bottom sheet closes on an outside press on its own
+                    if (panelEntry !== undefined) {
+                        closePreview()
+                    }
+                }}
             />
             <div
                 ref={overlayRef}
-                className="pointer-events-none absolute inset-x-4 top-4 flex flex-col gap-2 [&>*]:pointer-events-auto"
+                className={cn(
+                    "pointer-events-none absolute inset-x-4 top-4 flex flex-col gap-2 [&>*]:pointer-events-auto",
+                    { "right-[25.75rem]": panelEntry !== undefined },
+                )}
             >
                 <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
@@ -403,7 +417,11 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 {notices}
             </div>
             {/* Clears the map attribution, which sits in the bottom corner. */}
-            <div className="absolute right-4 bottom-8 flex items-center gap-2">
+            <div
+                className={cn("absolute right-4 bottom-8 flex items-center gap-2", {
+                    "right-[25.75rem]": panelEntry !== undefined,
+                })}
+            >
                 {search.isFetching ? (
                     <Spinner title={t("Map.Loading")} size="xs" />
                 ) : undefined}
@@ -424,12 +442,24 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                     }}
                 />
             </div>
+            {panelEntry === undefined ? undefined : (
+                <div
+                    ref={panelRef}
+                    className="absolute top-4 right-4 bottom-8 w-[23.75rem]"
+                >
+                    <EventPreviewPanel
+                        route={props.route}
+                        entry={panelEntry}
+                        categories={categoriesById}
+                        now={now}
+                        paging={paging}
+                        onClose={closePreview}
+                    />
+                </div>
+            )}
             <EventPreview
                 route={props.route}
-                open={
-                    previewCard === undefined &&
-                    (selectedRef !== undefined || selectedVenueId !== undefined)
-                }
+                open={panelEntry === undefined && previewOpen}
                 entry={selected}
                 loadFailed={
                     selectedRef === undefined ? venueDetail.isError : detail.isError

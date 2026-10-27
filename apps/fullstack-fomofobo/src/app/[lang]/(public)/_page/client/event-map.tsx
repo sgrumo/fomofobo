@@ -35,7 +35,7 @@ import type {
     OccurrenceSummary,
     PermanentVenueSummary,
 } from "models"
-import type { ReactNode, RefObject } from "react"
+import type { RefObject } from "react"
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Alert } from "ui-components/alert"
@@ -103,18 +103,11 @@ const addDotDither = async (map: MapLibreMap): Promise<void> => {
     map.addImage(DOT_DITHER_IMAGE, image.data)
 }
 
-const PREVIEW_CARD_LAYER = POSITION_MARKER_LAYER + 1
+// Space kept between the selected pin and the edges of the free part of the map
+const PIN_FRAME_MARGIN = 16
 
-// Lifts the card above the pin and its tag
-const PREVIEW_CARD_OFFSET: [number, number] = [0, -72]
-
-// Space kept between the card and the edges of the free part of the map
-const PREVIEW_CARD_MARGIN = 16
-
-interface PreviewCard {
-    coordinates: GeoPoint
-    content: ReactNode
-}
+// Box of a pin and its tag, above the anchor at its bottom center, in px
+const PIN_BOX = { width: 96, height: 72 }
 
 /**
  * @description Returns how far the map pans so a box fits inside a frame, zero on an axis where it fits
@@ -138,12 +131,17 @@ interface EventMapProps extends RouteClientComponentProps<"root"> {
     permanentVenues: PermanentVenueSummary[]
     iconOf: (categoryId: string) => CategoryIcon
     selectedVenueId: string | undefined
-    previewCard: PreviewCard | undefined
-    // Controls drawn over the top of the map, which the card keeps clear of
+    // Place of the selected pin, which pans clear of the controls and of the panel
+    revealedPoint: GeoPoint | undefined
+    // Controls drawn over the top of the map
     overlayRef: RefObject<HTMLElement | null>
+    // Panel drawn over the right side of the map
+    panelRef: RefObject<HTMLElement | null>
     now: Date
     onSelect: (ref: OccurrenceRef) => void
     onSelectVenue: (venueId: string) => void
+    // A click on the map itself, outside every marker
+    onBackgroundClick: () => void
 }
 
 export const EventMap = (props: EventMapProps) => {
@@ -153,6 +151,9 @@ export const EventMap = (props: EventMapProps) => {
     const [map, setMap] = useState<MapLibreMap>()
     const [viewport, setViewport] = useState<Viewport>()
     const readCenter = useEffectEvent(() => props.center)
+    const clickBackground = useEffectEvent(() => {
+        props.onBackgroundClick()
+    })
 
     useEffect(() => {
         const container = containerRef.current
@@ -180,6 +181,11 @@ export const EventMap = (props: EventMapProps) => {
             publishViewport()
         })
         instance.on("moveend", publishViewport)
+        instance.on("click", event => {
+            if (event.originalEvent.target === instance.getCanvas()) {
+                clickBackground()
+            }
+        })
         void addDotDither(instance)
 
         return () => {
@@ -201,20 +207,21 @@ export const EventMap = (props: EventMapProps) => {
         map?.flyTo(flight.zoom === undefined ? { center } : { center, zoom: flight.zoom })
     }, [map, latitude, longitude, locateCount])
 
-    const cardRef = useRef<HTMLDivElement>(null)
     const readOverlay = useEffectEvent(() => props.overlayRef.current)
-    const cardPlace =
-        props.previewCard === undefined
+    const readPanel = useEffectEvent(() => props.panelRef.current)
+    const readRevealedPoint = useEffectEvent(() => props.revealedPoint)
+    const revealedPlace =
+        props.revealedPoint === undefined
             ? undefined
-            : `${String(props.previewCard.coordinates.latitude)} ${String(props.previewCard.coordinates.longitude)}`
-    // A card that opens past the edges, or under the controls, pans into view
+            : `${String(props.revealedPoint.latitude)} ${String(props.revealedPoint.longitude)}`
+    // A selected pin past the edges, or under the controls or the panel, pans into view
     useEffect(() => {
-        const card = cardRef.current
+        const point = readRevealedPoint()
         const container = containerRef.current
         if (
             map === undefined ||
-            cardPlace === undefined ||
-            card === null ||
+            revealedPlace === undefined ||
+            point === undefined ||
             container === null
         ) {
             return
@@ -224,19 +231,29 @@ export const EventMap = (props: EventMapProps) => {
             bounds.top,
             readOverlay()?.getBoundingClientRect().bottom ?? 0,
         )
+        const right = Math.min(
+            bounds.right,
+            readPanel()?.getBoundingClientRect().left ?? bounds.right,
+        )
+        const anchor = map.project([point.longitude, point.latitude])
         const [x, y] = fitPanOf(
-            card.getBoundingClientRect(),
             new DOMRect(
-                bounds.left + PREVIEW_CARD_MARGIN,
-                top + PREVIEW_CARD_MARGIN,
-                bounds.width - 2 * PREVIEW_CARD_MARGIN,
-                bounds.bottom - top - 2 * PREVIEW_CARD_MARGIN,
+                bounds.left + anchor.x - PIN_BOX.width / 2,
+                bounds.top + anchor.y - PIN_BOX.height,
+                PIN_BOX.width,
+                PIN_BOX.height,
+            ),
+            new DOMRect(
+                bounds.left + PIN_FRAME_MARGIN,
+                top + PIN_FRAME_MARGIN,
+                right - bounds.left - 2 * PIN_FRAME_MARGIN,
+                bounds.bottom - top - 2 * PIN_FRAME_MARGIN,
             ),
         )
         if (x !== 0 || y !== 0) {
             map.panBy([x, y])
         }
-    }, [map, cardPlace])
+    }, [map, revealedPlace])
 
     // The result index of a permanent venue follows every occurrence.
     const spots = venueSpots([
@@ -444,8 +461,9 @@ export const EventMap = (props: EventMapProps) => {
 
     return (
         <>
-            {/* MapLibre sets `position: relative` on its container, so a wrapper places it. */}
-            <div className="absolute inset-0">
+            {/* MapLibre sets `position: relative` on its container, so a wrapper places it.
+                It isolates the layers of the markers, so the controls above draw on top. */}
+            <div className="absolute inset-0 isolate">
                 <div ref={containerRef} className="size-full" />
             </div>
             <p className="tp-body-sm text-fg-inverse absolute right-4 bottom-1.5 left-4 truncate text-right [&>a]:underline">
@@ -481,18 +499,6 @@ export const EventMap = (props: EventMapProps) => {
                           ),
                       ),
                   ]}
-            {map === undefined || props.previewCard === undefined ? undefined : (
-                <MapMarker
-                    route={props.route}
-                    map={map}
-                    coordinates={props.previewCard.coordinates}
-                    anchor="bottom"
-                    offset={PREVIEW_CARD_OFFSET}
-                    layer={PREVIEW_CARD_LAYER}
-                >
-                    <div ref={cardRef}>{props.previewCard.content}</div>
-                </MapMarker>
-            )}
             {map === undefined || props.position === undefined ? undefined : (
                 <MapMarker
                     route={props.route}

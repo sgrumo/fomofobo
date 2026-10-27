@@ -349,52 +349,50 @@ export const EventPreview = (props: EventPreviewProps) => (
     </BottomSheetRoot>
 )
 
-// Native events a press on the card would hand to the map below it
-const MAP_GESTURE_EVENTS = ["mousedown", "touchstart", "wheel", "dblclick"] as const
-
-interface EventPreviewCardProps extends StrictOmit<
+interface EventPreviewPanelProps extends StrictOmit<
     PreviewPanelProps,
     "entry" | "loadFailed" | "renderTitle"
 > {
     entry: PreviewEntry
 }
 
-export const EventPreviewCard = (props: EventPreviewCardProps) => {
+/**
+ * @description True when the key press belongs to another dialog, which closes on its own
+ * @param event Key press read
+ * @param panel Element of the preview panel
+ */
+const isInOtherDialog = (event: KeyboardEvent, panel: HTMLElement): boolean =>
+    event.target instanceof Element &&
+    !panel.contains(event.target) &&
+    event.target.closest("[role=dialog]") !== null
+
+export const EventPreviewPanel = (props: EventPreviewPanelProps) => {
     const titleId = useId()
-    const cardRef = useRef<HTMLElement>(null)
+    const panelRef = useRef<HTMLElement>(null)
     const close = useEffectEvent(() => {
         props.onClose()
     })
 
-    // The card takes the focus when it opens, gives it back when it closes, and closes on Escape
+    // The panel takes the focus when it opens, gives it back when it closes, and closes on Escape
     useEffect(() => {
-        const card = cardRef.current
-        if (card === null) {
+        const panel = panelRef.current
+        if (panel === null) {
             return undefined
         }
         const previous = document.activeElement
-        // The marker that holds the card, and the one of the pin, attach after this effect
-        const focusFrame = requestAnimationFrame(() => {
-            card.focus()
-        })
-        const keepFromMap = (event: Event) => {
-            event.stopPropagation()
-        }
+        panel.focus()
         const closeOnEscape = (event: KeyboardEvent) => {
-            if (event.key === "Escape") {
+            if (
+                event.key === "Escape" &&
+                !event.defaultPrevented &&
+                !isInOtherDialog(event, panel)
+            ) {
                 close()
             }
         }
-        for (const type of MAP_GESTURE_EVENTS) {
-            card.addEventListener(type, keepFromMap)
-        }
-        card.addEventListener("keydown", closeOnEscape)
+        document.addEventListener("keydown", closeOnEscape)
         return () => {
-            cancelAnimationFrame(focusFrame)
-            card.removeEventListener("keydown", closeOnEscape)
-            for (const type of MAP_GESTURE_EVENTS) {
-                card.removeEventListener(type, keepFromMap)
-            }
+            document.removeEventListener("keydown", closeOnEscape)
             requestAnimationFrame(() => {
                 if (previous instanceof HTMLElement && previous.isConnected) {
                     previous.focus()
@@ -405,12 +403,12 @@ export const EventPreviewCard = (props: EventPreviewCardProps) => {
 
     return (
         <section
-            ref={cardRef}
+            ref={panelRef}
             role="dialog"
             aria-modal={false}
             aria-labelledby={titleId}
             tabIndex={-1}
-            className="pixel-corners drop-shadow-hard-lg relative w-[23.75rem] cursor-auto p-4 outline-none"
+            className="pixel-corners drop-shadow-hard-lg h-full overflow-y-auto p-4 outline-none"
         >
             <PreviewPanel
                 route={props.route}
