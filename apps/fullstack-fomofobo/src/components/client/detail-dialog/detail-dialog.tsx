@@ -32,9 +32,12 @@ export const DetailSidePanel = (props: DetailDialogProps) => {
             aria-modal={false}
             aria-label={props.label}
             tabIndex={-1}
-            className="pixel-corners drop-shadow-hard-lg h-full overflow-y-auto px-4 pt-4 outline-none"
+            className="pixel-corners drop-shadow-hard-lg h-full outline-none"
         >
-            {props.children}
+            {/* The frame of `pixel-corners` stays put while the content scrolls inside it */}
+            <div className="relative h-full overflow-y-auto px-4 pt-4">
+                {props.children}
+            </div>
         </section>
     )
 }

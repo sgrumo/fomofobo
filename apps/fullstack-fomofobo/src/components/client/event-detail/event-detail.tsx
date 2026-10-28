@@ -173,7 +173,8 @@ export const EventDetail = (props: EventDetailProps) => {
             />
             <nav
                 aria-label={t("Detail.Actions")}
-                className="bg-surface border-line sticky bottom-0 flex gap-3 border-t-2 py-3"
+                // The shadow covers the bottom padding of the scroll area, which content would show through
+                className="bg-surface border-line sticky bottom-0 -mx-4 flex gap-3 border-t-2 p-4 shadow-[0_1rem_0_0_var(--color-surface)]"
             >
                 <DirectionsLink
                     coordinates={occurrence.venue.coordinates}
