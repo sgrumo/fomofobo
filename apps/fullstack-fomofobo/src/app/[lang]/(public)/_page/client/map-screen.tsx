@@ -24,6 +24,14 @@ import {
 import { Spinner } from "ui-components/spinner"
 import { useToast } from "ui-components/toast"
 
+import {
+    EventPreview,
+    EventPreviewPanel,
+} from "@/components/client/event-preview/event-preview"
+import type {
+    PreviewEntry,
+    PreviewVenue,
+} from "@/components/client/event-preview/event-preview"
 import { useDynamicRoute } from "@/framework/routes/route-hooks/use-dynamic-route"
 import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
@@ -36,8 +44,6 @@ import { useOnline } from "@/lib/hooks/use-online"
 
 import { CategoryChips } from "./category-chips"
 import { DateChips } from "./date-chips"
-import { EventPreview, EventPreviewPanel } from "./event-preview"
-import type { PreviewEntry, PreviewVenue } from "./event-preview"
 import { PlaceSearch } from "./place-search"
 
 const EventMap = dynamic(() => import("./event-map").then(module => module.EventMap), {
@@ -448,7 +454,6 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                     className="absolute top-4 right-4 bottom-8 w-[23.75rem]"
                 >
                     <EventPreviewPanel
-                        route={props.route}
                         entry={panelEntry}
                         categories={categoriesById}
                         now={now}
@@ -458,7 +463,6 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 </div>
             )}
             <EventPreview
-                route={props.route}
                 open={panelEntry === undefined && previewOpen}
                 entry={selected}
                 loadFailed={

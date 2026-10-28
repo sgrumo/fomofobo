@@ -1,6 +1,6 @@
 "use client"
 
-import { localTimeOf } from "domain/local-format"
+import { dayMonthOf, localDateOf, localTimeOf } from "domain/local-format"
 import { occurrenceProgress } from "domain/occurrence-progress"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { venuePhotoToneOf } from "domain/photo-tone"
@@ -29,7 +29,6 @@ import { SaveToggle } from "@/components/client/save-toggle/save-toggle"
 import { TonedImage } from "@/components/client/toned-image/toned-image"
 import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
-import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 
 interface PreviewPaging {
@@ -50,7 +49,7 @@ export type PreviewEntry =
 
 type RenderTitle = (text: string, className?: string) => ReactNode
 
-interface PreviewPanelProps extends RouteClientComponentProps<"root"> {
+interface PreviewPanelProps {
     entry: PreviewEntry | undefined
     loadFailed: boolean
     categories: ReadonlyMap<string, Category>
@@ -118,6 +117,9 @@ const PreviewBody = (props: PreviewBodyProps) => {
     }
     const status = occurrenceStatus(span, props.now)
     const elapsedFraction = occurrenceProgress(span, props.now)
+    const startsToday =
+        localDateOf(span.startsAt, PLATFORM_TIME_ZONE) ===
+        localDateOf(props.now, PLATFORM_TIME_ZONE)
     const details = [
         ...occurrence.categoryIds.map(id => props.categories.get(id)?.name),
         priceSummary(occurrence.priceScheme),
@@ -179,7 +181,12 @@ const PreviewBody = (props: PreviewBodyProps) => {
             ) : undefined}
             <div className="border-line flex items-center justify-between gap-2 border-t-2 pt-3">
                 <span className="tp-pixel-xl">
-                    {localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)}→
+                    {startsToday ? undefined : (
+                        <span className="tp-pixel-md mr-2">
+                            {dayMonthOf(span.startsAt, PLATFORM_TIME_ZONE)}
+                        </span>
+                    )}
+                    {localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)} →{" "}
                     {localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)}
                 </span>
                 <RouteLink
@@ -301,7 +308,6 @@ const PreviewPanel = (props: PreviewPanelProps) => {
 
     return props.entry.type === "occurrence" ? (
         <PreviewBody
-            route={props.route}
             occurrence={props.entry.occurrence}
             categories={props.categories}
             now={props.now}
@@ -334,7 +340,6 @@ export const EventPreview = (props: EventPreviewProps) => (
     >
         <BottomSheetContent>
             <PreviewPanel
-                route={props.route}
                 entry={props.entry}
                 loadFailed={props.loadFailed}
                 categories={props.categories}
@@ -394,7 +399,15 @@ export const EventPreviewPanel = (props: EventPreviewPanelProps) => {
         return () => {
             document.removeEventListener("keydown", closeOnEscape)
             requestAnimationFrame(() => {
-                if (previous instanceof HTMLElement && previous.isConnected) {
+                // A panel that opens meanwhile keeps the focus it took
+                const focusLost =
+                    document.activeElement === null ||
+                    document.activeElement === document.body
+                if (
+                    previous instanceof HTMLElement &&
+                    previous.isConnected &&
+                    focusLost
+                ) {
                     previous.focus()
                 }
             })
@@ -411,7 +424,6 @@ export const EventPreviewPanel = (props: EventPreviewPanelProps) => {
             className="pixel-corners drop-shadow-hard-lg h-full overflow-y-auto p-4 outline-none"
         >
             <PreviewPanel
-                route={props.route}
                 entry={props.entry}
                 loadFailed={false}
                 categories={props.categories}

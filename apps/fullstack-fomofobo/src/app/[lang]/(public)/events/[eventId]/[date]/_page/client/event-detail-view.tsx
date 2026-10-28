@@ -189,7 +189,7 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
             }))
             .with({ type: "time" }, time => ({
                 label: t("Detail.Time"),
-                value: `${time.start}→${time.end}`,
+                value: `${time.start} → ${time.end}`,
             }))
             .with({ type: "entry" }, entry => ({
                 label: t("Detail.Entry"),
