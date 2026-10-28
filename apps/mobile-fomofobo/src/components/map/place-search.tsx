@@ -6,7 +6,6 @@ import {
     venueSuggestionGroupsOf,
 } from "domain/map-search"
 import { identity } from "es-toolkit"
-import { router } from "expo-router"
 import { HttpStatus } from "models"
 import type { GeoPoint, OccurrenceRef, PlaceSuggestion } from "models"
 import { useState } from "react"
@@ -89,6 +88,7 @@ interface PlaceSearchProps {
     initialText: string
     onPlaceSelect: (place: PlaceSuggestion) => void
     onEventSelect: (ref: OccurrenceRef) => void
+    onVenueSelect: (venueId: string) => void
     onTextSubmit: (text: string) => void
 }
 
@@ -231,12 +231,7 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                                                 detail={venue.address}
                                                 onPress={() => {
                                                     close()
-                                                    router.push({
-                                                        pathname: "/venues/[venueId]",
-                                                        params: {
-                                                            venueId: venue.venueId,
-                                                        },
-                                                    })
+                                                    props.onVenueSelect(venue.venueId)
                                                 }}
                                             />
                                         ))}

@@ -8,12 +8,13 @@ import { Link, router } from "expo-router"
 import type { OccurrenceSummary } from "models"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { Keyboard, View } from "react-native"
+import { BackHandler, Keyboard, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { match } from "ts-pattern"
 
 import { CategoryChips } from "@/components/map/category-chips"
 import { DateChips } from "@/components/map/date-chips"
+import { EntityDetailSheet } from "@/components/map/entity-detail-sheet"
 import { EventMap } from "@/components/map/event-map"
 import { EventPreview } from "@/components/map/event-preview"
 import type { PreviewEntry, PreviewVenue } from "@/components/map/event-preview"
@@ -40,7 +41,12 @@ const CLOCK_TICK_MS = 60_000
 // Clears the attribution line at the bottom edge
 const CONTROLS_BOTTOM_OFFSET = 32
 
-const CLEARED_SELECTION = { event: undefined, occurrence: undefined, venue: undefined }
+const CLEARED_SELECTION = {
+    event: undefined,
+    occurrence: undefined,
+    venue: undefined,
+    detail: undefined,
+}
 
 /**
  * @description Returns the preview entry of the selected occurrence, else of the selected venue
@@ -142,6 +148,22 @@ const MapScreen = () => {
         enabled: selectedRef !== undefined && fromResults === undefined,
     })
     const selectedVenueId = selectedRef === undefined ? query.venue : undefined
+    const previewOpen = selectedRef !== undefined || selectedVenueId !== undefined
+    const detailOpen = previewOpen && query.detail === true
+
+    // The Android back button leaves the detail for the preview
+    useEffect(() => {
+        if (!detailOpen) {
+            return undefined
+        }
+        const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+            setQuery({ detail: undefined })
+            return true
+        })
+        return () => {
+            subscription.remove()
+        }
+    }, [detailOpen, setQuery])
     const venueFromResults = results?.permanentVenues.find(
         venue => venue.id === selectedVenueId,
     )
@@ -222,10 +244,16 @@ const MapScreen = () => {
                         event: ref.eventId,
                         occurrence: ref.date,
                         venue: undefined,
+                        detail: undefined,
                     })
                 }}
                 onSelectVenue={venueId => {
-                    setQuery({ event: undefined, occurrence: undefined, venue: venueId })
+                    setQuery({
+                        event: undefined,
+                        occurrence: undefined,
+                        venue: venueId,
+                        detail: undefined,
+                    })
                 }}
                 onPress={() => {
                     Keyboard.dismiss()
@@ -251,6 +279,15 @@ const MapScreen = () => {
                                     event: ref.eventId,
                                     occurrence: ref.date,
                                     venue: undefined,
+                                    detail: undefined,
+                                })
+                            }}
+                            onVenueSelect={venueId => {
+                                setQuery({
+                                    event: undefined,
+                                    occurrence: undefined,
+                                    venue: venueId,
+                                    detail: true,
                                 })
                             }}
                             onTextSubmit={text => {
@@ -358,7 +395,7 @@ const MapScreen = () => {
                 />
             </View>
             <EventPreview
-                open={selectedRef !== undefined || selectedVenueId !== undefined}
+                open={previewOpen && !detailOpen}
                 entry={selected}
                 loadFailed={selectedRef === undefined ? venueDetailFailed : detailFailed}
                 categories={categoriesById}
@@ -377,8 +414,51 @@ const MapScreen = () => {
                           }
                         : undefined
                 }
+                onOpenDetail={() => {
+                    setQuery({ detail: true })
+                }}
+                onOpenVenue={venueId => {
+                    setQuery({
+                        event: undefined,
+                        occurrence: undefined,
+                        venue: venueId,
+                        detail: true,
+                    })
+                }}
                 onClose={() => {
                     setQuery(CLEARED_SELECTION)
+                }}
+            />
+            <EntityDetailSheet
+                open={detailOpen}
+                selection={
+                    selectedRef === undefined
+                        ? selectedVenueId === undefined
+                            ? undefined
+                            : { type: "venue", venueId: selectedVenueId }
+                        : { type: "occurrence", ref: selectedRef }
+                }
+                onBack={() => {
+                    setQuery({ detail: undefined })
+                }}
+                onClose={() => {
+                    setQuery(CLEARED_SELECTION)
+                }}
+                onOpenVenue={venueId => {
+                    setQuery({
+                        event: undefined,
+                        occurrence: undefined,
+                        venue: venueId,
+                        detail: true,
+                    })
+                }}
+                onOpenEvent={ref => {
+                    setQuery({
+                        event: ref.eventId,
+                        occurrence: ref.date,
+                        venue: undefined,
+                        detail: true,
+                    })
                 }}
             />
         </View>

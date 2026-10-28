@@ -4,7 +4,6 @@ import { occurrenceProgress } from "domain/occurrence-progress"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { venuePhotoToneOf } from "domain/photo-tone"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
-import { router } from "expo-router"
 import type { Category, OccurrenceSummary, PublicVenue } from "models"
 import type { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
@@ -105,6 +104,8 @@ interface OccurrenceBodyProps {
     now: Date
     paging: PreviewPaging | undefined
     closeButton: ReactNode
+    onOpenDetail: () => void
+    onOpenVenue: (venueId: string) => void
 }
 
 const OccurrenceBody = (props: OccurrenceBodyProps) => {
@@ -157,10 +158,7 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                             accessibilityRole="link"
                             className="text-fg-muted underline"
                             onPress={() => {
-                                router.push({
-                                    pathname: "/venues/[venueId]",
-                                    params: { venueId: occurrence.venue.id },
-                                })
+                                props.onOpenVenue(occurrence.venue.id)
                             }}
                         >
                             {occurrence.venue.name}
@@ -185,15 +183,7 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                 <OpenLink
                     label={t("Preview.Open")}
                     fill={status}
-                    onPress={() => {
-                        router.push({
-                            pathname: "/events/[eventId]/[date]",
-                            params: {
-                                eventId: occurrence.eventId,
-                                date: occurrence.date,
-                            },
-                        })
-                    }}
+                    onPress={props.onOpenDetail}
                 />
             </View>
         </>
@@ -204,6 +194,7 @@ interface VenueBodyProps {
     venue: PreviewVenue
     paging: PreviewPaging | undefined
     closeButton: ReactNode
+    onOpenDetail: () => void
 }
 
 const VenueBody = (props: VenueBodyProps) => {
@@ -256,12 +247,7 @@ const VenueBody = (props: VenueBodyProps) => {
                 <OpenLink
                     label={t("Preview.OpenVenue")}
                     fill="permanent"
-                    onPress={() => {
-                        router.push({
-                            pathname: "/venues/[venueId]",
-                            params: { venueId: venue.id },
-                        })
-                    }}
+                    onPress={props.onOpenDetail}
                 />
             </View>
         </>
@@ -275,6 +261,8 @@ interface EventPreviewProps {
     categories: ReadonlyMap<string, Category>
     now: Date
     paging: PreviewPaging | undefined
+    onOpenDetail: () => void
+    onOpenVenue: (venueId: string) => void
     onClose: () => void
 }
 
@@ -316,12 +304,15 @@ export const EventPreview = (props: EventPreviewProps) => {
                     now={props.now}
                     paging={props.paging}
                     closeButton={closeButton}
+                    onOpenDetail={props.onOpenDetail}
+                    onOpenVenue={props.onOpenVenue}
                 />
             ) : (
                 <VenueBody
                     venue={props.entry.venue}
                     paging={props.paging}
                     closeButton={closeButton}
+                    onOpenDetail={props.onOpenDetail}
                 />
             )}
         </BottomSheetPanel>

@@ -1,14 +1,18 @@
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query"
 import { localTimeOf, weekdayDateOf } from "domain/local-format"
+import { mapQuerySchema } from "domain/map-query"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { router, Stack } from "expo-router"
-import type { OccurrenceSummary } from "models"
+import type { OccurrenceRef, OccurrenceSummary } from "models"
+import { useState } from "react"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import { Pressable, ScrollView, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { z } from "zod"
 
+import { EntityDetailSheet } from "@/components/map/entity-detail-sheet"
 import { SaveToggle } from "@/components/saves/save-toggle"
 import { Badge } from "@/components/ui/badge/badge"
 import { Button } from "@/components/ui/button/button"
@@ -28,6 +32,7 @@ const CLOCK_TICK_MS = 60_000
 interface SavedRowProps {
     occurrence: OccurrenceSummary
     now: Date
+    onOpen: (ref: OccurrenceRef) => void
 }
 
 const SavedRow = (props: SavedRowProps) => {
@@ -49,12 +54,9 @@ const SavedRow = (props: SavedRowProps) => {
                     accessibilityLabel={`${occurrence.title}, ${occurrence.venue.name}, ${when}`}
                     className="min-w-0 flex-1 gap-1"
                     onPress={() => {
-                        router.push({
-                            pathname: "/events/[eventId]/[date]",
-                            params: {
-                                eventId: occurrence.eventId,
-                                date: occurrence.date,
-                            },
+                        props.onOpen({
+                            eventId: occurrence.eventId,
+                            date: occurrence.date,
                         })
                     }}
                 >
@@ -84,6 +86,10 @@ const SavedScreen = () => {
     const online = useOnline()
     const queryClient = useQueryClient()
     const savedEvents = useSavedEvents()
+    const [selectedRef, setSelectedRef] = useState<OccurrenceRef>()
+    const closeDetail = () => {
+        setSelectedRef(undefined)
+    }
 
     const newestFirst = savedEvents.events.toSorted((first, second) =>
         second.savedAt.localeCompare(first.savedAt),
@@ -149,6 +155,7 @@ const SavedScreen = () => {
                         key={`${occurrence.eventId}:${occurrence.date}`}
                         occurrence={occurrence}
                         now={now}
+                        onOpen={setSelectedRef}
                     />
                 ))}
             </View>
@@ -181,6 +188,26 @@ const SavedScreen = () => {
                 </View>
                 {body}
             </ScrollView>
+            <EntityDetailSheet
+                open={selectedRef !== undefined}
+                selection={
+                    selectedRef === undefined
+                        ? undefined
+                        : { type: "occurrence", ref: selectedRef }
+                }
+                onBack={closeDetail}
+                onClose={closeDetail}
+                onOpenVenue={venueId => {
+                    router.dismissTo({
+                        pathname: "/",
+                        params: z.encode(mapQuerySchema, {
+                            venue: venueId,
+                            detail: true,
+                        }),
+                    })
+                }}
+                onOpenEvent={setSelectedRef}
+            />
         </>
     )
 }

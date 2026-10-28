@@ -5,12 +5,10 @@ import { occurrenceProgress } from "domain/occurrence-progress"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { occurrenceShareTextOf } from "domain/share-summary"
-import { router } from "expo-router"
 import type { OccurrenceDetail } from "models"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
-import { Linking, ScrollView, View } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { Linking, View } from "react-native"
 import { match } from "ts-pattern"
 
 import { PhotoGallery } from "@/components/event/photo-gallery"
@@ -28,23 +26,22 @@ import { Timeline } from "@/components/ui/timeline/timeline"
 import { env } from "@/lib/env"
 import { useNow } from "@/lib/hooks/use-now"
 import { usePriceSummary } from "@/lib/hooks/use-price-summary"
-import { backToMap } from "@/lib/navigation/back-to-map"
 
 const CLOCK_TICK_MS = 60_000
 
 interface EventDetailProps {
     occurrence: OccurrenceDetail
+    onBack: () => void
+    onOpenVenue: (venueId: string) => void
 }
 
 export const EventDetail = (props: EventDetailProps) => {
     const { t } = useTranslation("shared")
     const language = useLanguage()
-    const insets = useSafeAreaInsets()
     const now = useNow(CLOCK_TICK_MS)
     const priceSummary = usePriceSummary()
 
     const occurrence = props.occurrence
-    const { instagramUrl, facebookUrl } = occurrence.externalLinks
     const shareUrl = eventDetailUrlOf(env.apiUrl, language, occurrence)
     const shareText = occurrenceShareTextOf(occurrence, language)
     const span = {
@@ -62,7 +59,8 @@ export const EventDetail = (props: EventDetailProps) => {
             }))
             .with({ type: "time" }, time => ({
                 label: t("Detail.Time"),
-                value: `${time.start}→${time.end}`,
+                value: `${time.start} → ${time.end}`,
+                fit: true,
             }))
             .with({ type: "entry" }, entry => ({
                 label: t("Detail.Entry"),
@@ -80,141 +78,136 @@ export const EventDetail = (props: EventDetailProps) => {
     )
 
     return (
-        <View className="flex-1 bg-surface">
-            <ScrollView
-                className="flex-1"
-                contentContainerClassName="gap-5 p-4 pb-8"
-                contentContainerStyle={{ paddingTop: insets.top + 8 }}
-            >
-                <PhotoGallery
-                    title={occurrence.title}
-                    photos={occurrence.photos}
-                    tone={status}
-                    coverPhotoUrl={occurrence.coverPhotoUrl}
-                    controls={
-                        <>
-                            <IconButton
-                                icon="back"
-                                label={t("Detail.Back")}
-                                onPress={backToMap}
-                            />
-                            <View className="flex-row gap-2">
-                                <SaveToggle occurrence={occurrence} />
-                                <ShareButton url={shareUrl} text={shareText} />
-                            </View>
-                        </>
-                    }
-                />
-                <View className="gap-3">
-                    <Badge tone={status} dot={true}>
-                        {t(`Status.${status}`)}
-                    </Badge>
-                    {status === "live" && (
-                        <Timeline
-                            label={t("Preview.Elapsed")}
-                            value={occurrenceProgress(span, now) * 100}
-                            min={0}
-                            max={100}
-                            start={startTime}
-                            now={t("Detail.Now", {
-                                time: localTimeOf(now, PLATFORM_TIME_ZONE),
-                            })}
-                            end={endTime}
-                            tone="live"
+        <>
+            <PhotoGallery
+                title={occurrence.title}
+                photos={occurrence.photos}
+                tone={status}
+                coverPhotoUrl={occurrence.coverPhotoUrl}
+                controls={
+                    <>
+                        <IconButton
+                            icon="back"
+                            label={t("Detail.Back")}
+                            onPress={props.onBack}
                         />
-                    )}
-                </View>
-                <View className="gap-2">
-                    <Text
-                        variant="pixel-2xl"
-                        accessibilityRole="header"
-                        className="uppercase"
-                    >
-                        {occurrence.title}
-                    </Text>
-                    {occurrence.description !== null && (
-                        <Text variant="body-lg" className="text-fg-muted">
-                            {occurrence.description}
-                        </Text>
-                    )}
-                </View>
-                <StatGrid items={facts} />
-                <PriceDetails priceScheme={occurrence.priceScheme} />
-                <View className="gap-1">
-                    <Text
-                        variant="pixel-sm"
-                        accessibilityRole="header"
-                        className="uppercase text-fg-muted"
-                    >
-                        {t("Detail.Venue")}
-                    </Text>
-                    {occurrence.venue.isBlocked ? (
-                        <Text variant="pixel-lg">{occurrence.venue.name}</Text>
-                    ) : (
-                        <Text
-                            variant="pixel-lg"
-                            accessibilityRole="link"
-                            className="underline"
-                            onPress={() => {
-                                router.push({
-                                    pathname: "/venues/[venueId]",
-                                    params: { venueId: occurrence.venue.id },
-                                })
-                            }}
-                        >
-                            {occurrence.venue.name}
-                        </Text>
-                    )}
-                    <Text variant="body-md" className="text-fg-muted">
-                        {occurrence.venue.address}
-                    </Text>
-                </View>
-                <ShareRow url={shareUrl} text={shareText} />
-            </ScrollView>
-            <View
-                accessibilityLabel={t("Detail.Actions")}
-                className="flex-row gap-3 border-t-2 border-line bg-surface px-4 pt-4"
-                style={{ paddingBottom: insets.bottom + 16 }}
-            >
-                <DirectionsButton
-                    coordinates={occurrence.venue.coordinates}
-                    className="flex-1"
-                />
-                {instagramUrl !== null && (
-                    <Button
-                        variant="accent"
-                        size="sm"
-                        icon="instagram"
-                        accessibilityRole="link"
-                        accessibilityLabel={t("Detail.Instagram")}
-                        className="flex-1"
-                        onPress={() => {
-                            void Linking.openURL(instagramUrl)
-                        }}
-                    >
-                        <Text>{t("Detail.Instagram")}</Text>
-                    </Button>
-                )}
-                {facebookUrl !== null && (
-                    <Button
-                        variant="accent"
-                        size="sm"
-                        icon="facebook"
-                        accessibilityRole="link"
-                        accessibilityLabel={t("Detail.Facebook")}
-                        className="flex-1"
-                        onPress={() => {
-                            void Linking.openURL(facebookUrl)
-                        }}
-                    >
-                        <Text>{t("Detail.Facebook")}</Text>
-                    </Button>
+                        <View className="flex-row gap-2">
+                            <SaveToggle occurrence={occurrence} />
+                            <ShareButton url={shareUrl} text={shareText} />
+                        </View>
+                    </>
+                }
+            />
+            <View className="gap-3">
+                <Badge tone={status} dot={true}>
+                    {t(`Status.${status}`)}
+                </Badge>
+                {status === "live" && (
+                    <Timeline
+                        label={t("Preview.Elapsed")}
+                        value={occurrenceProgress(span, now) * 100}
+                        min={0}
+                        max={100}
+                        start={startTime}
+                        now={t("Detail.Now", {
+                            time: localTimeOf(now, PLATFORM_TIME_ZONE),
+                        })}
+                        end={endTime}
+                        tone="live"
+                    />
                 )}
             </View>
-            <View
-                className="absolute inset-x-0 top-0 bg-surface"
-                style={{ height: insets.top }}
+            <View className="gap-2">
+                <Text
+                    variant="pixel-2xl"
+                    accessibilityRole="header"
+                    className="uppercase"
+                >
+                    {occurrence.title}
+                </Text>
+                {occurrence.description !== null && (
+                    <Text variant="body-lg" className="text-fg-muted">
+                        {occurrence.description}
+                    </Text>
+                )}
+            </View>
+            <StatGrid items={facts} />
+            <PriceDetails priceScheme={occurrence.priceScheme} />
+            <View className="gap-1">
+                <Text
+                    variant="pixel-sm"
+                    accessibilityRole="header"
+                    className="uppercase text-fg-muted"
+                >
+                    {t("Detail.Venue")}
+                </Text>
+                {occurrence.venue.isBlocked ? (
+                    <Text variant="pixel-lg">{occurrence.venue.name}</Text>
+                ) : (
+                    <Text
+                        variant="pixel-lg"
+                        accessibilityRole="link"
+                        className="underline"
+                        onPress={() => {
+                            props.onOpenVenue(occurrence.venue.id)
+                        }}
+                    >
+                        {occurrence.venue.name}
+                    </Text>
+                )}
+                <Text variant="body-md" className="text-fg-muted">
+                    {occurrence.venue.address}
+                </Text>
+            </View>
+            <ShareRow url={shareUrl} text={shareText} />
+        </>
+    )
+}
+
+interface EventDetailActionsProps {
+    occurrence: OccurrenceDetail
+}
+
+export const EventDetailActions = (props: EventDetailActionsProps) => {
+    const { t } = useTranslation("shared")
+    const { instagramUrl, facebookUrl } = props.occurrence.externalLinks
+
+    return (
+        <View accessibilityLabel={t("Detail.Actions")} className="flex-1 flex-row gap-3">
+            <DirectionsButton
+                coordinates={props.occurrence.venue.coordinates}
+                className="flex-1"
             />
+            {instagramUrl !== null && (
+                <Button
+                    variant="accent"
+                    size="sm"
+                    icon="instagram"
+                    accessibilityRole="link"
+                    accessibilityLabel={t("Detail.Instagram")}
+                    className="flex-1"
+                    onPress={() => {
+                        void Linking.openURL(instagramUrl)
+                    }}
+                >
+                    <Text>{t("Detail.Instagram")}</Text>
+                </Button>
+            )}
+            {facebookUrl !== null && (
+                <Button
+                    variant="accent"
+                    size="sm"
+                    icon="facebook"
+                    accessibilityRole="link"
+                    accessibilityLabel={t("Detail.Facebook")}
+                    className="flex-1"
+                    onPress={() => {
+                        void Linking.openURL(facebookUrl)
+                    }}
+                >
+                    <Text>{t("Detail.Facebook")}</Text>
+                </Button>
+            )}
         </View>
     )
 }

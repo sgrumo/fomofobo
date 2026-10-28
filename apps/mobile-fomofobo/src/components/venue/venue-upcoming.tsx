@@ -1,8 +1,7 @@
 import { localTimeOf, weekdayDateOf } from "domain/local-format"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
-import { router } from "expo-router"
-import type { OccurrenceSummary } from "models"
+import type { OccurrenceRef, OccurrenceSummary } from "models"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import { Pressable, View } from "react-native"
@@ -17,6 +16,7 @@ const CLOCK_TICK_MS = 60_000
 interface UpcomingRowProps {
     occurrence: OccurrenceSummary
     now: Date
+    onOpen: (ref: OccurrenceRef) => void
 }
 
 const UpcomingRow = (props: UpcomingRowProps) => {
@@ -37,10 +37,7 @@ const UpcomingRow = (props: UpcomingRowProps) => {
                 accessibilityLabel={`${occurrence.title}, ${when}`}
                 className="gap-1 p-3"
                 onPress={() => {
-                    router.push({
-                        pathname: "/events/[eventId]/[date]",
-                        params: { eventId: occurrence.eventId, date: occurrence.date },
-                    })
+                    props.onOpen({ eventId: occurrence.eventId, date: occurrence.date })
                 }}
             >
                 <Badge tone={status} dot={true} className="self-start">
@@ -59,6 +56,7 @@ const UpcomingRow = (props: UpcomingRowProps) => {
 
 interface VenueUpcomingProps {
     upcoming: readonly OccurrenceSummary[]
+    onOpenEvent: (ref: OccurrenceRef) => void
 }
 
 export const VenueUpcoming = (props: VenueUpcomingProps) => {
@@ -80,6 +78,7 @@ export const VenueUpcoming = (props: VenueUpcomingProps) => {
                         key={occurrence.eventId}
                         occurrence={occurrence}
                         now={now}
+                        onOpen={props.onOpenEvent}
                     />
                 ))
             )}

@@ -46,7 +46,12 @@ const BottomSheetPanel = (props: BottomSheetPanelProps) => {
             style={bottomSheetPanelStyle}
             backgroundComponent={BottomSheetBackground}
             handleIndicatorStyle={bottomSheetHandleIndicator}
-            onClose={props.onClose}
+            onClose={() => {
+                // A close that `open` asked for is no close of the user
+                if (props.open) {
+                    props.onClose()
+                }
+            }}
         >
             <BottomSheetView>
                 <View className={bottomSheetPanelContentStyles}>{props.children}</View>

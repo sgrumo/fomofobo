@@ -20,3 +20,5 @@ export const statGridCellVariants = cva("gap-1 border-line p-3", {
 export const statGridLabelStyles = "tp-pixel-sm text-fg-muted"
 
 export const statGridValueStyles = "tp-pixel-lg text-fg"
+
+export const STAT_GRID_MIN_FONT_SCALE = 0.6

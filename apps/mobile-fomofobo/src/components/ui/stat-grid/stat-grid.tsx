@@ -4,6 +4,7 @@ import { Text } from "@/components/ui/text/text"
 import { cn } from "@/lib/utils/class-names"
 
 import {
+    STAT_GRID_MIN_FONT_SCALE,
     statGridCellVariants,
     statGridLabelStyles,
     statGridStyles,
@@ -13,6 +14,8 @@ import {
 interface StatGridItem {
     label: string
     value: string
+    // Shrinks the value to fit one line of its cell
+    fit?: boolean
 }
 
 interface StatGridProps {
@@ -33,7 +36,14 @@ const StatGrid = (props: StatGridProps) => (
                     className={statGridCellVariants({ column, firstRow: index < 2 })}
                 >
                     <Text className={statGridLabelStyles}>{item.label}</Text>
-                    <Text className={statGridValueStyles}>{item.value}</Text>
+                    <Text
+                        className={statGridValueStyles}
+                        numberOfLines={item.fit === true ? 1 : undefined}
+                        adjustsFontSizeToFit={item.fit === true}
+                        minimumFontScale={STAT_GRID_MIN_FONT_SCALE}
+                    >
+                        {item.value}
+                    </Text>
                 </View>
             )
         })}
