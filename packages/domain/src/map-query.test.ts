@@ -12,6 +12,7 @@ describe("mapQuerySchema", () => {
             date: "today",
             event: "c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e01",
             occurrence: "2026-10-23",
+            detail: "true",
         })
 
         expect(query).toStrictEqual({
@@ -21,6 +22,7 @@ describe("mapQuerySchema", () => {
             date: "today",
             event: "c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e01",
             occurrence: "2026-10-23",
+            detail: true,
         })
     })
 

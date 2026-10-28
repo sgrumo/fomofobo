@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import { shareContentOf } from "./share-content"
 
 const shared = {
-    url: "https://fomofobo-dev.vercel.app/it/events/c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e01/2026-10-24",
+    url: "https://fomofobo-dev.vercel.app/it?event=c3d4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e01&occurrence=2026-10-24&detail=true",
     text: "Jazz al Chiostro · sab 24/10 · 21:00 · Chiostro di San Domenico",
 }
 

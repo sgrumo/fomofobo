@@ -1,6 +1,6 @@
+import { venueDetailUrlOf } from "domain/detail-urls"
 import { venuePhotoToneOf } from "domain/photo-tone"
 import type { PixelIconName } from "domain/pixel-icons"
-import { venuePageUrlOf } from "domain/public-page-urls"
 import { venueShareTextOf } from "domain/share-summary"
 import type { PublicVenue } from "models"
 import { useLanguage } from "react-i18n/hooks"
@@ -142,7 +142,7 @@ export const VenueDetail = (props: VenueDetailProps) => {
                 <VenueUpcoming upcoming={venue.upcoming} />
                 <VenueHistory venueId={venue.id} />
                 <ShareRow
-                    url={venuePageUrlOf(env.apiUrl, language, venue.id)}
+                    url={venueDetailUrlOf(env.apiUrl, language, venue.id)}
                     text={venueShareTextOf(venue)}
                 />
             </ScrollView>

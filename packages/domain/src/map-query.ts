@@ -28,6 +28,7 @@ export const mapQuerySchema = z.object({
     event: z.uuid().optional().catch(undefined),
     occurrence: localDateSchema.optional().catch(undefined),
     venue: z.uuid().optional().catch(undefined),
+    detail: z.stringbool().optional().catch(undefined),
 })
 
 export type MapQuery = z.output<typeof mapQuerySchema>

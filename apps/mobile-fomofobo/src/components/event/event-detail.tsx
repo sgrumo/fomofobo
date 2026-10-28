@@ -1,9 +1,9 @@
+import { eventDetailUrlOf } from "domain/detail-urls"
 import { localTimeOf } from "domain/local-format"
 import { occurrenceFactsOf } from "domain/occurrence-facts"
 import { occurrenceProgress } from "domain/occurrence-progress"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
-import { eventPageUrlOf } from "domain/public-page-urls"
 import { occurrenceShareTextOf } from "domain/share-summary"
 import { router } from "expo-router"
 import type { OccurrenceDetail } from "models"
@@ -45,7 +45,7 @@ export const EventDetail = (props: EventDetailProps) => {
 
     const occurrence = props.occurrence
     const { instagramUrl, facebookUrl } = occurrence.externalLinks
-    const shareUrl = eventPageUrlOf(env.apiUrl, language, occurrence)
+    const shareUrl = eventDetailUrlOf(env.apiUrl, language, occurrence)
     const shareText = occurrenceShareTextOf(occurrence, language)
     const span = {
         startsAt: new Date(occurrence.startsAt),

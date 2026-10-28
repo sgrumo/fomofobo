@@ -5,6 +5,7 @@
     "type": "module",
     "exports": {
         "./bounding-box": "./src/bounding-box.ts",
+        "./detail-urls": "./src/detail-urls.ts",
         "./directions-url": "./src/directions-url.ts",
         "./event-clusters": "./src/event-clusters.ts",
         "./haversine-distance": "./src/haversine-distance.ts",
@@ -25,7 +26,6 @@
         "./platform": "./src/platform.ts",
         "./price-details": "./src/price-details.ts",
         "./price-summary": "./src/price-summary.ts",
-        "./public-page-urls": "./src/public-page-urls.ts",
         "./round-center": "./src/round-center.ts",
         "./save-queue": "./src/save-queue.ts",
         "./share-summary": "./src/share-summary.ts",
