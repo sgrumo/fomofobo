@@ -7,7 +7,7 @@ import { venuePhotoToneOf } from "domain/photo-tone"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { cn } from "frontend-shared/styles"
 import type { Category, OccurrenceSummary, PublicVenue } from "models"
-import type { ReactNode } from "react"
+import type { ReactNode, RefObject } from "react"
 import { useEffect, useEffectEvent, useId, useRef } from "react"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
@@ -354,52 +354,52 @@ export const EventPreview = (props: EventPreviewProps) => (
     </BottomSheetRoot>
 )
 
-interface EventPreviewPanelProps extends StrictOmit<
-    PreviewPanelProps,
-    "entry" | "loadFailed" | "renderTitle"
-> {
-    entry: PreviewEntry
-}
-
 /**
  * @description True when the key press belongs to another dialog, which closes on its own
  * @param event Key press read
- * @param panel Element of the preview panel
+ * @param dialog Element of the dialog
  */
-const isInOtherDialog = (event: KeyboardEvent, panel: HTMLElement): boolean =>
+const isInOtherDialog = (event: KeyboardEvent, dialog: HTMLElement): boolean =>
     event.target instanceof Element &&
-    !panel.contains(event.target) &&
+    !dialog.contains(event.target) &&
     event.target.closest("[role=dialog]") !== null
 
-export const EventPreviewPanel = (props: EventPreviewPanelProps) => {
-    const titleId = useId()
-    const panelRef = useRef<HTMLElement>(null)
-    const close = useEffectEvent(() => {
-        props.onClose()
-    })
+/**
+ * @description Moves the focus into a non-modal dialog while it shows, gives it back when it goes, and closes it on Escape from anywhere
+ * @param dialogRef Element of the dialog
+ * @param onClose Closes the dialog
+ */
+const useNonModalDialog = (
+    dialogRef: RefObject<HTMLElement | null>,
+    onClose: () => void,
+): void => {
+    const close = useEffectEvent(onClose)
 
-    // The panel takes the focus when it opens, gives it back when it closes, and closes on Escape
     useEffect(() => {
-        const panel = panelRef.current
-        if (panel === null) {
+        const dialog = dialogRef.current
+        if (dialog === null) {
             return undefined
         }
         const previous = document.activeElement
-        panel.focus()
+        // A dialog inside a map marker attaches after this effect
+        const focusFrame = requestAnimationFrame(() => {
+            dialog.focus()
+        })
         const closeOnEscape = (event: KeyboardEvent) => {
             if (
                 event.key === "Escape" &&
                 !event.defaultPrevented &&
-                !isInOtherDialog(event, panel)
+                !isInOtherDialog(event, dialog)
             ) {
                 close()
             }
         }
         document.addEventListener("keydown", closeOnEscape)
         return () => {
+            cancelAnimationFrame(focusFrame)
             document.removeEventListener("keydown", closeOnEscape)
             requestAnimationFrame(() => {
-                // A panel that opens meanwhile keeps the focus it took
+                // A dialog that opens meanwhile keeps the focus it took
                 const focusLost =
                     document.activeElement === null ||
                     document.activeElement === document.body
@@ -412,7 +412,20 @@ export const EventPreviewPanel = (props: EventPreviewPanelProps) => {
                 }
             })
         }
-    }, [])
+    }, [dialogRef])
+}
+
+interface NonModalPreviewProps extends StrictOmit<
+    PreviewPanelProps,
+    "entry" | "loadFailed" | "renderTitle"
+> {
+    entry: PreviewEntry
+}
+
+export const EventPreviewPanel = (props: NonModalPreviewProps) => {
+    const titleId = useId()
+    const panelRef = useRef<HTMLElement>(null)
+    useNonModalDialog(panelRef, props.onClose)
 
     return (
         <section
@@ -422,6 +435,58 @@ export const EventPreviewPanel = (props: EventPreviewPanelProps) => {
             aria-labelledby={titleId}
             tabIndex={-1}
             className="pixel-corners drop-shadow-hard-lg h-full overflow-y-auto p-4 outline-none"
+        >
+            <PreviewPanel
+                entry={props.entry}
+                loadFailed={false}
+                categories={props.categories}
+                now={props.now}
+                paging={props.paging}
+                renderTitle={(text, className) => (
+                    <h2 id={titleId} className={cn("text-fg tp-pixel-lg", className)}>
+                        {text}
+                    </h2>
+                )}
+                onClose={props.onClose}
+            />
+        </section>
+    )
+}
+
+// Native events on the card that the map below it would handle
+const MAP_GESTURE_EVENTS = ["mousedown", "touchstart", "wheel", "dblclick"] as const
+
+export const EventPreviewCard = (props: NonModalPreviewProps) => {
+    const titleId = useId()
+    const cardRef = useRef<HTMLElement>(null)
+    useNonModalDialog(cardRef, props.onClose)
+
+    useEffect(() => {
+        const card = cardRef.current
+        if (card === null) {
+            return undefined
+        }
+        const keepFromMap = (event: Event) => {
+            event.stopPropagation()
+        }
+        for (const type of MAP_GESTURE_EVENTS) {
+            card.addEventListener(type, keepFromMap)
+        }
+        return () => {
+            for (const type of MAP_GESTURE_EVENTS) {
+                card.removeEventListener(type, keepFromMap)
+            }
+        }
+    }, [])
+
+    return (
+        <section
+            ref={cardRef}
+            role="dialog"
+            aria-modal={false}
+            aria-labelledby={titleId}
+            tabIndex={-1}
+            className="pixel-corners drop-shadow-hard-lg relative w-[23.75rem] cursor-auto p-4 outline-none"
         >
             <PreviewPanel
                 entry={props.entry}

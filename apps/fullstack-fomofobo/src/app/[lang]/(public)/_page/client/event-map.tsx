@@ -35,7 +35,7 @@ import type {
     OccurrenceSummary,
     PermanentVenueSummary,
 } from "models"
-import type { RefObject } from "react"
+import type { ReactNode, RefObject } from "react"
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Alert } from "ui-components/alert"
@@ -103,8 +103,18 @@ const addDotDither = async (map: MapLibreMap): Promise<void> => {
     map.addImage(DOT_DITHER_IMAGE, image.data)
 }
 
-// Space kept between the selected pin and the edges of the free part of the map
+// Space kept between the selected pin, or the card, and the edges of the free part of the map
 const PIN_FRAME_MARGIN = 16
+
+const PREVIEW_CARD_LAYER = POSITION_MARKER_LAYER + 1
+
+// Lifts the card above the pin and its tag
+const PREVIEW_CARD_OFFSET: [number, number] = [0, -72]
+
+interface PreviewCard {
+    coordinates: GeoPoint
+    content: ReactNode
+}
 
 // Box of a pin and its tag, above the anchor at its bottom center, in px
 const PIN_BOX = { width: 96, height: 72 }
@@ -131,6 +141,7 @@ interface EventMapProps extends RouteClientComponentProps<"root"> {
     permanentVenues: PermanentVenueSummary[]
     iconOf: (categoryId: string) => CategoryIcon
     selectedVenueId: string | undefined
+    previewCard: PreviewCard | undefined
     // Place of the selected pin, which pans clear of the controls and of the panel
     revealedPoint: GeoPoint | undefined
     // Controls drawn over the top of the map
@@ -207,8 +218,48 @@ export const EventMap = (props: EventMapProps) => {
         map?.flyTo(flight.zoom === undefined ? { center } : { center, zoom: flight.zoom })
     }, [map, latitude, longitude, locateCount])
 
-    const readOverlay = useEffectEvent(() => props.overlayRef.current)
-    const readPanel = useEffectEvent(() => props.panelRef.current)
+    // Part of the map free of the controls and of the panel, less the margin
+    const readFreeFrame = useEffectEvent((container: HTMLElement): DOMRect => {
+        const bounds = container.getBoundingClientRect()
+        const top = Math.max(
+            bounds.top,
+            props.overlayRef.current?.getBoundingClientRect().bottom ?? 0,
+        )
+        const right = Math.min(
+            bounds.right,
+            props.panelRef.current?.getBoundingClientRect().left ?? bounds.right,
+        )
+        return new DOMRect(
+            bounds.left + PIN_FRAME_MARGIN,
+            top + PIN_FRAME_MARGIN,
+            right - bounds.left - 2 * PIN_FRAME_MARGIN,
+            bounds.bottom - top - 2 * PIN_FRAME_MARGIN,
+        )
+    })
+
+    const cardRef = useRef<HTMLDivElement>(null)
+    const cardPlace =
+        props.previewCard === undefined
+            ? undefined
+            : `${String(props.previewCard.coordinates.latitude)} ${String(props.previewCard.coordinates.longitude)}`
+    // A card that opens past the edges, or under the controls, pans into view
+    useEffect(() => {
+        const card = cardRef.current
+        const container = containerRef.current
+        if (
+            map === undefined ||
+            cardPlace === undefined ||
+            card === null ||
+            container === null
+        ) {
+            return
+        }
+        const [x, y] = fitPanOf(card.getBoundingClientRect(), readFreeFrame(container))
+        if (x !== 0 || y !== 0) {
+            map.panBy([x, y])
+        }
+    }, [map, cardPlace])
+
     const readRevealedPoint = useEffectEvent(() => props.revealedPoint)
     const revealedPlace =
         props.revealedPoint === undefined
@@ -227,14 +278,6 @@ export const EventMap = (props: EventMapProps) => {
             return
         }
         const bounds = container.getBoundingClientRect()
-        const top = Math.max(
-            bounds.top,
-            readOverlay()?.getBoundingClientRect().bottom ?? 0,
-        )
-        const right = Math.min(
-            bounds.right,
-            readPanel()?.getBoundingClientRect().left ?? bounds.right,
-        )
         const anchor = map.project([point.longitude, point.latitude])
         const [x, y] = fitPanOf(
             new DOMRect(
@@ -243,12 +286,7 @@ export const EventMap = (props: EventMapProps) => {
                 PIN_BOX.width,
                 PIN_BOX.height,
             ),
-            new DOMRect(
-                bounds.left + PIN_FRAME_MARGIN,
-                top + PIN_FRAME_MARGIN,
-                right - bounds.left - 2 * PIN_FRAME_MARGIN,
-                bounds.bottom - top - 2 * PIN_FRAME_MARGIN,
-            ),
+            readFreeFrame(container),
         )
         if (x !== 0 || y !== 0) {
             map.panBy([x, y])
@@ -499,6 +537,18 @@ export const EventMap = (props: EventMapProps) => {
                           ),
                       ),
                   ]}
+            {map === undefined || props.previewCard === undefined ? undefined : (
+                <MapMarker
+                    route={props.route}
+                    map={map}
+                    coordinates={props.previewCard.coordinates}
+                    anchor="bottom"
+                    offset={PREVIEW_CARD_OFFSET}
+                    layer={PREVIEW_CARD_LAYER}
+                >
+                    <div ref={cardRef}>{props.previewCard.content}</div>
+                </MapMarker>
+            )}
             {map === undefined || props.position === undefined ? undefined : (
                 <MapMarker
                     route={props.route}

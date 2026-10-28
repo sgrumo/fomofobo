@@ -26,7 +26,7 @@ import { useToast } from "ui-components/toast"
 
 import {
     EventPreview,
-    EventPreviewPanel,
+    EventPreviewCard,
 } from "@/components/client/event-preview/event-preview"
 import type {
     PreviewEntry,
@@ -240,12 +240,25 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
               }
             : undefined
     const previewOpen = selectedRef !== undefined || selectedVenueId !== undefined
-    // A wide screen docks the preview on the right, once the entry is known
-    const panelEntry = wide ? selected : undefined
-    const panelPoint =
-        panelEntry?.type === "occurrence"
-            ? panelEntry.occurrence.venue.coordinates
-            : panelEntry?.venue.coordinates
+    // A wide screen shows the preview above its pin, once the entry is known
+    const previewCard =
+        wide && selected !== undefined
+            ? {
+                  coordinates:
+                      selected.type === "occurrence"
+                          ? selected.occurrence.venue.coordinates
+                          : selected.venue.coordinates,
+                  content: (
+                      <EventPreviewCard
+                          entry={selected}
+                          categories={categoriesById}
+                          now={now}
+                          paging={paging}
+                          onClose={closePreview}
+                      />
+                  ),
+              }
+            : undefined
 
     // Escape closes the filter panel of a phone
     useEffect(() => {
@@ -332,7 +345,8 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 permanentVenues={results?.permanentVenues ?? []}
                 iconOf={iconOf}
                 selectedVenueId={spotVenueId}
-                revealedPoint={panelPoint}
+                previewCard={previewCard}
+                revealedPoint={undefined}
                 overlayRef={overlayRef}
                 panelRef={panelRef}
                 now={now}
@@ -344,17 +358,14 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 }}
                 onBackgroundClick={() => {
                     // The bottom sheet closes on an outside press on its own
-                    if (panelEntry !== undefined) {
+                    if (previewCard !== undefined) {
                         closePreview()
                     }
                 }}
             />
             <div
                 ref={overlayRef}
-                className={cn(
-                    "pointer-events-none absolute inset-x-4 top-4 flex flex-col gap-2 [&>*]:pointer-events-auto",
-                    { "right-[25.75rem]": panelEntry !== undefined },
-                )}
+                className="pointer-events-none absolute inset-x-4 top-4 flex flex-col gap-2 [&>*]:pointer-events-auto"
             >
                 <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
@@ -423,11 +434,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 {notices}
             </div>
             {/* Clears the map attribution, which sits in the bottom corner. */}
-            <div
-                className={cn("absolute right-4 bottom-8 flex items-center gap-2", {
-                    "right-[25.75rem]": panelEntry !== undefined,
-                })}
-            >
+            <div className="absolute right-4 bottom-8 flex items-center gap-2">
                 {search.isFetching ? (
                     <Spinner title={t("Map.Loading")} size="xs" />
                 ) : undefined}
@@ -448,22 +455,8 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                     }}
                 />
             </div>
-            {panelEntry === undefined ? undefined : (
-                <div
-                    ref={panelRef}
-                    className="absolute top-4 right-4 bottom-8 w-[23.75rem]"
-                >
-                    <EventPreviewPanel
-                        entry={panelEntry}
-                        categories={categoriesById}
-                        now={now}
-                        paging={paging}
-                        onClose={closePreview}
-                    />
-                </div>
-            )}
             <EventPreview
-                open={panelEntry === undefined && previewOpen}
+                open={previewCard === undefined && previewOpen}
                 entry={selected}
                 loadFailed={
                     selectedRef === undefined ? venueDetail.isError : detail.isError
