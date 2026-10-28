@@ -109,7 +109,7 @@ const PIN_FRAME_MARGIN = 16
 const PREVIEW_CARD_LAYER = POSITION_MARKER_LAYER + 1
 
 // Lifts the card above the pin and its tag
-const PREVIEW_CARD_OFFSET: [number, number] = [0, -72]
+const PREVIEW_CARD_OFFSET: [number, number] = [0, -88]
 
 interface PreviewCard {
     coordinates: GeoPoint
@@ -117,7 +117,7 @@ interface PreviewCard {
 }
 
 // Box of a pin and its tag, above the anchor at its bottom center, in px
-const PIN_BOX = { width: 96, height: 72 }
+const PIN_BOX = { width: 96, height: 80 }
 
 /**
  * @description Returns how far the map pans so a box fits inside a frame, zero on an axis where it fits

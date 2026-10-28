@@ -1,23 +1,17 @@
 import { clusterArcs } from "domain/event-clusters"
 import type { MarkerEmphasis } from "domain/event-clusters"
-import { PIXEL_CIRCLE_PROFILES } from "domain/pixel-shapes"
+import { CLUSTER_SHAPE, MARKER_CELL_PX } from "domain/pixel-markers"
 import { useId } from "react"
 import { useTranslation } from "react-i18next"
 import { Pressable, View } from "react-native"
 import Svg, { ClipPath, Defs, G, Path } from "react-native-svg"
 
 import { Text } from "@/components/ui/text/text"
-import {
-    innerProfile,
-    PIXEL_RING_WIDTH,
-    steppedPath,
-    wedgePath,
-} from "@/lib/pixel/pixel-shapes"
+import { wedgePath } from "@/lib/pixel/pixel-shapes"
 import { THEME_COLORS } from "@/lib/theme/theme-tokens"
 import { cn } from "@/lib/utils/class-names"
 
-const CLUSTER_SIZE = 48
-const CORE_SIZE = 36
+const CLUSTER_SIZE = CLUSTER_SHAPE.cells * MARKER_CELL_PX
 const DEGREES_PER_PERCENT = 3.6
 
 interface EventClusterProps {
@@ -33,8 +27,6 @@ interface EventClusterProps {
 export const EventCluster = (props: EventClusterProps) => {
     const { t } = useTranslation("shared")
     const id = useId()
-    const profile = PIXEL_CIRCLE_PROFILES[CLUSTER_SIZE]
-    const ring = 2 * PIXEL_RING_WIDTH
 
     return (
         <Pressable
@@ -47,53 +39,45 @@ export const EventCluster = (props: EventClusterProps) => {
                 permanent: props.permanentCount,
             })}
             onPress={props.onExpand}
-            className={cn("h-12 w-12 items-center justify-center", {
+            className={cn("items-center justify-center", {
                 "opacity-35": props.emphasis === "dimmed",
             })}
+            style={{ width: CLUSTER_SIZE, height: CLUSTER_SIZE }}
         >
             <View className="absolute left-0 top-0" pointerEvents="none">
-                <Svg width={CLUSTER_SIZE} height={CLUSTER_SIZE}>
+                <Svg
+                    width={CLUSTER_SIZE}
+                    height={CLUSTER_SIZE}
+                    viewBox={`0 0 ${String(CLUSTER_SHAPE.cells)} ${String(CLUSTER_SHAPE.cells)}`}
+                >
                     <Defs>
-                        <ClipPath id={`${id}-ring`}>
-                            <Path
-                                d={steppedPath(
-                                    CLUSTER_SIZE - ring,
-                                    CLUSTER_SIZE - ring,
-                                    innerProfile(profile),
-                                    PIXEL_RING_WIDTH,
-                                )}
-                            />
+                        <ClipPath id={`${id}-band`}>
+                            <Path d={CLUSTER_SHAPE.bandPath} />
                         </ClipPath>
                     </Defs>
-                    <Path
-                        fill={THEME_COLORS.line}
-                        d={steppedPath(CLUSTER_SIZE, CLUSTER_SIZE, profile)}
-                    />
-                    <G clipPath={`url(#${id}-ring)`}>
+                    <Path d={CLUSTER_SHAPE.fillPath} fill={THEME_COLORS.surface} />
+                    <Path d={CLUSTER_SHAPE.inkPath} fill={THEME_COLORS.line} />
+                    <G clipPath={`url(#${id}-band)`}>
                         {clusterArcs(props)
                             .filter(arc => arc.to > arc.from)
                             .map(arc => (
                                 <Path
                                     key={arc.kind}
-                                    fill={THEME_COLORS[arc.kind]}
+                                    // The ended share stays the color of the core
+                                    fill={
+                                        THEME_COLORS[
+                                            arc.kind === "ended" ? "surface" : arc.kind
+                                        ]
+                                    }
                                     d={wedgePath(
-                                        CLUSTER_SIZE,
-                                        CLUSTER_SIZE,
+                                        CLUSTER_SHAPE.cells,
+                                        CLUSTER_SHAPE.cells,
                                         arc.from * DEGREES_PER_PERCENT,
                                         arc.to * DEGREES_PER_PERCENT,
                                     )}
                                 />
                             ))}
                     </G>
-                    <Path
-                        fill={THEME_COLORS.surface}
-                        d={steppedPath(
-                            CORE_SIZE,
-                            CORE_SIZE,
-                            PIXEL_CIRCLE_PROFILES[CORE_SIZE],
-                            (CLUSTER_SIZE - CORE_SIZE) / 2,
-                        )}
-                    />
                 </Svg>
             </View>
             <Text variant="pixel-lg" maxFontSizeMultiplier={1.5}>

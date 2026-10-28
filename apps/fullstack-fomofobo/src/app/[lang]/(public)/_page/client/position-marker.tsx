@@ -1,32 +1,46 @@
 "use client"
 
-import { POSITION_BREATH_MS, POSITION_HALO } from "domain/pixel-shapes"
+import {
+    MARKER_CELL_PX,
+    POSITION_CORE,
+    POSITION_HALO,
+    POSITION_HALO_FRAME_MS,
+} from "domain/pixel-markers"
 import { useTranslation } from "react-i18next"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
-export const PositionMarker = (_props: RouteClientComponentProps<"root">) => {
+import { PixelSprite } from "./pixel-sprite"
+
+const CORE_PX = POSITION_CORE.cells * MARKER_CELL_PX
+
+export const PositionMarker = (props: RouteClientComponentProps<"root">) => {
     const { t } = useTranslation("shared")
 
     return (
-        <span role="img" aria-label={t("Map.Position")} className="relative block size-4">
+        <span
+            role="img"
+            aria-label={t("Map.Position")}
+            className="relative block"
+            style={{ width: CORE_PX, height: CORE_PX }}
+        >
+            <PixelSprite
+                route={props.route}
+                sprite={POSITION_HALO}
+                frameMs={POSITION_HALO_FRAME_MS}
+                className="text-position"
+            />
             <svg
                 aria-hidden={true}
-                width={POSITION_HALO.size}
-                height={POSITION_HALO.size}
-                viewBox={POSITION_HALO.viewBox}
+                width={CORE_PX}
+                height={CORE_PX}
+                viewBox={`0 0 ${String(POSITION_CORE.cells)} ${String(POSITION_CORE.cells)}`}
                 shapeRendering="crispEdges"
-                className="text-position pointer-events-none absolute top-1/2 left-1/2 -translate-1/2"
+                className="absolute inset-0"
             >
-                <path d={POSITION_HALO.innerPath} fill="currentColor" />
-                <path
-                    d={POSITION_HALO.outerPath}
-                    fill="currentColor"
-                    className="animate-halo-breath motion-reduce:hidden"
-                    style={{ animationDuration: `${String(POSITION_BREATH_MS)}ms` }}
-                />
+                <path d={POSITION_CORE.fillPath} className="fill-position" />
+                <path d={POSITION_CORE.ringPath} className="fill-line" />
             </svg>
-            <span className="bg-position border-line absolute inset-0 rounded-full border-2" />
         </span>
     )
 }
