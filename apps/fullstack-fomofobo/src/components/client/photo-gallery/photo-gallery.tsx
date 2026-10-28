@@ -8,9 +8,8 @@ import { useTranslation } from "react-i18next"
 import { Badge } from "ui-components/badge"
 
 import { TonedImage } from "@/components/client/toned-image/toned-image"
-import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
-interface PhotoGalleryProps extends RouteClientComponentProps<"eventDetail"> {
+interface PhotoGalleryProps {
     title: string
     photos: EventPhoto[]
     coverPhotoUrl: string

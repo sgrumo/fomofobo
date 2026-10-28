@@ -182,7 +182,10 @@
         "History": "Eventi passati",
         "HistoryLoading": "Caricamento eventi passati",
         "HistoryError": "Non è stato possibile caricare gli eventi passati.",
-        "NoHistory": "Nessun evento passato."
+        "NoHistory": "Nessun evento passato.",
+        "Loading": "Caricamento del locale",
+        "Unavailable": "Questo locale non è più disponibile.",
+        "More": "Mostra altri"
     },
     "Saved": {
         "Toggle": "Salva",

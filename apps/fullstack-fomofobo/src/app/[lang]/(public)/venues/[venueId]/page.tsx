@@ -1,5 +1,4 @@
 import { HydrationBoundary } from "@tanstack/react-query"
-import { VENUE_HISTORY_PAGE_SIZE } from "domain/venue-history"
 import type { Metadata } from "next"
 
 import { routes } from "@/framework/routes/routes"
@@ -49,27 +48,19 @@ export const generateMetadata = async (
 }
 
 const Page = async (props: PageProps<"/[lang]/venues/[venueId]">) => {
-    const { parameters, query, path } = await getDynamicRoute(route, props)
+    const { parameters, path } = await getDynamicRoute(route, props)
     const venue = await readVenue(parameters.venueId)
 
     const dehydratedState = await prefetchQueries(queryClient =>
-        Promise.allSettled([
-            Promise.resolve(
-                queryClient.setQueryData(
-                    serverApi.getPublicVenueQuery({
-                        params: { venueId: venue.id },
-                        query: {},
-                    }).queryKey,
-                    venue,
-                ),
-            ),
-            queryClient.query(
-                serverApi.listVenueHistoryQuery({
+        Promise.resolve(
+            queryClient.setQueryData(
+                serverApi.getPublicVenueQuery({
                     params: { venueId: venue.id },
-                    query: { page: query.page ?? 1, pageSize: VENUE_HISTORY_PAGE_SIZE },
-                }),
+                    query: {},
+                }).queryKey,
+                venue,
             ),
-        ]),
+        ),
     )
 
     return (
