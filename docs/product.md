@@ -6,7 +6,7 @@ summary: Mobile-first web app and native app that show events around a place on 
 
 ## Overview
 
-fomofobo is a responsive, mobile-first web app, with a native app for iOS and Android, for finding events around a place. Visitors open it with no account, see the events of the coming days as pins on a map, and narrow them by name, place, category and date. Each event has a page that a visitor can open directly or share. Organizers publish their events through a backoffice in the same app, and publishing needs no approval. Admins supervise the organizers, block organizers or events, and manage the shared catalogue of categories. The web app installs on the home screen, and both apps keep the events already loaded viewable offline.
+fomofobo is a responsive, mobile-first web app, with a native app for iOS and Android, for finding events around a place. Visitors open it with no account, see the events of the coming days as pins on a map, and narrow them by name, place, category and date. Each event opens a detail over the map that a visitor can open directly from a link or share. Organizers publish their events through a backoffice in the same app, and publishing needs no approval. Admins supervise the organizers, block organizers or events, and manage the shared catalogue of categories. The web app installs on the home screen, and both apps keep the events already loaded viewable offline.
 
 ## Perimeter
 
@@ -22,13 +22,13 @@ An Organizer owns one venue at most, and creates and edits only that venue. An A
 
 An Admin gives a venue a permanent kind: cinema, museum, theatre or gallery. A permanent venue carries one link to its programme outside the app and one category, and only Admins edit it, so it has no owner. A venue with an owner keeps the regular kind until the Admin takes the owner away.
 
-An Admin blocks a venue with a reason. A blocked venue can no longer be picked for an event, and the events already held there keep it and stay visible. A blocked venue loses its public page, and its events show its name with no link.
+An Admin blocks a venue with a reason. A blocked venue can no longer be picked for an event, and the events already held there keep it and stay visible. A blocked venue loses its public detail, and its events show its name with no link.
 
 ### Events
 
 An event has a title, one or more categories, one venue, a start and an end, an ordered photo gallery whose first photo is the cover, optional Instagram and Facebook links, a price scheme, an optional capacity and an owning organizer.
 
-The price scheme says whether the event is free or paid. A paid event has a full price, reduced prices with a label each, or notes alone. Free or paid, an event can require a membership card with an optional cost, and a minimum age. Amounts are in euro. The public app sums the scheme up in one line, such as "da 5 €" or "Gratis · Tessera richiesta · 18+", and a paid event with no amount shows its notes. The capacity is the number of places, shown and never enforced. The end is later than the start and can fall on the next day. An event holds up to ten photos, none at all included, and the account that writes the event uploads them. An event with no photo takes the cover of its venue, else the image of its primary category, else a generated image of the category icon, in the preview, on its page and in link previews. Each photo is stored as a two-color dither, at most 1200 pixels wide.
+The price scheme says whether the event is free or paid. A paid event has a full price, reduced prices with a label each, or notes alone. Free or paid, an event can require a membership card with an optional cost, and a minimum age. Amounts are in euro. The public app sums the scheme up in one line, such as "da 5 €" or "Gratis · Tessera richiesta · 18+", and a paid event with no amount shows its notes. The capacity is the number of places, shown and never enforced. The end is later than the start and can fall on the next day. An event holds up to ten photos, none at all included, and the account that writes the event uploads them. An event with no photo takes the cover of its venue, else the image of its primary category, else a generated image of the category icon, in the preview, in its detail and in link previews. Each photo is stored as a two-color dither, at most 1200 pixels wide.
 
 The public app draws each photo in ink and the color of the status of its event: red when live, yellow when upcoming, gray when ended. The cover of a permanent venue takes the color of permanent venues. The stored photo stays red, so a change of status needs no new upload.
 
@@ -48,7 +48,7 @@ An occurrence is upcoming before its start, live from its start until its end, a
 
 An event and all its occurrences are visible only when neither the event nor its organizer is blocked. A hidden event is absent from every part of the public app, saved events included, from the next request on. Saving an event in the backoffice publishes it at once.
 
-An occurrence stays visible for the retention days of the platform settings after its end, three by default, then leaves the public app, its page and the saved list included. With zero days it leaves at its end. A repeating event stays visible through its other occurrences.
+An occurrence stays visible for the retention days of the platform settings after its end, three by default, then leaves the public app, its detail and the saved list included. With zero days it leaves at its end. A repeating event stays visible through its other occurrences.
 
 ### Retention
 
@@ -64,27 +64,29 @@ Each venue with results is one pin. The pin shows the result of the venue with t
 
 Venues within about 20 meters of each other share one pin, because no zoom draws their pins apart. The pin counts the results of every venue it holds. Venues farther apart but too close to tell apart merge into a cluster that counts the venues. Its ring shows the share of venues whose pin is live, upcoming, ended or permanent. Live pins draw above every other pin, and permanent venues below every event. The position of the visitor draws above every pin and cluster.
 
-Every permanent venue inside the search area is a pin of its own color, whatever the date filter, with the icon of its category and its kind as the tag. Its preview shows the kind, the cover, the name and the address, with a link to the programme and one to the venue page. When a permanent venue also holds events, the preview pages through the events first and the venue last.
+Every permanent venue inside the search area is a pin of its own color, whatever the date filter, with the icon of its category and its kind as the tag. Its preview shows the kind, the cover, the name and the address, with a link to the programme and one to the venue detail. When a permanent venue also holds events, the preview pages through the events first and the venue last.
 
-A tap on a pin opens a preview of the occurrence. The preview shows status, venue, categories, price and times, with the elapsed time when live and a link to the event page. The pin of a venue with more results opens the preview of its result, which pages through every result of the pin.
+A tap on a pin opens a preview of the occurrence. The preview shows status, venue, categories, price and times, with the elapsed time when live and a link to the event detail. The pin of a venue with more results opens the preview of its result, which pages through every result of the pin.
 
 The map stays inside Italy, and it never turns or tilts, because it draws no compass to undo a turn. A right click on the web map opens no browser menu.
 
 ### Search and filters
 
-Results match every active filter. A permanent venue ignores the date filter, and the free filter leaves it out, since it has no price. One search field matches event titles and the names of the venues in the area, and sets a place as the search center. A venue result opens the page of the venue, and permanent venues come in a group of their own. Category chips select one category at a time and show the result count of each category under the other filters, permanent venues included. With no category chip pressed, the results hold every category. The date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days. A "Gratis" chip keeps the events marked free, membership card or not. On a phone, the category, date and price chips sit in a panel that a filter button opens.
+Results match every active filter. A permanent venue ignores the date filter, and the free filter leaves it out, since it has no price. One search field matches event titles and the names of the venues in the area, and sets a place as the search center. A venue result opens the detail of the venue, and permanent venues come in a group of their own. Category chips select one category at a time and show the result count of each category under the other filters, permanent venues included. With no category chip pressed, the results hold every category. The date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days. A "Gratis" chip keeps the events marked free, membership card or not. On a phone, the category, date and price chips sit in a panel that a filter button opens.
 
-### Event page
+### Event detail
 
-Each event has its own URL, and for a repeating event the URL refers to one occurrence. The page offers directions to the venue, the external link of the event and a save action. It shows the price summary, the capacity and the count of interested visitors, and lists every price, the membership card, the minimum age and the notes when the scheme holds more than one price line. Directions open Apple Maps on iOS and iPadOS, and Google Maps elsewhere.
+The event and venue details open over the map, with no page of their own. On a wide screen the detail is a panel beside the map, and on a phone a tall sheet that leaves the top of the map in view. The map URL names the detail, so each occurrence of an event and each venue has its own link. The old event and venue page URLs open the map with the detail open.
 
-Share opens the share sheet of the device, or copies the link where none exists. A row of links shares the page on WhatsApp, Telegram, Facebook and X with its title, date, time and venue, and a button copies the link. A shared link shows a card with the title, the cover, and the description of the event or else its date, time and venue.
+The event detail offers directions to the venue, the external link of the event and a save action. It shows the price summary, the capacity and the count of interested visitors, and lists every price, the membership card, the minimum age and the notes when the scheme holds more than one price line. Directions open Apple Maps on iOS and iPadOS, and Google Maps elsewhere.
 
-### Venue page
+Share opens the share sheet of the device, or copies the link where none exists. A row of links shares the detail on WhatsApp, Telegram, Facebook and X with its title, date, time and venue, and a button copies the link. A shared link shows a card with the title, the cover, and the description of the event or else its date, time and venue.
 
-Each venue has its own URL, and the event page and the map preview link to it. The page shows the profile of the venue, directions to it and its links, with the share row of the event page. The page of a permanent venue also shows its kind and the link to its programme.
+### Venue detail
 
-The page lists the upcoming events of the venue, one row for each event at its next occurrence, live events first. A row opens the event page. Below, the past events of the venue list their title and their first and last date, with no photo, newest first and in numbered pages.
+The event detail and the map preview link to the venue detail. It shows the profile of the venue, directions to it and its links, with the share row of the event detail. The detail of a permanent venue also shows its kind and the link to its programme.
+
+The detail lists the upcoming events of the venue, one row for each event at its next occurrence, live events first. A row opens the event detail. Below, the past events of the venue list their title and their first and last date, with no photo, newest first, and a button loads more.
 
 ### Saved events
 
@@ -98,13 +100,13 @@ Each IP sends 60 save changes every 10 minutes at most. Past that limit, the cha
 
 The app installs on the home screen and opens full-screen on the map. Browsers with an install prompt get an install button on the saved list, and iOS gets the steps of the share sheet.
 
-Offline, the pages, events, photos and map areas that the device already loaded stay viewable. A reopened map shows the last results of the same filters, and a new filter, a place search or an area never loaded needs a connection. A page never opened online shows an offline notice.
+Offline, the pages, event and venue details, photos and map areas that the device already loaded stay viewable. A reopened map shows the last results of the same filters, and a new filter, a place search or an area never loaded needs a connection. A page never opened online shows an offline notice.
 
 The saved list works offline for every saved event that the device showed online at least once. The backoffice is not part of the installed app and always needs a connection.
 
 ### Native app
 
-A native app for iOS and Android offers the features of the public web app: the map with its preview, search and filters, event pages, venue pages, saved events and offline reads. It has no sign-in and no backoffice, and it speaks Italian alone.
+A native app for iOS and Android offers the features of the public web app: the map with its preview, search and filters, event and venue details, saved events and offline reads. It has no sign-in and no backoffice, and it speaks Italian alone.
 
 The stores install and update the app, in place of the install button and the update prompt of the web app. A version gate asks for a store update when the server marks the installed version as too old, and shows a maintenance notice when the server says so.
 
@@ -136,7 +138,7 @@ Admins create organizer accounts with a name and an email, and block or unblock 
 
 An Admin sets the retention days of ended events, from 0 to 90, and the participant threshold, from 1 to 1000. The backoffice shows who saved them last and when. Until an Admin saves them, the defaults apply: three days and a threshold of 20. A larger value brings back events that ended before it, without the photos already deleted.
 
-The event page and the map preview show the count of saves of an occurrence once it reaches the participant threshold. Under the threshold the public app shows no count.
+The event detail and the map preview show the count of saves of an occurrence once it reaches the participant threshold. Under the threshold the public app shows no count.
 
 ## Architecture and integrations
 

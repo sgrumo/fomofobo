@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-10-28 · Event and venue pages become details over the map
+
+### Changed
+
+The event and venue pages are gone. Their content opens over the map, in a side panel on a wide screen and in a tall sheet on a phone, on the web and in the native app. The rework rebuilt both pages and the links to them on both clients.
+
+### Why
+
+A client request. The client wants the visitor to keep the map in view while reading an event, and rejected the panel that docked every preview on the right.
+
+### Check next time
+
+Agree on whether the detail of an entity is a page or a layer over the main view before the first client builds it.
+
 ## 2026-10-23 · A native app joins the web app
 
 ### Changed
