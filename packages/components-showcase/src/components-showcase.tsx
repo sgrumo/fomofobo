@@ -34,6 +34,7 @@ import { NumberInputShowcase } from "./number-input-showcase"
 import { OtpInputShowcase } from "./otp-input-showcase"
 import { PaginationShowcase } from "./pagination-showcase"
 import { PasswordInputShowcase } from "./password-input-showcase"
+import { PixelGlyphsShowcase } from "./pixel-glyphs-showcase"
 import { PixelIconsShowcase } from "./pixel-icons-showcase"
 import { PopoverShowcase } from "./popover-showcase"
 import { ProgressShowcase } from "./progress-showcase"
@@ -98,6 +99,11 @@ export const ComponentsShowcase = (props: ComponentsShowcaseProps) => (
             cols={2}
             title="Pixel Icons"
             component={<PixelIconsShowcase />}
+        />
+        <ShowcaseSection
+            cols={2}
+            title="Pixel Glyphs"
+            component={<PixelGlyphsShowcase />}
         />
         <ShowcaseSection
             cols={2}

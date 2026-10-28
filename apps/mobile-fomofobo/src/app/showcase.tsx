@@ -2,10 +2,12 @@ import type { BottomSheetModal } from "@gorhom/bottom-sheet"
 import { pixelIconNames } from "domain/pixel-icons"
 import { formatEuroCents } from "domain/price-summary"
 import { Redirect } from "expo-router"
+import { categoryIconValues } from "models"
 import { useRef, useState } from "react"
 import type { ReactNode } from "react"
 import { ScrollView, View } from "react-native"
 
+import { PixelDisc } from "@/components/map/pixel-disc"
 import { Badge } from "@/components/ui/badge/badge"
 import { BottomSheet } from "@/components/ui/bottom-sheet/bottom-sheet"
 import { Button } from "@/components/ui/button/button"
@@ -93,6 +95,11 @@ const PixelShowcase = () => (
         <View className="flex-row flex-wrap gap-3">
             {pixelIconNames.map(name => (
                 <PixelIcon key={name} name={name} size={24} />
+            ))}
+        </View>
+        <View className="flex-row flex-wrap gap-2">
+            {categoryIconValues.map(icon => (
+                <PixelDisc key={icon} kind="upcoming" icon={icon} selected={false} />
             ))}
         </View>
         <View className="flex-row flex-wrap items-center gap-4">

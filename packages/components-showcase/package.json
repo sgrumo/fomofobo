@@ -17,6 +17,7 @@
     },
     "dependencies": {
         "date-fns": "catalog:",
+        "domain": "workspace:*",
         "es-toolkit": "catalog:",
         "frontend-shared": "workspace:*",
         "models": "workspace:*",
