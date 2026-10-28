@@ -120,6 +120,8 @@ export const MapScreen = (props: MapScreenProps) => {
     const panelRef = useRef<HTMLDivElement>(null)
     // The `md` breakpoint of the filter panel
     const wide = useMediaQuery("(min-width: 48rem)")
+    // Both read false until hydration ends, so no sheet opens on a wide screen meanwhile
+    const narrow = useMediaQuery("not all and (min-width: 48rem)")
 
     const {
         center,
@@ -221,8 +223,11 @@ export const MapScreen = (props: MapScreenProps) => {
     const previewPushedRef = useRef(false)
     // True while the open detail owns the history entry above the one of its preview
     const [detailPushed, setDetailPushed] = useState(false)
-    if (detailPushed && !detailOpen) {
-        setDetailPushed(false)
+    // The URL opens the detail a render after `openDetail`, so the flag resets on a close alone
+    const [wasDetailOpen, setWasDetailOpen] = useState(detailOpen)
+    if (wasDetailOpen !== detailOpen) {
+        setWasDetailOpen(detailOpen)
+        setDetailPushed(detailPushed && detailOpen)
     }
     const openPreview = (target: PreviewTarget, withDetail = false) => {
         const opening = selectedRef === undefined && selectedVenueId === undefined
@@ -572,14 +577,19 @@ export const MapScreen = (props: MapScreenProps) => {
                 </div>
             ) : undefined}
             <DetailSheet
-                open={!wide && detailOpen}
+                open={narrow && detailOpen}
                 label={detailLabel}
                 onClose={closePreview}
             >
                 {detailContent}
             </DetailSheet>
             <EventPreview
-                open={previewCard === undefined && previewOpen && !detailOpen}
+                open={
+                    previewCard === undefined &&
+                    (wide || narrow) &&
+                    previewOpen &&
+                    !detailOpen
+                }
                 entry={selected}
                 loadFailed={
                     selectedRef === undefined ? venueDetail.isError : detail.isError

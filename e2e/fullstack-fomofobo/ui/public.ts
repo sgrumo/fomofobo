@@ -143,3 +143,18 @@ export const blockPublicEvent = async (eventId: string): Promise<void> => {
  */
 export const mapPath = (center: GeoPoint): string =>
     `/?lat=${String(center.latitude)}&lng=${String(center.longitude)}`
+
+/**
+ * @description Returns the map path with the detail of the occurrence open
+ * @param eventId Event of the occurrence
+ * @param date Date of the occurrence
+ */
+export const eventDetailPath = (eventId: string, date: string): string =>
+    `/?event=${eventId}&occurrence=${date}&detail=true`
+
+/**
+ * @description Returns the map path with the detail of the venue open
+ * @param venueId Venue opened
+ */
+export const venueDetailPath = (venueId: string): string =>
+    `/?venue=${venueId}&detail=true`

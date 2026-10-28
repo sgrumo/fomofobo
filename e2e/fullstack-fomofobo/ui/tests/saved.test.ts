@@ -9,6 +9,7 @@ import { gotoPage, reloadPage, t } from "../app"
 import {
     blockPublicEvent,
     buildArea,
+    eventDetailPath,
     preparePublicPage,
     seedCategory,
     seedPublicEvent,
@@ -31,8 +32,10 @@ test.describe("saved events", () => {
         await gotoPage(page, "/saved/")
         await expect(page.getByText(t("shared", "Saved.Empty"))).toBeVisible()
 
-        await gotoPage(page, `/events/${event.id}/2026-10-24/`)
-        const toggle = page.getByRole("button", { name: t("shared", "Saved.Toggle") })
+        await gotoPage(page, eventDetailPath(event.id, "2026-10-24"))
+        const toggle = page
+            .getByRole("dialog", { name: event.title, exact: true })
+            .getByRole("button", { name: t("shared", "Saved.Toggle") })
         await toggle.click()
         await expect(toggle).toHaveAttribute("aria-pressed", "true")
         await expectToast(page, { type: "success" }, t("shared", "Saved.Added"))
@@ -51,7 +54,7 @@ test.describe("saved events", () => {
         await expect(page.getByText(t("shared", "Saved.NoneVisible"))).toBeVisible()
     })
 
-    test("opens a saved event in a panel beside the list on a wide screen, and on its page on a phone", async ({
+    test("opens a saved event over the list, in a side panel on a wide screen and in a sheet on a phone", async ({
         page,
     }) => {
         const event = await seedPublicEvent(
@@ -59,31 +62,44 @@ test.describe("saved events", () => {
             { startsAt: "2026-10-25T18:00", endsAt: "2026-10-25T20:00" },
         )
 
-        await gotoPage(page, `/events/${event.id}/2026-10-25/`)
-        await page.getByRole("button", { name: t("shared", "Saved.Toggle") }).click()
+        await gotoPage(page, eventDetailPath(event.id, "2026-10-25"))
+        await page
+            .getByRole("dialog", { name: event.title, exact: true })
+            .getByRole("button", { name: t("shared", "Saved.Toggle") })
+            .click()
         await expectToast(page, { type: "success" }, t("shared", "Saved.Added"))
         await dismissToast(page, { type: "success" }, t("shared", "Saved.Added"))
 
         await gotoPage(page, "/saved/")
-        const item = page.getByRole("listitem").filter({ hasText: event.title })
-        const preview = page.getByRole("dialog", { name: event.title, exact: true })
-        await item.getByRole("link").click()
+        const link = page
+            .getByRole("listitem")
+            .filter({ hasText: event.title })
+            .getByRole("link")
+        const detail = page.getByRole("dialog", { name: event.title, exact: true })
+        await expect(link).toHaveAttribute(
+            "href",
+            `/it?event=${event.id}&occurrence=2026-10-25&detail=true`,
+        )
+        await link.click()
 
-        await expect(preview).toBeFocused()
-        await expect(preview).toContainText("25/10")
-        await expect(preview).toContainText("18:00 → 20:00")
+        await expect(detail).toBeFocused()
+        await expect(detail).toContainText("25/10")
+        await expect(detail).toContainText("18:00 → 20:00")
         await expect(page).toHaveURL(/\/saved\/?$/u)
 
-        await page.getByRole("heading", { level: 1 }).click()
+        await page
+            .getByRole("heading", { level: 1, name: t("shared", "PageTitle.Saved") })
+            .click()
 
-        await expect(preview).toBeHidden()
+        await expect(detail).toBeHidden()
 
         await page.setViewportSize({ width: 375, height: 812 })
-        await item.getByRole("link").click()
+        await link.click()
 
         await expect(
-            page.getByRole("heading", { level: 1, name: event.title }),
+            detail.getByRole("heading", { level: 1, name: event.title }),
         ).toBeVisible()
+        await expect(page).toHaveURL(/\/saved\/?$/u)
     })
 
     test("sends a save made offline once the connection is back", async ({
@@ -104,9 +120,11 @@ test.describe("saved events", () => {
             return res.data.find(entry => entry.date === "2026-10-24")?.count
         }
 
-        await gotoPage(page, `/events/${event.id}/2026-10-24/`)
+        await gotoPage(page, eventDetailPath(event.id, "2026-10-24"))
         await context.setOffline(true)
-        const toggle = page.getByRole("button", { name: t("shared", "Saved.Toggle") })
+        const toggle = page
+            .getByRole("dialog", { name: event.title, exact: true })
+            .getByRole("button", { name: t("shared", "Saved.Toggle") })
         await toggle.click()
         await expect(toggle).toHaveAttribute("aria-pressed", "true")
         await expectToast(page, { type: "success" }, t("shared", "Saved.Added"))

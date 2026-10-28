@@ -1,11 +1,13 @@
 import { expect, test } from "@playwright/test"
 import { expectAlert } from "e2e-ui-components/alert"
 import { pressChip } from "e2e-ui-components/chip"
+import { clickIconButton } from "e2e-ui-components/icon-button"
 import { dismissToast, expectToast } from "e2e-ui-components/toast"
 
 import { gotoBackofficePage, gotoPage, reloadPage, t } from "../app"
 import {
     buildArea,
+    eventDetailPath,
     mapPath,
     preparePublicPage,
     seedCategory,
@@ -39,25 +41,56 @@ test.describe("installed app offline", () => {
         })
     })
 
-    test("renders a loaded detail and its photo after an offline reload", async ({
+    test("renders the event and venue detail loaded online, and the photo, after an offline reload", async ({
         page,
         context,
     }) => {
-        const venue = await seedVenue(buildArea())
-        const event = await seedPublicEvent({ venue, category: await seedCategory() }, {})
+        const center = buildArea()
+        const venue = await seedVenue(center)
+        const category = await seedCategory()
+        const event = await seedPublicEvent({ venue, category }, {})
+        const past = await seedPublicEvent(
+            { venue, category },
+            { startsAt: "2026-10-20T21:00", endsAt: "2026-10-20T23:30" },
+        )
+        const eventDetail = page
+            .getByRole("dialog", { name: event.title, exact: true })
+            .filter({ has: page.getByRole("heading", { level: 1, name: event.title }) })
+        const venueDetail = page
+            .getByRole("dialog", { name: venue.name, exact: true })
+            .filter({ has: page.getByRole("heading", { level: 1, name: venue.name }) })
 
-        await gotoPage(page, `/events/${event.id}/2026-10-24/`)
+        await gotoPage(page, mapPath(center))
         await page.waitForFunction("navigator.serviceWorker.controller !== null")
         // The fake clock empties the resource timing that the first worker reads, so a
-        // second load under the worker caches the page and its photo.
+        // second load under the worker caches the page.
         await reloadPage(page)
         await expect
             .poll(() =>
                 page.evaluate(
-                    "Promise.all([location.href, document.images[0].currentSrc].map(url => caches.match(url))).then(cached => cached.every(Boolean))",
+                    "caches.match(location.origin + location.pathname).then(Boolean)",
                 ),
             )
             .toBe(true)
+        // The detail reads its event and its venue from the API, under the worker.
+        await page
+            .getByRole("button", {
+                name: t("shared", "Map.Pin", {
+                    title: event.title,
+                    status: t("shared", "Status.upcoming"),
+                    time: "21:00",
+                }),
+            })
+            .click({ timeout: MAP_TIMEOUT_MS })
+        await clickIconButton(
+            page.getByRole("dialog", { name: event.title, exact: true }),
+            t("shared", "Preview.Open"),
+        )
+        await expect(eventDetail).toBeVisible()
+        await eventDetail.getByRole("button", { name: venue.name }).click()
+        await expect(venueDetail.getByText(past.title)).toBeVisible()
+        await venueDetail.getByRole("button", { name: event.title }).click()
+        await expect(eventDetail).toBeVisible()
 
         await context.setOffline(true)
         const photo = page.waitForResponse(
@@ -67,43 +100,15 @@ test.describe("installed app offline", () => {
         )
         await reloadPage(page)
 
-        await expect(
-            page.getByRole("heading", { level: 1, name: event.title }),
-        ).toBeVisible()
-        await expect(page.getByText(venue.address)).toBeVisible()
+        await expect(eventDetail.getByText(venue.address)).toBeVisible()
         const offlinePhoto = await photo
         // The photos bucket answers without CORS, so the copy is opaque: no status to read.
         expect(offlinePhoto.fromServiceWorker()).toBe(true)
-    })
 
-    test("renders a loaded venue page with its events after an offline reload", async ({
-        page,
-        context,
-    }) => {
-        const venue = await seedVenue(buildArea())
-        const category = await seedCategory()
-        const upcoming = await seedPublicEvent({ venue, category }, {})
-        const past = await seedPublicEvent(
-            { venue, category },
-            { startsAt: "2026-10-20T21:00", endsAt: "2026-10-20T23:30" },
-        )
+        await eventDetail.getByRole("button", { name: venue.name }).click()
 
-        await gotoPage(page, `/venues/${venue.id}/`)
-        await page.waitForFunction("navigator.serviceWorker.controller !== null")
-        // A second load under the worker caches the page, as on the event page.
-        await reloadPage(page)
-        await expect
-            .poll(() => page.evaluate("caches.match(location.href).then(Boolean)"))
-            .toBe(true)
-
-        await context.setOffline(true)
-        await reloadPage(page)
-
-        await expect(
-            page.getByRole("heading", { level: 1, name: venue.name }),
-        ).toBeVisible()
-        await expect(page.getByText(upcoming.title)).toBeVisible()
-        await expect(page.getByText(past.title)).toBeVisible()
+        await expect(venueDetail.getByText(event.title)).toBeVisible()
+        await expect(venueDetail.getByText(past.title)).toBeVisible()
     })
 
     test("names the missing connection when a new filter cannot load offline", async ({
@@ -168,9 +173,12 @@ test.describe("installed app offline", () => {
             {},
         )
 
-        await gotoPage(page, `/events/${event.id}/2026-10-24/`)
+        await gotoPage(page, eventDetailPath(event.id, "2026-10-24"))
         await page.waitForFunction("navigator.serviceWorker.controller !== null")
-        await page.getByRole("button", { name: t("shared", "Saved.Toggle") }).click()
+        await page
+            .getByRole("dialog", { name: event.title, exact: true })
+            .getByRole("button", { name: t("shared", "Saved.Toggle") })
+            .click()
         await expectToast(page, { type: "success" }, t("shared", "Saved.Added"))
         await dismissToast(page, { type: "success" }, t("shared", "Saved.Added"))
 
