@@ -9,7 +9,6 @@ import { cn } from "frontend-shared/styles"
 import type { Category, OccurrenceSummary, PublicVenue } from "models"
 import type { ReactNode } from "react"
 import { useEffect, useId, useRef } from "react"
-import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import type { StrictOmit } from "shared/types"
 import { isDefined } from "shared/values"
@@ -27,8 +26,6 @@ import { TickProgress } from "ui-components/tick-progress"
 
 import { SaveToggle } from "@/components/client/save-toggle/save-toggle"
 import { TonedImage } from "@/components/client/toned-image/toned-image"
-import { RouteLink } from "@/framework/routes/route-link/route-link"
-import { routes } from "@/framework/routes/routes"
 import { useNonModalDialog } from "@/lib/hooks/use-non-modal-dialog"
 import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 
@@ -57,6 +54,8 @@ interface PreviewPanelProps {
     now: Date
     paging: PreviewPaging | undefined
     renderTitle: RenderTitle
+    onOpenDetail: () => void
+    onOpenVenue: (venueId: string) => void
     onClose: () => void
 }
 
@@ -108,7 +107,6 @@ interface PreviewBodyProps extends StrictOmit<
 
 const PreviewBody = (props: PreviewBodyProps) => {
     const { t } = useTranslation("shared")
-    const language = useLanguage()
     const priceSummary = usePriceSummary()
 
     const occurrence = props.occurrence
@@ -159,14 +157,15 @@ const PreviewBody = (props: PreviewBodyProps) => {
                             {occurrence.venue.name}
                         </span>
                     ) : (
-                        <RouteLink
-                            route={routes.venueDetail}
-                            parameters={{ lang: language, venueId: occurrence.venue.id }}
-                            query={{}}
-                            className="tp-body-md text-fg-muted underline"
+                        <button
+                            type="button"
+                            className="tp-body-md text-fg-muted cursor-pointer self-start text-left underline"
+                            onClick={() => {
+                                props.onOpenVenue(occurrence.venue.id)
+                            }}
                         >
                             {occurrence.venue.name}
-                        </RouteLink>
+                        </button>
                     )}
                     <span className="tp-pixel-sm uppercase">{details.join(" · ")}</span>
                 </div>
@@ -190,17 +189,12 @@ const PreviewBody = (props: PreviewBodyProps) => {
                     {localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)} →{" "}
                     {localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)}
                 </span>
-                <RouteLink
-                    route={routes.eventDetail}
-                    parameters={{
-                        lang: language,
-                        eventId: occurrence.eventId,
-                        date: occurrence.date,
-                    }}
-                    query={{}}
+                <button
+                    type="button"
                     aria-label={t("Preview.Open")}
+                    onClick={props.onOpenDetail}
                     className={cn(
-                        "pixel-circle-48 drop-shadow-hard-sm text-fg relative flex size-12 items-center justify-center rounded-full [&>svg]:size-5",
+                        "pixel-circle-48 drop-shadow-hard-sm text-fg relative flex size-12 cursor-pointer items-center justify-center rounded-full [&>svg]:size-5",
                         {
                             "[--pixel-fill:var(--color-live)]": status === "live",
                             "[--pixel-fill:var(--color-upcoming)]": status === "upcoming",
@@ -209,7 +203,7 @@ const PreviewBody = (props: PreviewBodyProps) => {
                     )}
                 >
                     <PixelIconArrow />
-                </RouteLink>
+                </button>
             </div>
         </div>
     )
@@ -220,11 +214,11 @@ interface VenuePreviewBodyProps {
     paging: PreviewPaging | undefined
     renderTitle: RenderTitle
     closeButton: ReactNode
+    onOpenDetail: () => void
 }
 
 const VenuePreviewBody = (props: VenuePreviewBodyProps) => {
     const { t } = useTranslation("shared")
-    const language = useLanguage()
     const venue = props.venue
 
     return (
@@ -265,15 +259,14 @@ const VenuePreviewBody = (props: VenuePreviewBodyProps) => {
                         {t("Preview.Programme")}
                     </a>
                 )}
-                <RouteLink
-                    route={routes.venueDetail}
-                    parameters={{ lang: language, venueId: venue.id }}
-                    query={{}}
+                <button
+                    type="button"
                     aria-label={t("Preview.OpenVenue")}
-                    className="pixel-circle-48 drop-shadow-hard-sm text-fg relative ml-auto flex size-12 items-center justify-center rounded-full [--pixel-fill:var(--color-permanent)] [&>svg]:size-5"
+                    onClick={props.onOpenDetail}
+                    className="pixel-circle-48 drop-shadow-hard-sm text-fg relative ml-auto flex size-12 cursor-pointer items-center justify-center rounded-full [--pixel-fill:var(--color-permanent)] [&>svg]:size-5"
                 >
                     <PixelIconArrow />
-                </RouteLink>
+                </button>
             </div>
         </div>
     )
@@ -315,6 +308,8 @@ const PreviewPanel = (props: PreviewPanelProps) => {
             paging={props.paging}
             renderTitle={props.renderTitle}
             closeButton={closeButton}
+            onOpenDetail={props.onOpenDetail}
+            onOpenVenue={props.onOpenVenue}
         />
     ) : (
         <VenuePreviewBody
@@ -322,6 +317,7 @@ const PreviewPanel = (props: PreviewPanelProps) => {
             paging={props.paging}
             renderTitle={props.renderTitle}
             closeButton={closeButton}
+            onOpenDetail={props.onOpenDetail}
         />
     )
 }
@@ -349,6 +345,8 @@ export const EventPreview = (props: EventPreviewProps) => (
                 renderTitle={(text, className) => (
                     <BottomSheetTitle className={className}>{text}</BottomSheetTitle>
                 )}
+                onOpenDetail={props.onOpenDetail}
+                onOpenVenue={props.onOpenVenue}
                 onClose={props.onClose}
             />
         </BottomSheetContent>
@@ -360,37 +358,6 @@ interface NonModalPreviewProps extends StrictOmit<
     "entry" | "loadFailed" | "renderTitle"
 > {
     entry: PreviewEntry
-}
-
-export const EventPreviewPanel = (props: NonModalPreviewProps) => {
-    const titleId = useId()
-    const panelRef = useRef<HTMLElement>(null)
-    useNonModalDialog(panelRef, props.onClose)
-
-    return (
-        <section
-            ref={panelRef}
-            role="dialog"
-            aria-modal={false}
-            aria-labelledby={titleId}
-            tabIndex={-1}
-            className="pixel-corners drop-shadow-hard-lg h-full overflow-y-auto p-4 outline-none"
-        >
-            <PreviewPanel
-                entry={props.entry}
-                loadFailed={false}
-                categories={props.categories}
-                now={props.now}
-                paging={props.paging}
-                renderTitle={(text, className) => (
-                    <h2 id={titleId} className={cn("text-fg tp-pixel-lg", className)}>
-                        {text}
-                    </h2>
-                )}
-                onClose={props.onClose}
-            />
-        </section>
-    )
 }
 
 // Native events on the card that the map below it would handle
@@ -439,6 +406,8 @@ export const EventPreviewCard = (props: NonModalPreviewProps) => {
                         {text}
                     </h2>
                 )}
+                onOpenDetail={props.onOpenDetail}
+                onOpenVenue={props.onOpenVenue}
                 onClose={props.onClose}
             />
         </section>

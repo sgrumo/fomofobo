@@ -11,16 +11,13 @@ import { identity } from "es-toolkit"
 import type { GeoPoint, OccurrenceRef, PlaceSuggestion } from "models"
 import { useRef, useState } from "react"
 import type { FocusEvent, MouseEvent } from "react"
-import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import { useDebounced } from "react-shared"
 import { Alert } from "ui-components/alert"
 import { SearchField } from "ui-components/search-field"
 import { Spinner } from "ui-components/spinner"
 
-import { RouteLink } from "@/framework/routes/route-link/route-link"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
-import { routes } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
 import { useOnline } from "@/lib/hooks/use-online"
 
@@ -29,12 +26,12 @@ interface PlaceSearchProps extends RouteClientComponentProps<"root"> {
     initialText: string
     onPlaceSelect: (place: PlaceSuggestion) => void
     onEventSelect: (ref: OccurrenceRef) => void
+    onVenueSelect: (venueId: string) => void
     onTextSubmit: (text: string) => void
 }
 
 export const PlaceSearch = (props: PlaceSearchProps) => {
     const { t } = useTranslation("shared")
-    const language = useLanguage()
     const online = useOnline()
     const [text, setText] = useState(props.initialText)
     const [open, setOpen] = useState(false)
@@ -197,23 +194,22 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                                     {group.label}
                                 </h2>
                                 {group.venues.map(venue => (
-                                    <RouteLink
+                                    <button
                                         key={venue.venueId}
-                                        route={routes.venueDetail}
-                                        parameters={{
-                                            lang: language,
-                                            venueId: venue.venueId,
-                                        }}
-                                        query={{}}
+                                        type="button"
                                         className={itemClassName}
                                         onBlur={closeWhenFocusLeaves}
                                         onMouseDown={keepFocus}
+                                        onClick={() => {
+                                            setOpen(false)
+                                            props.onVenueSelect(venue.venueId)
+                                        }}
                                     >
                                         {venue.name}
                                         <span className="tp-body-sm text-fg-muted block">
                                             {venue.address}
                                         </span>
-                                    </RouteLink>
+                                    </button>
                                 ))}
                             </section>
                         ),

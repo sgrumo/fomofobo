@@ -5,6 +5,7 @@ import { routes } from "@/framework/routes/routes"
 import { getDynamicRoute } from "@/framework/routes/server/get-dynamic-route"
 import { serverApi } from "@/lib/api/server/api"
 import { prefetchQueries } from "@/lib/query/server/prefetch"
+import { appBaseUrl } from "@/server/config/app-base-url"
 
 import { MapScreen } from "./_page/client/map-screen"
 
@@ -29,7 +30,7 @@ const Page = async () => {
 
     return (
         <HydrationBoundary state={dehydratedState}>
-            <MapScreen route="root" />
+            <MapScreen route="root" baseUrl={appBaseUrl().origin} />
         </HydrationBoundary>
     )
 }

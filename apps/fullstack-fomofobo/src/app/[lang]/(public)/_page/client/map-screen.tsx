@@ -1,6 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
+import { eventDetailUrlOf, venueDetailUrlOf } from "domain/detail-urls"
 import { centerQueryOf, nextLocateRequest, searchCenterOf } from "domain/map-center"
 import type { LocateRequest } from "domain/map-center"
 import { hasActiveFilters } from "domain/map-filters"
@@ -25,6 +26,12 @@ import { Spinner } from "ui-components/spinner"
 import { useToast } from "ui-components/toast"
 
 import {
+    DetailPending,
+    DetailSheet,
+    DetailSidePanel,
+} from "@/components/client/detail-dialog/detail-dialog"
+import { EventDetail } from "@/components/client/event-detail/event-detail"
+import {
     EventPreview,
     EventPreviewCard,
 } from "@/components/client/event-preview/event-preview"
@@ -32,6 +39,7 @@ import type {
     PreviewEntry,
     PreviewVenue,
 } from "@/components/client/event-preview/event-preview"
+import { VenueDetail } from "@/components/client/venue-detail/venue-detail"
 import { useDynamicRoute } from "@/framework/routes/route-hooks/use-dynamic-route"
 import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
@@ -72,6 +80,15 @@ const previewEntryOf = (
 }
 
 /**
+ * @description Returns the map query keys that select a preview target
+ * @param target Event occurrence or venue selected
+ */
+const selectionQueryOf = (target: PreviewTarget) =>
+    target.type === "occurrence"
+        ? { event: target.ref.eventId, occurrence: target.ref.date, venue: undefined }
+        : { event: undefined, occurrence: undefined, venue: target.venueId }
+
+/**
  * @description Returns the selection that opens the preview of an entry
  * @param entry Entry opened
  */
@@ -83,7 +100,11 @@ const targetOf = (entry: PreviewEntry): PreviewTarget =>
           }
         : { type: "venue", venueId: entry.venue.id }
 
-export const MapScreen = (props: RouteClientComponentProps<"root">) => {
+interface MapScreenProps extends RouteClientComponentProps<"root"> {
+    baseUrl: string
+}
+
+export const MapScreen = (props: MapScreenProps) => {
     const { t } = useTranslation("shared")
     const language = useLanguage()
     const toast = useToast()
@@ -157,15 +178,17 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                       occurrence.eventId === selectedRef.eventId &&
                       occurrence.date === selectedRef.date,
               )
-    // An event suggestion can name an occurrence outside the results.
+    const selectedVenueId = selectedRef === undefined ? query.venue : undefined
+    const previewOpen = selectedRef !== undefined || selectedVenueId !== undefined
+    const detailOpen = previewOpen && query.detail === true
+    // An event suggestion can name an occurrence outside the results, and the detail reads more.
     const detail = useQuery({
         ...api.getOccurrenceQuery({
             params: { eventId: query.event ?? "", date: query.occurrence ?? "" },
             query: {},
         }),
-        enabled: selectedRef !== undefined && fromResults === undefined,
+        enabled: selectedRef !== undefined && (fromResults === undefined || detailOpen),
     })
-    const selectedVenueId = selectedRef === undefined ? query.venue : undefined
     const venueFromResults = results?.permanentVenues.find(
         venue => venue.id === selectedVenueId,
     )
@@ -175,7 +198,9 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
             params: { venueId: selectedVenueId ?? "" },
             query: {},
         }),
-        enabled: selectedVenueId !== undefined && venueFromResults === undefined,
+        enabled:
+            selectedVenueId !== undefined &&
+            (venueFromResults === undefined || detailOpen),
     })
     const selectedOccurrence =
         selectedRef === undefined ? undefined : (fromResults ?? detail.data)
@@ -194,30 +219,49 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
 
     // True while the open preview owns the history entry that a close pops.
     const previewPushedRef = useRef(false)
-    const openPreview = (target: PreviewTarget) => {
+    // True while the open detail owns the history entry above the one of its preview
+    const [detailPushed, setDetailPushed] = useState(false)
+    if (detailPushed && !detailOpen) {
+        setDetailPushed(false)
+    }
+    const openPreview = (target: PreviewTarget, withDetail = false) => {
         const opening = selectedRef === undefined && selectedVenueId === undefined
         previewPushedRef.current = opening || previewPushedRef.current
         setQuery(
-            target.type === "occurrence"
-                ? {
-                      event: target.ref.eventId,
-                      occurrence: target.ref.date,
-                      venue: undefined,
-                  }
-                : { event: undefined, occurrence: undefined, venue: target.venueId },
+            { ...selectionQueryOf(target), detail: withDetail ? true : undefined },
             { history: opening ? "push" : "replace" },
         )
     }
     const closePreview = () => {
         if (previewPushedRef.current) {
             previewPushedRef.current = false
-            globalThis.history.back()
+            globalThis.history.go(detailPushed ? -2 : -1)
             return
         }
         setQuery(
-            { event: undefined, occurrence: undefined, venue: undefined },
+            {
+                event: undefined,
+                occurrence: undefined,
+                venue: undefined,
+                detail: undefined,
+            },
             { history: "replace" },
         )
+    }
+    const openDetail = () => {
+        setDetailPushed(true)
+        setQuery({ detail: true }, { history: "push" })
+    }
+    // A link inside the detail swaps the entry it shows
+    const showInDetail = (target: PreviewTarget) => {
+        setQuery({ ...selectionQueryOf(target), detail: true }, { history: "replace" })
+    }
+    const backToPreview = () => {
+        if (detailPushed) {
+            globalThis.history.back()
+            return
+        }
+        setQuery({ detail: undefined }, { history: "replace" })
     }
     const showSpotEntry = (index: number) => {
         const entry = sameSpot.at(index)
@@ -239,10 +283,9 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                   },
               }
             : undefined
-    const previewOpen = selectedRef !== undefined || selectedVenueId !== undefined
     // A wide screen shows the preview above its pin, once the entry is known
     const previewCard =
-        wide && selected !== undefined
+        wide && selected !== undefined && !detailOpen
             ? {
                   coordinates:
                       selected.type === "occurrence"
@@ -254,11 +297,64 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                           categories={categoriesById}
                           now={now}
                           paging={paging}
+                          onOpenDetail={openDetail}
+                          onOpenVenue={venueId => {
+                              showInDetail({ type: "venue", venueId })
+                          }}
                           onClose={closePreview}
                       />
                   ),
               }
             : undefined
+    const detailSide = wide && detailOpen
+    const detailPoint =
+        selected?.type === "occurrence"
+            ? selected.occurrence.venue.coordinates
+            : selected?.venue.coordinates
+    const detailLabel =
+        selected?.type === "occurrence"
+            ? selected.occurrence.title
+            : (selected?.venue.name ?? t("Preview.Title"))
+    const detailContent =
+        selectedRef === undefined ? (
+            venueDetail.data === undefined ? (
+                <DetailPending
+                    loadingText={t("Venue.Loading")}
+                    failedText={venueDetail.isError ? t("Venue.Unavailable") : undefined}
+                    onClose={closePreview}
+                />
+            ) : (
+                <VenueDetail
+                    venue={venueDetail.data}
+                    now={now}
+                    shareUrl={venueDetailUrlOf(
+                        props.baseUrl,
+                        language,
+                        venueDetail.data.id,
+                    )}
+                    onBack={backToPreview}
+                    onOpenEvent={ref => {
+                        showInDetail({ type: "occurrence", ref })
+                    }}
+                />
+            )
+        ) : detail.data === undefined ? (
+            <DetailPending
+                loadingText={t("Preview.Loading")}
+                failedText={detail.isError ? t("Preview.Unavailable") : undefined}
+                onClose={closePreview}
+            />
+        ) : (
+            <EventDetail
+                occurrence={detail.data}
+                now={now}
+                shareUrl={eventDetailUrlOf(props.baseUrl, language, selectedRef)}
+                onBack={backToPreview}
+                onOpenVenue={venueId => {
+                    showInDetail({ type: "venue", venueId })
+                }}
+            />
+        )
 
     // Escape closes the filter panel of a phone
     useEffect(() => {
@@ -346,7 +442,7 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 iconOf={iconOf}
                 selectedVenueId={spotVenueId}
                 previewCard={previewCard}
-                revealedPoint={undefined}
+                revealedPoint={detailSide ? detailPoint : undefined}
                 overlayRef={overlayRef}
                 panelRef={panelRef}
                 now={now}
@@ -357,15 +453,18 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                     openPreview({ type: "venue", venueId })
                 }}
                 onBackgroundClick={() => {
-                    // The bottom sheet closes on an outside press on its own
-                    if (previewCard !== undefined) {
+                    // The bottom sheets close on an outside press on their own
+                    if (previewCard !== undefined || detailSide) {
                         closePreview()
                     }
                 }}
             />
             <div
                 ref={overlayRef}
-                className="pointer-events-none absolute inset-x-4 top-4 flex flex-col gap-2 [&>*]:pointer-events-auto"
+                className={cn(
+                    "pointer-events-none absolute inset-x-4 top-4 flex flex-col gap-2 [&>*]:pointer-events-auto",
+                    { "right-[25.75rem]": detailSide },
+                )}
             >
                 <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
@@ -380,6 +479,9 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                             }}
                             onEventSelect={ref => {
                                 openPreview({ type: "occurrence", ref })
+                            }}
+                            onVenueSelect={venueId => {
+                                openPreview({ type: "venue", venueId }, true)
                             }}
                             onTextSubmit={text => {
                                 setQuery(textQueryOf(text))
@@ -434,7 +536,11 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 {notices}
             </div>
             {/* Clears the map attribution, which sits in the bottom corner. */}
-            <div className="absolute right-4 bottom-8 flex items-center gap-2">
+            <div
+                className={cn("absolute right-4 bottom-8 flex items-center gap-2", {
+                    "right-[25.75rem]": detailSide,
+                })}
+            >
                 {search.isFetching ? (
                     <Spinner title={t("Map.Loading")} size="xs" />
                 ) : undefined}
@@ -455,8 +561,25 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                     }}
                 />
             </div>
+            {detailSide ? (
+                <div
+                    ref={panelRef}
+                    className="absolute top-4 right-4 bottom-8 w-[23.75rem]"
+                >
+                    <DetailSidePanel label={detailLabel} onClose={closePreview}>
+                        {detailContent}
+                    </DetailSidePanel>
+                </div>
+            ) : undefined}
+            <DetailSheet
+                open={!wide && detailOpen}
+                label={detailLabel}
+                onClose={closePreview}
+            >
+                {detailContent}
+            </DetailSheet>
             <EventPreview
-                open={previewCard === undefined && previewOpen}
+                open={previewCard === undefined && previewOpen && !detailOpen}
                 entry={selected}
                 loadFailed={
                     selectedRef === undefined ? venueDetail.isError : detail.isError
@@ -464,6 +587,10 @@ export const MapScreen = (props: RouteClientComponentProps<"root">) => {
                 categories={categoriesById}
                 now={now}
                 paging={paging}
+                onOpenDetail={openDetail}
+                onOpenVenue={venueId => {
+                    showInDetail({ type: "venue", venueId })
+                }}
                 onClose={closePreview}
             />
         </section>

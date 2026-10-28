@@ -1,11 +1,13 @@
 "use client"
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { eventDetailUrlOf } from "domain/detail-urls"
 import { localTimeOf, weekdayDateOf } from "domain/local-format"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { cn } from "frontend-shared/styles"
 import type { OccurrenceRef } from "models"
+import { useRouter } from "next/navigation"
 import type { MouseEvent } from "react"
 import { useEffect, useRef, useState } from "react"
 import { useLanguage } from "react-i18n/hooks"
@@ -16,7 +18,12 @@ import { IconButton } from "ui-components/icon-button"
 import { PixelIconBack } from "ui-components/pixel-icons"
 import { Spinner } from "ui-components/spinner"
 
-import { EventPreviewPanel } from "@/components/client/event-preview/event-preview"
+import {
+    DetailPending,
+    DetailSheet,
+    DetailSidePanel,
+} from "@/components/client/detail-dialog/detail-dialog"
+import { EventDetail } from "@/components/client/event-detail/event-detail"
 import { SaveToggle } from "@/components/client/save-toggle/save-toggle"
 import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
@@ -47,13 +54,23 @@ export const SavedEventsView = (props: RouteClientComponentProps<"saved">) => {
     const { t } = useTranslation("shared")
     const language = useLanguage()
     const goBack = useBackToMap()
+    const router = useRouter()
     const now = useNow(CLOCK_TICK_MS)
     const [savedEvents] = useLocalStorage("saved-events")
-    // The `md` breakpoint of the preview panel of the map
+    // The `md` breakpoint of the detail panel of the map
     const wide = useMediaQuery("(min-width: 48rem)")
     const [selectedRef, setSelectedRef] = useState<OccurrenceRef>()
     const panelRef = useRef<HTMLDivElement>(null)
-    const categories = useQuery(api.listCategoriesQuery({ params: {}, query: {} }))
+    const detail = useQuery({
+        ...api.getOccurrenceQuery({
+            params: {
+                eventId: selectedRef?.eventId ?? "",
+                date: selectedRef?.date ?? "",
+            },
+            query: {},
+        }),
+        enabled: selectedRef !== undefined,
+    })
 
     const newestFirst = savedEvents.events.toSorted((first, second) =>
         second.savedAt.localeCompare(first.savedAt),
@@ -79,16 +96,8 @@ export const SavedEventsView = (props: RouteClientComponentProps<"saved">) => {
     const occurrences = ((fromSnapshots ? snapshots.data : lookup.data) ?? []).filter(
         occurrence => savedIds.has(occurrence.eventId),
     )
-    // A wide screen opens a saved event in a panel on the right, as the map does
-    const selected =
-        wide && selectedRef !== undefined
-            ? occurrences.find(
-                  occurrence =>
-                      occurrence.eventId === selectedRef.eventId &&
-                      occurrence.date === selectedRef.date,
-              )
-            : undefined
-    const panelOpen = selected !== undefined
+    // A wide screen opens the detail of a saved event in a panel on the right, as the map does
+    const panelOpen = wide && selectedRef !== undefined
 
     // A press outside the panel closes it, before a click on another event opens that one
     useEffect(() => {
@@ -134,16 +143,16 @@ export const SavedEventsView = (props: RouteClientComponentProps<"saved">) => {
                             className="bg-surface border-line shadow-hard-md flex items-start gap-3 rounded-md border-2 p-3"
                         >
                             <RouteLink
-                                route={routes.eventDetail}
-                                parameters={{
-                                    lang: language,
-                                    eventId: occurrence.eventId,
-                                    date: occurrence.date,
+                                route={routes.root}
+                                parameters={{ lang: language }}
+                                query={{
+                                    event: occurrence.eventId,
+                                    occurrence: occurrence.date,
+                                    detail: true,
                                 }}
-                                query={{}}
                                 className="flex min-w-0 flex-1 flex-col gap-1"
                                 onClick={event => {
-                                    if (wide && isPlainClick(event)) {
+                                    if (isPlainClick(event)) {
                                         event.preventDefault()
                                         setSelectedRef({
                                             eventId: occurrence.eventId,
@@ -177,6 +186,38 @@ export const SavedEventsView = (props: RouteClientComponentProps<"saved">) => {
             </ul>
         )
 
+    const closeDetail = () => {
+        setSelectedRef(undefined)
+    }
+    const detailLabel = detail.data?.title ?? t("Preview.Title")
+    const detailContent =
+        detail.data === undefined || selectedRef === undefined ? (
+            <DetailPending
+                loadingText={t("Preview.Loading")}
+                failedText={detail.isError ? t("Preview.Unavailable") : undefined}
+                onClose={closeDetail}
+            />
+        ) : (
+            <EventDetail
+                occurrence={detail.data}
+                now={now}
+                shareUrl={eventDetailUrlOf(
+                    globalThis.location.origin,
+                    language,
+                    selectedRef,
+                )}
+                onBack={closeDetail}
+                onOpenVenue={venueId => {
+                    router.push(
+                        routes.root.path({
+                            parameters: { lang: language },
+                            query: { venue: venueId, detail: true },
+                        }),
+                    )
+                }}
+            />
+        )
+
     return (
         <div className={cn({ "pr-[25.75rem]": panelOpen })}>
             <section className="mx-auto flex max-w-xl flex-col gap-4 p-4">
@@ -194,22 +235,16 @@ export const SavedEventsView = (props: RouteClientComponentProps<"saved">) => {
                 {body}
                 <InstallEntry route={props.route} />
             </section>
-            {selected === undefined ? undefined : (
+            {selectedRef === undefined ? undefined : wide ? (
                 <div ref={panelRef} className="fixed top-4 right-4 bottom-4 w-[23.75rem]">
-                    <EventPreviewPanel
-                        entry={{ type: "occurrence", occurrence: selected }}
-                        categories={
-                            new Map(
-                                categories.data?.map(category => [category.id, category]),
-                            )
-                        }
-                        now={now}
-                        paging={undefined}
-                        onClose={() => {
-                            setSelectedRef(undefined)
-                        }}
-                    />
+                    <DetailSidePanel label={detailLabel} onClose={closeDetail}>
+                        {detailContent}
+                    </DetailSidePanel>
                 </div>
+            ) : (
+                <DetailSheet open={true} label={detailLabel} onClose={closeDetail}>
+                    {detailContent}
+                </DetailSheet>
             )}
         </div>
     )
