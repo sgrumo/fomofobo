@@ -28,25 +28,6 @@ export const routes = {
         querySchema: mapQuerySchema,
         queryOptions: { event: { push: true }, venue: { push: true } },
     }),
-    eventDetail: createDynamicRoute({
-        segments: ["[lang]", "events", "[eventId]", "[date]"],
-        title: ({ t }) => t("PageTitle.Event"),
-        parametersSchema: z.object({
-            lang: languageKeySchema,
-            eventId: z.string(),
-            date: z.string(),
-        }),
-        querySchema: z.object({}),
-    }),
-    venueDetail: createDynamicRoute({
-        segments: ["[lang]", "venues", "[venueId]"],
-        title: ({ t }) => t("PageTitle.Venue"),
-        parametersSchema: z.object({
-            lang: languageKeySchema,
-            venueId: z.string(),
-        }),
-        querySchema: z.object({ page: pageCodec.optional().catch(undefined) }),
-    }),
     saved: createStaticRoute({
         segments: ["[lang]", "saved"],
         title: ({ t }) => t("PageTitle.Saved"),

@@ -4,6 +4,7 @@ import { withSerwist } from "@serwist/turbopack"
 import type { NextConfig } from "next"
 
 import { languageRedirects } from "./src/lib/i18n/language-redirects"
+import { detailRedirects } from "./src/lib/navigation/detail-redirects"
 
 // The workspace packages ship raw TypeScript, so Next compiles them with the app.
 const workspacePackages = [
@@ -28,7 +29,7 @@ const nextConfig: NextConfig = {
     // workspace package the app imports.
     outputFileTracingRoot: fileURLToPath(new URL("../..", import.meta.url)),
     transpilePackages: workspacePackages,
-    redirects: () => Promise.resolve(languageRedirects),
+    redirects: () => Promise.resolve([...languageRedirects, ...detailRedirects]),
 }
 
 // Keeps esbuild, which builds the service worker, out of the server bundle.

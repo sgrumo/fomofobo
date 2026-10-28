@@ -83,14 +83,14 @@ Client component  -> useMutation     -> api        -> apiAction       -> serverT
 
 - `const route = routes.<name>` once, top level, after the imports. No other `routes.<key>` in the file - links go through `RouteLink` in a component
 - Static route page: `export const generateStaticParams = route.generateStaticParams`, no `dynamic` config. Dynamic route page: `force-dynamic`, no `generateStaticParams`. No `layout.tsx` names `generateStaticParams`
-- `generateMetadata` reads `title` from `getDynamicRoute` / `getStaticRoute`, except on a page of one entity (below). The root layout holds the `title.template` of the site. **NEVER** render `<title>` in a page
+- `generateMetadata` reads `title` from `getDynamicRoute` / `getStaticRoute`, except on the map when its query selects an entity (below). The root layout holds the `title.template` of the site. **NEVER** render `<title>` in a page
 - Protected page: under `(protected)/`, opens with `await requireSession(path)`, `path` from `getDynamicRoute`
 - Prefetch with `prefetchQueries` + `Promise.allSettled`, wrap the client view in one `HydrationBoundary`
 - Pass `query` from `getDynamicRoute` (server) and `useDynamicRoute` (browser) to the prefetch and to `useQuery`. Both decode through `decodeRouteQuery`, so the cache keys match
 - A filter, a page number, or a sort is a query key of the route, never `useState`
 - `setQuery` writes the URL with `window.history`. No Server Component runs again. `useQuery` fetches the change, and `generateMetadata` keeps the title of the first load
 - No interaction -> no `_page/client`
-- A page of one entity, such as the event detail, titles itself with the entity name. `generateMetadata` and the page share one read through React `cache`, and a hidden or malformed entity calls `notFound()`
+- The map titles itself with the event or venue its query selects, and builds the share card of that entity. `generateMetadata` and the page share one read through React `cache`. A hidden or unknown entity leaves the title of the map
 
 ## Routes
 
