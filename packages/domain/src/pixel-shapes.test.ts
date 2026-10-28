@@ -10,7 +10,7 @@ import {
 describe("pixelCircleProfile", () => {
     it("steps a 36 px circle on whole cells", () => {
         expect(pixelCircleProfile(36)).toStrictEqual([
-            12, 12, 12, 6, 6, 6, 3, 3, 3, 3, 3, 3,
+            12, 12, 8, 8, 6, 6, 4, 4, 2, 2, 2, 2,
         ])
     })
 
@@ -38,6 +38,6 @@ describe("pixelCircleProfile", () => {
 
 describe("PIXEL_CORNER_PROFILE", () => {
     it("steps two cells in, then one", () => {
-        expect(PIXEL_CORNER_PROFILE).toStrictEqual([6, 6, 6, 3, 3, 3])
+        expect(PIXEL_CORNER_PROFILE).toStrictEqual([4, 4, 2, 2])
     })
 })

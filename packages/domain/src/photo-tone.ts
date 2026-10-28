@@ -11,7 +11,7 @@ type Rgb = readonly [number, number, number]
 // `--palette-red`, `--palette-yellow`, `--palette-gray-light` and `--palette-sky` of `styles`
 export const PHOTO_TONE_COLORS: Record<PhotoTone, Rgb> = {
     live: PHOTO_DITHER_LIGHT,
-    upcoming: [246, 210, 66],
+    upcoming: [255, 210, 63],
     ended: [203, 203, 198],
     permanent: [166, 220, 255],
 }

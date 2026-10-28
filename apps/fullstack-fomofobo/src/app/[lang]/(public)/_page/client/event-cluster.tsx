@@ -71,7 +71,9 @@ export const EventCluster = (props: EventClusterProps) => {
                 <path d={CLUSTER_SHAPE.fillPath} className="fill-surface" />
                 <path d={CLUSTER_SHAPE.inkPath} className="fill-line" />
             </svg>
-            <span className="text-fg tp-pixel-lg relative">{props.count}</span>
+            <span className="text-fg font-count relative pt-px text-[22px] leading-none [-webkit-font-smoothing:none]">
+                {props.count}
+            </span>
         </button>
     )
 }

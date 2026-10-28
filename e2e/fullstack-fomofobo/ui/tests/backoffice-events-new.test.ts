@@ -95,13 +95,13 @@ test.describe("backoffice new event", () => {
         const photo = await downloadPhoto(cover.url)
         expectToBeDefined(photo)
         const header = new DataView(photo.buffer, photo.byteOffset + 16, 13)
-        // IHDR: width, height (267 rows of 3 px cells), bit depth, color type (3 = indexed)
+        // IHDR: width, height (400 rows of 2 px cells), bit depth, color type (3 = indexed)
         expect([
             header.getUint32(0),
             header.getUint32(4),
             header.getUint8(8),
             header.getUint8(9),
-        ]).toStrictEqual([1200, 801, 1, 3])
+        ]).toStrictEqual([1200, 800, 1, 3])
     })
 
     test("creates a paid event with a reduced price, a membership card and a capacity", async ({

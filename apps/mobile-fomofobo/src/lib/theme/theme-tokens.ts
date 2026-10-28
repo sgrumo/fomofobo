@@ -4,30 +4,30 @@
  * @remarks Mirrors the palette of `packages/styles/src/globals.css`, PLACEHOLDER(TQ-08)
  */
 const PALETTE = {
-    ink: "#0c1e18",
+    ink: "#0f1f1a",
     inkMuted: "#5c5a4f",
     inkSubtle: "#8e887a",
-    paper: "#f0eade",
+    paper: "#f5efdf",
     paperMuted: "#e4ddcc",
     lineMuted: "#c6c0ae",
     grayLight: "#cbcbc6",
-    red: "#f6481e",
+    red: "#ff4a1f",
     redStrong: "#b8300f",
     redPale: "#f9d5c8",
-    yellow: "#f6d242",
+    yellow: "#ffd23f",
     yellowPale: "#f8e7a8",
     greenStrong: "#276b33",
     greenPale: "#d6ead0",
-    lilac: "#f0b4fc",
+    lilac: "#f2b8ff",
     sky: "#a6dcff",
     violet: "#6a3fd1",
     blueStrong: "#1f5f9e",
     bluePale: "#d4e4f2",
     amberStrong: "#8a5a00",
-    mapGround: "#247860",
-    mapBlock: "#18664e",
-    mapDot: "#368a6c",
-    mapWater: "#90e4c0",
+    mapGround: "#237a60",
+    mapBlock: "#185945",
+    mapDot: "#3e9c7c",
+    mapWater: "#8fe3c0",
     mapRoad: "#defcf0",
 } as const
 
@@ -38,7 +38,7 @@ const SEMANTIC_COLORS = {
     surface: PALETTE.paper,
     "surface-muted": PALETTE.paperMuted,
     "surface-inverse": PALETTE.ink,
-    overlay: "rgba(12, 30, 24, 0.6)",
+    overlay: "rgba(15, 31, 26, 0.6)",
 
     fg: PALETTE.ink,
     "fg-muted": PALETTE.inkMuted,
@@ -189,6 +189,6 @@ export const RADII = {
 
 export const HARD_SHADOW_OFFSETS = {
     sm: 2,
-    md: 3,
-    lg: 4,
+    md: 4,
+    lg: 6,
 } as const

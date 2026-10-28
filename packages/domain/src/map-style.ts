@@ -25,7 +25,7 @@ export const mapStyle = {
             id: "ground",
             type: "background",
             paint: {
-                "background-color": "#247860",
+                "background-color": "#237a60",
             },
         },
         {
@@ -46,7 +46,7 @@ export const mapStyle = {
                 ["literal", ["residential", "commercial", "retail", "industrial"]],
             ],
             paint: {
-                "fill-color": "#18664e",
+                "fill-color": "#185945",
                 "fill-opacity": 0.7,
             },
         },
@@ -56,7 +56,7 @@ export const mapStyle = {
             source: "openmaptiles",
             "source-layer": "park",
             paint: {
-                "fill-color": "#18664e",
+                "fill-color": "#185945",
             },
         },
         {
@@ -65,7 +65,7 @@ export const mapStyle = {
             source: "openmaptiles",
             "source-layer": "water",
             paint: {
-                "fill-color": "#90e4c0",
+                "fill-color": "#8fe3c0",
             },
         },
         {
@@ -74,7 +74,7 @@ export const mapStyle = {
             source: "openmaptiles",
             "source-layer": "waterway",
             paint: {
-                "line-color": "#90e4c0",
+                "line-color": "#8fe3c0",
                 "line-width": ["interpolate", ["linear"], ["zoom"], 12, 2, 18, 10],
             },
         },

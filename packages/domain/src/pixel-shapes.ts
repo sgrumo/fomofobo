@@ -2,7 +2,7 @@
 // corner, from the edge row inward. Steps fall on a grid of `PIXEL_CELL` px. The web draws them
 // as the `--pixel-*-outer` polygons of `packages/styles/src/globals.css`.
 
-export const PIXEL_CELL = 3
+export const PIXEL_CELL = 2
 
 export const PIXEL_CIRCLE_SIZES = [32, 36, 40, 48] as const
 

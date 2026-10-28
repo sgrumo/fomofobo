@@ -53,6 +53,6 @@ describe("ditherPhoto", () => {
         const metadata = await sharp(png).metadata()
 
         expect(isDitheredPng(png)).toBe(true)
-        expect([metadata.width, metadata.height]).toStrictEqual([1200, 801])
+        expect([metadata.width, metadata.height]).toStrictEqual([1200, 800])
     })
 })
