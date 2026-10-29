@@ -48,7 +48,7 @@ interface VenueLink {
 
 interface VenueDetailProps {
     venue: PublicVenue
-    onBack: () => void
+    onClose: () => void
     onOpenEvent: (ref: OccurrenceRef) => void
 }
 
@@ -71,7 +71,11 @@ export const VenueDetail = (props: VenueDetailProps) => {
     return (
         <>
             <View className="flex-row">
-                <IconButton icon="back" label={t("Detail.Back")} onPress={props.onBack} />
+                <IconButton
+                    icon="close"
+                    label={t("Preview.Close")}
+                    onPress={props.onClose}
+                />
             </View>
             {venue.coverPhotoUrl !== null && (
                 <TonedPhoto

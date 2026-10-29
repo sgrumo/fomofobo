@@ -452,9 +452,6 @@ const MapScreen = () => {
                             : { type: "venue", venueId: selectedVenueId }
                         : { type: "occurrence", ref: selectedRef }
                 }
-                onBack={() => {
-                    setQuery({ detail: undefined })
-                }}
                 onClose={() => {
                     setQuery(CLEARED_SELECTION)
                 }}

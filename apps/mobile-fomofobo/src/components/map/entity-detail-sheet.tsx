@@ -56,7 +56,6 @@ const DetailNotice = (props: DetailNoticeProps) => {
 interface EntityDetailSheetProps {
     open: boolean
     selection: DetailSelection | undefined
-    onBack: () => void
     onClose: () => void
     onOpenVenue: (venueId: string) => void
     onOpenEvent: (ref: OccurrenceRef) => void
@@ -139,13 +138,13 @@ export const EntityDetailSheet = (props: EntityDetailSheetProps) => {
             {isVenue && venue !== undefined ? (
                 <VenueDetail
                     venue={venue}
-                    onBack={props.onBack}
+                    onClose={props.onClose}
                     onOpenEvent={props.onOpenEvent}
                 />
             ) : !isVenue && occurrence !== undefined ? (
                 <EventDetail
                     occurrence={occurrence}
-                    onBack={props.onBack}
+                    onClose={props.onClose}
                     onOpenVenue={props.onOpenVenue}
                 />
             ) : (

@@ -276,13 +276,6 @@ export const MapScreen = (props: MapScreenProps) => {
     const showInDetail = (target: PreviewTarget) => {
         setQuery({ ...selectionQueryOf(target), detail: true }, { history: "replace" })
     }
-    const backToPreview = () => {
-        if (detailPushed) {
-            globalThis.history.back()
-            return
-        }
-        setQuery({ detail: undefined }, { history: "replace" })
-    }
     const showSpotEntry = (index: number) => {
         const entry = sameSpot.at(index)
         if (entry !== undefined && index >= 0) {
@@ -355,7 +348,7 @@ export const MapScreen = (props: MapScreenProps) => {
                         language,
                         venueDetail.data.id,
                     )}
-                    onBack={backToPreview}
+                    onClose={closePreview}
                     onOpenEvent={ref => {
                         showInDetail({ type: "occurrence", ref })
                     }}
@@ -372,7 +365,7 @@ export const MapScreen = (props: MapScreenProps) => {
                 occurrence={detail.data}
                 now={now}
                 shareUrl={eventDetailUrlOf(props.baseUrl, language, selectedRef)}
-                onBack={backToPreview}
+                onClose={closePreview}
                 onOpenVenue={venueId => {
                     showInDetail({ type: "venue", venueId })
                 }}

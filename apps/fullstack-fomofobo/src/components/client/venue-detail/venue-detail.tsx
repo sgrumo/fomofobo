@@ -20,7 +20,7 @@ import { Badge } from "ui-components/badge"
 import { Button } from "ui-components/button"
 import { IconButton } from "ui-components/icon-button"
 import {
-    PixelIconBack,
+    PixelIconClose,
     PixelIconDirections,
     PixelIconFacebook,
     PixelIconInstagram,
@@ -41,7 +41,7 @@ interface VenueDetailProps {
     venue: PublicVenue
     now: Date
     shareUrl: string
-    onBack: () => void
+    onClose: () => void
     onOpenEvent: (ref: OccurrenceRef) => void
 }
 
@@ -72,9 +72,9 @@ export const VenueDetail = (props: VenueDetailProps) => {
         <article className="flex flex-col gap-5">
             <header className="flex items-center gap-3">
                 <IconButton
-                    aria-label={t("Detail.Back")}
-                    icon={<PixelIconBack />}
-                    onClick={props.onBack}
+                    aria-label={t("Preview.Close")}
+                    icon={<PixelIconClose />}
+                    onClick={props.onClose}
                 />
             </header>
             {venue.coverPhotoUrl === null ? undefined : (

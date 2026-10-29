@@ -31,7 +31,7 @@ const CLOCK_TICK_MS = 60_000
 
 interface EventDetailProps {
     occurrence: OccurrenceDetail
-    onBack: () => void
+    onClose: () => void
     onOpenVenue: (venueId: string) => void
 }
 
@@ -88,9 +88,9 @@ export const EventDetail = (props: EventDetailProps) => {
                 controls={
                     <>
                         <IconButton
-                            icon="back"
-                            label={t("Detail.Back")}
-                            onPress={props.onBack}
+                            icon="close"
+                            label={t("Preview.Close")}
+                            onPress={props.onClose}
                         />
                         <View className="flex-row gap-2">
                             <SaveToggle occurrence={occurrence} />

@@ -195,7 +195,6 @@ const SavedScreen = () => {
                         ? undefined
                         : { type: "occurrence", ref: selectedRef }
                 }
-                onBack={closeDetail}
                 onClose={closeDetail}
                 onOpenVenue={venueId => {
                     router.dismissTo({

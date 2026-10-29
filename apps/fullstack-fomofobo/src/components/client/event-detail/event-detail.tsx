@@ -15,7 +15,7 @@ import { match } from "ts-pattern"
 import { Badge } from "ui-components/badge"
 import { IconButton } from "ui-components/icon-button"
 import {
-    PixelIconBack,
+    PixelIconClose,
     PixelIconDirections,
     PixelIconFacebook,
     PixelIconInstagram,
@@ -39,7 +39,7 @@ interface EventDetailProps {
     occurrence: OccurrenceDetail
     now: Date
     shareUrl: string
-    onBack: () => void
+    onClose: () => void
     onOpenVenue: (venueId: string) => void
 }
 
@@ -107,9 +107,9 @@ export const EventDetail = (props: EventDetailProps) => {
                 controls={
                     <>
                         <IconButton
-                            aria-label={t("Detail.Back")}
-                            icon={<PixelIconBack />}
-                            onClick={props.onBack}
+                            aria-label={t("Preview.Close")}
+                            icon={<PixelIconClose />}
+                            onClick={props.onClose}
                         />
                         <div className="flex gap-2">
                             <SaveToggle occurrence={occurrence} />

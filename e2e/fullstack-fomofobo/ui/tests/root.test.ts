@@ -942,12 +942,21 @@ test.describe("map", () => {
             await expect(preview).toBeHidden()
             await expect(page).toHaveURL(/detail=true/u)
 
-            await clickIconButton(detail, t("shared", "Detail.Back"))
+            await clickIconButton(detail, t("shared", "Preview.Close"))
 
-            await expect(preview).toBeVisible()
             await expect(detail).toBeHidden()
-            await expect(page).not.toHaveURL(/detail=/u)
+            await expect(preview).toBeHidden()
+            await expect(page).not.toHaveURL(/event=/u)
 
+            await page
+                .getByRole("button", {
+                    name: t("shared", "Map.Pin", {
+                        title: event.title,
+                        status: t("shared", "Status.live"),
+                        time: "11:00",
+                    }),
+                })
+                .click()
             await clickIconButton(preview, t("shared", "Preview.Open"))
             await expect(detail).toBeVisible()
             await page.keyboard.press("Escape")
@@ -1180,7 +1189,7 @@ test.describe("detail over the map", () => {
         }
     })
 
-    test("opens the venue detail from the venue of an event, back to its preview, and names a blocked venue alone", async ({
+    test("opens the venue detail from the venue of an event, closes it, and names a blocked venue alone", async ({
         page,
     }) => {
         const venue = await seedVenue(buildArea())
@@ -1204,14 +1213,10 @@ test.describe("detail over the map", () => {
                 !url.searchParams.has("event"),
         )
 
-        await clickIconButton(venueDetail, t("shared", "Detail.Back"))
+        await clickIconButton(venueDetail, t("shared", "Preview.Close"))
 
-        await expect(
-            page
-                .getByRole("dialog", { name: venue.name, exact: true })
-                .getByRole("button", { name: t("shared", "Preview.OpenVenue") }),
-        ).toBeVisible()
-        await expect(page).not.toHaveURL(/detail=/u)
+        await expect(venueDetail).toBeHidden()
+        await expect(page).not.toHaveURL(/venue=/u)
 
         expectStatus(
             await blockVenue({
@@ -1364,7 +1369,7 @@ test.describe("detail over the map", () => {
 
         await expect(detail).toBeVisible()
         await expect(savedPanel).toBeHidden()
-        await clickIconButton(detail, t("shared", "Detail.Back"))
+        await clickIconButton(detail, t("shared", "Preview.Close"))
 
         await expect(detail).toBeHidden()
         await expect(savedPanel).toBeVisible()
