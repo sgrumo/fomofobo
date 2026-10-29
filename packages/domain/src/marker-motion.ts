@@ -7,7 +7,7 @@ import type {
     EventPointProperties,
 } from "./event-clusters"
 
-export const MARKER_MOTION_MS = 250
+export const MARKER_MOTION_MS = 150
 
 // Side of the whole world in px at zoom 0, the tile size of MapLibre
 const WORLD_SIZE = 512
