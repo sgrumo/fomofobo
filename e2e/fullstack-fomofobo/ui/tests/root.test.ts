@@ -45,7 +45,7 @@ test.describe("map", () => {
         const live = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+                    offsetPoint(center, { latitude: 0.005, longitude: 0 }),
                 ),
                 category,
             },
@@ -54,7 +54,7 @@ test.describe("map", () => {
         const upcoming = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: -0.01, longitude: 0 }),
+                    offsetPoint(center, { latitude: -0.005, longitude: 0 }),
                 ),
                 category,
             },
@@ -63,7 +63,7 @@ test.describe("map", () => {
         const ended = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0, longitude: 0.015 }),
+                    offsetPoint(center, { latitude: 0, longitude: 0.0075 }),
                 ),
                 category,
             },
@@ -105,7 +105,7 @@ test.describe("map", () => {
     }) => {
         const center = buildArea()
         const venue = await seedVenue(
-            offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+            offsetPoint(center, { latitude: 0.005, longitude: 0 }),
         )
         const category = await seedCategory()
         const [, live] = await Promise.all(
@@ -137,8 +137,8 @@ test.describe("map", () => {
         const center = buildArea()
         const category = await seedCategory()
         const [busy, quiet] = await Promise.all([
-            seedVenue(offsetPoint(center, { latitude: 0.01, longitude: 0 })),
-            seedVenue(offsetPoint(center, { latitude: 0.0105, longitude: 0 })),
+            seedVenue(offsetPoint(center, { latitude: 0.005, longitude: 0 })),
+            seedVenue(offsetPoint(center, { latitude: 0.0055, longitude: 0 })),
         ])
         await Promise.all([
             seedPublicEvent(
@@ -180,7 +180,7 @@ test.describe("map", () => {
             seedPublicEvent(
                 {
                     venue: await seedVenue(
-                        offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+                        offsetPoint(center, { latitude: 0.005, longitude: 0 }),
                     ),
                     category,
                 },
@@ -189,7 +189,7 @@ test.describe("map", () => {
             seedPublicEvent(
                 {
                     venue: await seedVenue(
-                        offsetPoint(center, { latitude: -0.01, longitude: 0 }),
+                        offsetPoint(center, { latitude: -0.005, longitude: 0 }),
                     ),
                     category,
                 },
@@ -223,7 +223,7 @@ test.describe("map", () => {
     }) => {
         const center = buildArea()
         const cinema = await seedPublicCinema(
-            offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+            offsetPoint(center, { latitude: 0.005, longitude: 0 }),
             await seedCategory(),
         )
 
@@ -264,7 +264,7 @@ test.describe("map", () => {
         const center = buildArea()
         const category = await seedCategory()
         const cinema = await seedPublicCinema(
-            offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+            offsetPoint(center, { latitude: 0.005, longitude: 0 }),
             category,
         )
         const screening = await seedPublicEvent(
@@ -302,8 +302,8 @@ test.describe("map", () => {
         const center = buildArea()
         const category = await seedCategory()
         const [courtyard, loggia] = await Promise.all([
-            seedVenue(offsetPoint(center, { latitude: 0.01, longitude: 0 })),
-            seedVenue(offsetPoint(center, { latitude: 0.01002, longitude: 0.00002 })),
+            seedVenue(offsetPoint(center, { latitude: 0.005, longitude: 0 })),
+            seedVenue(offsetPoint(center, { latitude: 0.00502, longitude: 0.00002 })),
         ])
         const [live, upcoming] = await Promise.all([
             seedPublicEvent(
@@ -348,7 +348,7 @@ test.describe("map", () => {
         const concert = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+                    offsetPoint(center, { latitude: 0.005, longitude: 0 }),
                 ),
                 category: concerts,
             },
@@ -357,7 +357,7 @@ test.describe("map", () => {
         const market = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: -0.01, longitude: 0 }),
+                    offsetPoint(center, { latitude: -0.005, longitude: 0 }),
                 ),
                 category: markets,
             },
@@ -366,7 +366,7 @@ test.describe("map", () => {
         const talk = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0, longitude: 0.015 }),
+                    offsetPoint(center, { latitude: 0, longitude: 0.0075 }),
                 ),
                 category: talks,
             },
@@ -430,7 +430,7 @@ test.describe("map", () => {
         const today = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+                    offsetPoint(center, { latitude: 0.005, longitude: 0 }),
                 ),
                 category,
             },
@@ -439,7 +439,7 @@ test.describe("map", () => {
         const tomorrow = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: -0.01, longitude: 0 }),
+                    offsetPoint(center, { latitude: -0.005, longitude: 0 }),
                 ),
                 category,
             },
@@ -492,7 +492,7 @@ test.describe("map", () => {
         const today = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+                    offsetPoint(center, { latitude: 0.005, longitude: 0 }),
                 ),
                 category,
             },
@@ -501,7 +501,7 @@ test.describe("map", () => {
         const tomorrow = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: -0.01, longitude: 0 }),
+                    offsetPoint(center, { latitude: -0.005, longitude: 0 }),
                 ),
                 category,
             },
@@ -537,7 +537,7 @@ test.describe("map", () => {
         const today = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+                    offsetPoint(center, { latitude: 0.005, longitude: 0 }),
                 ),
                 category,
             },
@@ -546,7 +546,7 @@ test.describe("map", () => {
         const monday = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: -0.01, longitude: 0 }),
+                    offsetPoint(center, { latitude: -0.005, longitude: 0 }),
                 ),
                 category,
             },
@@ -634,7 +634,8 @@ test.describe("map", () => {
         await searchField.press("Enter")
 
         await expect(page).toHaveURL(/place=/u)
-        await expect(searchField).toHaveValue(`${text}, Imola, Italy`)
+        // The search service lowercases the text that the geocoding mock echoes
+        await expect(searchField).toHaveValue(`${text.toLowerCase()}, Imola, Italy`)
     })
 
     test("opens the detail of a venue of the area that the search names, in the group of its kind", async ({
@@ -705,7 +706,7 @@ test.describe("map", () => {
         const event = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(position, { latitude: 0.01, longitude: 0 }),
+                    offsetPoint(position, { latitude: 0.005, longitude: 0 }),
                 ),
                 category: await seedCategory(),
             },
@@ -745,7 +746,7 @@ test.describe("map", () => {
         const nearby = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(position, { latitude: 0.01, longitude: 0 }),
+                    offsetPoint(position, { latitude: 0.005, longitude: 0 }),
                 ),
                 category: await seedCategory(),
             },
@@ -793,7 +794,7 @@ test.describe("map", () => {
         const event = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+                    offsetPoint(center, { latitude: 0.005, longitude: 0 }),
                 ),
                 category: await seedCategory(),
             },
@@ -826,7 +827,7 @@ test.describe("map", () => {
         const event = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+                    offsetPoint(center, { latitude: 0.005, longitude: 0 }),
                 ),
                 category: await seedCategory(),
             },
@@ -875,7 +876,7 @@ test.describe("map", () => {
         const event = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+                    offsetPoint(center, { latitude: 0.005, longitude: 0 }),
                 ),
                 category: await seedCategory(),
             },
@@ -1311,7 +1312,7 @@ test.describe("detail over the map", () => {
         const event = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+                    offsetPoint(center, { latitude: 0.005, longitude: 0 }),
                 ),
                 category: await seedCategory(),
             },
