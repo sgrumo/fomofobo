@@ -3,7 +3,6 @@
 import { isBefore, parseISO } from "date-fns"
 import {
     earliestRangeDayOf,
-    freeQueryOf,
     isValidRange,
     NO_DATE_FILTER,
     QUICK_DATE_KINDS,
@@ -27,7 +26,7 @@ import { Field } from "ui-components/field"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
 interface DateChipsProps extends RouteClientComponentProps<"root"> {
-    query: Pick<MapQuery, "date" | "from" | "to" | "free">
+    query: Pick<MapQuery, "date" | "from" | "to">
     now: Date
     onChange: (change: MapQuery) => void
     className?: string
@@ -56,9 +55,8 @@ export const DateChips = (props: DateChipsProps) => {
 
     return (
         <>
-            {/* The free chip shares the row: one more row covers more of the map. */}
-            <ChipRow label={t("Filters.DatesAndPrice")} className={props.className}>
-                <ChipBar label={t("Filters.Dates")}>
+            <ChipRow label={t("Filters.Dates")} className={props.className}>
+                <ChipBar label={t("Filters.QuickDates")}>
                     {QUICK_DATE_KINDS.map(kind => (
                         <Chip
                             key={kind}
@@ -75,13 +73,6 @@ export const DateChips = (props: DateChipsProps) => {
                         onPressedChange={openSheet}
                     />
                 </ChipBar>
-                <Chip
-                    label={t("Price.Free")}
-                    pressed={props.query.free === true}
-                    onPressedChange={free => {
-                        props.onChange(freeQueryOf(free))
-                    }}
-                />
             </ChipRow>
             <BottomSheetRoot open={sheetOpen} onOpenChange={setSheetOpen}>
                 <BottomSheetContent>

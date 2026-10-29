@@ -38,7 +38,7 @@ interface PreviewPaging {
 
 export type PreviewVenue = Pick<
     PublicVenue,
-    "id" | "name" | "address" | "coordinates" | "coverPhotoUrl" | "kind" | "programmeUrl"
+    "id" | "name" | "address" | "coordinates" | "coverPhotoUrl" | "kind"
 >
 
 export type PreviewEntry =
@@ -180,14 +180,16 @@ const PreviewBody = (props: PreviewBodyProps) => {
                 />
             ) : undefined}
             <div className="border-line flex items-center justify-between gap-2 border-t-2 pt-3">
-                <span className="tp-pixel-xl">
+                <span className="flex flex-col">
                     {startsToday ? undefined : (
-                        <span className="tp-pixel-md mr-2">
+                        <span className="tp-pixel-sm">
                             {dayMonthOf(span.startsAt, PLATFORM_TIME_ZONE)}
                         </span>
                     )}
-                    {localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)}→
-                    {localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)}
+                    <span className="tp-pixel-xl">
+                        {localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)}→
+                        {localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)}
+                    </span>
                 </span>
                 <button
                     type="button"
@@ -249,16 +251,6 @@ const VenuePreviewBody = (props: VenuePreviewBodyProps) => {
                 </div>
             </div>
             <div className="border-line flex items-center gap-2 border-t-2 pt-3">
-                {venue.programmeUrl === null ? undefined : (
-                    <a
-                        href={venue.programmeUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="border-line shadow-hard-md tp-pixel-md bg-permanent text-fg rounded-md border-2 px-4 py-3 uppercase"
-                    >
-                        {t("Preview.Programme")}
-                    </a>
-                )}
                 <button
                     type="button"
                     aria-label={t("Preview.OpenVenue")}

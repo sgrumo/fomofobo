@@ -2,7 +2,6 @@ import type { BottomSheetModal } from "@gorhom/bottom-sheet"
 import { parseISO } from "date-fns"
 import {
     earliestRangeDayOf,
-    freeQueryOf,
     isValidRange,
     NO_DATE_FILTER,
     QUICK_DATE_KINDS,
@@ -22,7 +21,7 @@ import { DateRangePicker } from "@/components/ui/date-range-picker/date-range-pi
 import type { DateRange } from "@/components/ui/date-range-picker/date-range-picker"
 import { Text } from "@/components/ui/text/text"
 
-type DateChipsQuery = Pick<MapQuery, "date" | "from" | "to" | "free">
+type DateChipsQuery = Pick<MapQuery, "date" | "from" | "to">
 
 interface RangeSheetContentProps {
     query: DateChipsQuery
@@ -81,9 +80,8 @@ export const DateChips = (props: DateChipsProps) => {
 
     return (
         <>
-            {/* The free chip shares the row: one more row covers more of the map */}
-            <ChipRow label={t("Filters.DatesAndPrice")} wrap={true}>
-                <ChipBar label={t("Filters.Dates")}>
+            <ChipRow label={t("Filters.Dates")} wrap={true}>
+                <ChipBar label={t("Filters.QuickDates")}>
                     {QUICK_DATE_KINDS.map(kind => (
                         <Chip
                             key={kind}
@@ -102,14 +100,6 @@ export const DateChips = (props: DateChipsProps) => {
                         }}
                     />
                 </ChipBar>
-                {/* PLACEHOLDER(TQ-37): a "Gratis" chip beside the date chips, with no count */}
-                <Chip
-                    label={t("Price.Free")}
-                    pressed={props.query.free === true}
-                    onPressedChange={free => {
-                        props.onChange(freeQueryOf(free))
-                    }}
-                />
             </ChipRow>
             <BottomSheet ref={sheetRef} title={t("Filters.RangeTitle")}>
                 <RangeSheetContent

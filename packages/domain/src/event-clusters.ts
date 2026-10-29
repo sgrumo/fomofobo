@@ -36,18 +36,22 @@ export type EventMapFeature =
     | ClusterFeature<EventClusterProperties>
     | PointFeature<EventPointProperties>
 
+// The position of the visitor draws below every result marker.
+export const POSITION_MARKER_LAYER = 0
+
 // Bottom to top: a live result draws above every other marker.
 const LAYER_ORDER: readonly MapPointKind[] = ["permanent", "ended", "upcoming", "live"]
+
+const FIRST_RESULT_LAYER = POSITION_MARKER_LAYER + 1
 
 /**
  * @description Returns the stacking layer of a marker of the kind, higher on top
  * @param kind Kind of the point
  */
-export const markerLayer = (kind: MapPointKind): number => LAYER_ORDER.indexOf(kind)
+export const markerLayer = (kind: MapPointKind): number =>
+    FIRST_RESULT_LAYER + LAYER_ORDER.indexOf(kind)
 
-export const SELECTED_MARKER_LAYER = LAYER_ORDER.length
-
-export const POSITION_MARKER_LAYER = SELECTED_MARKER_LAYER + 1
+export const SELECTED_MARKER_LAYER = FIRST_RESULT_LAYER + LAYER_ORDER.length
 
 /**
  * @description Groups the venues that the cluster index still merges at its last zoom, one
@@ -167,7 +171,7 @@ const kindCountsOf = (cluster: EventClusterProperties): Record<MapPointKind, num
  */
 export const clusterLayer = (cluster: EventClusterProperties): number => {
     const counts = kindCountsOf(cluster)
-    return LAYER_ORDER.findLastIndex(kind => counts[kind] > 0)
+    return FIRST_RESULT_LAYER + LAYER_ORDER.findLastIndex(kind => counts[kind] > 0)
 }
 
 export interface ClusterArc {

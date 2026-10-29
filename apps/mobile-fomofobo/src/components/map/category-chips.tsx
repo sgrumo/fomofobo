@@ -1,4 +1,9 @@
-import { categoryCountOf, categoryQueryOf } from "domain/map-filters"
+import {
+    categoryChipOrderOf,
+    categoryCountOf,
+    categoryQueryOf,
+    freeQueryOf,
+} from "domain/map-filters"
 import type { MapQuery } from "domain/map-query"
 import type { Category, PublicSearchResponse } from "models"
 import { useTranslation } from "react-i18next"
@@ -9,6 +14,7 @@ interface CategoryChipsProps {
     categories: readonly Category[]
     counts: PublicSearchResponse["categoryCounts"] | undefined
     selected: string | undefined
+    free: boolean
     onChange: (change: MapQuery) => void
 }
 
@@ -17,7 +23,7 @@ export const CategoryChips = (props: CategoryChipsProps) => {
 
     return (
         <ChipRow label={t("Filters.Categories")} wrap={true}>
-            {props.categories.map(category => (
+            {categoryChipOrderOf(props.categories).map(category => (
                 <Chip
                     key={category.id}
                     label={category.name}
@@ -33,6 +39,13 @@ export const CategoryChips = (props: CategoryChipsProps) => {
                     }}
                 />
             ))}
+            <Chip
+                label={t("Price.Free")}
+                pressed={props.free}
+                onPressedChange={free => {
+                    props.onChange(freeQueryOf(free))
+                }}
+            />
         </ChipRow>
     )
 }

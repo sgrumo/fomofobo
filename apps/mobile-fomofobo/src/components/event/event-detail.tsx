@@ -59,7 +59,8 @@ export const EventDetail = (props: EventDetailProps) => {
             }))
             .with({ type: "time" }, time => ({
                 label: t("Detail.Time"),
-                value: `${time.start} → ${time.end}`,
+                // No-break spaces keep the time span on one line
+                value: `${time.start}\u00A0→\u00A0${time.end}`,
                 fit: true,
             }))
             .with({ type: "entry" }, entry => ({
@@ -109,9 +110,6 @@ export const EventDetail = (props: EventDetailProps) => {
                         min={0}
                         max={100}
                         start={startTime}
-                        now={t("Detail.Now", {
-                            time: localTimeOf(now, PLATFORM_TIME_ZONE),
-                        })}
                         end={endTime}
                         tone="live"
                     />

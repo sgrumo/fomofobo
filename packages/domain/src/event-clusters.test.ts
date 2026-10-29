@@ -7,6 +7,8 @@ import {
     firstLeafIndex,
     markerEmphasis,
     markerLayer,
+    POSITION_MARKER_LAYER,
+    SELECTED_MARKER_LAYER,
     sharedSpotsOf,
     venueSpots,
 } from "./event-clusters"
@@ -281,7 +283,12 @@ describe("markerLayer and clusterLayer", () => {
     it("stacks live above upcoming, upcoming above ended, ended above permanent", () => {
         const bottomToTop: MapPointKind[] = ["permanent", "ended", "upcoming", "live"]
 
-        expect(bottomToTop.map(markerLayer)).toStrictEqual([0, 1, 2, 3])
+        expect(bottomToTop.map(markerLayer)).toStrictEqual([1, 2, 3, 4])
+    })
+
+    it("stacks the position below every result and the selected spot above them", () => {
+        expect(POSITION_MARKER_LAYER).toBeLessThan(markerLayer("permanent"))
+        expect(SELECTED_MARKER_LAYER).toBeGreaterThan(markerLayer("live"))
     })
 
     it("stacks a cluster at the layer of the highest kind it holds", () => {

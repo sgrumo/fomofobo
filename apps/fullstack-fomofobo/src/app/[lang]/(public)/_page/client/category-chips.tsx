@@ -1,6 +1,11 @@
 "use client"
 
-import { categoryCountOf, categoryQueryOf } from "domain/map-filters"
+import {
+    categoryChipOrderOf,
+    categoryCountOf,
+    categoryQueryOf,
+    freeQueryOf,
+} from "domain/map-filters"
 import type { MapQuery } from "domain/map-query"
 import type { Category, PublicSearchResponse } from "models"
 import { useTranslation } from "react-i18next"
@@ -13,6 +18,7 @@ interface CategoryChipsProps extends RouteClientComponentProps<"root"> {
     categories: Category[]
     counts: PublicSearchResponse["categoryCounts"] | undefined
     selected: string | undefined
+    free: boolean
     onChange: (change: MapQuery) => void
     className?: string
 }
@@ -22,7 +28,7 @@ export const CategoryChips = (props: CategoryChipsProps) => {
 
     return (
         <ChipRow label={t("Filters.Categories")} className={props.className}>
-            {props.categories.map(category => (
+            {categoryChipOrderOf(props.categories).map(category => (
                 <Chip
                     key={category.id}
                     label={category.name}
@@ -38,6 +44,13 @@ export const CategoryChips = (props: CategoryChipsProps) => {
                     }}
                 />
             ))}
+            <Chip
+                label={t("Price.Free")}
+                pressed={props.free}
+                onPressedChange={free => {
+                    props.onChange(freeQueryOf(free))
+                }}
+            />
         </ChipRow>
     )
 }

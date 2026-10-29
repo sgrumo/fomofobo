@@ -20,7 +20,7 @@ interface TimelineProps {
     max: number
     valueText?: string
     start: string
-    now: string
+    now?: string
     end: string
     tone?: TickProgressTone
     className?: string

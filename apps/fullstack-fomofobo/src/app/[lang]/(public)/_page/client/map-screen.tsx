@@ -23,10 +23,12 @@ import { Alert } from "ui-components/alert"
 import { Button } from "ui-components/button"
 import { IconButton } from "ui-components/icon-button"
 import {
+    PixelIconClose,
     PixelIconFilter,
     PixelIconLocate,
     PixelIconSaved,
 } from "ui-components/pixel-icons"
+import { Separator } from "ui-components/separator"
 import { Spinner } from "ui-components/spinner"
 import { useToast } from "ui-components/toast"
 
@@ -518,7 +520,7 @@ export const MapScreen = (props: MapScreenProps) => {
                             aria-label={t("Filters.Label")}
                             aria-expanded={filtersOpen}
                             aria-controls={filtersId}
-                            icon={<PixelIconFilter />}
+                            icon={filtersOpen ? <PixelIconClose /> : <PixelIconFilter />}
                             tone={filtersOpen ? "inverse" : "surface"}
                             onClick={() => {
                                 setFiltersOpen(open => !open)
@@ -557,9 +559,11 @@ export const MapScreen = (props: MapScreenProps) => {
                         categories={categories.data ?? []}
                         counts={results?.categoryCounts}
                         selected={query.category}
+                        free={query.free === true}
                         onChange={setQuery}
                         className="max-md:flex-wrap md:max-w-full md:self-start"
                     />
+                    <Separator className="pointer-events-none" />
                     <DateChips
                         route={props.route}
                         query={query}

@@ -17,7 +17,7 @@ interface TimelineProps {
     max: number
     valueText?: string
     start: ReactNode
-    now: ReactNode
+    now?: ReactNode
     end: ReactNode
     tone?: TickProgressTone
     className?: string

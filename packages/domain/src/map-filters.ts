@@ -1,6 +1,6 @@
 import { format, isBefore, parseISO } from "date-fns"
-import { countBy } from "es-toolkit"
-import type { PublicSearchResponse } from "models"
+import { countBy, partition } from "es-toolkit"
+import type { CategoryIcon, PublicSearchResponse } from "models"
 import { match } from "ts-pattern"
 
 import type { MapPointKind } from "./event-clusters"
@@ -192,6 +192,22 @@ export const kindCountsOf = (
         permanent: results.permanentVenues.length,
         ended: counts.ended ?? 0,
     }
+}
+
+/**
+ * @description Returns the categories in chip order: the order of the list, with the catch-all
+ * category of the `other` icon last
+ * @template TCategory Category
+ * @param categories Categories of the platform
+ */
+export const categoryChipOrderOf = <TCategory extends { icon: CategoryIcon }>(
+    categories: readonly TCategory[],
+): TCategory[] => {
+    const [specific, catchAll] = partition(
+        categories,
+        category => category.icon !== "other",
+    )
+    return [...specific, ...catchAll]
 }
 
 // PLACEHOLDER(OP-09): a range starts today at the earliest

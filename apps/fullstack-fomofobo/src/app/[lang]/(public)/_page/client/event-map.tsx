@@ -12,7 +12,7 @@ import {
     venueSpots,
 } from "domain/event-clusters"
 import type { MapPointKind } from "domain/event-clusters"
-import { mapFlightOf } from "domain/map-center"
+import { LOCATE_ZOOM, mapFlightOf } from "domain/map-center"
 import type { LocateRequest } from "domain/map-center"
 import { mapStyle } from "domain/map-style"
 import {
@@ -54,7 +54,8 @@ setWorkerUrl(
     new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).toString(),
 )
 
-const INITIAL_ZOOM = 13
+// A wide screen opens at the zoom of a locate, a phone one level out to show more of the area
+const PHONE_INITIAL_ZOOM = LOCATE_ZOOM - 1
 const DOT_DITHER_IMAGE = "dot-dither"
 
 interface Viewport {
@@ -106,7 +107,7 @@ const addDotDither = async (map: MapLibreMap): Promise<void> => {
 // Space kept between the selected pin, or the card, and the edges of the free part of the map
 const PIN_FRAME_MARGIN = 16
 
-const PREVIEW_CARD_LAYER = POSITION_MARKER_LAYER + 1
+const PREVIEW_CARD_LAYER = SELECTED_MARKER_LAYER + 1
 
 // Lifts the card above the pin and its tag
 const PREVIEW_CARD_OFFSET: [number, number] = [0, -88]
@@ -179,7 +180,9 @@ export const EventMap = (props: EventMapProps) => {
             container,
             style: mapStyle,
             center: [longitude, latitude],
-            zoom: INITIAL_ZOOM,
+            zoom: globalThis.matchMedia("(min-width: 48rem)").matches
+                ? LOCATE_ZOOM
+                : PHONE_INITIAL_ZOOM,
             ...FIXED_MAP_OPTIONS,
             // The expanded control wraps over the bottom controls on a phone, so the map
             // draws its own one-line credit below.

@@ -45,7 +45,7 @@ test.describe("map", () => {
         const live = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0.02, longitude: 0 }),
+                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
                 ),
                 category,
             },
@@ -54,7 +54,7 @@ test.describe("map", () => {
         const upcoming = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: -0.02, longitude: 0 }),
+                    offsetPoint(center, { latitude: -0.01, longitude: 0 }),
                 ),
                 category,
             },
@@ -63,7 +63,7 @@ test.describe("map", () => {
         const ended = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0, longitude: 0.03 }),
+                    offsetPoint(center, { latitude: 0, longitude: 0.015 }),
                 ),
                 category,
             },
@@ -218,7 +218,7 @@ test.describe("map", () => {
         await expect(pinOf(paid.title)).toBeVisible({ timeout: MAP_TIMEOUT_MS })
     })
 
-    test("shows a cinema under any date filter, and opens its programme and its detail from the preview", async ({
+    test("shows a cinema under any date filter, and opens its detail with the programme from the preview", async ({
         page,
     }) => {
         const center = buildArea()
@@ -242,7 +242,7 @@ test.describe("map", () => {
         await expect(preview).toContainText(t("shared", "VenueKind.cinema"))
         await expect(
             preview.getByRole("link", { name: t("shared", "Preview.Programme") }),
-        ).toHaveAttribute("href", cinema.programmeUrl)
+        ).toBeHidden()
         await clickIconButton(preview, t("shared", "Preview.OpenVenue"))
 
         const detail = page
@@ -293,9 +293,7 @@ test.describe("map", () => {
         await expect(preview).toContainText(
             t("shared", "Preview.Position", { index: 2, total: 2 }),
         )
-        await expect(
-            preview.getByRole("link", { name: t("shared", "Preview.Programme") }),
-        ).toBeVisible()
+        await expect(preview).toContainText(t("shared", "VenueKind.cinema"))
     })
 
     test("joins venues too close to tell apart in one pin, whose preview pages through the events of both", async ({
@@ -349,7 +347,7 @@ test.describe("map", () => {
         const concert = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0.02, longitude: 0 }),
+                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
                 ),
                 category: concerts,
             },
@@ -358,7 +356,7 @@ test.describe("map", () => {
         const market = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: -0.02, longitude: 0 }),
+                    offsetPoint(center, { latitude: -0.01, longitude: 0 }),
                 ),
                 category: markets,
             },
@@ -405,7 +403,7 @@ test.describe("map", () => {
         const today = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0.02, longitude: 0 }),
+                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
                 ),
                 category,
             },
@@ -414,7 +412,7 @@ test.describe("map", () => {
         const tomorrow = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: -0.02, longitude: 0 }),
+                    offsetPoint(center, { latitude: -0.01, longitude: 0 }),
                 ),
                 category,
             },
@@ -467,7 +465,7 @@ test.describe("map", () => {
         const today = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0.02, longitude: 0 }),
+                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
                 ),
                 category,
             },
@@ -476,7 +474,7 @@ test.describe("map", () => {
         const tomorrow = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: -0.02, longitude: 0 }),
+                    offsetPoint(center, { latitude: -0.01, longitude: 0 }),
                 ),
                 category,
             },
@@ -512,7 +510,7 @@ test.describe("map", () => {
         const today = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0.02, longitude: 0 }),
+                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
                 ),
                 category,
             },
@@ -521,7 +519,7 @@ test.describe("map", () => {
         const monday = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: -0.02, longitude: 0 }),
+                    offsetPoint(center, { latitude: -0.01, longitude: 0 }),
                 ),
                 category,
             },

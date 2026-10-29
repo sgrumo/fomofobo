@@ -2,6 +2,7 @@ import { parseISO } from "date-fns"
 import { describe, expect, it } from "vitest"
 
 import {
+    categoryChipOrderOf,
     categoryCountOf,
     categoryQueryOf,
     earliestRangeDayOf,
@@ -95,6 +96,20 @@ describe("categoryCountOf", () => {
 
         expect(categoryCountOf(counts, music)).toBe(4)
         expect(categoryCountOf(counts, crypto.randomUUID())).toBe(0)
+    })
+})
+
+describe("categoryChipOrderOf", () => {
+    it("keeps the list order and moves the other category last", () => {
+        const other = { name: "Altro", icon: "other" as const }
+        const music = { name: "Musica", icon: "music" as const }
+        const food = { name: "Cibo", icon: "food" as const }
+
+        expect(categoryChipOrderOf([other, music, food])).toStrictEqual([
+            music,
+            food,
+            other,
+        ])
     })
 })
 

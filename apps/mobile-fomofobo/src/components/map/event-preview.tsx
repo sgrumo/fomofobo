@@ -1,5 +1,5 @@
 import type { MapPointKind } from "domain/event-clusters"
-import { localTimeOf } from "domain/local-format"
+import { dayMonthOf, localDateOf, localTimeOf } from "domain/local-format"
 import { occurrenceProgress } from "domain/occurrence-progress"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { venuePhotoToneOf } from "domain/photo-tone"
@@ -7,13 +7,12 @@ import { PLATFORM_TIME_ZONE } from "domain/platform"
 import type { Category, OccurrenceSummary, PublicVenue } from "models"
 import type { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
-import { Linking, Pressable, View } from "react-native"
+import { Pressable, View } from "react-native"
 import { isDefined } from "shared/values"
 
 import { SaveToggle } from "@/components/saves/save-toggle"
 import { Badge } from "@/components/ui/badge/badge"
 import { BottomSheetPanel } from "@/components/ui/bottom-sheet-panel/bottom-sheet-panel"
-import { Button } from "@/components/ui/button/button"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { Notice } from "@/components/ui/notice/notice"
 import { PixelCircle } from "@/components/ui/pixel-circle/pixel-circle"
@@ -34,7 +33,7 @@ interface PreviewPaging {
 
 export type PreviewVenue = Pick<
     PublicVenue,
-    "id" | "name" | "address" | "coverPhotoUrl" | "kind" | "programmeUrl"
+    "id" | "name" | "address" | "coverPhotoUrl" | "kind"
 >
 
 export type PreviewEntry =
@@ -177,9 +176,17 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                 />
             )}
             <View className="flex-row items-center gap-2 border-t-2 border-line pt-3">
-                <Text variant="pixel-xl">
-                    {`${localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)}→${localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)}`}
-                </Text>
+                <View>
+                    {localDateOf(span.startsAt, PLATFORM_TIME_ZONE) !==
+                        localDateOf(props.now, PLATFORM_TIME_ZONE) && (
+                        <Text variant="pixel-sm">
+                            {dayMonthOf(span.startsAt, PLATFORM_TIME_ZONE)}
+                        </Text>
+                    )}
+                    <Text variant="pixel-xl">
+                        {`${localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)}→${localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)}`}
+                    </Text>
+                </View>
                 <OpenLink
                     label={t("Preview.Open")}
                     fill={status}
@@ -200,7 +207,6 @@ interface VenueBodyProps {
 const VenueBody = (props: VenueBodyProps) => {
     const { t } = useTranslation("shared")
     const venue = props.venue
-    const programmeUrl = venue.programmeUrl
 
     return (
         <>
@@ -231,19 +237,6 @@ const VenueBody = (props: VenueBodyProps) => {
                 </View>
             </View>
             <View className="flex-row items-center gap-2 border-t-2 border-line pt-3">
-                {programmeUrl !== null && (
-                    <Button
-                        variant="secondary"
-                        className="bg-permanent"
-                        accessibilityRole="link"
-                        accessibilityLabel={t("Preview.Programme")}
-                        onPress={() => {
-                            void Linking.openURL(programmeUrl)
-                        }}
-                    >
-                        <Text>{t("Preview.Programme")}</Text>
-                    </Button>
-                )}
                 <OpenLink
                     label={t("Preview.OpenVenue")}
                     fill="permanent"

@@ -107,8 +107,8 @@
             "ended": "Finiti"
         },
         "Categories": "Categorie",
-        "DatesAndPrice": "Date e prezzo",
         "Dates": "Date",
+        "QuickDates": "Giorni",
         "today": "Oggi",
         "tomorrow": "Domani",
         "weekend": "Weekend",
@@ -130,7 +130,7 @@
         "Programme": "Programmazione",
         "Previous": "Precedente qui",
         "Next": "Successivo qui",
-        "Position": "{{index}}/{{total}} qui"
+        "Position": "{{index}}/{{total}}"
     },
     "Detail": {
         "Gallery": "Foto di {{title}}",
@@ -159,7 +159,6 @@
             "MinimumAge": "Età minima",
             "Notes": "Note"
         },
-        "Now": "ora {{time}}",
         "Venue": "Luogo",
         "Instagram": "Instagram",
         "Facebook": "Facebook",

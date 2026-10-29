@@ -309,7 +309,7 @@ const MapScreen = () => {
                     </View>
                     <View className="h-11 justify-center">
                         <IconButton
-                            icon="filter"
+                            icon={filtersOpen ? "close" : "filter"}
                             label={
                                 filtersActive
                                     ? t("Filters.LabelActive")
@@ -337,8 +337,10 @@ const MapScreen = () => {
                                 categories={categories ?? []}
                                 counts={results?.categoryCounts}
                                 selected={query.category}
+                                free={query.free === true}
                                 onChange={setQuery}
                             />
+                            <View className="h-0.5 bg-line" />
                             <DateChips query={query} now={now} onChange={setQuery} />
                         </View>
                     </PixelPanel>
