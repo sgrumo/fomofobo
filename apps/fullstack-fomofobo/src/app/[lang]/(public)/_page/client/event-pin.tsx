@@ -72,7 +72,8 @@ export const EventPin = (props: EventPinProps) => {
                 { "opacity-35": props.emphasis === "dimmed" },
             )}
         >
-            <span className="flex items-center">
+            {/* Draws above the live wave of the disc */}
+            <span className="relative z-10 flex items-center">
                 {badge}
                 {props.moreCount === 0 ? undefined : (
                     <Badge
