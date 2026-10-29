@@ -5,6 +5,7 @@ import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { toastSuccess } from "@/components/ui/toast/toast"
 import { useSavedEvents } from "@/lib/hooks/use-saved-events"
 import { syncSaveChange } from "@/lib/saves/device-save-sync"
+import { playSaveSound } from "@/lib/saves/save-sound"
 
 interface SaveToggleProps {
     occurrence: OccurrenceRef
@@ -28,6 +29,7 @@ export const SaveToggle = (props: SaveToggleProps) => {
                     savedEvents.unsave(ref)
                 } else {
                     savedEvents.save(ref)
+                    playSaveSound()
                 }
                 void syncSaveChange({ ...ref, action: saved ? "unsave" : "save" })
                 toastSuccess(saved ? t("Saved.Removed") : t("Saved.Added"))

@@ -18,6 +18,9 @@ config.resolver.nodeModulesPaths = [
 
 config.resolver.unstable_enablePackageExports = true
 
+// The sounds of the app ship as FLAC, which the Expo defaults leave out
+config.resolver.assetExts = [...config.resolver.assetExts, "flac"]
+
 // Resolved from the app: a workspace package otherwise gets its own copy, outside the context of the app
 const singletons = ["@tanstack/react-query", "i18next", "react-i18next"]
 const appOrigin = path.join(projectRoot, "package.json")
