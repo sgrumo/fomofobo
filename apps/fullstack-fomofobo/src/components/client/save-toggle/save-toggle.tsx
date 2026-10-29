@@ -9,6 +9,7 @@ import { useToast } from "ui-components/toast"
 
 import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import { removeSavedSnapshot, storeSavedSnapshots } from "@/lib/pwa/saved-snapshots"
+import { playSaveSound } from "@/lib/saves/save-sound"
 import { syncSaveChange } from "@/lib/saves/save-sync"
 
 interface SaveToggleProps {
@@ -41,6 +42,8 @@ export const SaveToggle = (props: SaveToggleProps) => {
             onClick={() => {
                 if (saved) {
                     void removeSavedSnapshot(props.occurrence)
+                } else {
+                    playSaveSound()
                 }
                 setSavedEvents({
                     ...savedEvents,
