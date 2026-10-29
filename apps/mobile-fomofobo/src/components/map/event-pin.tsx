@@ -21,6 +21,9 @@ import { Badge } from "@/components/ui/badge/badge"
 import { THEME_COLORS } from "@/lib/theme/theme-tokens"
 import { cn } from "@/lib/utils/class-names"
 
+// Widens the press of the disc to 44 pt across and below it, clear of the tag above
+const PIN_HIT_SLOP = { top: 4, bottom: 13, left: 13, right: 13 }
+
 interface EventPinProps {
     title: string
     status: OccurrenceStatus
@@ -54,30 +57,13 @@ export const EventPin = (props: EventPinProps) => {
         .exhaustive()
 
     return (
-        <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={[
-                t("Map.Pin", {
-                    title: props.title,
-                    status: t(`Status.${props.status}`),
-                    time:
-                        props.start.day === undefined
-                            ? props.start.time
-                            : `${props.start.day} ${props.start.time}`,
-                }),
-                props.moreCount === 0
-                    ? undefined
-                    : t("Map.MoreHere", { count: props.moreCount }),
-            ]
-                .filter(isDefined)
-                .join(", ")}
-            onPress={props.onSelect}
+        <View
             className={cn("items-center gap-0.5", {
                 "opacity-35": props.emphasis === "dimmed",
             })}
         >
             {/* Draws above the live wave of the disc */}
-            <View className="z-10 flex-row">
+            <View className="z-10 flex-row" pointerEvents="none">
                 {tag}
                 {props.moreCount !== 0 && (
                     <Badge
@@ -88,30 +74,52 @@ export const EventPin = (props: EventPinProps) => {
                     </Badge>
                 )}
             </View>
-            <PixelDisc
-                kind={props.status}
-                icon={props.icon}
-                selected={props.emphasis === "selected"}
-                behind={
-                    props.status === "live" && (
-                        <PixelSprite
-                            sprite={
-                                props.emphasis === "selected"
-                                    ? SELECTED_LIVE_WAVE
-                                    : LIVE_WAVE
-                            }
-                            frameMs={LIVE_WAVE_FRAME_MS}
-                            color={THEME_COLORS.live}
-                            box={
-                                (props.emphasis === "selected"
-                                    ? SELECTED_EVENT_DISC
-                                    : EVENT_DISC
-                                ).cells * MARKER_CELL_PX
-                            }
-                        />
-                    )
-                }
-            />
-        </Pressable>
+            {/* The disc alone opens the preview: the tag above it takes no press */}
+            <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={[
+                    t("Map.Pin", {
+                        title: props.title,
+                        status: t(`Status.${props.status}`),
+                        time:
+                            props.start.day === undefined
+                                ? props.start.time
+                                : `${props.start.day} ${props.start.time}`,
+                    }),
+                    props.moreCount === 0
+                        ? undefined
+                        : t("Map.MoreHere", { count: props.moreCount }),
+                ]
+                    .filter(isDefined)
+                    .join(", ")}
+                onPress={props.onSelect}
+                hitSlop={PIN_HIT_SLOP}
+            >
+                <PixelDisc
+                    kind={props.status}
+                    icon={props.icon}
+                    selected={props.emphasis === "selected"}
+                    behind={
+                        props.status === "live" && (
+                            <PixelSprite
+                                sprite={
+                                    props.emphasis === "selected"
+                                        ? SELECTED_LIVE_WAVE
+                                        : LIVE_WAVE
+                                }
+                                frameMs={LIVE_WAVE_FRAME_MS}
+                                color={THEME_COLORS.live}
+                                box={
+                                    (props.emphasis === "selected"
+                                        ? SELECTED_EVENT_DISC
+                                        : EVENT_DISC
+                                    ).cells * MARKER_CELL_PX
+                                }
+                            />
+                        )
+                    }
+                />
+            </Pressable>
+        </View>
     )
 }

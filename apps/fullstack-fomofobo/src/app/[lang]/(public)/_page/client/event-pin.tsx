@@ -49,28 +49,10 @@ export const EventPin = (props: EventPinProps) => {
         .exhaustive()
 
     return (
-        <button
-            type="button"
-            aria-label={[
-                t("Map.Pin", {
-                    title: props.title,
-                    status: t(`Status.${props.status}`),
-                    time:
-                        props.start.day === undefined
-                            ? props.start.time
-                            : `${props.start.day} ${props.start.time}`,
-                }),
-                props.moreCount === 0
-                    ? undefined
-                    : t("Map.MoreHere", { count: props.moreCount }),
-            ]
-                .filter(isDefined)
-                .join(", ")}
-            onClick={props.onSelect}
-            className={cn(
-                "flex cursor-pointer flex-col items-center gap-0.5 transition-opacity",
-                { "opacity-35": props.emphasis === "dimmed" },
-            )}
+        <div
+            className={cn("flex flex-col items-center gap-0.5 transition-opacity", {
+                "opacity-35": props.emphasis === "dimmed",
+            })}
         >
             {/* Draws above the live wave of the disc */}
             <span className="relative z-10 flex items-center">
@@ -84,26 +66,48 @@ export const EventPin = (props: EventPinProps) => {
                     </Badge>
                 )}
             </span>
-            <PixelDisc
-                route={props.route}
-                kind={props.status}
-                icon={props.icon}
-                selected={props.emphasis === "selected"}
-                behind={
-                    props.status === "live" ? (
-                        <PixelSprite
-                            route={props.route}
-                            sprite={
-                                props.emphasis === "selected"
-                                    ? SELECTED_LIVE_WAVE
-                                    : LIVE_WAVE
-                            }
-                            frameMs={LIVE_WAVE_FRAME_MS}
-                            className="text-live"
-                        />
-                    ) : undefined
-                }
-            />
-        </button>
+            {/* The disc alone opens the preview: the tag above it takes no press */}
+            <button
+                type="button"
+                aria-label={[
+                    t("Map.Pin", {
+                        title: props.title,
+                        status: t(`Status.${props.status}`),
+                        time:
+                            props.start.day === undefined
+                                ? props.start.time
+                                : `${props.start.day} ${props.start.time}`,
+                    }),
+                    props.moreCount === 0
+                        ? undefined
+                        : t("Map.MoreHere", { count: props.moreCount }),
+                ]
+                    .filter(isDefined)
+                    .join(", ")}
+                onClick={props.onSelect}
+                className="cursor-pointer"
+            >
+                <PixelDisc
+                    route={props.route}
+                    kind={props.status}
+                    icon={props.icon}
+                    selected={props.emphasis === "selected"}
+                    behind={
+                        props.status === "live" ? (
+                            <PixelSprite
+                                route={props.route}
+                                sprite={
+                                    props.emphasis === "selected"
+                                        ? SELECTED_LIVE_WAVE
+                                        : LIVE_WAVE
+                                }
+                                frameMs={LIVE_WAVE_FRAME_MS}
+                                className="text-live"
+                            />
+                        ) : undefined
+                    }
+                />
+            </button>
+        </div>
     )
 }

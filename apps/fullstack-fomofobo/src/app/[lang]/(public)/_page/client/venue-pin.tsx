@@ -22,27 +22,31 @@ export const VenuePin = (props: VenuePinProps) => {
     const { t } = useTranslation("shared")
 
     return (
-        <button
-            type="button"
-            aria-label={t("Map.VenuePin", {
-                name: props.name,
-                kind: t(`VenueKind.${props.kind}`),
+        <div
+            className={cn("flex flex-col items-center gap-0.5 transition-opacity", {
+                "opacity-35": props.emphasis === "dimmed",
             })}
-            onClick={props.onSelect}
-            className={cn(
-                "flex cursor-pointer flex-col items-center gap-0.5 transition-opacity",
-                { "opacity-35": props.emphasis === "dimmed" },
-            )}
         >
             <Badge tone="permanent" className="rounded-none">
                 {t(`VenueKind.${props.kind}`)}
             </Badge>
-            <PixelDisc
-                route={props.route}
-                kind="permanent"
-                icon={props.icon}
-                selected={props.emphasis === "selected"}
-            />
-        </button>
+            {/* The disc alone opens the preview: the tag above it takes no press */}
+            <button
+                type="button"
+                aria-label={t("Map.VenuePin", {
+                    name: props.name,
+                    kind: t(`VenueKind.${props.kind}`),
+                })}
+                onClick={props.onSelect}
+                className="cursor-pointer"
+            >
+                <PixelDisc
+                    route={props.route}
+                    kind="permanent"
+                    icon={props.icon}
+                    selected={props.emphasis === "selected"}
+                />
+            </button>
+        </div>
     )
 }
