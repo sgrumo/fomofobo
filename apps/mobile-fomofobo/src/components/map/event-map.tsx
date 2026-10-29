@@ -270,6 +270,10 @@ export const EventMap = (props: EventMapProps) => {
         const { feature, coordinates } = marker
         const lngLat: [number, number] = [coordinates.longitude, coordinates.latitude]
         const layerStyle = { zIndex: layer }
+        // A press on a pin centers the map on it
+        const centerOnMarker = () => {
+            cameraRef.current?.easeTo({ center: lngLat })
+        }
         const key = `${move?.type === "leave" ? "leaving" : "shown"}:${marker.key}`
 
         if ("cluster" in feature.properties) {
@@ -294,6 +298,7 @@ export const EventMap = (props: EventMapProps) => {
                                           )
                                         : undefined
                                 if (first !== undefined) {
+                                    centerOnMarker()
                                     selectIndex(first)
                                     return
                                 }
@@ -320,6 +325,7 @@ export const EventMap = (props: EventMapProps) => {
                             icon={props.iconOf(venue.categoryId)}
                             emphasis={emphasis}
                             onSelect={() => {
+                                centerOnMarker()
                                 props.onSelectVenue(venue.id)
                             }}
                         />
@@ -344,6 +350,7 @@ export const EventMap = (props: EventMapProps) => {
                         moreCount={spot.moreCount}
                         emphasis={emphasis}
                         onSelect={() => {
+                            centerOnMarker()
                             props.onSelect({
                                 eventId: occurrence.eventId,
                                 date: occurrence.date,

@@ -164,6 +164,8 @@ interface EventMapProps extends RouteClientComponentProps<"root"> {
     onSelectedClick: () => void
     // A drag of the map by the visitor
     onDragStart: () => void
+    // True when a press on a pin moves the map to center it, as on a phone
+    centersSelection: boolean
 }
 
 export const EventMap = (props: EventMapProps) => {
@@ -408,6 +410,11 @@ export const EventMap = (props: EventMapProps) => {
         source: ResultSource,
     ) => {
         const { feature, coordinates } = marker
+        const centerOnMarker = () => {
+            if (props.centersSelection) {
+                shownOn.easeTo({ center: [coordinates.longitude, coordinates.latitude] })
+            }
+        }
         const leavingMarker = move?.type === "leave"
         const key = `${leavingMarker ? "leaving" : "shown"}:${marker.key}`
         // A leaving marker can come from replaced results that the cluster index no longer holds
@@ -444,6 +451,7 @@ export const EventMap = (props: EventMapProps) => {
                                           )
                                         : undefined
                                 if (first !== undefined) {
+                                    centerOnMarker()
                                     selectIndex(first)
                                     return
                                 }
@@ -483,6 +491,7 @@ export const EventMap = (props: EventMapProps) => {
                                     props.onSelectedClick()
                                     return
                                 }
+                                centerOnMarker()
                                 props.onSelectVenue(venue.id)
                             }}
                         />
@@ -519,6 +528,7 @@ export const EventMap = (props: EventMapProps) => {
                                 props.onSelectedClick()
                                 return
                             }
+                            centerOnMarker()
                             props.onSelect({
                                 eventId: occurrence.eventId,
                                 date: occurrence.date,

@@ -539,6 +539,7 @@ export const MapScreen = (props: MapScreenProps) => {
                 }}
                 onBackgroundClick={closeWideSelection}
                 onSelectedClick={closeWideSelection}
+                centersSelection={narrow}
                 onDragStart={() => {
                     if (previewCard !== undefined) {
                         closePreview()
