@@ -17,13 +17,7 @@ export const venueLinksSchema = z.object({
 })
 export type VenueLinks = z.infer<typeof venueLinksSchema>
 
-export const venueKindValues = [
-    "regular",
-    "cinema",
-    "museum",
-    "theatre",
-    "gallery",
-] as const
+export const venueKindValues = ["regular", "cinema", "museum", "theatre"] as const
 export const venueKindSchema = z.enum(venueKindValues)
 export type VenueKind = z.infer<typeof venueKindSchema>
 

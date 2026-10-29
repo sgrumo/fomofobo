@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-10-29 · Galleries leave the permanent venue kinds
+
+### Changed
+
+A permanent venue is a cinema, a museum or a theatre, and every gallery became a museum. Setting a permanent kind now asks for the closing days of the venue.
+
+### Why
+
+A client request. The client keeps three permanent kinds and wants the closing days of each permanent venue on the map.
+
+### Check next time
+
+Agree on the list of venue kinds and the facts each kind shows before the first client draws them.
+
 ## 2026-10-29 · Kind chips hide ended events and permanent venues
 
 ### Changed

@@ -175,7 +175,7 @@ export const BackofficeVenuesRoutes = {
         tags: ["Backoffice"],
         summary: "Set venue kind",
         description:
-            "A permanent kind (cinema, museum, theatre, gallery) takes a programme link and a category, and only a venue with no owner takes it.",
+            "A permanent kind (cinema, museum, theatre) takes a programme link and a category, and only a venue with no owner takes it.",
     }),
 
     block: createRoute({

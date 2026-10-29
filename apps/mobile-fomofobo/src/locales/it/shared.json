@@ -25,7 +25,7 @@
         "VenuePin": "{{name}}, {{kind}}",
         "MoreHere_one": "{{count}} altro risultato qui",
         "MoreHere_other": "{{count}} altri risultati qui",
-        "Cluster": "{{count}} luoghi: {{live}} con eventi in corso, {{upcoming}} con eventi in arrivo, {{ended}} con eventi finiti, {{permanent}} tra cinema, musei, teatri e gallerie. Ingrandisci",
+        "Cluster": "{{count}} luoghi: {{live}} con eventi in corso, {{upcoming}} con eventi in arrivo, {{ended}} con eventi finiti, {{permanent}} tra cinema, musei e teatri. Ingrandisci",
         "Error": "Non è stato possibile caricare gli eventi. Mostro gli ultimi risultati.",
         "Truncated": "Troppi eventi per mostrarli tutti. Restringi la ricerca.",
         "PastDateRange": "Le date scelte iniziano prima di oggi. Scegline di nuove.",
@@ -75,8 +75,7 @@
         "regular": "Locale",
         "cinema": "Cinema",
         "museum": "Museo",
-        "theatre": "Teatro",
-        "gallery": "Galleria"
+        "theatre": "Teatro"
     },
     "Preview": {
         "Title": "Evento",
@@ -167,7 +166,7 @@
         "Offline": "Sei offline. La lista mostra gli eventi dell'ultimo aggiornamento."
     },
     "Venue": {
-        "AlwaysOpen": "Aperto tutti i giorni",
+        "AlwaysOpen": "Nessun giorno di chiusura",
         "ClosedOn": "Chiuso {{days}}",
         "Loading": "Caricamento del locale",
         "NotFound": "Questo locale non esiste o non è più visibile.",

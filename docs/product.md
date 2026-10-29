@@ -20,7 +20,7 @@ A venue is a reusable place with a name, an address and coordinates, and an opti
 
 An Organizer owns one venue at most, and creates and edits only that venue. An Admin creates every other venue, edits every venue, and gives a venue to an Organizer or takes it back. Any Organizer holds events at any venue.
 
-An Admin gives a venue a permanent kind: cinema, museum, theatre or gallery. A permanent venue carries one link to its programme outside the app, one category and its closing days, and only Admins edit it, so it has no owner. The Admin must give the closing days, or mark the venue as open every day, to set a permanent kind. A venue with an owner keeps the regular kind until the Admin takes the owner away.
+An Admin gives a venue a permanent kind: cinema, museum or theatre. A permanent venue carries one link to its programme outside the app, one category and its closing days, and only Admins edit it, so it has no owner. The Admin must give the closing days, or mark that it has none, to set a permanent kind. A venue with an owner keeps the regular kind until the Admin takes the owner away.
 
 An Admin blocks a venue with a reason. A blocked venue can no longer be picked for an event, and the events already held there keep it and stay visible. A blocked venue loses its public detail, and its events show its name with no link.
 

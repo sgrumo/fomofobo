@@ -39,7 +39,7 @@
         "VenuePin": "{{name}}, {{kind}}",
         "MoreHere_one": "{{count}} altro risultato qui",
         "MoreHere_other": "{{count}} altri risultati qui",
-        "Cluster": "{{count}} luoghi: {{live}} con eventi in corso, {{upcoming}} con eventi in arrivo, {{ended}} con eventi finiti, {{permanent}} tra cinema, musei, teatri e gallerie. Ingrandisci",
+        "Cluster": "{{count}} luoghi: {{live}} con eventi in corso, {{upcoming}} con eventi in arrivo, {{ended}} con eventi finiti, {{permanent}} tra cinema, musei e teatri. Ingrandisci",
         "Position": "La tua posizione",
         "Locate": "Centra sulla mia posizione",
         "LocationOff": "La posizione è disattivata. Consentila per vedere gli eventi intorno a te, oppure cerca un luogo.",
@@ -81,8 +81,7 @@
         "regular": "Locale",
         "cinema": "Cinema",
         "museum": "Museo",
-        "theatre": "Teatro",
-        "gallery": "Galleria"
+        "theatre": "Teatro"
     },
     "Search": {
         "Label": "Cerca eventi o luoghi",
@@ -179,7 +178,7 @@
         "MinimumAge": "{{age}}+"
     },
     "Venue": {
-        "AlwaysOpen": "Aperto tutti i giorni",
+        "AlwaysOpen": "Nessun giorno di chiusura",
         "ClosedOn": "Chiuso {{days}}",
         "Cover": "Foto di {{name}}",
         "Website": "Sito web",
@@ -480,11 +479,11 @@
         },
         "VenueKindForm": {
             "Kind": "Tipo",
-            "KindHint": "Cinema, musei, teatri e gallerie restano sulla mappa con qualunque data, con un link alla loro programmazione.",
+            "KindHint": "Cinema, musei e teatri restano sulla mappa con qualunque data, con un link alla loro programmazione.",
             "ProgrammeUrl": "Link alla programmazione",
             "ClosingDays": "Giorni di chiusura",
-            "ClosingDaysHint": "Spunta i giorni in cui è chiuso, oppure Sempre aperto.",
-            "AlwaysOpen": "Sempre aperto",
+            "ClosingDaysHint": "Spunta i giorni in cui è chiuso, oppure Nessun giorno di chiusura.",
+            "AlwaysOpen": "Nessun giorno di chiusura",
             "Category": "Categoria",
             "CategoryHint": "La categoria filtra il luogo sulla mappa e ne sceglie l'icona.",
             "Save": "Salva tipo"
@@ -593,7 +592,7 @@
             "Owner": "Gestito da",
             "OwnerHint": "Un organizzatore gestisce al massimo un luogo.",
             "PermanentOwnerHint": "Un luogo permanente non ha un gestore: lo modificano solo gli Admin.",
-            "OwnedKind": "Un organizzatore gestisce questo luogo, quindi resta un locale. Togli il gestore per renderlo un cinema, un museo, un teatro o una galleria.",
+            "OwnedKind": "Un organizzatore gestisce questo luogo, quindi resta un locale. Togli il gestore per renderlo un cinema, un museo o un teatro.",
             "NoOwner": "Nessun organizzatore",
             "SaveOwner": "Salva gestore"
         },
