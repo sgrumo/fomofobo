@@ -7,7 +7,7 @@ interface IconButtonStylesOpts {
     size: IconButtonSize
 }
 export const iconButtonStyles = styles((opts: IconButtonStylesOpts) => [
-    "drop-shadow-hard-md focus-visible:outline-focus enabled:active:drop-shadow-hard-sm relative inline-flex shrink-0 items-center justify-center rounded-full transition-[translate,filter] focus-visible:outline-2 focus-visible:outline-offset-2 enabled:active:translate-x-0.5 enabled:active:translate-y-0.5 disabled:opacity-50",
+    "drop-shadow-hard-md focus-visible:outline-focus enabled:active:drop-shadow-hard-sm relative inline-flex shrink-0 items-center justify-center rounded-full transition-[translate,filter,scale] duration-150 ease-[cubic-bezier(0.34,1.56,0.64,1)] focus-visible:outline-2 focus-visible:outline-offset-2 enabled:active:translate-x-0.5 enabled:active:translate-y-0.5 enabled:active:scale-90 disabled:opacity-50 motion-reduce:enabled:active:scale-100",
     {
         "pixel-circle-32 size-8 [&>svg]:size-3.5": opts.size === "sm",
         "pixel-circle-40 size-10 [&>svg]:size-4": opts.size === "md",

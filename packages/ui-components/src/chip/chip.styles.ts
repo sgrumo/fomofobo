@@ -12,7 +12,7 @@ export const chipBarStyles = styles(
 )
 
 export const chipStyles = styles((tone: ChipTone) => [
-    "group tp-pixel-sm border-line text-fg shadow-hard-sm focus-visible:outline-focus inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md border-2 px-2.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50",
+    "group tp-pixel-sm border-line text-fg shadow-hard-sm focus-visible:outline-focus inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md border-2 px-2.5 transition-[background-color,color,scale] duration-150 ease-[cubic-bezier(0.34,1.56,0.64,1)] focus-visible:outline-2 focus-visible:outline-offset-2 enabled:active:scale-95 disabled:opacity-50 motion-reduce:enabled:active:scale-100",
     {
         "bg-surface not-data-[pressed]:enabled:hover:bg-surface-muted data-[pressed]:bg-surface-inverse data-[pressed]:text-fg-inverse":
             tone === "inverse",

@@ -46,7 +46,7 @@ export const EventCluster = (props: EventClusterProps) => {
             })}
             onClick={props.onExpand}
             className={cn(
-                "relative flex cursor-pointer items-center justify-center transition-opacity",
+                "relative flex cursor-pointer items-center justify-center transition-[opacity,scale] duration-150 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-90 motion-reduce:active:scale-100",
                 { "opacity-35": props.emphasis === "dimmed" },
             )}
             style={{ width: CLUSTER_PX, height: CLUSTER_PX }}
