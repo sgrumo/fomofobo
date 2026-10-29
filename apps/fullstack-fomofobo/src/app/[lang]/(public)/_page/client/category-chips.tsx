@@ -17,7 +17,7 @@ import type { RouteClientComponentProps } from "@/framework/routes/routes"
 interface CategoryChipsProps extends RouteClientComponentProps<"root"> {
     categories: Category[]
     counts: PublicSearchResponse["categoryCounts"] | undefined
-    selected: string | undefined
+    selected: readonly string[] | undefined
     free: boolean
     onChange: (change: MapQuery) => void
     className?: string
@@ -38,9 +38,11 @@ export const CategoryChips = (props: CategoryChipsProps) => {
                             ? undefined
                             : categoryCountOf(props.counts, category.id)
                     }
-                    pressed={props.selected === category.id}
+                    pressed={props.selected?.includes(category.id) === true}
                     onPressedChange={pressed => {
-                        props.onChange(categoryQueryOf(category.id, pressed))
+                        props.onChange(
+                            categoryQueryOf(props.selected, category.id, pressed),
+                        )
                     }}
                 />
             ))}

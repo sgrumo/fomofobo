@@ -22,13 +22,21 @@ export const NO_DATE_FILTER: DateQuery = {
 }
 
 /**
- * @description Returns the map query change of a tap on a category chip
+ * @description Returns the map query change of a tap on a category chip, which adds the
+ * category to the pressed ones or takes it away
+ * @param selected Categories pressed before the tap
  * @param categoryId Category of the chip
  * @param pressed True when the tap presses the chip
  */
-export const categoryQueryOf = (categoryId: string, pressed: boolean): MapQuery => ({
-    category: pressed ? categoryId : undefined,
-})
+export const categoryQueryOf = (
+    selected: readonly string[] | undefined,
+    categoryId: string,
+    pressed: boolean,
+): MapQuery => {
+    const others = (selected ?? []).filter(id => id !== categoryId)
+    const next = pressed ? [...others, categoryId] : others
+    return { categories: next.length === 0 ? undefined : next }
+}
 
 /**
  * @description Returns the map query change of a tap on a quick date chip
@@ -62,9 +70,9 @@ export const freeQueryOf = (free: boolean): MapQuery => ({
  * @param query Map query
  */
 export const hasActiveFilters = (
-    query: Pick<MapQuery, "category" | "date" | "free">,
+    query: Pick<MapQuery, "categories" | "date" | "free">,
 ): boolean =>
-    query.category !== undefined || query.date !== undefined || query.free === true
+    query.categories !== undefined || query.date !== undefined || query.free === true
 
 /**
  * @description Returns the result count of a category under the other filters, 0 when the

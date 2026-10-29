@@ -98,7 +98,7 @@ const MapScreen = () => {
         lat: center.latitude,
         lng: center.longitude,
         q: query.q,
-        categoryIds: query.category === undefined ? undefined : [query.category],
+        categoryIds: query.categories,
         free: query.free,
         date: query.date ?? "default",
         from: query.from,
@@ -336,7 +336,7 @@ const MapScreen = () => {
                             <CategoryChips
                                 categories={categories ?? []}
                                 counts={results?.categoryCounts}
-                                selected={query.category}
+                                selected={query.categories}
                                 free={query.free === true}
                                 onChange={setQuery}
                             />

@@ -32,6 +32,18 @@ describe("mapQuerySchema", () => {
         expect(query).toStrictEqual({ lat: undefined, lng: undefined, venue: undefined })
     })
 
+    it("decodes the pressed categories of a comma list, and drops a malformed list", () => {
+        const music = crypto.randomUUID()
+        const food = crypto.randomUUID()
+
+        expect(mapQuerySchema.parse({ categories: `${music},${food}` })).toStrictEqual({
+            categories: [music, food],
+        })
+        expect(mapQuerySchema.parse({ categories: `${music},42` })).toStrictEqual({
+            categories: undefined,
+        })
+    })
+
     it("encodes back to the strings it decodes", () => {
         const encoded = z.encode(mapQuerySchema, { lat: 44.353, lng: 11.715, free: true })
 

@@ -1,4 +1,4 @@
-import { dateFilterKindSchema, localDateSchema } from "models"
+import { dateFilterKindSchema, localDateSchema, MAX_SEARCH_CATEGORIES } from "models"
 import { z } from "zod"
 
 /**
@@ -20,7 +20,13 @@ export const mapQuerySchema = z.object({
     lng: coordinateCodec(180).optional().catch(undefined),
     place: z.string().trim().min(1).optional().catch(undefined),
     q: z.string().trim().min(1).optional().catch(undefined),
-    category: z.uuid().optional().catch(undefined),
+    categories: z
+        .codec(z.string(), z.array(z.uuid()).min(1).max(MAX_SEARCH_CATEGORIES), {
+            decode: value => value.split(","),
+            encode: ids => ids.join(","),
+        })
+        .optional()
+        .catch(undefined),
     free: z.stringbool().optional().catch(undefined),
     date: dateFilterKindSchema.optional().catch(undefined),
     from: localDateSchema.optional().catch(undefined),

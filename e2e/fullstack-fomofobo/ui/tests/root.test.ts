@@ -338,12 +338,13 @@ test.describe("map", () => {
         )
     })
 
-    test("narrows the pins to the pressed category, with the count of each chip, and shows every category again once unpressed", async ({
+    test("narrows the pins to any pressed category, with the count of each chip, and shows every category again once unpressed", async ({
         page,
     }) => {
         const center = buildArea()
         const concerts = await seedCategory()
         const markets = await seedCategory()
+        const talks = await seedCategory()
         const concert = await seedPublicEvent(
             {
                 venue: await seedVenue(
@@ -362,6 +363,22 @@ test.describe("map", () => {
             },
             { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
         )
+        const talk = await seedPublicEvent(
+            {
+                venue: await seedVenue(
+                    offsetPoint(center, { latitude: 0, longitude: 0.015 }),
+                ),
+                category: talks,
+            },
+            { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+        )
+        const talkPin = page.getByRole("button", {
+            name: t("shared", "Map.Pin", {
+                title: talk.title,
+                status: t("shared", "Status.upcoming"),
+                time: "18:00",
+            }),
+        })
         const concertPin = page.getByRole("button", {
             name: t("shared", "Map.Pin", {
                 title: concert.title,
@@ -385,13 +402,23 @@ test.describe("map", () => {
 
         await expect(concertPin).toBeVisible()
         await expect(marketPin).toBeHidden()
-        await expect(page).toHaveURL(new RegExp(`category=${concerts.id}`, "u"))
+        await expect(talkPin).toBeHidden()
 
-        await unpressChip(page, `${concerts.name} 1`)
+        await pressChip(page, `${markets.name} 1`)
 
         await expect(concertPin).toBeVisible()
         await expect(marketPin).toBeVisible()
-        await expect(page).not.toHaveURL(/category=/u)
+        await expect(talkPin).toBeHidden()
+        await expect(page).toHaveURL(
+            new RegExp(`categories=${concerts.id}%2C${markets.id}`, "u"),
+        )
+
+        await unpressChip(page, `${concerts.name} 1`)
+        await unpressChip(page, `${markets.name} 1`)
+
+        await expect(concertPin).toBeVisible()
+        await expect(talkPin).toBeVisible()
+        await expect(page).not.toHaveURL(/categories=/u)
     })
 
     test("keeps the kind chips in sight on a phone, opens the other filters from the filter button, and Escape closes them", async ({

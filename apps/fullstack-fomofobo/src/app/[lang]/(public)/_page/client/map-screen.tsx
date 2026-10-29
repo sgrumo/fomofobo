@@ -155,7 +155,7 @@ export const MapScreen = (props: MapScreenProps) => {
                 lat: center.latitude,
                 lng: center.longitude,
                 q: query.q,
-                categoryIds: query.category === undefined ? undefined : [query.category],
+                categoryIds: query.categories,
                 free: query.free,
                 date: query.date ?? "default",
                 from: query.from,
@@ -558,7 +558,7 @@ export const MapScreen = (props: MapScreenProps) => {
                         route={props.route}
                         categories={categories.data ?? []}
                         counts={results?.categoryCounts}
-                        selected={query.category}
+                        selected={query.categories}
                         free={query.free === true}
                         onChange={setQuery}
                         className="max-md:flex-wrap md:max-w-full md:self-start"

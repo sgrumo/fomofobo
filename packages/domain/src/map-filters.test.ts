@@ -36,11 +36,25 @@ const upcoming = buildOccurrence("2026-10-24T19:00:00Z", "2026-10-24T22:00:00Z")
 const ended = buildOccurrence("2026-10-22T19:00:00Z", "2026-10-22T22:00:00Z")
 
 describe("categoryQueryOf", () => {
-    it("sets the category on a press and clears it on a release", () => {
-        const categoryId = crypto.randomUUID()
+    const music = crypto.randomUUID()
+    const food = crypto.randomUUID()
 
-        expect(categoryQueryOf(categoryId, true)).toStrictEqual({ category: categoryId })
-        expect(categoryQueryOf(categoryId, false)).toStrictEqual({ category: undefined })
+    it("adds the category on a press, beside the pressed ones", () => {
+        expect(categoryQueryOf(undefined, music, true)).toStrictEqual({
+            categories: [music],
+        })
+        expect(categoryQueryOf([music], food, true)).toStrictEqual({
+            categories: [music, food],
+        })
+    })
+
+    it("takes the category away on a release, and clears the key with none left", () => {
+        expect(categoryQueryOf([music, food], music, false)).toStrictEqual({
+            categories: [food],
+        })
+        expect(categoryQueryOf([food], food, false)).toStrictEqual({
+            categories: undefined,
+        })
     })
 })
 
@@ -83,7 +97,7 @@ describe("hasActiveFilters", () => {
     })
 
     it("is true with a category, a date filter or the free filter", () => {
-        expect(hasActiveFilters({ category: crypto.randomUUID() })).toBe(true)
+        expect(hasActiveFilters({ categories: [crypto.randomUUID()] })).toBe(true)
         expect(hasActiveFilters({ date: "tomorrow" })).toBe(true)
         expect(hasActiveFilters({ free: true })).toBe(true)
     })
