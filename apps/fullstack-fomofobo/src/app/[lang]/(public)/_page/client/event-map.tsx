@@ -19,8 +19,9 @@ import {
     enterMoveOf,
     leaveMoveOf,
     MARKER_MOTION_MS,
-    markerTransitions,
     NO_MARKER_TRANSITIONS,
+    resultIdOf,
+    sceneTransitionsOf,
     shownMarkersOf,
 } from "domain/marker-motion"
 import type { MarkerMove, MarkerTransitions, ShownMarker } from "domain/marker-motion"
@@ -64,12 +65,17 @@ interface Viewport {
     exactZoom: number
 }
 
-interface MarkerScene {
-    viewport: Viewport
+interface ResultSource {
     occurrences: OccurrenceSummary[]
     permanentVenues: PermanentVenueSummary[]
+}
+
+interface MarkerScene extends ResultSource {
+    viewport: Viewport
     markers: ShownMarker[]
     transitions: MarkerTransitions
+    // Results the leaving markers read, the replaced ones while new results fade in
+    leavingFrom: ResultSource
     // Counts the scenes, so a timer drops the leaving markers of its own scene alone
     generation: number
 }
@@ -339,23 +345,30 @@ export const EventMap = (props: EventMapProps) => {
     const markers =
         viewport === undefined
             ? []
-            : shownMarkersOf(clusters.getClusters(viewport.bbox, viewport.zoom), clusters)
+            : shownMarkersOf(
+                  clusters.getClusters(viewport.bbox, viewport.zoom),
+                  clusters,
+                  index => resultIdOf(props, index),
+              )
 
     const [scene, setScene] = useState<MarkerScene>()
     const sameResults =
         scene?.occurrences === props.occurrences &&
         scene.permanentVenues === props.permanentVenues
     if (viewport !== undefined && (scene?.viewport !== viewport || !sameResults)) {
-        // Markers move only between two zoom levels of the same results
-        const zoomed = sameResults && scene.viewport.zoom !== viewport.zoom
         setScene({
             viewport,
             occurrences: props.occurrences,
             permanentVenues: props.permanentVenues,
             markers,
-            transitions: zoomed
-                ? markerTransitions(scene.markers, markers)
-                : NO_MARKER_TRANSITIONS,
+            transitions: sceneTransitionsOf(scene, sameResults, viewport.zoom, markers),
+            leavingFrom:
+                scene === undefined || sameResults
+                    ? props
+                    : {
+                          occurrences: scene.occurrences,
+                          permanentVenues: scene.permanentVenues,
+                      },
             generation: (scene?.generation ?? 0) + 1,
         })
     }
@@ -386,10 +399,15 @@ export const EventMap = (props: EventMapProps) => {
         shownOn: MapLibreMap,
         marker: ShownMarker,
         move: MarkerMove | undefined,
+        source: ResultSource,
     ) => {
         const { feature, coordinates } = marker
-        const key = `${move?.type === "leave" ? "leaving" : "shown"}:${marker.key}`
-        const emphasis = markerEmphasis(feature, clusters, selectedIndex)
+        const leavingMarker = move?.type === "leave"
+        const key = `${leavingMarker ? "leaving" : "shown"}:${marker.key}`
+        // A leaving marker can come from replaced results that the cluster index no longer holds
+        const emphasis = leavingMarker
+            ? "normal"
+            : markerEmphasis(feature, clusters, selectedIndex)
         if ("cluster" in feature.properties) {
             const clusterId = feature.properties.cluster_id
             return (
@@ -437,7 +455,7 @@ export const EventMap = (props: EventMapProps) => {
         const { index, kind, moreCount } = feature.properties
         const layer = emphasis === "selected" ? SELECTED_MARKER_LAYER : markerLayer(kind)
         if (kind === "permanent") {
-            const venue = props.permanentVenues.at(index - props.occurrences.length)
+            const venue = source.permanentVenues.at(index - source.occurrences.length)
             return venue === undefined ? undefined : (
                 <MapMarker
                     route={props.route}
@@ -467,7 +485,7 @@ export const EventMap = (props: EventMapProps) => {
             )
         }
 
-        const occurrence = props.occurrences.at(index)
+        const occurrence = source.occurrences.at(index)
         return occurrence === undefined ? undefined : (
             <MapMarker
                 route={props.route}
@@ -540,6 +558,7 @@ export const EventMap = (props: EventMapProps) => {
                               map,
                               marker,
                               enterMoveOf(marker, transitions, viewport.exactZoom),
+                              props,
                           ),
                       ),
                       ...leaving.map(left =>
@@ -547,6 +566,7 @@ export const EventMap = (props: EventMapProps) => {
                               map,
                               left.marker,
                               leaveMoveOf(left, viewport.exactZoom),
+                              scene?.leavingFrom ?? props,
                           ),
                       ),
                   ]}

@@ -13,7 +13,8 @@ export const MARKER_MOTION_MS = 250
 const WORLD_SIZE = 512
 
 export interface ShownMarker {
-    // Result indexes the marker holds, sorted and joined: a cluster keeps it across zoom levels
+    // Result ids the marker holds, sorted and joined: a marker keeps it across zoom levels and
+    // across result sets
     key: string
     coordinates: GeoPoint
     leaves: number[]
@@ -42,13 +43,34 @@ export interface PixelOffset {
 }
 
 /**
+ * @description Returns the id of a result of the map: the occurrence, else the permanent venue
+ * that follows every occurrence
+ * @param results Occurrences and permanent venues of a search
+ * @param index Result index
+ */
+export const resultIdOf = (
+    results: {
+        occurrences: ReadonlyArray<{ eventId: string; date: string }>
+        permanentVenues: ReadonlyArray<{ id: string }>
+    },
+    index: number,
+): string => {
+    const occurrence = results.occurrences.at(index)
+    return occurrence === undefined
+        ? `venue:${results.permanentVenues.at(index - results.occurrences.length)?.id ?? String(index)}`
+        : `${occurrence.eventId}:${occurrence.date}`
+}
+
+/**
  * @description Builds the markers that the map shows for its features, each with the result indexes it holds
  * @param features Clusters and single spots of the viewport
  * @param clusters Cluster index of the features
+ * @param idOf Id of the result at an index
  */
 export const shownMarkersOf = (
     features: readonly EventMapFeature[],
     clusters: Supercluster<EventPointProperties, EventClusterProperties>,
+    idOf: (index: number) => string,
 ): ShownMarker[] =>
     features.map(feature => {
         const [longitude = 0, latitude = 0] = feature.geometry.coordinates
@@ -60,7 +82,7 @@ export const shownMarkersOf = (
                 : [feature.properties.index]
         ).toSorted((first, second) => first - second)
         return {
-            key: leaves.join(" "),
+            key: leaves.map(idOf).toSorted().join(" "),
             coordinates: { latitude, longitude },
             leaves,
             feature,
@@ -103,6 +125,55 @@ export const markerTransitions = (
                 target: next.find(shown => holds(shown, marker))?.coordinates,
             })),
     }
+}
+
+/**
+ * @description Returns how the markers change between two result sets: a new marker fades in
+ * and a gone marker fades out in place
+ * @param previous Markers shown before
+ * @param next Markers shown now
+ */
+export const resultTransitions = (
+    previous: readonly ShownMarker[],
+    next: readonly ShownMarker[],
+): MarkerTransitions => {
+    const previousKeys = new Set(previous.map(marker => marker.key))
+    const nextKeys = new Set(next.map(marker => marker.key))
+    return {
+        entering: new Map(
+            next
+                .filter(marker => !previousKeys.has(marker.key))
+                .map(marker => [marker.key, undefined]),
+        ),
+        leaving: previous
+            .filter(marker => !nextKeys.has(marker.key))
+            .map(marker => ({ marker, target: undefined })),
+    }
+}
+
+/**
+ * @description Returns the transitions of a new scene of the map: the markers fade between two
+ * result sets, and move between two zoom levels of the same results
+ * @param previous Markers and whole zoom level shown before, if any
+ * @param sameResults True when the results did not change
+ * @param zoom Whole zoom level of the new scene
+ * @param markers Markers of the new scene
+ */
+export const sceneTransitionsOf = (
+    previous: { markers: readonly ShownMarker[]; viewport: { zoom: number } } | undefined,
+    sameResults: boolean,
+    zoom: number,
+    markers: readonly ShownMarker[],
+): MarkerTransitions => {
+    if (previous === undefined) {
+        return NO_MARKER_TRANSITIONS
+    }
+    if (!sameResults) {
+        return resultTransitions(previous.markers, markers)
+    }
+    return previous.viewport.zoom === zoom
+        ? NO_MARKER_TRANSITIONS
+        : markerTransitions(previous.markers, markers)
 }
 
 /**

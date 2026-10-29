@@ -6,8 +6,12 @@ import {
     leaveMoveOf,
     markerTransitions,
     pixelOffset,
+    resultIdOf,
+    resultTransitions,
+    sceneTransitionsOf,
     shownMarkersOf,
 } from "./marker-motion"
+import type { ShownMarker } from "./marker-motion"
 
 describe("markerTransitions", () => {
     const world: [number, number, number, number] = [-180, -85, 180, 85]
@@ -38,11 +42,11 @@ describe("markerTransitions", () => {
         },
     ])
     const markersAt = (zoom: number) =>
-        shownMarkersOf(clusters.getClusters(world, zoom), clusters)
+        shownMarkersOf(clusters.getClusters(world, zoom), clusters, String)
     const far = markersAt(10)
     const near = markersAt(15)
 
-    it("keys a marker by the result indexes it holds", () => {
+    it("keys a marker by the ids of the results it holds", () => {
         expect(far.map(marker => marker.key)).toStrictEqual(["0 1 2"])
         expect(near.map(marker => marker.key).toSorted()).toStrictEqual(["0 1", "2"])
     })
@@ -89,6 +93,77 @@ describe("markerTransitions", () => {
             entering: new Map(),
             leaving: [],
         })
+    })
+})
+
+describe("resultTransitions", () => {
+    const marker = (key: string): ShownMarker => ({
+        key,
+        coordinates: { latitude: 44.3533, longitude: 11.7147 },
+        leaves: [0],
+        feature: {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [11.7147, 44.3533] },
+            properties: { index: 0, kind: "live", moreCount: 0 },
+        },
+    })
+
+    it("fades the new markers in and the gone ones out in place, and leaves the kept ones", () => {
+        const kept = marker("kept")
+        const gone = marker("gone")
+        const added = marker("added")
+
+        expect(resultTransitions([kept, gone], [kept, added])).toStrictEqual({
+            entering: new Map([["added", undefined]]),
+            leaving: [{ marker: gone, target: undefined }],
+        })
+    })
+})
+
+describe("sceneTransitionsOf", () => {
+    const world: [number, number, number, number] = [-180, -85, 180, 85]
+    const clusters = buildEventClusters([
+        {
+            venueIds: ["piazza"],
+            coordinates: { latitude: 44.3533, longitude: 11.7147 },
+            kind: "live",
+            index: 0,
+            moreCount: 0,
+        },
+    ])
+    const markers = shownMarkersOf(clusters.getClusters(world, 12), clusters, String)
+    const renamed = shownMarkersOf(
+        clusters.getClusters(world, 12),
+        clusters,
+        () => "other",
+    )
+
+    it("moves nothing on the first scene, or on a pan of the same results", () => {
+        expect(sceneTransitionsOf(undefined, true, 12, markers)).toStrictEqual({
+            entering: new Map(),
+            leaving: [],
+        })
+        expect(
+            sceneTransitionsOf({ markers, viewport: { zoom: 12 } }, true, 12, markers),
+        ).toStrictEqual({ entering: new Map(), leaving: [] })
+    })
+
+    it("fades the markers of new results", () => {
+        expect(
+            sceneTransitionsOf({ markers, viewport: { zoom: 12 } }, false, 12, renamed),
+        ).toStrictEqual(resultTransitions(markers, renamed))
+    })
+})
+
+describe("resultIdOf", () => {
+    const results = {
+        occurrences: [{ eventId: "concert", date: "2026-10-24" }],
+        permanentVenues: [{ id: "cinema" }],
+    }
+
+    it("names an occurrence by its event and date, and a permanent venue after them", () => {
+        expect(resultIdOf(results, 0)).toBe("concert:2026-10-24")
+        expect(resultIdOf(results, 1)).toBe("venue:cinema")
     })
 })
 
