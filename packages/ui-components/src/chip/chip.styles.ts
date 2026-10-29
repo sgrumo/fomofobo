@@ -12,14 +12,15 @@ export const chipBarStyles = styles(
 )
 
 export const chipStyles = styles((tone: ChipTone) => [
-    "group tp-pixel-sm border-line bg-surface text-fg shadow-hard-sm focus-visible:outline-focus not-data-[pressed]:enabled:hover:bg-surface-muted inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md border-2 px-2.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50",
+    "group tp-pixel-sm border-line text-fg shadow-hard-sm focus-visible:outline-focus inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md border-2 px-2.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50",
     {
-        "data-[pressed]:bg-surface-inverse data-[pressed]:text-fg-inverse":
+        "bg-surface not-data-[pressed]:enabled:hover:bg-surface-muted data-[pressed]:bg-surface-inverse data-[pressed]:text-fg-inverse":
             tone === "inverse",
-        "data-[pressed]:bg-live": tone === "live",
-        "data-[pressed]:bg-upcoming": tone === "upcoming",
-        "data-[pressed]:bg-ended": tone === "ended",
-        "data-[pressed]:bg-permanent": tone === "permanent",
+        // A colored chip keeps its fill, see-through until pressed
+        "bg-live/40 data-[pressed]:bg-live": tone === "live",
+        "bg-upcoming/40 data-[pressed]:bg-upcoming": tone === "upcoming",
+        "bg-ended/40 data-[pressed]:bg-ended": tone === "ended",
+        "bg-permanent/40 data-[pressed]:bg-permanent": tone === "permanent",
     },
 ])
 

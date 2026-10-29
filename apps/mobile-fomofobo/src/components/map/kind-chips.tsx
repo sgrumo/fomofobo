@@ -10,17 +10,17 @@ interface KindChipsProps {
     onChange: (change: MapQuery) => void
 }
 
-// No count and no icon, so a phone fits the four chips in one row
 export const KindChips = (props: KindChipsProps) => {
     const { t } = useTranslation("shared")
 
     return (
-        <ChipRow label={t("Filters.Kinds")}>
+        <ChipRow label={t("Filters.Kinds")} wrap={true}>
             {KIND_FILTERS.map(kind => (
                 <Chip
                     key={kind}
                     label={t(`Filters.Kind.${kind}`)}
                     tone={kind}
+                    grow={true}
                     pressed={props.shown.has(kind)}
                     onPressedChange={pressed => {
                         props.onChange(kindQueryOf(kind, pressed))

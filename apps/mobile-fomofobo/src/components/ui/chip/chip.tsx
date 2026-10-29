@@ -81,6 +81,8 @@ interface ChipProps {
     icon?: PixelIconName
     count?: number
     tone?: ChipTone
+    // Shares the width of its row with the other growing chips
+    grow?: boolean
     disabled?: boolean
 }
 
@@ -108,6 +110,7 @@ const Chip = (props: ChipProps) => {
             }}
             className={cn(
                 chipVariants({ pressed: props.pressed, tone, inBar }),
+                props.grow === true && "grow justify-center",
                 props.disabled === true && "opacity-50",
             )}
             style={inBar ? undefined : hardShadow("sm")}

@@ -600,18 +600,18 @@ export const MapScreen = (props: MapScreenProps) => {
                         ) : undefined}
                     </div>
                 </div>
+                {/* A phone spreads the kind chips over the width of the search row */}
                 <KindChips
                     route={props.route}
                     shown={shownKinds}
-                    compact={!wide}
                     onChange={applyFilter}
-                    className="max-w-full self-start"
+                    className="max-w-full md:self-center"
                 />
                 {/* Below `md` the filters sit in a panel that the filter button opens. Each row takes the width of its chips, so the map stays clickable beside them. */}
                 <div
                     id={filtersId}
                     className={cn(
-                        "flex flex-col gap-2 md:contents",
+                        "flex flex-col gap-2 md:max-w-full md:flex-row md:items-center md:self-center",
                         filtersOpen
                             ? "max-md:pixel-corners max-md:drop-shadow-hard-md max-md:relative max-md:p-2"
                             : "max-md:hidden",
@@ -623,15 +623,15 @@ export const MapScreen = (props: MapScreenProps) => {
                         selected={query.categories}
                         free={query.free === true}
                         onChange={applyFilter}
-                        className="max-md:flex-wrap md:max-w-full md:self-start"
+                        className="max-md:flex-wrap max-md:justify-center md:min-w-0"
                     />
-                    <Separator className="pointer-events-none" />
+                    <Separator className="pointer-events-none md:h-7 md:w-0.5" />
                     <DateChips
                         route={props.route}
                         query={query}
                         now={now}
                         onChange={applyFilter}
-                        className="max-md:flex-wrap md:max-w-full md:self-start"
+                        className="max-md:flex-wrap max-md:justify-center md:shrink-0"
                     />
                 </div>
                 {notices}

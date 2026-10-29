@@ -13,7 +13,7 @@ export const chipVariants = cva("flex-row items-center gap-1.5 border-line px-2.
     variants: {
         pressed: {
             true: "",
-            false: "bg-surface",
+            false: "",
         },
         tone: {
             inverse: "",
@@ -28,6 +28,12 @@ export const chipVariants = cva("flex-row items-center gap-1.5 border-line px-2.
         },
     },
     compoundVariants: [
+        { pressed: false, tone: "inverse", className: "bg-surface" },
+        // A colored chip keeps its fill, see-through until pressed
+        { pressed: false, tone: "live", className: "bg-live/40" },
+        { pressed: false, tone: "upcoming", className: "bg-upcoming/40" },
+        { pressed: false, tone: "ended", className: "bg-ended/40" },
+        { pressed: false, tone: "permanent", className: "bg-permanent/40" },
         { pressed: true, tone: "inverse", className: "bg-surface-inverse" },
         { pressed: true, tone: "live", className: "bg-live" },
         { pressed: true, tone: "upcoming", className: "bg-upcoming" },
