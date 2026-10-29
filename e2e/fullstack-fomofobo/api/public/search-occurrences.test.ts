@@ -128,6 +128,7 @@ describe("GET /api/public/occurrences", () => {
                     kind: "cinema",
                     programmeUrl: near.programmeUrl,
                     categoryId,
+                    closingDays: near.closingDays,
                 },
             ],
             [{ categoryId, count: 1 }],

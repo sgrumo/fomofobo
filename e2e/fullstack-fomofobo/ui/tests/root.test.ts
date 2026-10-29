@@ -240,6 +240,10 @@ test.describe("map", () => {
         const preview = getBottomSheet(page, cinema.name)
         expectToBeDefined(cinema.programmeUrl)
         await expect(preview).toContainText(t("shared", "VenueKind.cinema"))
+        await expect(preview).toContainText(
+            t("shared", "Venue.ClosedOn", { days: t("shared", "Weekday.monday") }),
+            { ignoreCase: true },
+        )
         await expect(
             preview.getByRole("link", { name: t("shared", "Preview.Programme") }),
         ).toBeHidden()

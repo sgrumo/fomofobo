@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi"
+import { weekDays } from "shared/temporal"
 
 import { accountSchema } from "./accounts"
 import { geoPointSchema } from "./lib/geo"
@@ -31,6 +32,10 @@ export type PermanentVenueKind = z.infer<typeof permanentVenueKindSchema>
 
 export const venueProgrammeUrlSchema = z.url({ protocol: /^https$/u }).max(500)
 
+// Empty when the venue never closes
+export const venueClosingDaysSchema = z.array(z.enum(weekDays)).max(weekDays.length)
+export type VenueClosingDays = z.infer<typeof venueClosingDaysSchema>
+
 export const venueSchema = z.object({
     id: z.uuid(),
     name: z.string().trim().min(1).max(120),
@@ -43,6 +48,8 @@ export const venueSchema = z.object({
     // `programmeUrl` and `categoryId` are `null` exactly when the kind is `regular`
     programmeUrl: venueProgrammeUrlSchema.nullable(),
     categoryId: z.uuid().nullable(),
+    // `null` for a regular venue, and for a permanent venue whose closing days nobody set
+    closingDays: venueClosingDaysSchema.nullable(),
     owner: accountSchema.pick({ id: true, name: true }).nullable(),
     isBlocked: z.boolean(),
     blockReason: z.string().nullable(),
@@ -71,6 +78,7 @@ export const permanentVenueKindChangeSchema = z.object({
     kind: permanentVenueKindSchema,
     programmeUrl: venueProgrammeUrlSchema,
     categoryId: z.uuid(),
+    closingDays: venueClosingDaysSchema,
 })
 export type PermanentVenueKindChange = z.infer<typeof permanentVenueKindChangeSchema>
 

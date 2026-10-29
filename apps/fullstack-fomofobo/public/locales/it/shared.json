@@ -179,6 +179,8 @@
         "MinimumAge": "{{age}}+"
     },
     "Venue": {
+        "AlwaysOpen": "Aperto tutti i giorni",
+        "ClosedOn": "Chiuso {{days}}",
         "Cover": "Foto di {{name}}",
         "Website": "Sito web",
         "Upcoming": "Prossimi eventi",
@@ -190,6 +192,15 @@
         "Loading": "Caricamento del locale",
         "Unavailable": "Questo locale non è più disponibile.",
         "More": "Mostra altri"
+    },
+    "Weekday": {
+        "monday": "lunedì",
+        "tuesday": "martedì",
+        "wednesday": "mercoledì",
+        "thursday": "giovedì",
+        "friday": "venerdì",
+        "saturday": "sabato",
+        "sunday": "domenica"
     },
     "Saved": {
         "Toggle": "Salva",
@@ -471,6 +482,9 @@
             "Kind": "Tipo",
             "KindHint": "Cinema, musei, teatri e gallerie restano sulla mappa con qualunque data, con un link alla loro programmazione.",
             "ProgrammeUrl": "Link alla programmazione",
+            "ClosingDays": "Giorni di chiusura",
+            "ClosingDaysHint": "Spunta i giorni in cui è chiuso, oppure Sempre aperto.",
+            "AlwaysOpen": "Sempre aperto",
             "Category": "Categoria",
             "CategoryHint": "La categoria filtra il luogo sulla mappa e ne sceglie l'icona.",
             "Save": "Salva tipo"

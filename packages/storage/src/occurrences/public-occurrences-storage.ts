@@ -324,6 +324,7 @@ export class PublicOccurrencesStorage {
                                   kind: row.kind,
                                   programmeUrl: row.programmeUrl,
                                   categoryId: row.categoryId,
+                                  closingDays: row.closingDays,
                               },
                           ],
                 ),
@@ -466,6 +467,7 @@ export class PublicOccurrencesStorage {
                   },
                   kind: row.kind,
                   programmeUrl: row.programmeUrl,
+                  closingDays: row.closingDays,
               }
             : null
     }

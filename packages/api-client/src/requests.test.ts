@@ -17,6 +17,7 @@ const venue: Venue = {
     kind: "regular",
     programmeUrl: null,
     categoryId: null,
+    closingDays: null,
     owner: null,
     isBlocked: false,
     blockReason: null,

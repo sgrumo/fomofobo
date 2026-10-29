@@ -26,6 +26,7 @@ import { TickProgress } from "ui-components/tick-progress"
 
 import { SaveToggle } from "@/components/client/save-toggle/save-toggle"
 import { TonedImage } from "@/components/client/toned-image/toned-image"
+import { useClosingText } from "@/lib/hooks/use-closing-text"
 import { useNonModalDialog } from "@/lib/hooks/use-non-modal-dialog"
 import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 
@@ -38,7 +39,7 @@ interface PreviewPaging {
 
 export type PreviewVenue = Pick<
     PublicVenue,
-    "id" | "name" | "address" | "coordinates" | "coverPhotoUrl" | "kind"
+    "id" | "name" | "address" | "coordinates" | "coverPhotoUrl" | "kind" | "closingDays"
 >
 
 export type PreviewEntry =
@@ -221,6 +222,7 @@ interface VenuePreviewBodyProps {
 
 const VenuePreviewBody = (props: VenuePreviewBodyProps) => {
     const { t } = useTranslation("shared")
+    const closingText = useClosingText()(props.venue.closingDays)
     const venue = props.venue
 
     return (
@@ -251,6 +253,9 @@ const VenuePreviewBody = (props: VenuePreviewBodyProps) => {
                 </div>
             </div>
             <div className="border-line flex items-center gap-2 border-t-2 pt-3">
+                {closingText === undefined ? undefined : (
+                    <span className="tp-pixel-sm uppercase">{closingText}</span>
+                )}
                 <button
                     type="button"
                     aria-label={t("Preview.OpenVenue")}

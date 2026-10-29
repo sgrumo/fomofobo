@@ -17,12 +17,20 @@ export const publicVenueSchema = venueSchema
         links: true,
         kind: true,
         programmeUrl: true,
+        closingDays: true,
     })
     .extend({ upcoming: z.array(occurrenceSummarySchema) })
 export type PublicVenue = z.infer<typeof publicVenueSchema>
 
 export const permanentVenueSummarySchema = venueSchema
-    .pick({ id: true, name: true, address: true, coordinates: true, coverPhotoUrl: true })
+    .pick({
+        id: true,
+        name: true,
+        address: true,
+        coordinates: true,
+        coverPhotoUrl: true,
+        closingDays: true,
+    })
     .extend({
         kind: permanentVenueKindSchema,
         programmeUrl: venueProgrammeUrlSchema,

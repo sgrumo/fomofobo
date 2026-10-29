@@ -33,6 +33,7 @@
         "./share-summary": "./src/share-summary.ts",
         "./share-urls": "./src/share-urls.ts",
         "./spot-entries": "./src/spot-entries.ts",
+        "./venue-closing": "./src/venue-closing.ts",
         "./venue-history": "./src/venue-history.ts"
     },
     "scripts": {

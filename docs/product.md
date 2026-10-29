@@ -20,7 +20,7 @@ A venue is a reusable place with a name, an address and coordinates, and an opti
 
 An Organizer owns one venue at most, and creates and edits only that venue. An Admin creates every other venue, edits every venue, and gives a venue to an Organizer or takes it back. Any Organizer holds events at any venue.
 
-An Admin gives a venue a permanent kind: cinema, museum, theatre or gallery. A permanent venue carries one link to its programme outside the app and one category, and only Admins edit it, so it has no owner. A venue with an owner keeps the regular kind until the Admin takes the owner away.
+An Admin gives a venue a permanent kind: cinema, museum, theatre or gallery. A permanent venue carries one link to its programme outside the app, one category and its closing days, and only Admins edit it, so it has no owner. The Admin must give the closing days, or mark the venue as open every day, to set a permanent kind. A venue with an owner keeps the regular kind until the Admin takes the owner away.
 
 An Admin blocks a venue with a reason. A blocked venue can no longer be picked for an event, and the events already held there keep it and stay visible. A blocked venue loses its public detail, and its events show its name with no link.
 
@@ -64,7 +64,7 @@ Each venue with results is one pin. The pin shows the result of the venue with t
 
 Venues within about 20 meters of each other share one pin, because no zoom draws their pins apart. The pin counts the results of every venue it holds. Venues farther apart but too close to tell apart merge into a cluster that counts the venues. Its ring shows the share of venues whose pin is live, upcoming, ended or permanent. Live pins draw above every other pin, and permanent venues below every event. The position of the visitor draws below every pin and cluster.
 
-While the visitor shows permanent venues, every permanent venue inside the search area is a pin of its own color, whatever the date filter, with the icon of its category and its kind as the tag. Its preview shows the kind, the cover, the name and the address, with a link to the venue detail, which holds the link to the programme. When a permanent venue also holds events, the preview pages through the events first and the venue last.
+While the visitor shows permanent venues, every permanent venue inside the search area is a pin of its own color, whatever the date filter, with the icon of its category and its kind as the tag. Its preview shows the kind, the cover, the name, the address and the closing days, with a link to the venue detail, which holds the link to the programme. When a permanent venue also holds events, the preview pages through the events first and the venue last.
 
 A tap on a pin opens a preview of the occurrence. The preview shows status, venue, categories, price and times, with the elapsed time when live and a link to the event detail. The pin of a venue with more results opens the preview of its result, which pages through every result of the pin.
 
@@ -86,7 +86,7 @@ Share opens the share sheet of the device, or copies the link where none exists.
 
 ### Venue detail
 
-The event detail and the map preview link to the venue detail. It shows the profile of the venue, directions to it and its links, with the share row of the event detail. The detail of a permanent venue also shows its kind and the link to its programme.
+The event detail and the map preview link to the venue detail. It shows the profile of the venue, directions to it and its links, with the share row of the event detail. The detail of a permanent venue also shows its kind, its closing days and the link to its programme.
 
 The detail lists the upcoming events of the venue, one row for each event at its next occurrence, live events first. A row opens the event detail. Below, the past events of the venue list their title and their first and last date, with no photo, newest first, and a button loads more.
 

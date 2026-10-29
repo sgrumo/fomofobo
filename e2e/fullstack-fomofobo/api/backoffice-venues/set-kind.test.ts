@@ -36,6 +36,35 @@ describe("PUT /api/backoffice/venues/{id}/kind", () => {
         expect(regular.data).toStrictEqual(created.data)
     })
 
+    it("stores the closing days once each, in the order of the week, and none for a venue that never closes", async () => {
+        const { headers } = await signInAs("admin")
+        const category = await createCategory({ headers, body: buildCategoryCreation() })
+        const created = await createVenue({ headers, body: buildVenueCreation() })
+        expectStatus(category, 201)
+        expectStatus(created, 201)
+
+        const twoDays = await setVenueKind({
+            headers,
+            pathParams: { id: created.data.id },
+            body: {
+                ...buildCinemaKind(category.data.id),
+                closingDays: ["tuesday", "monday", "tuesday"],
+            },
+        })
+        const always = await setVenueKind({
+            headers,
+            pathParams: { id: created.data.id },
+            body: { ...buildCinemaKind(category.data.id), closingDays: [] },
+        })
+
+        expectStatus(twoDays, 200)
+        expectStatus(always, 200)
+        expect([twoDays.data.closingDays, always.data.closingDays]).toStrictEqual([
+            ["monday", "tuesday"],
+            [],
+        ])
+    })
+
     it("answers 409 to a permanent kind for a venue with an owner", async () => {
         const admin = await signInAs("admin")
         const organizer = await signInAs("organizer")

@@ -23,6 +23,7 @@ describe("POST /api/backoffice/venues", () => {
             kind: "regular",
             programmeUrl: null,
             categoryId: null,
+            closingDays: null,
             owner: { id: account.id, name: account.name },
             isBlocked: false,
             blockReason: null,

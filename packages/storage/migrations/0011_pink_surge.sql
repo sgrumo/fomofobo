@@ -1,0 +1,1 @@
+ALTER TABLE `venues` ADD `closing_days` text;

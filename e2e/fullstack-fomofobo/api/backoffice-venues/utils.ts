@@ -18,13 +18,15 @@ export const buildVenueCreation = (): VenueCreation => ({
 })
 
 /**
- * @description Builds the payload of a cinema kind with a programme link, in the category
+ * @description Builds the payload of a cinema kind with a programme link and a Monday closing,
+ * in the category
  * @param categoryId Category the cinema matches
  */
 export const buildCinemaKind = (categoryId: string): PermanentVenueKindChange => ({
     kind: "cinema",
     programmeUrl: `https://www.cinema-imola.it/programmazione/${crypto.randomUUID()}`,
     categoryId,
+    closingDays: ["monday"],
 })
 
 /**

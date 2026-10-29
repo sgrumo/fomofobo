@@ -144,6 +144,15 @@
         "Membership": "Tessera richiesta",
         "MinimumAge": "{{age}}+"
     },
+    "Weekday": {
+        "monday": "lunedì",
+        "tuesday": "martedì",
+        "wednesday": "mercoledì",
+        "thursday": "giovedì",
+        "friday": "venerdì",
+        "saturday": "sabato",
+        "sunday": "domenica"
+    },
     "Saved": {
         "Toggle": "Salva",
         "Added": "Evento salvato. Lo trovi tra gli eventi salvati.",
@@ -158,6 +167,8 @@
         "Offline": "Sei offline. La lista mostra gli eventi dell'ultimo aggiornamento."
     },
     "Venue": {
+        "AlwaysOpen": "Aperto tutti i giorni",
+        "ClosedOn": "Chiuso {{days}}",
         "Loading": "Caricamento del locale",
         "NotFound": "Questo locale non esiste o non è più visibile.",
         "LoadFailed": "Non è stato possibile caricare il locale.",

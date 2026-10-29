@@ -32,6 +32,7 @@ import { DirectionsLink } from "@/components/client/directions-link/directions-l
 import { ShareRow } from "@/components/client/share-row/share-row"
 import { TonedImage } from "@/components/client/toned-image/toned-image"
 import { api } from "@/lib/api/client-api"
+import { useClosingText } from "@/lib/hooks/use-closing-text"
 
 const linkClassName =
     "border-line shadow-hard-md tp-pixel-sm flex items-center justify-center gap-2 rounded-md border-2 px-3 py-2 uppercase [&>svg]:size-4"
@@ -47,6 +48,7 @@ interface VenueDetailProps {
 export const VenueDetail = (props: VenueDetailProps) => {
     const { t } = useTranslation("shared")
     const { venue } = props
+    const closingText = useClosingText()(venue.closingDays)
 
     const links = [
         {
@@ -93,6 +95,9 @@ export const VenueDetail = (props: VenueDetailProps) => {
                 )}
                 <h1 className="tp-pixel-2xl uppercase">{venue.name}</h1>
                 <p className="tp-body-md text-fg-muted">{venue.address}</p>
+                {closingText === undefined ? undefined : (
+                    <p className="tp-pixel-sm uppercase">{closingText}</p>
+                )}
                 {venue.description === null ? undefined : (
                     <p className="tp-body-lg">{venue.description}</p>
                 )}

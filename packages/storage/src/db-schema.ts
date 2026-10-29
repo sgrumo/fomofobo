@@ -9,7 +9,7 @@ import {
     text,
     uniqueIndex,
 } from "drizzle-orm/sqlite-core"
-import type { Recurrence, ReducedPrice } from "models"
+import type { Recurrence, ReducedPrice, VenueClosingDays } from "models"
 import { accountRoleValues, categoryIconValues, venueKindValues } from "models"
 
 /**
@@ -162,6 +162,7 @@ export const venues = sqliteTable(
         facebookUrl: text("facebook_url"),
         kind: text("kind", { enum: venueKindValues }).notNull().default("regular"),
         programmeUrl: text("programme_url"),
+        closingDays: text("closing_days", { mode: "json" }).$type<VenueClosingDays>(),
         categoryId: text("category_id").references(() => categories.id, {
             onDelete: "restrict",
         }),

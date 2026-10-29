@@ -77,7 +77,7 @@ export class PublicVenuesService {
                 const stored = await this.occurrencesStorage.findPublicVenue(venueId)
                 return stored === null ? null : this.toProfile(stored)
             },
-            ["venue-profile-v2", venueId],
+            ["venue-profile-v3", venueId],
             { tags: [PUBLIC_TAG, venueTag(venueId)] },
         )()
         if (venue === null) {

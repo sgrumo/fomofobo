@@ -17,6 +17,7 @@ import { TonedPhoto } from "@/components/ui/toned-photo/toned-photo"
 import { VenueHistory } from "@/components/venue/venue-history"
 import { VenueUpcoming } from "@/components/venue/venue-upcoming"
 import { env } from "@/lib/env"
+import { useClosingText } from "@/lib/hooks/use-closing-text"
 
 interface VenueLinkButtonProps {
     url: string
@@ -56,6 +57,7 @@ export const VenueDetail = (props: VenueDetailProps) => {
     const language = useLanguage()
     const venue = props.venue
     const programmeUrl = venue.programmeUrl
+    const closingText = useClosingText()(venue.closingDays)
     const links: readonly VenueLink[] = [
         { url: venue.links.websiteUrl, label: t("Venue.Website"), icon: "link" },
         {
@@ -95,6 +97,11 @@ export const VenueDetail = (props: VenueDetailProps) => {
                 <Text variant="body-md" className="text-fg-muted">
                     {venue.address}
                 </Text>
+                {closingText !== undefined && (
+                    <Text variant="pixel-sm" className="uppercase">
+                        {closingText}
+                    </Text>
+                )}
                 {venue.description !== null && (
                     <Text variant="body-lg">{venue.description}</Text>
                 )}

@@ -43,6 +43,7 @@ const toStoredVenue = (row: {
     kind: row.venue.kind,
     programmeUrl: row.venue.programmeUrl,
     categoryId: row.venue.categoryId,
+    closingDays: row.venue.closingDays,
     owner:
         row.venue.ownerId === null || row.ownerName === null
             ? null
@@ -210,7 +211,7 @@ export class VenuesStorage {
     /**
      * @description Persists the kind of one venue, and returns false when no row matches or a permanent kind meets an owner
      * @param id Venue changed
-     * @param change Kind, with the programme link and the category of a permanent kind
+     * @param change Kind, with the programme link, the category and the closing days of a permanent kind
      * @param updatedAt Instant of the change
      */
     public async setKind(
@@ -224,6 +225,7 @@ export class VenuesStorage {
                 kind: change.kind,
                 programmeUrl: change.kind === "regular" ? null : change.programmeUrl,
                 categoryId: change.kind === "regular" ? null : change.categoryId,
+                closingDays: change.kind === "regular" ? null : change.closingDays,
                 updatedAt,
             })
             .where(

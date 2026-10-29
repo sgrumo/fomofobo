@@ -10,6 +10,7 @@ import type {
     VenueListQuery,
     VenueUpdate,
 } from "models"
+import { weekDays } from "shared/temporal"
 import type {
     AccountsStorage,
     CategoriesStorage,
@@ -198,7 +199,8 @@ export class VenuesService {
     /**
      * @description Persists the kind of a venue, with the programme link and the category of a permanent kind, which a venue with an owner cannot take
      * @param id Venue changed
-     * @param change Kind, and the programme link and the category of a permanent kind
+     * @param change Kind, and the programme link, the category and the closing days of a
+     * permanent kind
      */
     public async setKind(id: string, change: VenueKindChange): Promise<Venue> {
         const venue = await this.findStored(id)
@@ -213,7 +215,17 @@ export class VenuesService {
                 )
             }
         }
-        if (!(await this.venuesStorage.setKind(id, change, new Date()))) {
+        // The closing days keep the order of the week, each once
+        const stored =
+            change.kind === "regular"
+                ? change
+                : {
+                      ...change,
+                      closingDays: weekDays.filter(day =>
+                          change.closingDays.includes(day),
+                      ),
+                  }
+        if (!(await this.venuesStorage.setKind(id, stored, new Date()))) {
             throw appError("PermanentVenueOwner", `Venue ${id} got an owner meanwhile`)
         }
         expireTags(PUBLIC_TAG, venueTag(id))

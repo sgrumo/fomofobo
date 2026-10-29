@@ -45,6 +45,7 @@ describe("GET /api/public/venues/{venueId}", () => {
             links: { websiteUrl: null, instagramUrl: null, facebookUrl: null },
             kind: "regular",
             programmeUrl: null,
+            closingDays: null,
             upcoming: [
                 expect.objectContaining({ eventId: live.id, date: "2026-10-24" }),
                 expect.objectContaining({ eventId: tonight.id, date: "2026-10-24" }),

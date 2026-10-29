@@ -1,10 +1,12 @@
 "use client"
 
+import { WEEK_FROM_MONDAY } from "domain/venue-closing"
 import { identity } from "es-toolkit"
 import type { FormErrors } from "frontend-shared/types"
 import type { Category } from "models"
 import { venueKindValues } from "models"
 import { useTranslation } from "react-i18next"
+import { Checkbox } from "ui-components/checkbox"
 import { Field } from "ui-components/field"
 import { Select } from "ui-components/select"
 import { StringInput } from "ui-components/string-input"
@@ -83,6 +85,50 @@ export const VenueKindForm = (props: VenueKindFormProps) => {
                             }}
                             disabled={props.disabled}
                         />
+                    </Field>
+                    <Field
+                        label={t("Backoffice.VenueKindForm.ClosingDays")}
+                        description={t("Backoffice.VenueKindForm.ClosingDaysHint")}
+                        required={true}
+                        errors={props.errors?.closingDays?.errors}
+                    >
+                        <div className="flex flex-wrap gap-3">
+                            {WEEK_FROM_MONDAY.map(weekday => (
+                                <Field
+                                    key={weekday}
+                                    label={t(`Backoffice.EventForm.Weekday.${weekday}`)}
+                                    labelSide="right"
+                                    required={false}
+                                >
+                                    <Checkbox
+                                        value={props.value.closingDays.includes(weekday)}
+                                        onValueChange={closed => {
+                                            onAction({
+                                                type: "closing-day",
+                                                value: { day: weekday, closed },
+                                            })
+                                        }}
+                                        disabled={props.disabled}
+                                    />
+                                </Field>
+                            ))}
+                            <Field
+                                label={t("Backoffice.VenueKindForm.AlwaysOpen")}
+                                labelSide="right"
+                                required={false}
+                            >
+                                <Checkbox
+                                    value={props.value.alwaysOpen}
+                                    onValueChange={alwaysOpen => {
+                                        onAction({
+                                            type: "always-open",
+                                            value: alwaysOpen,
+                                        })
+                                    }}
+                                    disabled={props.disabled}
+                                />
+                            </Field>
+                        </div>
                     </Field>
                 </>
             )}

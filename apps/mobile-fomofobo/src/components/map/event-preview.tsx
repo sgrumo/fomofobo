@@ -20,6 +20,7 @@ import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
 import { Text } from "@/components/ui/text/text"
 import { TickProgress } from "@/components/ui/tick-progress/tick-progress"
 import { TonedPhoto } from "@/components/ui/toned-photo/toned-photo"
+import { useClosingText } from "@/lib/hooks/use-closing-text"
 import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 
 const OPEN_ICON_SIZE = 20
@@ -33,7 +34,7 @@ interface PreviewPaging {
 
 export type PreviewVenue = Pick<
     PublicVenue,
-    "id" | "name" | "address" | "coverPhotoUrl" | "kind"
+    "id" | "name" | "address" | "coverPhotoUrl" | "kind" | "closingDays"
 >
 
 export type PreviewEntry =
@@ -207,6 +208,7 @@ interface VenueBodyProps {
 const VenueBody = (props: VenueBodyProps) => {
     const { t } = useTranslation("shared")
     const venue = props.venue
+    const closingText = useClosingText()(venue.closingDays)
 
     return (
         <>
@@ -237,6 +239,11 @@ const VenueBody = (props: VenueBodyProps) => {
                 </View>
             </View>
             <View className="flex-row items-center gap-2 border-t-2 border-line pt-3">
+                {closingText !== undefined && (
+                    <Text variant="pixel-sm" className="uppercase">
+                        {closingText}
+                    </Text>
+                )}
                 <OpenLink
                     label={t("Preview.OpenVenue")}
                     fill="permanent"

@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test"
 import { clickButton } from "e2e-ui-components/button"
+import { checkCheckbox, expectCheckboxChecked } from "e2e-ui-components/checkbox"
 import { getDialog } from "e2e-ui-components/dialog"
 import { expectInputValue, fillInput } from "e2e-ui-components/input"
 import { expectSelectValue, selectSelectItem } from "e2e-ui-components/select"
@@ -84,7 +85,7 @@ test.describe("backoffice venue", () => {
         )
     })
 
-    test("lets an Admin make a venue a cinema with its programme link and category", async ({
+    test("lets an Admin make a venue a cinema with its programme link, category and closing days, which it asks for", async ({
         page,
     }) => {
         const venue = await seedVenue(buildArea())
@@ -108,6 +109,12 @@ test.describe("backoffice venue", () => {
         ])
         await clickButton(page, t("shared", "Backoffice.VenueKindForm.Save"))
 
+        await expect(page.getByText(t("ui", "FormErrors.Required"))).toHaveCount(1)
+
+        await checkCheckbox(page, t("shared", "Backoffice.EventForm.Weekday.monday"))
+        await checkCheckbox(page, t("shared", "Backoffice.EventForm.Weekday.tuesday"))
+        await clickButton(page, t("shared", "Backoffice.VenueKindForm.Save"))
+
         const saved = t("shared", "Backoffice.Venues.Toast.Updated", { name: venue.name })
         await expectToast(page, { type: "success" }, saved)
         await dismissToast(page, { type: "success" }, saved)
@@ -126,6 +133,14 @@ test.describe("backoffice venue", () => {
             page,
             t("shared", "Backoffice.VenueKindForm.Category"),
             category.name,
+        )
+        await expectCheckboxChecked(
+            page,
+            t("shared", "Backoffice.EventForm.Weekday.monday"),
+        )
+        await expectCheckboxChecked(
+            page,
+            t("shared", "Backoffice.EventForm.Weekday.tuesday"),
         )
     })
 
