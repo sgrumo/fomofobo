@@ -119,6 +119,7 @@ export const MapScreen = (props: MapScreenProps) => {
     const filtersId = useId()
     const [filtersOpen, setFiltersOpen] = useState(false)
     const [locateRequest, setLocateRequest] = useState<LocateRequest>()
+    const [previewSheetHeight, setPreviewSheetHeight] = useState(0)
     const filtersActive = hasActiveFilters(query)
     const overlayRef = useRef<HTMLDivElement>(null)
     const panelRef = useRef<HTMLDivElement>(null)
@@ -390,9 +391,21 @@ export const MapScreen = (props: MapScreenProps) => {
 
     // True while the open saved list owns the history entry that a close pops
     const savedPushedRef = useRef(false)
+    // The saved list takes the place of an open preview or detail
     const openSaved = () => {
         savedPushedRef.current = true
-        setQuery({ saved: true }, { history: "push" })
+        previewPushedRef.current = false
+        setDetailPushed(false)
+        setQuery(
+            {
+                saved: true,
+                event: undefined,
+                occurrence: undefined,
+                venue: undefined,
+                detail: undefined,
+            },
+            { history: "push" },
+        )
     }
     const closeSaved = () => {
         if (savedPushedRef.current) {
@@ -623,11 +636,16 @@ export const MapScreen = (props: MapScreenProps) => {
                 </div>
                 {notices}
             </div>
-            {/* Clears the map attribution, which sits in the bottom corner. */}
+            {/* Clears the map attribution, which sits in the bottom corner, and rises above the preview sheet of a phone */}
             <div
                 className={cn("absolute right-4 bottom-8 flex items-center gap-2", {
                     "right-[25.75rem]": sidePanelOpen,
                 })}
+                style={
+                    previewSheetHeight > 0
+                        ? { bottom: previewSheetHeight + 16 }
+                        : undefined
+                }
             >
                 {search.isFetching ? (
                     <Spinner title={t("Map.Loading")} size="xs" />
@@ -684,6 +702,7 @@ export const MapScreen = (props: MapScreenProps) => {
                 {detailContent}
             </DetailSheet>
             <EventPreview
+                onHeightChange={setPreviewSheetHeight}
                 open={
                     previewCard === undefined &&
                     (wide || narrow) &&

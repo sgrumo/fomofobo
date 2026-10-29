@@ -28,14 +28,15 @@ export const BottomSheetRoot = (props: BottomSheetRootProps) => (
 
 interface BottomSheetContentProps extends Pick<
     ComponentProps<typeof DrawerPrimitive.Popup>,
-    "className"
+    "className" | "ref"
 > {
     children?: ReactNode
 }
-export const BottomSheetContent = (props: BottomSheetContentProps) => (
+export const BottomSheetContent = ({ ref, ...props }: BottomSheetContentProps) => (
     <DrawerPrimitive.Portal>
         <DrawerPrimitive.Viewport>
             <DrawerPrimitive.Popup
+                ref={ref}
                 className={state =>
                     cn(
                         bottomSheetPopupStyles(),

@@ -8,7 +8,7 @@ import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { cn } from "frontend-shared/styles"
 import type { Category, OccurrenceSummary, PublicVenue } from "models"
 import type { ReactNode } from "react"
-import { useEffect, useId, useRef } from "react"
+import { useEffect, useEffectEvent, useId, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import type { StrictOmit } from "shared/types"
 import { isDefined } from "shared/values"
@@ -321,34 +321,55 @@ const PreviewPanel = (props: PreviewPanelProps) => {
 
 interface EventPreviewProps extends StrictOmit<PreviewPanelProps, "renderTitle"> {
     open: boolean
+    // Height of the open sheet in px, 0 once it closes
+    onHeightChange: (height: number) => void
 }
 
-export const EventPreview = (props: EventPreviewProps) => (
-    <BottomSheetRoot
-        open={props.open}
-        onOpenChange={open => {
-            if (!open) {
-                props.onClose()
-            }
-        }}
-    >
-        <BottomSheetContent>
-            <PreviewPanel
-                entry={props.entry}
-                loadFailed={props.loadFailed}
-                categories={props.categories}
-                now={props.now}
-                paging={props.paging}
-                renderTitle={(text, className) => (
-                    <BottomSheetTitle className={className}>{text}</BottomSheetTitle>
-                )}
-                onOpenDetail={props.onOpenDetail}
-                onOpenVenue={props.onOpenVenue}
-                onClose={props.onClose}
-            />
-        </BottomSheetContent>
-    </BottomSheetRoot>
-)
+export const EventPreview = (props: EventPreviewProps) => {
+    const readHeightChange = useEffectEvent(props.onHeightChange)
+    const [sheet, setSheet] = useState<HTMLDivElement | null>(null)
+
+    useEffect(() => {
+        if (sheet === null) {
+            readHeightChange(0)
+            return undefined
+        }
+        const observer = new ResizeObserver(() => {
+            readHeightChange(sheet.offsetHeight)
+        })
+        observer.observe(sheet)
+        return () => {
+            observer.disconnect()
+        }
+    }, [sheet])
+
+    return (
+        <BottomSheetRoot
+            open={props.open}
+            onOpenChange={open => {
+                if (!open) {
+                    props.onClose()
+                }
+            }}
+        >
+            <BottomSheetContent ref={setSheet}>
+                <PreviewPanel
+                    entry={props.entry}
+                    loadFailed={props.loadFailed}
+                    categories={props.categories}
+                    now={props.now}
+                    paging={props.paging}
+                    renderTitle={(text, className) => (
+                        <BottomSheetTitle className={className}>{text}</BottomSheetTitle>
+                    )}
+                    onOpenDetail={props.onOpenDetail}
+                    onOpenVenue={props.onOpenVenue}
+                    onClose={props.onClose}
+                />
+            </BottomSheetContent>
+        </BottomSheetRoot>
+    )
+}
 
 interface NonModalPreviewProps extends StrictOmit<
     PreviewPanelProps,

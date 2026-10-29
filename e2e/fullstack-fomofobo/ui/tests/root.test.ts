@@ -1332,7 +1332,7 @@ test.describe("detail over the map", () => {
         ).toBeHidden()
     })
 
-    test("opens the saved events in a panel over the map, a saved event over the list, and the list again once its detail closes", async ({
+    test("opens the saved events in a panel over the map, over an open preview too, a saved event over the list, and the list again once its detail closes", async ({
         page,
     }) => {
         const center = buildArea()
@@ -1357,9 +1357,20 @@ test.describe("detail over the map", () => {
         await dismissToast(page, { type: "success" }, t("shared", "Saved.Added"))
 
         await gotoPage(page, mapPath(center))
+        await page
+            .getByRole("button", {
+                name: t("shared", "Map.Pin", {
+                    title: event.title,
+                    status: t("shared", "Status.upcoming"),
+                    time: "18:00",
+                }),
+            })
+            .click({ timeout: MAP_TIMEOUT_MS })
+        await expect(detail).toBeVisible()
         await page.getByRole("button", { name: t("shared", "Saved.Open") }).click()
 
         await expect(savedPanel).toBeVisible()
+        await expect(detail).toBeHidden()
         await expect(page).toHaveURL(/saved=true/u)
         await savedPanel
             .getByRole("listitem")
