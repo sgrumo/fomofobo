@@ -607,7 +607,12 @@ export const EventMap = (props: EventMapProps) => {
                     offset={PREVIEW_CARD_OFFSET}
                     layer={PREVIEW_CARD_LAYER}
                 >
-                    <div ref={cardRef}>{props.previewCard.content}</div>
+                    <div
+                        ref={cardRef}
+                        className="animate-in [--tw-enter-opacity:0] [--tw-enter-scale:0.95] [--tw-enter-translate-y:0.5rem] motion-reduce:animate-none"
+                    >
+                        {props.previewCard.content}
+                    </div>
                 </MapMarker>
             )}
             {map === undefined || props.position === undefined ? undefined : (

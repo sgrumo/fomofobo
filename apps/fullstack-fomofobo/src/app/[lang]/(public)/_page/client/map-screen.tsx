@@ -670,7 +670,7 @@ export const MapScreen = (props: MapScreenProps) => {
             {detailSide ? (
                 <div
                     ref={panelRef}
-                    className="absolute top-4 right-4 bottom-8 w-[23.75rem]"
+                    className="animate-in absolute top-4 right-4 bottom-8 w-[23.75rem] [--tw-enter-opacity:0] [--tw-enter-translate-x:1rem] motion-reduce:animate-none"
                 >
                     <DetailSidePanel label={detailLabel} onClose={closePreview}>
                         {detailContent}
@@ -680,7 +680,7 @@ export const MapScreen = (props: MapScreenProps) => {
             {savedSide ? (
                 <div
                     ref={panelRef}
-                    className="absolute top-4 right-4 bottom-8 w-[23.75rem]"
+                    className="animate-in absolute top-4 right-4 bottom-8 w-[23.75rem] [--tw-enter-opacity:0] [--tw-enter-translate-x:1rem] motion-reduce:animate-none"
                 >
                     <DetailSidePanel label={t("PageTitle.Saved")} onClose={closeSaved}>
                         {savedContent}
