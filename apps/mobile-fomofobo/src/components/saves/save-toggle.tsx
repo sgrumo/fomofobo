@@ -22,7 +22,6 @@ export const SaveToggle = (props: SaveToggleProps) => {
             icon={saved ? "saved" : "save"}
             label={t("Saved.Toggle")}
             selected={saved}
-            tone={saved ? "live" : "surface"}
             size={props.size}
             onPress={() => {
                 if (saved) {

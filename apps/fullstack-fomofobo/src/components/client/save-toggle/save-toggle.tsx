@@ -37,7 +37,6 @@ export const SaveToggle = (props: SaveToggleProps) => {
             aria-label={t("Saved.Toggle")}
             aria-pressed={saved}
             icon={saved ? <PixelIconSaved /> : <PixelIconSave />}
-            tone={saved ? "live" : "surface"}
             size={props.size}
             onClick={() => {
                 if (saved) {
