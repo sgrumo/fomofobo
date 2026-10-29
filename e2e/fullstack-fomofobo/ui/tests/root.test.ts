@@ -824,7 +824,7 @@ test.describe("map", () => {
         await expect(pin).toBeFocused()
     })
 
-    test("closes the preview of a wide screen on a click on the map or on its pin, and on Escape with the focus outside it", async ({
+    test("closes the preview of a wide screen on a click on the map or on its pin, a filter, a drag of the map, and Escape with the focus outside it", async ({
         page,
     }) => {
         const center = buildArea()
@@ -868,6 +868,24 @@ test.describe("map", () => {
         await expect(preview).toBeVisible()
         await page.getByLabel(t("shared", "Search.Label")).focus()
         await page.keyboard.press("Escape")
+
+        await expect(preview).toBeHidden()
+        await expect(page).not.toHaveURL(/event=/u)
+
+        await pin.click()
+        await expect(preview).toBeVisible()
+        await pressChip(page, t("shared", "Filters.Kind.ended"))
+
+        await expect(preview).toBeHidden()
+        await expect(page).not.toHaveURL(/event=/u)
+
+        await pin.click()
+        await expect(preview).toBeVisible()
+        // The left edge of the map, clear of the controls and of the pin at the center
+        await page.mouse.move(40, 400)
+        await page.mouse.down()
+        await page.mouse.move(140, 450, { steps: 5 })
+        await page.mouse.up()
 
         await expect(preview).toBeHidden()
         await expect(page).not.toHaveURL(/event=/u)

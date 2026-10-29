@@ -5,6 +5,7 @@ import { eventDetailUrlOf, venueDetailUrlOf } from "domain/detail-urls"
 import { centerQueryOf, nextLocateRequest, searchCenterOf } from "domain/map-center"
 import type { LocateRequest } from "domain/map-center"
 import { hasActiveFilters, shownKindsOf, shownResultsOf } from "domain/map-filters"
+import type { MapQuery } from "domain/map-query"
 import { placeQueryOf, textQueryOf } from "domain/map-search"
 import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
 import { cn } from "frontend-shared/styles"
@@ -436,6 +437,19 @@ export const MapScreen = (props: MapScreenProps) => {
         </div>
     )
 
+    // A filter change closes the preview in the same history entry, as its pin may leave the map
+    const applyFilter = (change: MapQuery) => {
+        if (!previewOpen || detailOpen) {
+            setQuery(change)
+            return
+        }
+        previewPushedRef.current = false
+        setQuery(
+            { ...change, event: undefined, occurrence: undefined, venue: undefined },
+            { history: "replace" },
+        )
+    }
+
     // The bottom sheets close on an outside press on their own
     const closeWideSelection = () => {
         if (previewCard !== undefined || detailSide) {
@@ -525,6 +539,11 @@ export const MapScreen = (props: MapScreenProps) => {
                 }}
                 onBackgroundClick={closeWideSelection}
                 onSelectedClick={closeWideSelection}
+                onDragStart={() => {
+                    if (previewCard !== undefined) {
+                        closePreview()
+                    }
+                }}
             />
             <div
                 ref={overlayRef}
@@ -578,7 +597,7 @@ export const MapScreen = (props: MapScreenProps) => {
                     route={props.route}
                     shown={shownKinds}
                     compact={!wide}
-                    onChange={setQuery}
+                    onChange={applyFilter}
                     className="max-w-full self-start"
                 />
                 {/* Below `md` the filters sit in a panel that the filter button opens. Each row takes the width of its chips, so the map stays clickable beside them. */}
@@ -596,7 +615,7 @@ export const MapScreen = (props: MapScreenProps) => {
                         categories={categories.data ?? []}
                         selected={query.categories}
                         free={query.free === true}
-                        onChange={setQuery}
+                        onChange={applyFilter}
                         className="max-md:flex-wrap md:max-w-full md:self-start"
                     />
                     <Separator className="pointer-events-none" />
@@ -604,7 +623,7 @@ export const MapScreen = (props: MapScreenProps) => {
                         route={props.route}
                         query={query}
                         now={now}
-                        onChange={setQuery}
+                        onChange={applyFilter}
                         className="max-md:flex-wrap md:max-w-full md:self-start"
                     />
                 </div>

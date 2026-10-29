@@ -162,6 +162,8 @@ interface EventMapProps extends RouteClientComponentProps<"root"> {
     onBackgroundClick: () => void
     // A click on the pin of the selected spot
     onSelectedClick: () => void
+    // A drag of the map by the visitor
+    onDragStart: () => void
 }
 
 export const EventMap = (props: EventMapProps) => {
@@ -173,6 +175,9 @@ export const EventMap = (props: EventMapProps) => {
     const readCenter = useEffectEvent(() => props.center)
     const clickBackground = useEffectEvent(() => {
         props.onBackgroundClick()
+    })
+    const startDrag = useEffectEvent(() => {
+        props.onDragStart()
     })
 
     useEffect(() => {
@@ -203,6 +208,7 @@ export const EventMap = (props: EventMapProps) => {
             publishViewport()
         })
         instance.on("moveend", publishViewport)
+        instance.on("dragstart", startDrag)
         instance.on("click", event => {
             if (event.originalEvent.target === instance.getCanvas()) {
                 clickBackground()
