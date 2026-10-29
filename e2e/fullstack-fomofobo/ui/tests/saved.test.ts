@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test"
 import { expectStatus } from "e2e-kit/assertions"
-import { dismissToast, expectToast } from "e2e-ui-components/toast"
 
 import { signInAs } from "../../api/auth/utils"
 import { listEventSaveCounts } from "../../api/backoffice-events/api"
@@ -38,8 +37,6 @@ test.describe("saved events", () => {
             .getByRole("button", { name: t("shared", "Saved.Toggle") })
         await toggle.click()
         await expect(toggle).toHaveAttribute("aria-pressed", "true")
-        await expectToast(page, { type: "success" }, t("shared", "Saved.Added"))
-        await dismissToast(page, { type: "success" }, t("shared", "Saved.Added"))
 
         await gotoPage(page, "/saved/")
         const item = page.getByRole("listitem").filter({ hasText: event.title })
@@ -63,12 +60,11 @@ test.describe("saved events", () => {
         )
 
         await gotoPage(page, eventDetailPath(event.id, "2026-10-25"))
-        await page
+        const toggle = page
             .getByRole("dialog", { name: event.title, exact: true })
             .getByRole("button", { name: t("shared", "Saved.Toggle") })
-            .click()
-        await expectToast(page, { type: "success" }, t("shared", "Saved.Added"))
-        await dismissToast(page, { type: "success" }, t("shared", "Saved.Added"))
+        await toggle.click()
+        await expect(toggle).toHaveAttribute("aria-pressed", "true")
 
         await gotoPage(page, "/saved/")
         const link = page
@@ -127,8 +123,6 @@ test.describe("saved events", () => {
             .getByRole("button", { name: t("shared", "Saved.Toggle") })
         await toggle.click()
         await expect(toggle).toHaveAttribute("aria-pressed", "true")
-        await expectToast(page, { type: "success" }, t("shared", "Saved.Added"))
-        await dismissToast(page, { type: "success" }, t("shared", "Saved.Added"))
 
         expect(await countOfSaturday()).toBe(0)
 

@@ -21,7 +21,14 @@ interface MapMarkerProps extends RouteClientComponentProps<"root"> {
 }
 
 export const MapMarker = (props: MapMarkerProps) => {
-    const element = useMemo(() => document.createElement("div"), [])
+    const element = useMemo(() => {
+        const created = document.createElement("div")
+        // A double click on a marker leaves the zoom of the map as it is
+        created.addEventListener("dblclick", event => {
+            event.stopPropagation()
+        })
+        return created
+    }, [])
     const { latitude, longitude } = props.coordinates
     const [offsetX = 0, offsetY = 0] = props.offset ?? []
 

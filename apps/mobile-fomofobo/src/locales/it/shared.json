@@ -123,7 +123,6 @@
         "Facebook": "Facebook",
         "Share": "Condividi",
         "ShareFailed": "Non è stato possibile aprire la condivisione.",
-        "LinkCopied": "Link copiato",
         "CopyFailed": "Non è stato possibile copiare il link.",
         "ShareOn": {
             "Label": "Condividi su",
@@ -154,8 +153,6 @@
     },
     "Saved": {
         "Toggle": "Salva",
-        "Added": "Evento salvato. Lo trovi tra gli eventi salvati.",
-        "Removed": "Evento rimosso dagli eventi salvati.",
         "Open": "Eventi salvati",
         "Title": "Eventi salvati",
         "Empty": "Nessun evento salvato. Salvane uno dalla sua anteprima o dalla sua pagina.",

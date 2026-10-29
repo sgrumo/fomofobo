@@ -5,7 +5,6 @@ import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { IconButton } from "ui-components/icon-button"
 import { PixelIconSave, PixelIconSaved } from "ui-components/pixel-icons"
-import { useToast } from "ui-components/toast"
 
 import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import { removeSavedSnapshot, storeSavedSnapshots } from "@/lib/pwa/saved-snapshots"
@@ -19,7 +18,6 @@ interface SaveToggleProps {
 
 export const SaveToggle = (props: SaveToggleProps) => {
     const { t } = useTranslation("shared")
-    const toast = useToast()
     const [savedEvents, setSavedEvents] = useLocalStorage("saved-events")
     const { eventId, date } = props.occurrence
     const isSame = (entry: OccurrenceRef) =>
@@ -55,10 +53,6 @@ export const SaveToggle = (props: SaveToggleProps) => {
                           ],
                 })
                 void syncSaveChange({ eventId, date, action: saved ? "unsave" : "save" })
-                toast.add({
-                    type: "success",
-                    messages: [saved ? t("Saved.Removed") : t("Saved.Added")],
-                })
             }}
         />
     )

@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test"
 import { expectAlert } from "e2e-ui-components/alert"
 import { pressChip } from "e2e-ui-components/chip"
 import { clickIconButton } from "e2e-ui-components/icon-button"
-import { dismissToast, expectToast } from "e2e-ui-components/toast"
 
 import { gotoBackofficePage, gotoPage, reloadPage, t } from "../app"
 import {
@@ -175,12 +174,11 @@ test.describe("installed app offline", () => {
 
         await gotoPage(page, eventDetailPath(event.id, "2026-10-24"))
         await page.waitForFunction("navigator.serviceWorker.controller !== null")
-        await page
+        const toggle = page
             .getByRole("dialog", { name: event.title, exact: true })
             .getByRole("button", { name: t("shared", "Saved.Toggle") })
-            .click()
-        await expectToast(page, { type: "success" }, t("shared", "Saved.Added"))
-        await dismissToast(page, { type: "success" }, t("shared", "Saved.Added"))
+        await toggle.click()
+        await expect(toggle).toHaveAttribute("aria-pressed", "true")
 
         await context.setOffline(true)
         // The trailing-slash redirect of Next needs the network. App links never carry the slash.

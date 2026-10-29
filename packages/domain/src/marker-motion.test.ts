@@ -6,6 +6,7 @@ import {
     leaveMoveOf,
     markerTransitions,
     pixelOffset,
+    leavingEmphasisOf,
     resultIdOf,
     resultTransitions,
     sceneTransitionsOf,
@@ -152,6 +153,15 @@ describe("sceneTransitionsOf", () => {
         expect(
             sceneTransitionsOf({ markers, viewport: { zoom: 12 } }, false, 12, renamed),
         ).toStrictEqual(resultTransitions(markers, renamed))
+    })
+})
+
+describe("leavingEmphasisOf", () => {
+    it("fades a leaving marker out dimmed while a spot was selected", () => {
+        expect([leavingEmphasisOf(true), leavingEmphasisOf(false)]).toStrictEqual([
+            "dimmed",
+            "normal",
+        ])
     })
 })
 

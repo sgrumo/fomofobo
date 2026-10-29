@@ -138,7 +138,6 @@
         "Cover": "Immagine di {{title}}",
         "Back": "Indietro",
         "Share": "Condividi",
-        "LinkCopied": "Link copiato",
         "Actions": "Azioni dell'evento",
         "Directions": "Indicazioni",
         "Date": "Data",
@@ -208,8 +207,6 @@
         "NoneVisible": "I tuoi eventi salvati non sono più disponibili.",
         "Loading": "Caricamento eventi salvati",
         "Error": "Non è stato possibile caricare gli eventi salvati.",
-        "Added": "Evento salvato. Lo trovi tra gli eventi salvati.",
-        "Removed": "Evento rimosso dagli eventi salvati.",
         "Offline": "Sei offline: l'elenco mostra le copie salvate sul dispositivo."
     },
     "Backoffice": {

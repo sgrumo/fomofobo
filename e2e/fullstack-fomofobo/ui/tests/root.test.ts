@@ -1178,14 +1178,10 @@ test.describe("detail over the map", () => {
             await page.evaluate("navigator.clipboard.writeText('')")
             await clickIconButton(detail, control)
 
-            await expectToast(page, { type: "success" }, t("shared", "Detail.LinkCopied"))
-            await dismissToast(
-                page,
-                { type: "success" },
-                t("shared", "Detail.LinkCopied"),
-            )
             // A string expression: the suite compiles without the DOM types of the browser.
-            expect(await page.evaluate("navigator.clipboard.readText()")).toBe(shareUrl)
+            await expect
+                .poll(async () => await page.evaluate("navigator.clipboard.readText()"))
+                .toBe(shareUrl)
         }
     })
 
@@ -1352,9 +1348,9 @@ test.describe("detail over the map", () => {
         const detail = page.getByRole("dialog", { name: event.title, exact: true })
 
         await gotoPage(page, eventDetailPath(event.id, "2026-10-24"))
-        await detail.getByRole("button", { name: t("shared", "Saved.Toggle") }).click()
-        await expectToast(page, { type: "success" }, t("shared", "Saved.Added"))
-        await dismissToast(page, { type: "success" }, t("shared", "Saved.Added"))
+        const toggle = detail.getByRole("button", { name: t("shared", "Saved.Toggle") })
+        await toggle.click()
+        await expect(toggle).toHaveAttribute("aria-pressed", "true")
 
         await gotoPage(page, mapPath(center))
         await page

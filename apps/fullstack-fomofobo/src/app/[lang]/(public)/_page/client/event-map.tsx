@@ -19,6 +19,7 @@ import {
     enterMoveOf,
     leaveMoveOf,
     MARKER_MOTION_MS,
+    leavingEmphasisOf,
     NO_MARKER_TRANSITIONS,
     resultIdOf,
     sceneTransitionsOf,
@@ -76,6 +77,10 @@ interface MarkerScene extends ResultSource {
     transitions: MarkerTransitions
     // Results the leaving markers read, the replaced ones while new results fade in
     leavingFrom: ResultSource
+    // Result index of the selected spot when the scene began
+    selectedIndex: number | undefined
+    // True when the leaving markers fade out from the dimmed look of a selection
+    leavingDimmed: boolean
     // Counts the scenes, so a timer drops the leaving markers of its own scene alone
     generation: number
 }
@@ -363,7 +368,12 @@ export const EventMap = (props: EventMapProps) => {
     const sameResults =
         scene?.occurrences === props.occurrences &&
         scene.permanentVenues === props.permanentVenues
-    if (viewport !== undefined && (scene?.viewport !== viewport || !sameResults)) {
+    if (
+        viewport !== undefined &&
+        (scene?.viewport !== viewport ||
+            !sameResults ||
+            scene.selectedIndex !== selectedIndex)
+    ) {
         setScene({
             viewport,
             occurrences: props.occurrences,
@@ -377,6 +387,8 @@ export const EventMap = (props: EventMapProps) => {
                           occurrences: scene.occurrences,
                           permanentVenues: scene.permanentVenues,
                       },
+            selectedIndex,
+            leavingDimmed: scene?.selectedIndex !== undefined,
             generation: (scene?.generation ?? 0) + 1,
         })
     }
@@ -419,7 +431,7 @@ export const EventMap = (props: EventMapProps) => {
         const key = `${leavingMarker ? "leaving" : "shown"}:${marker.key}`
         // A leaving marker can come from replaced results that the cluster index no longer holds
         const emphasis = leavingMarker
-            ? "normal"
+            ? leavingEmphasisOf(scene?.leavingDimmed === true)
             : markerEmphasis(feature, clusters, selectedIndex)
         if ("cluster" in feature.properties) {
             const clusterId = feature.properties.cluster_id

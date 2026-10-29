@@ -188,8 +188,8 @@ const PreviewBody = (props: PreviewBodyProps) => {
                         </span>
                     )}
                     <span className="tp-pixel-xl">
-                        {localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)}→
-                        {localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)}
+                        {/* Thin spaces part the arrow from the times */}
+                        {`${localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)}\u2009→\u2009${localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)}`}
                     </span>
                 </span>
                 <button

@@ -185,7 +185,7 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                         </Text>
                     )}
                     <Text variant="pixel-xl">
-                        {`${localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)}→${localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)}`}
+                        {`${localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)}\u2009→\u2009${localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)}`}
                     </Text>
                 </View>
                 <OpenLink

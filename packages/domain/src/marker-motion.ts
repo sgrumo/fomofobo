@@ -5,6 +5,7 @@ import type {
     EventClusterProperties,
     EventMapFeature,
     EventPointProperties,
+    MarkerEmphasis,
 } from "./event-clusters"
 
 export const MARKER_MOTION_MS = 150
@@ -175,6 +176,14 @@ export const sceneTransitionsOf = (
         ? NO_MARKER_TRANSITIONS
         : markerTransitions(previous.markers, markers)
 }
+
+/**
+ * @description Returns the emphasis a leaving marker fades out from: dimmed while a spot was
+ * selected, so it never flashes back to full before it fades
+ * @param selectionShown True when a spot was selected as the marker began to leave
+ */
+export const leavingEmphasisOf = (selectionShown: boolean): MarkerEmphasis =>
+    selectionShown ? "dimmed" : "normal"
 
 /**
  * @description Returns the point in px of the Web Mercator world at a zoom
