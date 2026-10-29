@@ -777,7 +777,7 @@ test.describe("map", () => {
         await expect(pin).toBeFocused()
     })
 
-    test("closes the preview of a wide screen on a click on the map, and on Escape with the focus outside it", async ({
+    test("closes the preview of a wide screen on a click on the map or on its pin, and on Escape with the focus outside it", async ({
         page,
     }) => {
         const center = buildArea()
@@ -806,6 +806,13 @@ test.describe("map", () => {
         await page
             .getByRole("region", { name: t("shared", "Map.Label") })
             .click({ position: { x: 40, y: 400 } })
+
+        await expect(preview).toBeHidden()
+        await expect(page).not.toHaveURL(/event=/u)
+
+        await pin.click()
+        await expect(preview).toBeVisible()
+        await pin.click()
 
         await expect(preview).toBeHidden()
         await expect(page).not.toHaveURL(/event=/u)

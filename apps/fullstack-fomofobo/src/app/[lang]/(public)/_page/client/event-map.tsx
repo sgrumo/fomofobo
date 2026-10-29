@@ -153,6 +153,8 @@ interface EventMapProps extends RouteClientComponentProps<"root"> {
     onSelectVenue: (venueId: string) => void
     // A click on the map itself, outside every marker
     onBackgroundClick: () => void
+    // A click on the pin of the selected spot
+    onSelectedClick: () => void
 }
 
 export const EventMap = (props: EventMapProps) => {
@@ -450,6 +452,10 @@ export const EventMap = (props: EventMapProps) => {
                             icon={props.iconOf(venue.categoryId)}
                             emphasis={emphasis}
                             onSelect={() => {
+                                if (emphasis === "selected") {
+                                    props.onSelectedClick()
+                                    return
+                                }
                                 props.onSelectVenue(venue.id)
                             }}
                         />
@@ -482,6 +488,10 @@ export const EventMap = (props: EventMapProps) => {
                         moreCount={moreCount}
                         emphasis={emphasis}
                         onSelect={() => {
+                            if (emphasis === "selected") {
+                                props.onSelectedClick()
+                                return
+                            }
                             props.onSelect({
                                 eventId: occurrence.eventId,
                                 date: occurrence.date,

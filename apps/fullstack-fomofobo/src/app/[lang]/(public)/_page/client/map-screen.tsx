@@ -394,6 +394,13 @@ export const MapScreen = (props: MapScreenProps) => {
         }
     }, [filtersOpen])
 
+    // The bottom sheets close on an outside press on their own
+    const closeWideSelection = () => {
+        if (previewCard !== undefined || detailSide) {
+            closePreview()
+        }
+    }
+
     const locate = async () => {
         const result = await geolocation.locate()
         match(result)
@@ -474,12 +481,8 @@ export const MapScreen = (props: MapScreenProps) => {
                 onSelectVenue={venueId => {
                     openPreview({ type: "venue", venueId })
                 }}
-                onBackgroundClick={() => {
-                    // The bottom sheets close on an outside press on their own
-                    if (previewCard !== undefined || detailSide) {
-                        closePreview()
-                    }
-                }}
+                onBackgroundClick={closeWideSelection}
+                onSelectedClick={closeWideSelection}
             />
             <div
                 ref={overlayRef}
