@@ -68,7 +68,7 @@ export const EventPin = (props: EventPinProps) => {
                 .join(", ")}
             onClick={props.onSelect}
             className={cn(
-                "flex cursor-pointer flex-col items-center gap-1 transition-opacity",
+                "flex cursor-pointer flex-col items-center gap-0.5 transition-opacity",
                 { "opacity-35": props.emphasis === "dimmed" },
             )}
         >

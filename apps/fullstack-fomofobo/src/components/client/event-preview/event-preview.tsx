@@ -186,7 +186,7 @@ const PreviewBody = (props: PreviewBodyProps) => {
                             {dayMonthOf(span.startsAt, PLATFORM_TIME_ZONE)}
                         </span>
                     )}
-                    {localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)} →{" "}
+                    {localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)}→
                     {localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)}
                 </span>
                 <button

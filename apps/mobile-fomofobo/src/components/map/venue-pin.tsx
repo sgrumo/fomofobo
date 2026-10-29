@@ -26,7 +26,7 @@ export const VenuePin = (props: VenuePinProps) => {
                 kind: t(`VenueKind.${props.kind}`),
             })}
             onPress={props.onSelect}
-            className={cn("items-center gap-1", {
+            className={cn("items-center gap-0.5", {
                 "opacity-35": props.emphasis === "dimmed",
             })}
         >

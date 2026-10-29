@@ -72,7 +72,7 @@ export const EventPin = (props: EventPinProps) => {
                 .filter(isDefined)
                 .join(", ")}
             onPress={props.onSelect}
-            className={cn("items-center gap-1", {
+            className={cn("items-center gap-0.5", {
                 "opacity-35": props.emphasis === "dimmed",
             })}
         >
