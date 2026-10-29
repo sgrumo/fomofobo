@@ -91,11 +91,11 @@ test.describe("map", () => {
         await expect(pinOf(upcoming.title, "upcoming", "18:00")).toBeVisible()
         await expect(pinOf(ended.title, "ended", "08:00")).toBeHidden()
 
-        await pressChip(page, `${t("shared", "Filters.Kind.ended")} 1`)
+        await pressChip(page, t("shared", "Filters.Kind.ended"))
         await expect(pinOf(ended.title, "ended", "08:00")).toBeVisible()
         await expect(page).toHaveURL(/show-ended=true/u)
 
-        await unpressChip(page, `${t("shared", "Filters.Kind.live")} 1`)
+        await unpressChip(page, t("shared", "Filters.Kind.live"))
         await expect(pinOf(live.title, "live", "11:00")).toBeHidden()
         await expect(pinOf(upcoming.title, "upcoming", "18:00")).toBeVisible()
     })
@@ -342,7 +342,7 @@ test.describe("map", () => {
         )
     })
 
-    test("narrows the pins to any pressed category, with the count of each chip, and shows every category again once unpressed", async ({
+    test("narrows the pins to any pressed category, and shows every category again once unpressed", async ({
         page,
     }) => {
         const center = buildArea()
@@ -400,15 +400,15 @@ test.describe("map", () => {
 
         await gotoPage(page, mapPath(center))
         await expect(marketPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
-        await expect(getChip(page, `${markets.name} 1`)).toBeVisible()
+        await expect(getChip(page, markets.name)).toBeVisible()
 
-        await pressChip(page, `${concerts.name} 1`)
+        await pressChip(page, concerts.name)
 
         await expect(concertPin).toBeVisible()
         await expect(marketPin).toBeHidden()
         await expect(talkPin).toBeHidden()
 
-        await pressChip(page, `${markets.name} 1`)
+        await pressChip(page, markets.name)
 
         await expect(concertPin).toBeVisible()
         await expect(marketPin).toBeVisible()
@@ -417,8 +417,8 @@ test.describe("map", () => {
             new RegExp(`categories=${concerts.id}%2C${markets.id}`, "u"),
         )
 
-        await unpressChip(page, `${concerts.name} 1`)
-        await unpressChip(page, `${markets.name} 1`)
+        await unpressChip(page, concerts.name)
+        await unpressChip(page, markets.name)
 
         await expect(concertPin).toBeVisible()
         await expect(talkPin).toBeVisible()

@@ -3,13 +3,11 @@ import { describe, expect, it } from "vitest"
 
 import {
     categoryChipOrderOf,
-    categoryCountOf,
     categoryQueryOf,
     earliestRangeDayOf,
     freeQueryOf,
     hasActiveFilters,
     isValidRange,
-    kindCountsOf,
     kindQueryOf,
     quickDateQueryOf,
     rangeLabelOf,
@@ -103,16 +101,6 @@ describe("hasActiveFilters", () => {
     })
 })
 
-describe("categoryCountOf", () => {
-    it("returns the count of the category, else 0", () => {
-        const music = crypto.randomUUID()
-        const counts = [{ categoryId: music, count: 4 }]
-
-        expect(categoryCountOf(counts, music)).toBe(4)
-        expect(categoryCountOf(counts, crypto.randomUUID())).toBe(0)
-    })
-})
-
 describe("categoryChipOrderOf", () => {
     it("keeps the list order and moves the other category last", () => {
         const other = { name: "Altro", icon: "other" as const }
@@ -173,20 +161,6 @@ describe("shownResultsOf", () => {
         expect(
             shownResultsOf(results, new Set(["permanent"]), now).permanentVenues,
         ).toStrictEqual([venue])
-    })
-})
-
-describe("kindCountsOf", () => {
-    it("counts the results of each kind", () => {
-        expect(
-            kindCountsOf(
-                {
-                    occurrences: [live, live, ended],
-                    permanentVenues: [{ id: crypto.randomUUID() }],
-                },
-                now,
-            ),
-        ).toStrictEqual({ live: 2, upcoming: 0, permanent: 1, ended: 1 })
     })
 })
 

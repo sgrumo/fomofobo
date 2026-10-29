@@ -4,12 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { eventDetailUrlOf, venueDetailUrlOf } from "domain/detail-urls"
 import { centerQueryOf, nextLocateRequest, searchCenterOf } from "domain/map-center"
 import type { LocateRequest } from "domain/map-center"
-import {
-    hasActiveFilters,
-    kindCountsOf,
-    shownKindsOf,
-    shownResultsOf,
-} from "domain/map-filters"
+import { hasActiveFilters, shownKindsOf, shownResultsOf } from "domain/map-filters"
 import { placeQueryOf, textQueryOf } from "domain/map-search"
 import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
 import { cn } from "frontend-shared/styles"
@@ -582,9 +577,6 @@ export const MapScreen = (props: MapScreenProps) => {
                 <KindChips
                     route={props.route}
                     shown={shownKinds}
-                    counts={
-                        results === undefined ? undefined : kindCountsOf(results, now)
-                    }
                     compact={!wide}
                     onChange={setQuery}
                     className="max-w-full self-start"
@@ -602,7 +594,6 @@ export const MapScreen = (props: MapScreenProps) => {
                     <CategoryChips
                         route={props.route}
                         categories={categories.data ?? []}
-                        counts={results?.categoryCounts}
                         selected={query.categories}
                         free={query.free === true}
                         onChange={setQuery}

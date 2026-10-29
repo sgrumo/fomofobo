@@ -335,7 +335,6 @@ const MapScreen = () => {
                         <View className="gap-2 p-2">
                             <CategoryChips
                                 categories={categories ?? []}
-                                counts={results?.categoryCounts}
                                 selected={query.categories}
                                 free={query.free === true}
                                 onChange={setQuery}

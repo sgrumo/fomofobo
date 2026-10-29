@@ -1,13 +1,8 @@
 "use client"
 
-import {
-    categoryChipOrderOf,
-    categoryCountOf,
-    categoryQueryOf,
-    freeQueryOf,
-} from "domain/map-filters"
+import { categoryChipOrderOf, categoryQueryOf, freeQueryOf } from "domain/map-filters"
 import type { MapQuery } from "domain/map-query"
-import type { Category, PublicSearchResponse } from "models"
+import type { Category } from "models"
 import { useTranslation } from "react-i18next"
 import { Chip, ChipRow } from "ui-components/chip"
 import { PixelIcon } from "ui-components/pixel-icons"
@@ -16,7 +11,6 @@ import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
 interface CategoryChipsProps extends RouteClientComponentProps<"root"> {
     categories: Category[]
-    counts: PublicSearchResponse["categoryCounts"] | undefined
     selected: readonly string[] | undefined
     free: boolean
     onChange: (change: MapQuery) => void
@@ -33,11 +27,6 @@ export const CategoryChips = (props: CategoryChipsProps) => {
                     key={category.id}
                     label={category.name}
                     icon={<PixelIcon name={category.icon} />}
-                    count={
-                        props.counts === undefined
-                            ? undefined
-                            : categoryCountOf(props.counts, category.id)
-                    }
                     pressed={props.selected?.includes(category.id) === true}
                     onPressedChange={pressed => {
                         props.onChange(

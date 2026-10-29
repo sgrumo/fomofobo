@@ -1,6 +1,6 @@
 import { format, isBefore, parseISO } from "date-fns"
-import { countBy, partition } from "es-toolkit"
-import type { CategoryIcon, PublicSearchResponse } from "models"
+import { partition } from "es-toolkit"
+import type { CategoryIcon } from "models"
 import { match } from "ts-pattern"
 
 import type { MapPointKind } from "./event-clusters"
@@ -73,17 +73,6 @@ export const hasActiveFilters = (
     query: Pick<MapQuery, "categories" | "date" | "free">,
 ): boolean =>
     query.categories !== undefined || query.date !== undefined || query.free === true
-
-/**
- * @description Returns the result count of a category under the other filters, 0 when the
- * response misses it
- * @param categoryCounts Category counts of the search response
- * @param categoryId Category counted
- */
-export const categoryCountOf = (
-    categoryCounts: PublicSearchResponse["categoryCounts"],
-    categoryId: string,
-): number => categoryCounts.find(entry => entry.categoryId === categoryId)?.count ?? 0
 
 export const KIND_FILTERS: readonly MapPointKind[] = [
     "live",
@@ -177,30 +166,6 @@ export const shownResultsOf = <
     ),
     permanentVenues: kinds.has("permanent") ? results.permanentVenues : [],
 })
-
-/**
- * @description Returns the result count of each kind, whatever kinds the map shows
- * @param results Occurrences and permanent venues of a search
- * @param now Instant the status of each occurrence holds at
- */
-export const kindCountsOf = (
-    results: {
-        occurrences: ReadonlyArray<{ startsAt: string; endsAt: string }>
-        permanentVenues: readonly unknown[]
-    },
-    now: Date,
-): Record<MapPointKind, number> => {
-    const counts: Partial<Record<MapPointKind, number>> = countBy(
-        results.occurrences,
-        occurrence => kindOf(occurrence, now),
-    )
-    return {
-        live: counts.live ?? 0,
-        upcoming: counts.upcoming ?? 0,
-        permanent: results.permanentVenues.length,
-        ended: counts.ended ?? 0,
-    }
-}
 
 /**
  * @description Returns the categories in chip order: the order of the list, with the catch-all

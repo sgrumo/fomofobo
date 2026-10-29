@@ -18,8 +18,7 @@ const SWATCH_CLASSES: Record<MapPointKind, string> = {
 
 interface KindChipsProps extends RouteClientComponentProps<"root"> {
     shown: ReadonlySet<MapPointKind>
-    counts: Record<MapPointKind, number> | undefined
-    // Drops the swatch and the count, so a phone fits the four chips in one row
+    // Drops the swatch, so a phone fits the four chips in one row
     compact: boolean
     onChange: (change: MapQuery) => void
     className?: string
@@ -44,7 +43,6 @@ export const KindChips = (props: KindChipsProps) => {
                             />
                         )
                     }
-                    count={props.compact ? undefined : props.counts?.[kind]}
                     tone={kind}
                     pressed={props.shown.has(kind)}
                     onPressedChange={pressed => {
