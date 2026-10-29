@@ -72,17 +72,22 @@ const ChipBar = (props: ChipBarProps) => (
     </View>
 )
 
+type ChipTone = "inverse" | "live" | "upcoming" | "ended" | "permanent"
+
 interface ChipProps {
     label: string
     pressed: boolean
     onPressedChange: (pressed: boolean) => void
     icon?: PixelIconName
     count?: number
+    tone?: ChipTone
     disabled?: boolean
 }
 
 const Chip = (props: ChipProps) => {
     const inBar = useContext(ChipBarContext)
+    const tone = props.tone ?? "inverse"
+    const inverse = props.pressed && tone === "inverse"
 
     return (
         <Pressable
@@ -102,7 +107,7 @@ const Chip = (props: ChipProps) => {
                 props.onPressedChange(!props.pressed)
             }}
             className={cn(
-                chipVariants({ pressed: props.pressed, inBar }),
+                chipVariants({ pressed: props.pressed, tone, inBar }),
                 props.disabled === true && "opacity-50",
             )}
             style={inBar ? undefined : hardShadow("sm")}
@@ -111,18 +116,18 @@ const Chip = (props: ChipProps) => {
                 <PixelIcon
                     name={props.icon}
                     size={CHIP_ICON_SIZE}
-                    color={props.pressed ? "fg-inverse" : "fg"}
+                    color={inverse ? "fg-inverse" : "fg"}
                 />
             )}
-            <Text
-                className={chipLabelVariants({ pressed: props.pressed })}
-                maxFontSizeMultiplier={1.5}
-            >
+            <Text className={chipLabelVariants({ inverse })} maxFontSizeMultiplier={1.5}>
                 {props.label}
             </Text>
             {props.count !== undefined && (
                 <Text
-                    className={chipCountVariants({ pressed: props.pressed })}
+                    className={chipCountVariants({
+                        pressed: props.pressed,
+                        inverseTone: tone === "inverse",
+                    })}
                     maxFontSizeMultiplier={1.5}
                 >
                     {props.count}
@@ -133,3 +138,4 @@ const Chip = (props: ChipProps) => {
 }
 
 export { Chip, ChipBar, ChipRow }
+export type { ChipTone }

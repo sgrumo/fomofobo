@@ -245,6 +245,18 @@ const ChipShowcase = () => {
                     onPressedChange={toggle("free")}
                 />
             </ChipRow>
+            <ChipRow label="Kinds">
+                {(["live", "upcoming", "permanent", "ended"] as const).map(tone => (
+                    <Chip
+                        key={tone}
+                        label={tone}
+                        count={4}
+                        tone={tone}
+                        pressed={selected.includes(tone)}
+                        onPressedChange={toggle(tone)}
+                    />
+                ))}
+            </ChipRow>
         </ShowcaseSection>
     )
 }

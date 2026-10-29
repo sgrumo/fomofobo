@@ -12,19 +12,33 @@ export const chipBarTrackStyles = "-mr-0.5 flex-row"
 export const chipVariants = cva("flex-row items-center gap-1.5 border-line px-2.5", {
     variants: {
         pressed: {
-            true: "bg-surface-inverse",
+            true: "",
             false: "bg-surface",
+        },
+        tone: {
+            inverse: "",
+            live: "",
+            upcoming: "",
+            ended: "",
+            permanent: "",
         },
         inBar: {
             true: "h-6 border-r-2",
             false: "h-7 rounded-md border-2",
         },
     },
+    compoundVariants: [
+        { pressed: true, tone: "inverse", className: "bg-surface-inverse" },
+        { pressed: true, tone: "live", className: "bg-live" },
+        { pressed: true, tone: "upcoming", className: "bg-upcoming" },
+        { pressed: true, tone: "ended", className: "bg-ended" },
+        { pressed: true, tone: "permanent", className: "bg-permanent" },
+    ],
 })
 
 export const chipLabelVariants = cva("tp-pixel-sm", {
     variants: {
-        pressed: {
+        inverse: {
             true: "text-fg-inverse",
             false: "text-fg",
         },
@@ -34,10 +48,18 @@ export const chipLabelVariants = cva("tp-pixel-sm", {
 export const chipCountVariants = cva("tp-pixel-sm", {
     variants: {
         pressed: {
-            true: "text-line-muted",
+            true: "",
             false: "text-fg-muted",
         },
+        inverseTone: {
+            true: "",
+            false: "",
+        },
     },
+    compoundVariants: [
+        { pressed: true, inverseTone: true, className: "text-line-muted" },
+        { pressed: true, inverseTone: false, className: "text-fg" },
+    ],
 })
 
 export const CHIP_ICON_SIZE = 12

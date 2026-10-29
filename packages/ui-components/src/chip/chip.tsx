@@ -4,6 +4,7 @@ import type { ComponentProps, ReactNode } from "react"
 import type { StrictOmit } from "shared/types"
 import { isDefined } from "shared/values"
 
+import type { ChipTone } from "./chip.helper"
 import {
     chipBarStyles,
     chipCountStyles,
@@ -44,16 +45,24 @@ interface ChipProps extends StrictOmit<
     label: string
     icon?: ReactNode
     count?: number
+    tone?: ChipTone
     className?: string
 }
-export const Chip = ({ label, icon, count, className, ...props }: ChipProps) => (
-    <TogglePrimitive className={cn(chipStyles(), className)} {...props}>
+export const Chip = ({
+    label,
+    icon,
+    count,
+    tone = "inverse",
+    className,
+    ...props
+}: ChipProps) => (
+    <TogglePrimitive className={cn(chipStyles(tone), className)} {...props}>
         {isDefined(icon) && <span className={chipIconStyles()}>{icon}</span>}
         <span>{label}</span>
         {isDefined(count) && (
             <>
                 {" "}
-                <span className={chipCountStyles()}>{count}</span>
+                <span className={chipCountStyles(tone)}>{count}</span>
             </>
         )}
     </TogglePrimitive>
