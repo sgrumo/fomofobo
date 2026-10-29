@@ -391,9 +391,9 @@ export const MapScreen = (props: MapScreenProps) => {
 
     // True while the open saved list owns the history entry that a close pops
     const savedPushedRef = useRef(false)
-    // The saved list takes the place of an open preview or detail
+    // The saved list takes the place of an open preview or detail, and its history entry
     const openSaved = () => {
-        savedPushedRef.current = true
+        savedPushedRef.current = previewOpen ? previewPushedRef.current : true
         previewPushedRef.current = false
         setDetailPushed(false)
         setQuery(
@@ -404,7 +404,7 @@ export const MapScreen = (props: MapScreenProps) => {
                 venue: undefined,
                 detail: undefined,
             },
-            { history: "push" },
+            { history: previewOpen ? "replace" : "push" },
         )
     }
     const closeSaved = () => {
@@ -417,7 +417,7 @@ export const MapScreen = (props: MapScreenProps) => {
     }
     // The detail of a saved event owns its history entry, so back and close return to the list
     const openSavedEvent = (ref: OccurrenceRef) => {
-        setDetailPushed(true)
+        previewPushedRef.current = true
         setQuery(
             {
                 event: ref.eventId,
