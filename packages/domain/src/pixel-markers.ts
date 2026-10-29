@@ -4,9 +4,9 @@
 
 export const MARKER_CELL_PX = 2
 
-export const LIVE_WAVE_FRAME_MS = 350
+export const LIVE_WAVE_FRAME_MS = 250
 
-export const POSITION_HALO_FRAME_MS = 500
+export const POSITION_HALO_FRAME_MS = 200
 
 type CellTest = (distance: number, x: number, y: number) => boolean
 
