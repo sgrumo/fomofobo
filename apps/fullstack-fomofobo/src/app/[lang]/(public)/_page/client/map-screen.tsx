@@ -4,13 +4,18 @@ import { useQuery } from "@tanstack/react-query"
 import { eventDetailUrlOf, venueDetailUrlOf } from "domain/detail-urls"
 import { centerQueryOf, nextLocateRequest, searchCenterOf } from "domain/map-center"
 import type { LocateRequest } from "domain/map-center"
-import { hasActiveFilters } from "domain/map-filters"
+import {
+    hasActiveFilters,
+    kindCountsOf,
+    shownKindsOf,
+    shownResultsOf,
+} from "domain/map-filters"
 import { placeQueryOf, textQueryOf } from "domain/map-search"
 import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
 import { cn } from "frontend-shared/styles"
 import type { OccurrenceRef, OccurrenceSummary } from "models"
 import dynamic from "next/dynamic"
-import { useEffect, useId, useRef, useState } from "react"
+import { useEffect, useId, useMemo, useRef, useState } from "react"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import { match } from "ts-pattern"
@@ -52,6 +57,7 @@ import { useOnline } from "@/lib/hooks/use-online"
 
 import { CategoryChips } from "./category-chips"
 import { DateChips } from "./date-chips"
+import { KindChips } from "./kind-chips"
 import { PlaceSearch } from "./place-search"
 
 const EventMap = dynamic(() => import("./event-map").then(module => module.EventMap), {
@@ -162,6 +168,17 @@ export const MapScreen = (props: MapScreenProps) => {
     if (search.data !== undefined && search.data !== results) {
         setResults(search.data)
     }
+    const { showLive, showUpcoming, showPermanent, showEnded } = query
+    const shownKinds = useMemo(
+        () => shownKindsOf({ showLive, showUpcoming, showPermanent, showEnded }),
+        [showLive, showUpcoming, showPermanent, showEnded],
+    )
+    // The map rebuilds its markers on new result arrays, so they change with their inputs alone
+    const shownResults = useMemo(
+        () =>
+            results === undefined ? undefined : shownResultsOf(results, shownKinds, now),
+        [results, shownKinds, now],
+    )
 
     const categoriesById = new Map(
         categories.data?.map(category => [category.id, category]),
@@ -214,9 +231,9 @@ export const MapScreen = (props: MapScreenProps) => {
             ? selected.occurrence.venue.id
             : selected?.venue.id
     const sameSpot: PreviewEntry[] =
-        spotVenueId === undefined || results === undefined
+        spotVenueId === undefined || shownResults === undefined
             ? []
-            : spotEntriesOf(results, spotVenueId)
+            : spotEntriesOf(shownResults, spotVenueId)
     const spotIndex = sameSpot.findIndex(entry => isSameSpotEntry(entry, selected))
 
     // True while the open preview owns the history entry that a close pops.
@@ -442,8 +459,8 @@ export const MapScreen = (props: MapScreenProps) => {
                 center={center}
                 locateRequest={locateRequest}
                 position={position}
-                occurrences={results?.occurrences ?? []}
-                permanentVenues={results?.permanentVenues ?? []}
+                occurrences={shownResults?.occurrences ?? []}
+                permanentVenues={shownResults?.permanentVenues ?? []}
                 iconOf={iconOf}
                 selectedVenueId={spotVenueId}
                 previewCard={previewCard}
@@ -512,11 +529,21 @@ export const MapScreen = (props: MapScreenProps) => {
                         ) : undefined}
                     </div>
                 </div>
-                {/* Below `md` the filters sit in a panel that the filter button opens. */}
+                <KindChips
+                    route={props.route}
+                    shown={shownKinds}
+                    counts={
+                        results === undefined ? undefined : kindCountsOf(results, now)
+                    }
+                    compact={!wide}
+                    onChange={setQuery}
+                    className="max-w-full self-start"
+                />
+                {/* Below `md` the filters sit in a panel that the filter button opens. Each row takes the width of its chips, so the map stays clickable beside them. */}
                 <div
                     id={filtersId}
                     className={cn(
-                        "flex flex-col gap-2",
+                        "flex flex-col gap-2 md:contents",
                         filtersOpen
                             ? "max-md:pixel-corners max-md:drop-shadow-hard-md max-md:relative max-md:p-2"
                             : "max-md:hidden",
@@ -528,14 +555,14 @@ export const MapScreen = (props: MapScreenProps) => {
                         counts={results?.categoryCounts}
                         selected={query.category}
                         onChange={setQuery}
-                        className="max-md:flex-wrap"
+                        className="max-md:flex-wrap md:max-w-full md:self-start"
                     />
                     <DateChips
                         route={props.route}
                         query={query}
                         now={now}
                         onChange={setQuery}
-                        className="max-md:flex-wrap"
+                        className="max-md:flex-wrap md:max-w-full md:self-start"
                     />
                 </div>
                 {notices}

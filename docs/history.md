@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-10-29 · Kind chips hide ended events and permanent venues
+
+### Changed
+
+Four chips under the search field show or hide the live, upcoming, ended and permanent pins on the web and in the native app. The map opens with live and upcoming pins alone, so permanent venues no longer show under every filter.
+
+### Why
+
+A decision. Ended events and permanent venues crowded the map, and the pins had no legend for their colors.
+
+### Check next time
+
+Agree on which kinds of result the map shows by default before the first client draws the pins.
+
 ## 2026-10-28 · Event and venue pages become details over the map
 
 ### Changed

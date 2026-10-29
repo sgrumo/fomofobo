@@ -140,9 +140,15 @@ export const blockPublicEvent = async (eventId: string): Promise<void> => {
 /**
  * @description Returns the map path centered on the point
  * @param center Search center written in the URL
+ * @param shown Kinds of result the map shows on top of the live and upcoming ones
  */
-export const mapPath = (center: GeoPoint): string =>
-    `/?lat=${String(center.latitude)}&lng=${String(center.longitude)}`
+export const mapPath = (
+    center: GeoPoint,
+    shown: ReadonlyArray<"permanent" | "ended"> = [],
+): string =>
+    `/?lat=${String(center.latitude)}&lng=${String(center.longitude)}${shown
+        .map(kind => `&show-${kind}=true`)
+        .join("")}`
 
 /**
  * @description Returns the map path with the detail of the occurrence open

@@ -1,12 +1,12 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { centerQueryOf, nextLocateRequest, searchCenterOf } from "domain/map-center"
 import type { LocateRequest } from "domain/map-center"
-import { hasActiveFilters } from "domain/map-filters"
+import { hasActiveFilters, shownKindsOf, shownResultsOf } from "domain/map-filters"
 import { placeQueryOf, textQueryOf } from "domain/map-search"
 import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
 import { Link, router } from "expo-router"
 import type { OccurrenceSummary } from "models"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { BackHandler, Keyboard, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -18,6 +18,7 @@ import { EntityDetailSheet } from "@/components/map/entity-detail-sheet"
 import { EventMap } from "@/components/map/event-map"
 import { EventPreview } from "@/components/map/event-preview"
 import type { PreviewEntry, PreviewVenue } from "@/components/map/event-preview"
+import { KindChips } from "@/components/map/kind-chips"
 import { PlaceSearch } from "@/components/map/place-search"
 import { useDeviceLocation } from "@/components/map/use-device-location"
 import { useMapQuery } from "@/components/map/use-map-query"
@@ -123,6 +124,17 @@ const MapScreen = () => {
     if (search !== undefined && search !== results) {
         setResults(search)
     }
+    const { showLive, showUpcoming, showPermanent, showEnded } = query
+    const shownKinds = useMemo(
+        () => shownKindsOf({ showLive, showUpcoming, showPermanent, showEnded }),
+        [showLive, showUpcoming, showPermanent, showEnded],
+    )
+    // The map rebuilds its markers on new result arrays, so they change with their inputs alone
+    const shownResults = useMemo(
+        () =>
+            results === undefined ? undefined : shownResultsOf(results, shownKinds, now),
+        [results, shownKinds, now],
+    )
 
     const categoriesById = new Map(categories?.map(category => [category.id, category]))
     const iconOf = (categoryId: string) => categoriesById.get(categoryId)?.icon ?? "other"
@@ -184,9 +196,9 @@ const MapScreen = () => {
             ? selected.occurrence.venue.id
             : selected?.venue.id
     const sameSpot =
-        spotVenueId === undefined || results === undefined
+        spotVenueId === undefined || shownResults === undefined
             ? []
-            : spotEntriesOf(results, spotVenueId)
+            : spotEntriesOf(shownResults, spotVenueId)
     const spotIndex = sameSpot.findIndex(entry => isSameSpotEntry(entry, selected))
 
     const showSpotEntry = (index: number) => {
@@ -234,8 +246,8 @@ const MapScreen = () => {
                 center={center}
                 locateRequest={locateRequest}
                 position={position}
-                occurrences={results?.occurrences ?? []}
-                permanentVenues={results?.permanentVenues ?? []}
+                occurrences={shownResults?.occurrences ?? []}
+                permanentVenues={shownResults?.permanentVenues ?? []}
                 iconOf={iconOf}
                 selectedVenueId={spotVenueId}
                 now={now}
@@ -317,6 +329,7 @@ const MapScreen = () => {
                         )}
                     </View>
                 </View>
+                <KindChips shown={shownKinds} onChange={setQuery} />
                 {filtersOpen && (
                     <PixelPanel shadow="md">
                         <View className="gap-2 p-2">

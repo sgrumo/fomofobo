@@ -48,6 +48,13 @@
     "Filters": {
         "Label": "Filtri",
         "LabelActive": "Filtri, alcuni attivi",
+        "Kinds": "Cosa mostrare",
+        "Kind": {
+            "live": "Live",
+            "upcoming": "In arrivo",
+            "permanent": "Programma",
+            "ended": "Finiti"
+        },
         "Categories": "Categorie",
         "DatesAndPrice": "Date e prezzo",
         "Dates": "Date",

@@ -1,8 +1,12 @@
 import { format, isBefore, parseISO } from "date-fns"
+import { countBy } from "es-toolkit"
 import type { PublicSearchResponse } from "models"
+import { match } from "ts-pattern"
 
+import type { MapPointKind } from "./event-clusters"
 import { localDateOf } from "./local-format"
 import type { MapQuery } from "./map-query"
+import { occurrenceStatus } from "./occurrence-status"
 import { PLATFORM_TIME_ZONE } from "./platform"
 
 export const QUICK_DATE_KINDS = ["today", "tomorrow", "weekend"] as const
@@ -72,6 +76,123 @@ export const categoryCountOf = (
     categoryCounts: PublicSearchResponse["categoryCounts"],
     categoryId: string,
 ): number => categoryCounts.find(entry => entry.categoryId === categoryId)?.count ?? 0
+
+export const KIND_FILTERS: readonly MapPointKind[] = [
+    "live",
+    "upcoming",
+    "permanent",
+    "ended",
+]
+
+// Ended events and permanent venues stay off by default, so they do not crowd the map.
+const SHOWN_BY_DEFAULT: Record<MapPointKind, boolean> = {
+    live: true,
+    upcoming: true,
+    permanent: false,
+    ended: false,
+}
+
+type KindQuery = Pick<
+    MapQuery,
+    "showLive" | "showUpcoming" | "showPermanent" | "showEnded"
+>
+
+/**
+ * @description Returns the kinds of result the map shows under the query
+ * @param query Kind filters of the map query
+ */
+export const shownKindsOf = (query: KindQuery): ReadonlySet<MapPointKind> =>
+    new Set(
+        KIND_FILTERS.filter(
+            kind =>
+                match(kind)
+                    .with("live", () => query.showLive)
+                    .with("upcoming", () => query.showUpcoming)
+                    .with("permanent", () => query.showPermanent)
+                    .with("ended", () => query.showEnded)
+                    .exhaustive() ?? SHOWN_BY_DEFAULT[kind],
+        ),
+    )
+
+/**
+ * @description Returns the map query change of a tap on a kind chip, the key cleared when the
+ * tap gives back the default
+ * @param kind Kind of the chip
+ * @param pressed True when the tap presses the chip
+ */
+export const kindQueryOf = (kind: MapPointKind, pressed: boolean): KindQuery => {
+    const value = pressed === SHOWN_BY_DEFAULT[kind] ? undefined : pressed
+    return match(kind)
+        .returnType<KindQuery>()
+        .with("live", () => ({ showLive: value }))
+        .with("upcoming", () => ({ showUpcoming: value }))
+        .with("permanent", () => ({ showPermanent: value }))
+        .with("ended", () => ({ showEnded: value }))
+        .exhaustive()
+}
+
+/**
+ * @description Returns the kind of an occurrence result at an instant
+ * @param occurrence Start and end instants of the occurrence
+ * @param now Instant the kind holds at
+ */
+const kindOf = (
+    occurrence: { startsAt: string; endsAt: string },
+    now: Date,
+): MapPointKind =>
+    occurrenceStatus(
+        { startsAt: new Date(occurrence.startsAt), endsAt: new Date(occurrence.endsAt) },
+        now,
+    )
+
+/**
+ * @description Returns the results the map shows: the occurrences of a shown status, and the
+ * permanent venues when their kind is shown
+ * @template TResults Search results
+ * @param results Occurrences and permanent venues of a search
+ * @param kinds Kinds shown
+ * @param now Instant the status of each occurrence holds at
+ */
+export const shownResultsOf = <
+    TResults extends {
+        occurrences: ReadonlyArray<{ startsAt: string; endsAt: string }>
+        permanentVenues: readonly unknown[]
+    },
+>(
+    results: TResults,
+    kinds: ReadonlySet<MapPointKind>,
+    now: Date,
+): TResults => ({
+    ...results,
+    occurrences: results.occurrences.filter(occurrence =>
+        kinds.has(kindOf(occurrence, now)),
+    ),
+    permanentVenues: kinds.has("permanent") ? results.permanentVenues : [],
+})
+
+/**
+ * @description Returns the result count of each kind, whatever kinds the map shows
+ * @param results Occurrences and permanent venues of a search
+ * @param now Instant the status of each occurrence holds at
+ */
+export const kindCountsOf = (
+    results: {
+        occurrences: ReadonlyArray<{ startsAt: string; endsAt: string }>
+        permanentVenues: readonly unknown[]
+    },
+    now: Date,
+): Record<MapPointKind, number> => {
+    const counts: Partial<Record<MapPointKind, number>> = countBy(
+        results.occurrences,
+        occurrence => kindOf(occurrence, now),
+    )
+    return {
+        live: counts.live ?? 0,
+        upcoming: counts.upcoming ?? 0,
+        permanent: results.permanentVenues.length,
+        ended: counts.ended ?? 0,
+    }
+}
 
 // PLACEHOLDER(OP-09): a range starts today at the earliest
 /**

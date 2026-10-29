@@ -37,7 +37,9 @@ test.describe("map", () => {
         await preparePublicPage(page)
     })
 
-    test("shows a pin per result, with the look of its status", async ({ page }) => {
+    test("shows a pin per live and upcoming result with the look of its status, and the ended ones once their chip is pressed", async ({
+        page,
+    }) => {
         const center = buildArea()
         const category = await seedCategory()
         const live = await seedPublicEvent(
@@ -68,23 +70,34 @@ test.describe("map", () => {
             { startsAt: "2026-10-24T08:00", endsAt: "2026-10-24T09:00" },
         )
 
+        const pinOf = (
+            title: string,
+            status: "live" | "upcoming" | "ended",
+            time: string,
+        ) =>
+            page.getByRole("button", {
+                name: t("shared", "Map.Pin", {
+                    title,
+                    status: t("shared", `Status.${status}`),
+                    time,
+                }),
+            })
+
         await gotoPage(page, mapPath(center))
 
-        for (const [event, status, time] of [
-            [live, "live", "11:00"],
-            [upcoming, "upcoming", "18:00"],
-            [ended, "ended", "08:00"],
-        ] as const) {
-            await expect(
-                page.getByRole("button", {
-                    name: t("shared", "Map.Pin", {
-                        title: event.title,
-                        status: t("shared", `Status.${status}`),
-                        time,
-                    }),
-                }),
-            ).toBeVisible({ timeout: MAP_TIMEOUT_MS })
-        }
+        await expect(pinOf(live.title, "live", "11:00")).toBeVisible({
+            timeout: MAP_TIMEOUT_MS,
+        })
+        await expect(pinOf(upcoming.title, "upcoming", "18:00")).toBeVisible()
+        await expect(pinOf(ended.title, "ended", "08:00")).toBeHidden()
+
+        await pressChip(page, `${t("shared", "Filters.Kind.ended")} 1`)
+        await expect(pinOf(ended.title, "ended", "08:00")).toBeVisible()
+        await expect(page).toHaveURL(/show-ended=true/u)
+
+        await unpressChip(page, `${t("shared", "Filters.Kind.live")} 1`)
+        await expect(pinOf(live.title, "live", "11:00")).toBeHidden()
+        await expect(pinOf(upcoming.title, "upcoming", "18:00")).toBeVisible()
     })
 
     test("draws one pin per venue, its live event with the count of the other results", async ({
@@ -103,7 +116,7 @@ test.describe("map", () => {
             ].map(times => seedPublicEvent({ venue, category }, times)),
         )
 
-        await gotoPage(page, mapPath(center))
+        await gotoPage(page, mapPath(center, ["ended"]))
 
         expectToBeDefined(live)
         await expect(
@@ -142,7 +155,7 @@ test.describe("map", () => {
             ),
         ])
 
-        await gotoPage(page, mapPath(center))
+        await gotoPage(page, mapPath(center, ["ended"]))
 
         await expect(
             page.getByRole("button", {
@@ -214,7 +227,7 @@ test.describe("map", () => {
             await seedCategory(),
         )
 
-        await gotoPage(page, `${mapPath(center)}&date=tomorrow`)
+        await gotoPage(page, `${mapPath(center, ["permanent"])}&date=tomorrow`)
         await page
             .getByRole("button", {
                 name: t("shared", "Map.VenuePin", {
@@ -259,7 +272,7 @@ test.describe("map", () => {
             { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
         )
 
-        await gotoPage(page, mapPath(center))
+        await gotoPage(page, mapPath(center, ["permanent"]))
         await page
             .getByRole("button", {
                 name: `${t("shared", "Map.Pin", {
@@ -383,7 +396,7 @@ test.describe("map", () => {
         await expect(page).not.toHaveURL(/category=/u)
     })
 
-    test("opens the filters from the filter button on a phone, and Escape closes them", async ({
+    test("keeps the kind chips in sight on a phone, opens the other filters from the filter button, and Escape closes them", async ({
         page,
     }) => {
         await page.setViewportSize({ width: 375, height: 812 })
@@ -426,6 +439,7 @@ test.describe("map", () => {
         await gotoPage(page, mapPath(center))
         await expect(todayPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
         await expect(tomorrowChip).toBeHidden()
+        await expect(getChip(page, t("shared", "Filters.Kind.live"))).toBeVisible()
 
         await clickIconButton(page, t("shared", "Filters.Label"))
         await pressChip(page, t("shared", "Filters.tomorrow"))

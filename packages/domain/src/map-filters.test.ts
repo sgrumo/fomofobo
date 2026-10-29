@@ -8,10 +8,31 @@ import {
     freeQueryOf,
     hasActiveFilters,
     isValidRange,
+    kindCountsOf,
+    kindQueryOf,
     quickDateQueryOf,
     rangeLabelOf,
     rangeQueryOf,
+    shownKindsOf,
+    shownResultsOf,
 } from "./map-filters"
+
+const now = new Date("2026-10-23T20:00:00Z")
+
+/**
+ * @description Builds an occurrence result with the start and end instants
+ * @param startsAt Start instant
+ * @param endsAt End instant
+ */
+const buildOccurrence = (startsAt: string, endsAt: string) => ({
+    id: crypto.randomUUID(),
+    startsAt,
+    endsAt,
+})
+
+const live = buildOccurrence("2026-10-23T19:00:00Z", "2026-10-23T22:00:00Z")
+const upcoming = buildOccurrence("2026-10-24T19:00:00Z", "2026-10-24T22:00:00Z")
+const ended = buildOccurrence("2026-10-22T19:00:00Z", "2026-10-22T22:00:00Z")
 
 describe("categoryQueryOf", () => {
     it("sets the category on a press and clears it on a release", () => {
@@ -74,6 +95,69 @@ describe("categoryCountOf", () => {
 
         expect(categoryCountOf(counts, music)).toBe(4)
         expect(categoryCountOf(counts, crypto.randomUUID())).toBe(0)
+    })
+})
+
+describe("shownKindsOf", () => {
+    it("shows the live and upcoming results with no kind filter", () => {
+        expect(shownKindsOf({})).toStrictEqual(new Set(["live", "upcoming"]))
+    })
+
+    it("applies each kind filter over its default", () => {
+        expect(
+            shownKindsOf({ showLive: false, showPermanent: true, showEnded: true }),
+        ).toStrictEqual(new Set(["upcoming", "permanent", "ended"]))
+    })
+})
+
+describe("kindQueryOf", () => {
+    it("writes a tap that leaves the default of its kind", () => {
+        expect(kindQueryOf("live", false)).toStrictEqual({ showLive: false })
+        expect(kindQueryOf("ended", true)).toStrictEqual({ showEnded: true })
+    })
+
+    it("clears the key of a tap that gives back the default of its kind", () => {
+        expect(kindQueryOf("upcoming", true)).toStrictEqual({ showUpcoming: undefined })
+        expect(kindQueryOf("permanent", false)).toStrictEqual({
+            showPermanent: undefined,
+        })
+    })
+})
+
+describe("shownResultsOf", () => {
+    const venue = { id: crypto.randomUUID() }
+    const results = {
+        occurrences: [live, upcoming, ended],
+        permanentVenues: [venue],
+        truncated: false,
+    }
+
+    it("keeps the occurrences of a shown status and the rest of the response", () => {
+        expect(shownResultsOf(results, new Set(["live", "ended"]), now)).toStrictEqual({
+            occurrences: [live, ended],
+            permanentVenues: [],
+            truncated: false,
+        })
+    })
+
+    it("keeps the permanent venues when their kind is shown", () => {
+        expect(
+            shownResultsOf(results, new Set(["permanent"]), now).permanentVenues,
+        ).toStrictEqual([venue])
+    })
+})
+
+describe("kindCountsOf", () => {
+    it("counts the results of each kind", () => {
+        expect(
+            kindCountsOf(
+                {
+                    occurrences: [live, live, ended],
+                    permanentVenues: [{ id: crypto.randomUUID() }],
+                },
+                now,
+            ),
+        ).toStrictEqual({ live: 2, upcoming: 0, permanent: 1, ended: 1 })
     })
 })
 

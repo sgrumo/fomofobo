@@ -64,7 +64,7 @@ Each venue with results is one pin. The pin shows the result of the venue with t
 
 Venues within about 20 meters of each other share one pin, because no zoom draws their pins apart. The pin counts the results of every venue it holds. Venues farther apart but too close to tell apart merge into a cluster that counts the venues. Its ring shows the share of venues whose pin is live, upcoming, ended or permanent. Live pins draw above every other pin, and permanent venues below every event. The position of the visitor draws above every pin and cluster.
 
-Every permanent venue inside the search area is a pin of its own color, whatever the date filter, with the icon of its category and its kind as the tag. Its preview shows the kind, the cover, the name and the address, with a link to the programme and one to the venue detail. When a permanent venue also holds events, the preview pages through the events first and the venue last.
+While the visitor shows permanent venues, every permanent venue inside the search area is a pin of its own color, whatever the date filter, with the icon of its category and its kind as the tag. Its preview shows the kind, the cover, the name and the address, with a link to the programme and one to the venue detail. When a permanent venue also holds events, the preview pages through the events first and the venue last.
 
 A tap on a pin opens a preview of the occurrence. The preview shows status, venue, categories, price and times, with the elapsed time when live and a link to the event detail. The pin of a venue with more results opens the preview of its result, which pages through every result of the pin.
 
@@ -73,6 +73,8 @@ The map stays inside Italy, and it never turns or tilts, because it draws no com
 ### Search and filters
 
 Results match every active filter. A permanent venue ignores the date filter, and the free filter leaves it out, since it has no price. One search field matches event titles and the names of the venues in the area, and sets a place as the search center. A venue result opens the detail of the venue, and permanent venues come in a group of their own. Category chips select one category at a time and show the result count of each category under the other filters, permanent venues included. With no category chip pressed, the results hold every category. The date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days. A "Gratis" chip keeps the events marked free, membership card or not. On a phone, the category, date and price chips sit in a panel that a filter button opens.
+
+Four kind chips under the search field are the legend of the pins, and each one shows or hides one kind on the map: live, upcoming, permanent venues and ended. A pressed chip takes the color of its kind. The map opens with live and upcoming results alone, so ended events and permanent venues do not crowd it. The kind chips stay in sight on a phone, and they leave the results of the search and the category counts as they are.
 
 ### Event detail
 
