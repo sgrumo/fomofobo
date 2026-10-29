@@ -37,6 +37,25 @@ export const textQueryOf = (text: string): MapQuery => {
 }
 
 /**
+ * @description Returns the place that a submitted text picks: the first place suggestion of the
+ * text when no event or venue matches it, else undefined for a text search
+ * @param text Submitted text
+ * @param suggestedText Text of the suggestions
+ * @param suggestions Suggestions of the suggested text, undefined until they load
+ */
+export const submittedPlaceOf = (
+    text: string,
+    suggestedText: string,
+    suggestions: SearchSuggestions | undefined,
+): PlaceSuggestion | undefined =>
+    suggestions === undefined ||
+    text.trim() !== suggestedText ||
+    suggestions.events.length > 0 ||
+    suggestions.venues.length > 0
+        ? undefined
+        : suggestions.places.at(0)
+
+/**
  * @description Returns the venue suggestions split into regular venues and permanent venues
  * @param venues Venue suggestions of the search field
  */

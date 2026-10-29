@@ -595,6 +595,23 @@ test.describe("map", () => {
         await expect(farPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
     })
 
+    test("moves to the first suggested place on Enter when no event or venue matches the text", async ({
+        page,
+    }) => {
+        const text = `Piazza ${crypto.randomUUID().slice(0, 8)}`
+        const searchField = page.getByLabel(t("shared", "Search.Label"))
+
+        await gotoPage(page, mapPath(buildArea()))
+        await fillSearchField(page, t("shared", "Search.Label"), text)
+        await expect(
+            page.getByRole("button", { name: `${text}, Imola, Italy` }),
+        ).toBeVisible()
+        await searchField.press("Enter")
+
+        await expect(page).toHaveURL(/place=/u)
+        await expect(searchField).toHaveValue(`${text}, Imola, Italy`)
+    })
+
     test("opens the detail of a venue of the area that the search names, in the group of its kind", async ({
         page,
     }) => {

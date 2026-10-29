@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import {
     isEmptySuggestions,
     MIN_SUGGESTION_TEXT,
+    submittedPlaceOf,
     SUGGESTION_DELAY_MS,
     venueSuggestionGroupsOf,
 } from "domain/map-search"
@@ -77,7 +78,13 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
             onSubmit={event => {
                 event.preventDefault()
                 setOpen(false)
-                props.onTextSubmit(text)
+                const place = submittedPlaceOf(text, debouncedText, suggestions.data)
+                if (place === undefined) {
+                    props.onTextSubmit(text)
+                    return
+                }
+                setText(place.label)
+                props.onPlaceSelect(place)
             }}
         >
             <SearchField

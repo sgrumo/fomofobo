@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest"
 import {
     isEmptySuggestions,
     placeQueryOf,
+    submittedPlaceOf,
     textQueryOf,
     venueSuggestionGroupsOf,
 } from "./map-search"
@@ -32,6 +33,44 @@ describe("textQueryOf", () => {
 
     it("clears the text and the place on a blank text", () => {
         expect(textQueryOf("  ")).toStrictEqual({ q: undefined, place: undefined })
+    })
+})
+
+describe("submittedPlaceOf", () => {
+    const imola = {
+        label: "Imola, BO",
+        coordinates: { latitude: 44.3532, longitude: 11.7148 },
+    }
+    const bologna = {
+        label: "Bologna, BO",
+        coordinates: { latitude: 44.4949, longitude: 11.3426 },
+    }
+
+    it("picks the first place when no event or venue matches the text", () => {
+        expect(
+            submittedPlaceOf(" Imola ", "Imola", {
+                places: [imola, bologna],
+                events: [],
+                venues: [],
+            }),
+        ).toStrictEqual(imola)
+    })
+
+    it("keeps a text search when an event or a venue matches the text", () => {
+        expect(
+            submittedPlaceOf("Imola", "Imola", {
+                places: [imola],
+                events: [],
+                venues: [venue("Imola Jazz Club", "regular")],
+            }),
+        ).toBeUndefined()
+    })
+
+    it("keeps a text search while the suggestions belong to another text", () => {
+        expect(
+            submittedPlaceOf("Imola", "Imo", { places: [imola], events: [], venues: [] }),
+        ).toBeUndefined()
+        expect(submittedPlaceOf("Imola", "Imola", undefined)).toBeUndefined()
     })
 })
 
