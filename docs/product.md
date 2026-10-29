@@ -92,7 +92,7 @@ The detail lists the upcoming events of the venue, one row for each event at its
 
 ### Saved events
 
-Visitors save events with no account. The saved list lives on the device and shows only the visible events. A saved event stays in the list until the visitor removes it, or until the retention days after it ends.
+Visitors save events with no account. The saved list lives on the device and shows only the visible events. On the web map the saved list opens over the map, in a panel on the right on a wide screen and in a sheet on a phone, and a saved event opens its detail over the list. A saved event stays in the list until the visitor removes it, or until the retention days after it ends.
 
 Each save and unsave also reaches the server under a random id of the device, which names no one. The server counts each device once for each occurrence. A change made offline waits on the device and leaves once the connection is back. On its first visit after the counts started, a device sends the saves that it already held.
 

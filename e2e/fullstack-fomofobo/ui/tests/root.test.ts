@@ -1304,6 +1304,53 @@ test.describe("detail over the map", () => {
         ).toBeHidden()
     })
 
+    test("opens the saved events in a panel over the map, a saved event over the list, and the list again once its detail closes", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const event = await seedPublicEvent(
+            {
+                venue: await seedVenue(
+                    offsetPoint(center, { latitude: 0.01, longitude: 0 }),
+                ),
+                category: await seedCategory(),
+            },
+            { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+        )
+        const savedPanel = page.getByRole("dialog", {
+            name: t("shared", "PageTitle.Saved"),
+            exact: true,
+        })
+        const detail = page.getByRole("dialog", { name: event.title, exact: true })
+
+        await gotoPage(page, eventDetailPath(event.id, "2026-10-24"))
+        await detail.getByRole("button", { name: t("shared", "Saved.Toggle") }).click()
+        await expectToast(page, { type: "success" }, t("shared", "Saved.Added"))
+        await dismissToast(page, { type: "success" }, t("shared", "Saved.Added"))
+
+        await gotoPage(page, mapPath(center))
+        await page.getByRole("button", { name: t("shared", "Saved.Open") }).click()
+
+        await expect(savedPanel).toBeVisible()
+        await expect(page).toHaveURL(/saved=true/u)
+        await savedPanel
+            .getByRole("listitem")
+            .filter({ hasText: event.title })
+            .getByRole("link")
+            .click()
+
+        await expect(detail).toBeVisible()
+        await expect(savedPanel).toBeHidden()
+        await clickIconButton(detail, t("shared", "Detail.Back"))
+
+        await expect(detail).toBeHidden()
+        await expect(savedPanel).toBeVisible()
+        await clickIconButton(savedPanel, t("shared", "Preview.Close"))
+
+        await expect(savedPanel).toBeHidden()
+        await expect(page).not.toHaveURL(/saved=true/u)
+    })
+
     test("names an event or a venue that is no longer visible", async ({ page }) => {
         const venue = await seedVenue(buildArea())
         const event = await seedPublicEvent({ venue, category: await seedCategory() }, {})

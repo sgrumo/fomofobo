@@ -46,9 +46,9 @@ import type {
     PreviewEntry,
     PreviewVenue,
 } from "@/components/client/event-preview/event-preview"
+import { SavedEventsList } from "@/components/client/saved-events-list/saved-events-list"
 import { VenueDetail } from "@/components/client/venue-detail/venue-detail"
 import { useDynamicRoute } from "@/framework/routes/route-hooks/use-dynamic-route"
-import { RouteLink } from "@/framework/routes/route-link/route-link"
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
@@ -331,6 +331,9 @@ export const MapScreen = (props: MapScreenProps) => {
               }
             : undefined
     const detailSide = wide && detailOpen
+    const savedOpen = query.saved === true && !previewOpen
+    const savedSide = wide && savedOpen
+    const sidePanelOpen = detailSide || savedSide
     const detailPoint =
         selected?.type === "occurrence"
             ? selected.occurrence.venue.coordinates
@@ -395,6 +398,48 @@ export const MapScreen = (props: MapScreenProps) => {
             document.removeEventListener("keydown", closeOnEscape)
         }
     }, [filtersOpen])
+
+    // True while the open saved list owns the history entry that a close pops
+    const savedPushedRef = useRef(false)
+    const openSaved = () => {
+        savedPushedRef.current = true
+        setQuery({ saved: true }, { history: "push" })
+    }
+    const closeSaved = () => {
+        if (savedPushedRef.current) {
+            savedPushedRef.current = false
+            globalThis.history.back()
+            return
+        }
+        setQuery({ saved: undefined }, { history: "replace" })
+    }
+    // The detail of a saved event owns its history entry, so back and close return to the list
+    const openSavedEvent = (ref: OccurrenceRef) => {
+        setDetailPushed(true)
+        setQuery(
+            {
+                event: ref.eventId,
+                occurrence: ref.date,
+                venue: undefined,
+                detail: true,
+            },
+            { history: "push" },
+        )
+    }
+    const savedContent = (
+        <div className="flex flex-col gap-4 pb-4">
+            <div className="flex items-center justify-between gap-2">
+                <h2 className="tp-pixel-xl uppercase">{t("PageTitle.Saved")}</h2>
+                <IconButton
+                    aria-label={t("Preview.Close")}
+                    icon={<PixelIconClose />}
+                    size="sm"
+                    onClick={closeSaved}
+                />
+            </div>
+            <SavedEventsList now={now} onOpen={openSavedEvent} />
+        </div>
+    )
 
     // The bottom sheets close on an outside press on their own
     const closeWideSelection = () => {
@@ -490,7 +535,7 @@ export const MapScreen = (props: MapScreenProps) => {
                 ref={overlayRef}
                 className={cn(
                     "pointer-events-none absolute inset-x-4 top-4 flex flex-col gap-2 [&>*]:pointer-events-auto",
-                    { "right-[25.75rem]": detailSide },
+                    { "right-[25.75rem]": sidePanelOpen },
                 )}
             >
                 <div className="flex items-center gap-2">
@@ -577,21 +622,21 @@ export const MapScreen = (props: MapScreenProps) => {
             {/* Clears the map attribution, which sits in the bottom corner. */}
             <div
                 className={cn("absolute right-4 bottom-8 flex items-center gap-2", {
-                    "right-[25.75rem]": detailSide,
+                    "right-[25.75rem]": sidePanelOpen,
                 })}
             >
                 {search.isFetching ? (
                     <Spinner title={t("Map.Loading")} size="xs" />
                 ) : undefined}
-                <RouteLink
-                    route={routes.saved}
-                    parameters={{ lang: language }}
-                    query={{}}
+                <button
+                    type="button"
                     aria-label={t("Saved.Open")}
-                    className="pixel-circle-40 drop-shadow-hard-md text-fg relative inline-flex size-10 shrink-0 items-center justify-center rounded-full [&>svg]:size-4"
+                    aria-expanded={savedOpen}
+                    className="pixel-circle-40 drop-shadow-hard-md text-fg relative inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full [&>svg]:size-4"
+                    onClick={savedOpen ? closeSaved : openSaved}
                 >
                     <PixelIconSaved />
-                </RouteLink>
+                </button>
                 <IconButton
                     aria-label={t("Map.Locate")}
                     icon={<PixelIconLocate />}
@@ -610,6 +655,23 @@ export const MapScreen = (props: MapScreenProps) => {
                     </DetailSidePanel>
                 </div>
             ) : undefined}
+            {savedSide ? (
+                <div
+                    ref={panelRef}
+                    className="absolute top-4 right-4 bottom-8 w-[23.75rem]"
+                >
+                    <DetailSidePanel label={t("PageTitle.Saved")} onClose={closeSaved}>
+                        {savedContent}
+                    </DetailSidePanel>
+                </div>
+            ) : undefined}
+            <DetailSheet
+                open={narrow && savedOpen}
+                label={t("PageTitle.Saved")}
+                onClose={closeSaved}
+            >
+                {savedContent}
+            </DetailSheet>
             <DetailSheet
                 open={narrow && detailOpen}
                 label={detailLabel}
