@@ -34,6 +34,12 @@
         "Error": "Non è stato possibile caricare gli eventi. Mostro gli ultimi risultati.",
         "Truncated": "Troppi eventi per mostrarli tutti. Restringi la ricerca.",
         "Unsupported": "Questo browser non riesce a disegnare la mappa.",
+        "Credits": "Fonti della mappa",
+        "Attribution": {
+            "OpenFreeMap": "OpenFreeMap",
+            "OpenMapTiles": "© OpenMapTiles",
+            "OpenStreetMap": "© OpenStreetMap"
+        },
         "LiveBadge": "Live",
         "Pin": "{{title}}, {{status}}, {{time}}",
         "VenuePin": "{{name}}, {{kind}}",

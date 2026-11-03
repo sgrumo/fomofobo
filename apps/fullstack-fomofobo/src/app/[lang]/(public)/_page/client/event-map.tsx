@@ -47,6 +47,7 @@ import { FIXED_MAP_OPTIONS, fixMapGestures } from "@/lib/map/fixed-map"
 
 import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"
+import { MapCredit } from "./map-credit"
 import { MapMarker } from "./map-marker"
 import { MarkerMotion } from "./marker-motion"
 import { PositionMarker } from "./position-marker"
@@ -179,6 +180,8 @@ export const EventMap = (props: EventMapProps) => {
     const supported = useMemo(() => supportsWebGl2(), [])
     const [map, setMap] = useState<MapLibreMap>()
     const [viewport, setViewport] = useState<Viewport>()
+    // Shown on load, folded by the first pan or zoom of the visitor
+    const [creditOpen, setCreditOpen] = useState(true)
     const readCenter = useEffectEvent(() => props.center)
     const clickBackground = useEffectEvent(() => {
         props.onBackgroundClick()
@@ -203,8 +206,14 @@ export const EventMap = (props: EventMapProps) => {
                 : PHONE_INITIAL_ZOOM,
             ...FIXED_MAP_OPTIONS,
             // The expanded control wraps over the bottom controls on a phone, so the map
-            // draws its own one-line credit below.
+            // draws its own one-line credit below, which folds into a button.
             attributionControl: false,
+        })
+        instance.on("movestart", event => {
+            // A move with no original event is a fly of the app, not of the visitor
+            if (event.originalEvent !== undefined) {
+                setCreditOpen(false)
+            }
         })
         const releaseGestures = fixMapGestures(instance)
         const publishViewport = () => {
@@ -563,21 +572,11 @@ export const EventMap = (props: EventMapProps) => {
             <div className="absolute inset-0 isolate">
                 <div ref={containerRef} className="size-full" />
             </div>
-            <p className="tp-body-sm text-fg-inverse absolute right-4 bottom-1.5 left-4 truncate text-right [&>a]:underline">
-                <a href="https://openfreemap.org" target="_blank" rel="noreferrer">
-                    OpenFreeMap
-                </a>{" "}
-                <a href="https://www.openmaptiles.org/" target="_blank" rel="noreferrer">
-                    © OpenMapTiles
-                </a>{" "}
-                <a
-                    href="https://www.openstreetmap.org/copyright"
-                    target="_blank"
-                    rel="noreferrer"
-                >
-                    © OpenStreetMap
-                </a>
-            </p>
+            <MapCredit
+                route={props.route}
+                open={creditOpen}
+                onOpenChange={setCreditOpen}
+            />
             {map === undefined || viewport === undefined
                 ? undefined
                 : [

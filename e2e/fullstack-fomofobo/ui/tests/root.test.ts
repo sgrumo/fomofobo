@@ -891,6 +891,53 @@ test.describe("map", () => {
         await expect(page).not.toHaveURL(/event=/u)
     })
 
+    test("shows the map credit on load, folds it into its button on a drag of the map, and the button opens it again", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const event = await seedPublicEvent(
+            { venue: await seedVenue(center), category: await seedCategory() },
+            { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
+        )
+        const creditButton = page.getByRole("button", {
+            name: t("shared", "Map.Credits"),
+        })
+        const osmLink = page.getByRole("link", {
+            name: t("shared", "Map.Attribution.OpenStreetMap"),
+        })
+
+        await gotoPage(page, mapPath(center))
+        await expect(
+            page.getByRole("button", {
+                name: t("shared", "Map.Pin", {
+                    title: event.title,
+                    status: t("shared", "Status.live"),
+                    time: "11:00",
+                }),
+            }),
+        ).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+
+        await expect(osmLink).toHaveAttribute(
+            "href",
+            "https://www.openstreetmap.org/copyright",
+        )
+        await expect(creditButton).toHaveAttribute("aria-expanded", "true")
+
+        // The left edge of the map, clear of the controls and of the pin at the center
+        await page.mouse.move(40, 400)
+        await page.mouse.down()
+        await page.mouse.move(140, 450, { steps: 5 })
+        await page.mouse.up()
+
+        await expect(osmLink).toBeHidden()
+        await expect(creditButton).toHaveAttribute("aria-expanded", "false")
+
+        await creditButton.click()
+
+        await expect(osmLink).toBeVisible()
+        await expect(creditButton).toHaveAttribute("aria-expanded", "true")
+    })
+
     test("opens the preview of a pin, free when it has no price, then its detail over the map, a side panel on a wide screen and a sheet on a phone", async ({
         page,
     }) => {
