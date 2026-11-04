@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-04 · Permanent venues show on the map by default
+
+### Changed
+
+The map opens with live, upcoming and permanent pins on the web and in the native app. Only ended events stay off until the visitor presses their chip.
+
+### Why
+
+A client request. The client wants cinemas, museums and theatres in view from the first load, and reverses the default of 2026-10-29.
+
+### Check next time
+
+Agree on which kinds of result the map shows by default before the first client draws the pins.
+
 ## 2026-11-04 · Pins rank permanent venues above ended events
 
 ### Changed

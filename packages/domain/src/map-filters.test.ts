@@ -116,26 +116,26 @@ describe("categoryChipOrderOf", () => {
 })
 
 describe("shownKindsOf", () => {
-    it("shows the live and upcoming results with no kind filter", () => {
-        expect(shownKindsOf({})).toStrictEqual(new Set(["live", "upcoming"]))
+    it("shows the live, upcoming and permanent results with no kind filter", () => {
+        expect(shownKindsOf({})).toStrictEqual(new Set(["live", "upcoming", "permanent"]))
     })
 
     it("applies each kind filter over its default", () => {
         expect(
-            shownKindsOf({ showLive: false, showPermanent: true, showEnded: true }),
-        ).toStrictEqual(new Set(["upcoming", "permanent", "ended"]))
+            shownKindsOf({ showLive: false, showPermanent: false, showEnded: true }),
+        ).toStrictEqual(new Set(["upcoming", "ended"]))
     })
 })
 
 describe("kindQueryOf", () => {
     it("writes a tap that leaves the default of its kind", () => {
-        expect(kindQueryOf("live", false)).toStrictEqual({ showLive: false })
+        expect(kindQueryOf("permanent", false)).toStrictEqual({ showPermanent: false })
         expect(kindQueryOf("ended", true)).toStrictEqual({ showEnded: true })
     })
 
     it("clears the key of a tap that gives back the default of its kind", () => {
         expect(kindQueryOf("upcoming", true)).toStrictEqual({ showUpcoming: undefined })
-        expect(kindQueryOf("permanent", false)).toStrictEqual({
+        expect(kindQueryOf("permanent", true)).toStrictEqual({
             showPermanent: undefined,
         })
     })
