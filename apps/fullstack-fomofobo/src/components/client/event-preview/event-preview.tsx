@@ -327,8 +327,12 @@ interface EventPreviewProps extends StrictOmit<PreviewPanelProps, "renderTitle">
     onHeightChange: (height: number) => void
 }
 
+// Upward travel in px of a touch that opens the detail from the sheet
+const SWIPE_UP_PX = 48
+
 export const EventPreview = (props: EventPreviewProps) => {
     const readHeightChange = useEffectEvent(props.onHeightChange)
+    const readOpenDetail = useEffectEvent(props.onOpenDetail)
     const [sheet, setSheet] = useState<HTMLDivElement | null>(null)
 
     useEffect(() => {
@@ -342,6 +346,34 @@ export const EventPreview = (props: EventPreviewProps) => {
         observer.observe(sheet)
         return () => {
             observer.disconnect()
+        }
+    }, [sheet])
+
+    // A swipe up on the sheet opens the detail, as a swipe down closes it
+    useEffect(() => {
+        if (sheet === null) {
+            return undefined
+        }
+        let startY: number | undefined = undefined
+        const start = (event: TouchEvent) => {
+            startY = event.touches.length === 1 ? event.touches[0]?.clientY : undefined
+        }
+        const end = (event: TouchEvent) => {
+            const endY = event.changedTouches[0]?.clientY
+            if (
+                startY !== undefined &&
+                endY !== undefined &&
+                startY - endY >= SWIPE_UP_PX
+            ) {
+                readOpenDetail()
+            }
+            startY = undefined
+        }
+        sheet.addEventListener("touchstart", start, { passive: true })
+        sheet.addEventListener("touchend", end)
+        return () => {
+            sheet.removeEventListener("touchstart", start)
+            sheet.removeEventListener("touchend", end)
         }
     }, [sheet])
 

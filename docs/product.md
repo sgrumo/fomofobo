@@ -66,7 +66,7 @@ Venues within about 20 meters of each other share one pin, because no zoom draws
 
 While the visitor shows permanent venues, every permanent venue inside the search area is a pin of its own color, whatever the date filter, with the icon of its category and its kind as the tag. Its preview shows the kind, the cover, the name, the address and the closing days, with a link to the venue detail, which holds the link to the programme. When a permanent venue also holds events, the preview pages through the events first and the venue last.
 
-A tap on a pin opens a preview of the occurrence. The preview shows status, venue, categories, price and times, with the elapsed time when live and a link to the event detail. The pin of a venue with more results opens the preview of its result, which pages through every result of the pin.
+A tap on a pin opens a preview of the occurrence. The preview shows status, venue, categories, price and times, with the elapsed time when live and a link to the event detail. The pin of a venue with more results opens the preview of its result, which pages through every result of the pin. On a phone, a tap on another pin moves the open preview to that pin, and a swipe up on the preview opens the detail.
 
 The map stays inside Italy, and it never turns or tilts, because it draws no compass to undo a turn. A right click on the web map opens no browser menu.
 
