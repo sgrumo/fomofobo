@@ -1,8 +1,6 @@
 "use client"
 
 import type { MapPointKind } from "domain/event-clusters"
-import { PIXEL_GLYPH_GRID, PIXEL_GLYPHS } from "domain/pixel-glyphs"
-import { pixelIconPath } from "domain/pixel-icons"
 import { EVENT_DISC, MARKER_CELL_PX, SELECTED_EVENT_DISC } from "domain/pixel-markers"
 import { cn } from "frontend-shared/styles"
 import type { CategoryIcon } from "models"
@@ -10,10 +8,10 @@ import type { ReactNode } from "react"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
+import { CategoryGlyph } from "./category-glyph"
+
 // Shadow cells of a selected disc, right and down
 const SHADOW_CELLS = 2
-
-const GLYPH_PX = PIXEL_GLYPH_GRID * MARKER_CELL_PX
 
 interface PixelDiscProps extends RouteClientComponentProps<"root"> {
     kind: MapPointKind
@@ -56,16 +54,12 @@ export const PixelDisc = (props: PixelDiscProps) => {
                     })}
                 />
             </svg>
-            <svg
-                aria-hidden={true}
-                width={GLYPH_PX}
-                height={GLYPH_PX}
-                viewBox={`0 0 ${String(PIXEL_GLYPH_GRID)} ${String(PIXEL_GLYPH_GRID)}`}
-                shapeRendering="crispEdges"
+            <CategoryGlyph
+                route={props.route}
+                icon={props.icon}
+                cellPx={MARKER_CELL_PX}
                 className="fill-line absolute top-1/2 left-1/2 -translate-1/2"
-            >
-                <path d={pixelIconPath(PIXEL_GLYPHS[props.icon])} />
-            </svg>
+            />
         </span>
     )
 }

@@ -5,9 +5,10 @@ import type { MapQuery } from "domain/map-query"
 import type { Category } from "models"
 import { useTranslation } from "react-i18next"
 import { Chip, ChipRow } from "ui-components/chip"
-import { PixelIcon } from "ui-components/pixel-icons"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
+
+import { CategoryGlyph } from "./category-glyph"
 
 interface CategoryChipsProps extends RouteClientComponentProps<"root"> {
     categories: Category[]
@@ -26,7 +27,17 @@ export const CategoryChips = (props: CategoryChipsProps) => {
                 <Chip
                     key={category.id}
                     label={category.name}
-                    icon={<PixelIcon name={category.icon} />}
+                    icon={
+                        // A span keeps the glyph out of the icon size of the chip, so each cell stays 2px
+                        <span className="flex">
+                            <CategoryGlyph
+                                route={props.route}
+                                icon={category.icon}
+                                cellPx={2}
+                                className="fill-current"
+                            />
+                        </span>
+                    }
                     pressed={props.selected?.includes(category.id) === true}
                     onPressedChange={pressed => {
                         props.onChange(
