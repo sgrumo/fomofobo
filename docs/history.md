@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-04 · Pins rank permanent venues above ended events
+
+### Changed
+
+A pin shows its result in the order live, upcoming, permanent, ended, on the web and in the native app. Its "+N" counts only the other live and upcoming events.
+
+### Why
+
+A client request. The client wants a pin to show the most relevant result, and the count to promise only events that a visitor can still attend.
+
+### Check next time
+
+Agree on the priority of the results that share a pin, and on what its count includes, before the first client draws the pins.
+
 ## 2026-10-29 · Galleries leave the permanent venue kinds
 
 ### Changed

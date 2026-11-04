@@ -39,8 +39,11 @@ export type EventMapFeature =
 // The position of the visitor draws below every result marker.
 export const POSITION_MARKER_LAYER = 0
 
-// Bottom to top: a live result draws above every other marker.
-const LAYER_ORDER: readonly MapPointKind[] = ["permanent", "ended", "upcoming", "live"]
+// Bottom to top, also the priority of the result that marks a spot
+const LAYER_ORDER: readonly MapPointKind[] = ["ended", "permanent", "upcoming", "live"]
+
+// Kinds that the "+N" of a spot counts
+const COUNTED_KINDS: ReadonlySet<MapPointKind> = new Set(["live", "upcoming"])
 
 const FIRST_RESULT_LAYER = POSITION_MARKER_LAYER + 1
 
@@ -86,7 +89,8 @@ export const sharedSpotsOf = (venues: readonly VenuePoint[]): string[][] => {
 
 /**
  * @description Groups the results into one spot per group of venues too close to tell apart,
- * marked by its result of the highest layer, the first in result order among equals
+ * marked by its result of the highest layer, the first in result order among equals, and
+ * counting its other live and upcoming results
  * @param results Venue and kind of each result, in result order: occurrences first, then
  * permanent venues
  */
@@ -115,7 +119,9 @@ export const venueSpots = (
                 coordinates: top.coordinates,
                 kind: top.kind,
                 index: top.index,
-                moreCount: group.length - 1,
+                moreCount: group.filter(
+                    result => result !== top && COUNTED_KINDS.has(result.kind),
+                ).length,
             }
         })
 }

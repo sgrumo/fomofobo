@@ -100,7 +100,7 @@ test.describe("map", () => {
         await expect(pinOf(upcoming.title, "upcoming", "18:00")).toBeVisible()
     })
 
-    test("draws one pin per venue, its live event with the count of the other results", async ({
+    test("draws one pin per venue, its live event with the count of its other live and upcoming events", async ({
         page,
     }) => {
         const center = buildArea()
@@ -125,7 +125,7 @@ test.describe("map", () => {
                     title: live.title,
                     status: t("shared", "Status.live"),
                     time: "11:00",
-                })}, ${t("shared", "Map.MoreHere_other", { count: 2 })}`,
+                })}, ${t("shared", "Map.MoreHere_one", { count: 1 })}`,
                 exact: true,
             }),
         ).toBeVisible({ timeout: MAP_TIMEOUT_MS })

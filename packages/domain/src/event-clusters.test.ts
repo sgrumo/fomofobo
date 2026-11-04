@@ -118,12 +118,14 @@ describe("venueSpots", () => {
     const venue = { latitude: 44.3533, longitude: 11.7147 }
     const farAway = { latitude: 44.5, longitude: 11.9 }
 
-    it("marks each venue with its result of the highest layer and counts the others", () => {
+    it("marks each venue with its result of the highest layer and counts its other live and upcoming results", () => {
         expect(
             venueSpots([
                 { venueId: "chiostro", coordinates: venue, kind: "upcoming" },
                 { venueId: "rocca", coordinates: farAway, kind: "ended" },
                 { venueId: "chiostro", coordinates: venue, kind: "live" },
+                { venueId: "chiostro", coordinates: venue, kind: "live" },
+                { venueId: "chiostro", coordinates: venue, kind: "ended" },
                 { venueId: "chiostro", coordinates: venue, kind: "permanent" },
             ]),
         ).toStrictEqual([
@@ -166,6 +168,23 @@ describe("venueSpots", () => {
                 coordinates: farAway,
                 kind: "ended",
                 index: 2,
+                moreCount: 0,
+            },
+        ])
+    })
+
+    it("marks a venue with its permanent kind above an ended result, and counts neither", () => {
+        expect(
+            venueSpots([
+                { venueId: "cinema", coordinates: venue, kind: "ended" },
+                { venueId: "cinema", coordinates: venue, kind: "permanent" },
+            ]),
+        ).toStrictEqual([
+            {
+                venueIds: ["cinema"],
+                coordinates: venue,
+                kind: "permanent",
+                index: 1,
                 moreCount: 0,
             },
         ])
@@ -280,14 +299,14 @@ describe("markerEmphasis", () => {
 })
 
 describe("markerLayer and clusterLayer", () => {
-    it("stacks live above upcoming, upcoming above ended, ended above permanent", () => {
-        const bottomToTop: MapPointKind[] = ["permanent", "ended", "upcoming", "live"]
+    it("stacks live above upcoming, upcoming above permanent, permanent above ended", () => {
+        const bottomToTop: MapPointKind[] = ["ended", "permanent", "upcoming", "live"]
 
         expect(bottomToTop.map(markerLayer)).toStrictEqual([1, 2, 3, 4])
     })
 
     it("stacks the position below every result and the selected spot above them", () => {
-        expect(POSITION_MARKER_LAYER).toBeLessThan(markerLayer("permanent"))
+        expect(POSITION_MARKER_LAYER).toBeLessThan(markerLayer("ended"))
         expect(SELECTED_MARKER_LAYER).toBeGreaterThan(markerLayer("live"))
     })
 
@@ -297,17 +316,17 @@ describe("markerLayer and clusterLayer", () => {
         expect([
             clusterLayer({ ...empty, permanentCount: 3, liveCount: 1 }),
             clusterLayer({ ...empty, permanentCount: 2, endedCount: 1 }),
-            clusterLayer({ ...empty, permanentCount: 2 }),
+            clusterLayer({ ...empty, endedCount: 2 }),
         ]).toStrictEqual([
             markerLayer("live"),
-            markerLayer("ended"),
             markerLayer("permanent"),
+            markerLayer("ended"),
         ])
     })
 })
 
 describe("clusterArcs", () => {
-    it("draws one arc per kind from live to permanent, sized by its share, over the whole ring", () => {
+    it("draws one arc per kind from live to ended, sized by its share, over the whole ring", () => {
         expect(
             clusterArcs({
                 liveCount: 1,
@@ -318,8 +337,8 @@ describe("clusterArcs", () => {
         ).toStrictEqual([
             { kind: "live", from: 0, to: 25 },
             { kind: "upcoming", from: 25, to: 75 },
-            { kind: "ended", from: 75, to: 75 },
             { kind: "permanent", from: 75, to: 100 },
+            { kind: "ended", from: 100, to: 100 },
         ])
     })
 })
