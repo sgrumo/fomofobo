@@ -654,7 +654,7 @@ export const MapScreen = (props: MapScreenProps) => {
                     type="button"
                     aria-label={t("Saved.Open")}
                     aria-expanded={savedOpen}
-                    className="pixel-circle-40 drop-shadow-hard-md text-fg relative inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full [&>svg]:size-4"
+                    className="pixel-circle-40 drop-shadow-hard-md press-bounce active:drop-shadow-hard-sm text-fg relative inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full [&>svg]:size-4"
                     onClick={savedOpen ? closeSaved : openSaved}
                 >
                     <PixelIconSaved />

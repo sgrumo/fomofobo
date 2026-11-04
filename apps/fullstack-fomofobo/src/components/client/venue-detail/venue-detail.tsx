@@ -35,7 +35,7 @@ import { api } from "@/lib/api/client-api"
 import { useClosingText } from "@/lib/hooks/use-closing-text"
 
 const linkClassName =
-    "border-line shadow-hard-md tp-pixel-sm flex items-center justify-center gap-2 rounded-md border-2 px-3 py-2 uppercase [&>svg]:size-4"
+    "border-line shadow-hard-md press-bounce active:shadow-hard-sm tp-pixel-sm flex items-center justify-center gap-2 rounded-md border-2 px-3 py-2 uppercase [&>svg]:size-4"
 
 interface VenueDetailProps {
     venue: PublicVenue

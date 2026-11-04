@@ -197,7 +197,7 @@ const PreviewBody = (props: PreviewBodyProps) => {
                     aria-label={t("Preview.Open")}
                     onClick={props.onOpenDetail}
                     className={cn(
-                        "pixel-circle-48 drop-shadow-hard-sm text-fg relative flex size-12 cursor-pointer items-center justify-center rounded-full [&>svg]:size-5",
+                        "pixel-circle-48 drop-shadow-hard-sm press-bounce text-fg relative flex size-12 cursor-pointer items-center justify-center rounded-full active:drop-shadow-none [&>svg]:size-5",
                         {
                             "[--pixel-fill:var(--color-live)]": status === "live",
                             "[--pixel-fill:var(--color-upcoming)]": status === "upcoming",
@@ -260,7 +260,7 @@ const VenuePreviewBody = (props: VenuePreviewBodyProps) => {
                     type="button"
                     aria-label={t("Preview.OpenVenue")}
                     onClick={props.onOpenDetail}
-                    className="pixel-circle-48 drop-shadow-hard-sm text-fg relative ml-auto flex size-12 cursor-pointer items-center justify-center rounded-full [--pixel-fill:var(--color-permanent)] [&>svg]:size-5"
+                    className="pixel-circle-48 drop-shadow-hard-sm press-bounce text-fg relative ml-auto flex size-12 cursor-pointer items-center justify-center rounded-full [--pixel-fill:var(--color-permanent)] active:drop-shadow-none [&>svg]:size-5"
                 >
                     <PixelIconArrow />
                 </button>

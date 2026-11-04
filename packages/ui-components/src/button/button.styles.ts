@@ -7,7 +7,7 @@ interface ButtonStylesOpts {
 }
 
 export const buttonStyles = styles((opts: ButtonStylesOpts) => [
-    "focus-visible:outline-focus inline-flex items-center justify-center transition-[background,translate,box-shadow] focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:opacity-50",
+    "focus-visible:outline-focus inline-flex items-center justify-center transition-[background,translate,box-shadow,scale] duration-150 ease-[cubic-bezier(0.34,1.56,0.64,1)] focus-visible:outline-2 focus-visible:outline-offset-2 not-aria-disabled:active:scale-95 aria-disabled:opacity-50 motion-reduce:not-aria-disabled:active:scale-100",
     {
         "rounded-md": opts.size !== "icon",
         "gap-0 rounded-full p-2": opts.size === "icon",

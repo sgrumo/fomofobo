@@ -23,7 +23,7 @@ const shareTargets: ReadonlyArray<{ target: ShareTarget; icon: ReactNode }> = [
 ]
 
 const shareLinkClassName =
-    "pixel-circle-40 drop-shadow-hard-md text-fg focus-visible:outline-focus relative inline-flex size-10 shrink-0 items-center justify-center rounded-full hover:[--pixel-fill:var(--color-surface-muted)] focus-visible:outline-2 focus-visible:outline-offset-2 [&>svg]:size-4"
+    "pixel-circle-40 drop-shadow-hard-md press-bounce active:drop-shadow-hard-sm text-fg focus-visible:outline-focus relative inline-flex size-10 shrink-0 items-center justify-center rounded-full hover:[--pixel-fill:var(--color-surface-muted)] focus-visible:outline-2 focus-visible:outline-offset-2 [&>svg]:size-4"
 
 interface ShareRowProps {
     url: string
