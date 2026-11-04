@@ -57,6 +57,7 @@ import { CategoryChips } from "./category-chips"
 import { DateChips } from "./date-chips"
 import { KindChips } from "./kind-chips"
 import { PlaceSearch } from "./place-search"
+import { isResultMarkerTarget } from "./result-marker"
 
 const EventMap = dynamic(() => import("./event-map").then(module => module.EventMap), {
     ssr: false,
@@ -462,6 +463,14 @@ export const MapScreen = (props: MapScreenProps) => {
             closePreview()
         }
     }
+    // The preview sheet stays open on a press on a pin, so its own pin closes it
+    const closeSelection = () => {
+        if (narrow && previewOpen && !detailOpen) {
+            closePreview()
+            return
+        }
+        closeWideSelection()
+    }
 
     const locate = async () => {
         const result = await geolocation.locate()
@@ -544,7 +553,7 @@ export const MapScreen = (props: MapScreenProps) => {
                     openPreview({ type: "venue", venueId })
                 }}
                 onBackgroundClick={closeWideSelection}
-                onSelectedClick={closeWideSelection}
+                onSelectedClick={closeSelection}
                 centersSelection={narrow}
                 onDragStart={() => {
                     if (previewCard !== undefined) {
@@ -702,6 +711,7 @@ export const MapScreen = (props: MapScreenProps) => {
                 {detailContent}
             </DetailSheet>
             <EventPreview
+                keepsOpenOn={isResultMarkerTarget}
                 onHeightChange={setPreviewSheetHeight}
                 open={
                     previewCard === undefined &&

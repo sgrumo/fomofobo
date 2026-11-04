@@ -321,6 +321,8 @@ const PreviewPanel = (props: PreviewPanelProps) => {
 
 interface EventPreviewProps extends StrictOmit<PreviewPanelProps, "renderTitle"> {
     open: boolean
+    // True when a press outside the sheet leaves it open, as the press opens another entry
+    keepsOpenOn: (target: EventTarget | null) => boolean
     // Height of the open sheet in px, 0 once it closes
     onHeightChange: (height: number) => void
 }
@@ -346,10 +348,18 @@ export const EventPreview = (props: EventPreviewProps) => {
     return (
         <BottomSheetRoot
             open={props.open}
-            onOpenChange={open => {
-                if (!open) {
-                    props.onClose()
+            onOpenChange={(open, details) => {
+                if (open) {
+                    return
                 }
+                if (
+                    details.reason === "outside-press" &&
+                    props.keepsOpenOn(details.event.target)
+                ) {
+                    details.cancel()
+                    return
+                }
+                props.onClose()
             }}
         >
             <BottomSheetContent ref={setSheet}>

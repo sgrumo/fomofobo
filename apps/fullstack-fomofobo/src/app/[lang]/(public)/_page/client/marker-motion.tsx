@@ -9,6 +9,8 @@ import { match, P } from "ts-pattern"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
+import { RESULT_MARKER_ATTRIBUTE } from "./result-marker"
+
 interface MarkerMotionProps extends RouteClientComponentProps<"root"> {
     move: MarkerMove | undefined
     children: ReactNode
@@ -66,6 +68,7 @@ export const MarkerMotion = (props: MarkerMotionProps) => {
     return (
         <span
             ref={ref}
+            {...{ [RESULT_MARKER_ATTRIBUTE]: true }}
             className={cn("block", {
                 "pointer-events-none": props.move?.type === "leave",
             })}

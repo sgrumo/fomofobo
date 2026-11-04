@@ -342,6 +342,62 @@ test.describe("map", () => {
         )
     })
 
+    test("switches the preview of a phone to the pin that a tap names, and the pin of the open preview closes it", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const category = await seedCategory()
+        const live = await seedPublicEvent(
+            {
+                venue: await seedVenue(
+                    offsetPoint(center, { latitude: 0, longitude: -0.006 }),
+                ),
+                category,
+            },
+            { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
+        )
+        const upcoming = await seedPublicEvent(
+            {
+                venue: await seedVenue(
+                    offsetPoint(center, { latitude: 0, longitude: 0.006 }),
+                ),
+                category,
+            },
+            { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+        )
+        const livePin = page.getByRole("button", {
+            name: t("shared", "Map.Pin", {
+                title: live.title,
+                status: t("shared", "Status.live"),
+                time: "11:00",
+            }),
+        })
+        const upcomingPin = page.getByRole("button", {
+            name: t("shared", "Map.Pin", {
+                title: upcoming.title,
+                status: t("shared", "Status.upcoming"),
+                time: "18:00",
+            }),
+        })
+
+        await page.setViewportSize({ width: 375, height: 812 })
+        await gotoPage(page, mapPath(center))
+        await livePin.click({ timeout: MAP_TIMEOUT_MS })
+
+        await expect(getBottomSheet(page, live.title)).toBeVisible()
+
+        await upcomingPin.click()
+
+        await expect(getBottomSheet(page, upcoming.title)).toBeVisible()
+        await expect(getBottomSheet(page, live.title)).toBeHidden()
+        await expect(page).toHaveURL(new RegExp(`event=${upcoming.id}`, "u"))
+
+        await upcomingPin.click()
+
+        await expect(getBottomSheet(page, upcoming.title)).toBeHidden()
+        await expect(page).not.toHaveURL(/event=/u)
+    })
+
     test("narrows the pins to any pressed category, and shows every category again once unpressed", async ({
         page,
     }) => {
