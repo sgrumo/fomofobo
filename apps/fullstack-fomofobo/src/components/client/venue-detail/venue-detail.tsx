@@ -13,6 +13,7 @@ import type {
     PublicVenue,
     VenueHistoryItem,
 } from "models"
+import { useRef, useState } from "react"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import { Alert } from "ui-components/alert"
@@ -20,6 +21,7 @@ import { Badge } from "ui-components/badge"
 import { Button } from "ui-components/button"
 import { IconButton } from "ui-components/icon-button"
 import {
+    PixelIconBack,
     PixelIconClose,
     PixelIconDirections,
     PixelIconFacebook,
@@ -45,10 +47,45 @@ interface VenueDetailProps {
     onOpenEvent: (ref: OccurrenceRef) => void
 }
 
+type VenuePage = "profile" | "history"
+
 export const VenueDetail = (props: VenueDetailProps) => {
     const { t } = useTranslation("shared")
     const { venue } = props
     const closingText = useClosingText()(venue.closingDays)
+    const [page, setPage] = useState<VenuePage>("profile")
+    const articleRef = useRef<HTMLElement>(null)
+    // Each page opens at its top, inside the panel or the sheet that scrolls it
+    const showPage = (next: VenuePage) => {
+        articleRef.current?.scrollIntoView({ block: "start" })
+        setPage(next)
+    }
+    const closeButton = (
+        <IconButton
+            aria-label={t("Preview.Close")}
+            icon={<PixelIconClose />}
+            onClick={props.onClose}
+        />
+    )
+
+    if (page === "history") {
+        return (
+            <article ref={articleRef} className="flex flex-col gap-5 pb-4">
+                <header className="flex items-center justify-between gap-3">
+                    <IconButton
+                        aria-label={t("Venue.BackToProfile")}
+                        icon={<PixelIconBack />}
+                        onClick={() => {
+                            showPage("profile")
+                        }}
+                    />
+                    {closeButton}
+                </header>
+                <p className="tp-pixel-sm text-fg-muted uppercase">{venue.name}</p>
+                <VenueHistory venueId={venue.id} />
+            </article>
+        )
+    }
 
     const links = [
         {
@@ -69,14 +106,8 @@ export const VenueDetail = (props: VenueDetailProps) => {
     ]
 
     return (
-        <article className="flex flex-col gap-5">
-            <header className="flex items-center gap-3">
-                <IconButton
-                    aria-label={t("Preview.Close")}
-                    icon={<PixelIconClose />}
-                    onClick={props.onClose}
-                />
-            </header>
+        <article ref={articleRef} className="flex flex-col gap-5">
+            <header className="flex items-center gap-3">{closeButton}</header>
             {venue.coverPhotoUrl === null ? undefined : (
                 <TonedImage
                     src={venue.coverPhotoUrl}
@@ -152,7 +183,18 @@ export const VenueDetail = (props: VenueDetailProps) => {
                     </ul>
                 )}
             </section>
-            <VenueHistory venueId={venue.id} />
+            <Button
+                variant="secondary"
+                size="md"
+                icon={<PixelIconBack className="rotate-180" />}
+                iconPosition="end"
+                className="self-start"
+                onClick={() => {
+                    showPage("history")
+                }}
+            >
+                {t("Venue.ShowHistory")}
+            </Button>
             <ShareRow url={props.shareUrl} text={venueShareTextOf(venue)} />
         </article>
     )
@@ -212,7 +254,7 @@ const VenueHistory = (props: VenueHistoryProps) => {
 
     return (
         <section aria-label={t("Venue.History")} className="flex flex-col gap-3">
-            <h2 className="tp-pixel-md uppercase">{t("Venue.History")}</h2>
+            <h1 className="tp-pixel-2xl uppercase">{t("Venue.History")}</h1>
             {history.isPending ? (
                 <Spinner title={t("Venue.HistoryLoading")} />
             ) : history.isError && history.data === undefined ? (

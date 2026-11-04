@@ -1332,7 +1332,7 @@ test.describe("detail over the map", () => {
         await expect(eventDetail.getByRole("button", { name: venue.name })).toHaveCount(0)
     })
 
-    test("shows the profile of a venue, the past events, and opens the detail of an upcoming event", async ({
+    test("shows the profile of a venue, its past events on a page of their own, and opens the detail of an upcoming event", async ({
         page,
     }) => {
         const venue = await seedVenue(buildArea())
@@ -1375,9 +1375,19 @@ test.describe("detail over the map", () => {
             `https://www.google.com/maps/dir/?api=1&destination=${String(venue.coordinates.latitude)},${String(venue.coordinates.longitude)}`,
         )
         const history = detail.getByRole("region", { name: t("shared", "Venue.History") })
+        await expect(history).toBeHidden()
+
+        await clickButton(detail, t("shared", "Venue.ShowHistory"))
+
         await expect(history.getByText(past.title)).toBeVisible()
         await expect(history.getByText("20/10/2026")).toBeVisible()
+        await expect(
+            detail.getByRole("heading", { level: 1, name: venue.name }),
+        ).toBeHidden()
 
+        await clickIconButton(detail, t("shared", "Venue.BackToProfile"))
+
+        await expect(history).toBeHidden()
         await detail
             .getByRole("region", { name: t("shared", "Venue.Upcoming") })
             .getByRole("button", { name: upcoming.title })
@@ -1414,11 +1424,11 @@ test.describe("detail over the map", () => {
         const newest = past.at(-1)
         expectToBeDefined(oldest)
         expectToBeDefined(newest)
-        const history = page
-            .getByRole("dialog", { name: venue.name, exact: true })
-            .getByRole("region", { name: t("shared", "Venue.History") })
+        const detail = page.getByRole("dialog", { name: venue.name, exact: true })
+        const history = detail.getByRole("region", { name: t("shared", "Venue.History") })
 
         await gotoPage(page, venueDetailPath(venue.id))
+        await clickButton(detail, t("shared", "Venue.ShowHistory"))
         await expect(history.getByText(newest.title)).toBeVisible()
         await expect(history.getByText(oldest.title)).toBeHidden()
 

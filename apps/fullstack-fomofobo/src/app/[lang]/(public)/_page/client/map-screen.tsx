@@ -347,6 +347,8 @@ export const MapScreen = (props: MapScreenProps) => {
                 />
             ) : (
                 <VenueDetail
+                    // A new venue opens on its profile
+                    key={venueDetail.data.id}
                     venue={venueDetail.data}
                     now={now}
                     shareUrl={venueDetailUrlOf(

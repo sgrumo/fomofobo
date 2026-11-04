@@ -88,7 +88,7 @@ Share opens the share sheet of the device, or copies the link where none exists.
 
 The event detail and the map preview link to the venue detail. It shows the profile of the venue, directions to it and its links, with the share row of the event detail. The detail of a permanent venue also shows its kind, its closing days and the link to its programme.
 
-The detail lists the upcoming events of the venue, one row for each event at its next occurrence, live events first. A row opens the event detail. Below, the past events of the venue list their title and their first and last date, with no photo, newest first, and a button loads more.
+The detail lists the upcoming events of the venue, one row for each event at its next occurrence, live events first. A row opens the event detail. A button below opens the past events of the venue as a second page in the same panel or sheet, with a back button to the profile. They list their title and their first and last date, with no photo, newest first, and a button loads more.
 
 ### Saved events
 
