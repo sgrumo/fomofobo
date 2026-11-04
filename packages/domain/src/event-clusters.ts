@@ -1,4 +1,4 @@
-import { sum } from "es-toolkit"
+import { groupBy, sum } from "es-toolkit"
 import type { GeoPoint, OccurrenceStatus } from "models"
 import Supercluster from "supercluster"
 import type { ClusterFeature, PointFeature } from "supercluster"
@@ -97,17 +97,18 @@ export const sharedSpotsOf = (venues: readonly VenuePoint[]): string[][] => {
 export const venueSpots = (
     results: ReadonlyArray<VenuePoint & { kind: MapPointKind }>,
 ): MapSpot[] => {
-    const byVenue = Map.groupBy(
+    // `Map.groupBy` is missing before Safari 17.4, so the map would not draw there
+    const byVenue = groupBy(
         results.map((result, index) => ({ ...result, index })),
         result => result.venueId,
     )
     const firstIndexOf = (venueIds: readonly string[]) =>
-        Math.min(...venueIds.map(venueId => byVenue.get(venueId)?.[0]?.index ?? Infinity))
+        Math.min(...venueIds.map(venueId => byVenue[venueId]?.[0]?.index ?? Infinity))
     return sharedSpotsOf(results)
         .toSorted((first, second) => firstIndexOf(first) - firstIndexOf(second))
         .map(venueIds => {
             const group = venueIds
-                .flatMap(venueId => byVenue.get(venueId) ?? [])
+                .flatMap(venueId => byVenue[venueId] ?? [])
                 .toSorted((first, second) => first.index - second.index)
             const top = group.reduce((best, result) =>
                 markerLayer(result.kind) > markerLayer(best.kind) ? result : best,
