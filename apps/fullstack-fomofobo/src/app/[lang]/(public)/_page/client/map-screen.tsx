@@ -325,6 +325,10 @@ export const MapScreen = (props: MapScreenProps) => {
     const savedOpen = query.saved === true && !previewOpen
     const savedSide = wide && savedOpen
     const sidePanelOpen = detailSide || savedSide
+    // A sheet over the map of a phone covers the filter panel, so the panel closes as it opens
+    if (narrow && (detailOpen || savedOpen) && filtersOpen) {
+        setFiltersOpen(false)
+    }
     const detailPoint =
         selected?.type === "occurrence"
             ? selected.occurrence.venue.coordinates
@@ -616,14 +620,15 @@ export const MapScreen = (props: MapScreenProps) => {
                     onChange={applyFilter}
                     className="max-w-full md:self-center"
                 />
-                {/* Below `md` the filters sit in a panel that the filter button opens. Each row takes the width of its chips, so the map stays clickable beside them. */}
+                {/* Below `md` the filters sit in a panel that the filter button opens. Each row takes the width of its chips, so the map stays clickable beside them. A side panel leaves too little width for one row, so the dates go below the categories. */}
                 <div
                     id={filtersId}
                     className={cn(
-                        "flex flex-col gap-2 md:max-w-full md:flex-row md:items-center md:self-center",
+                        "flex flex-col gap-2 md:max-w-full md:items-center md:self-center",
                         filtersOpen
                             ? "max-md:pixel-corners max-md:drop-shadow-hard-md max-md:relative max-md:p-2"
                             : "max-md:hidden",
+                        { "md:flex-row": !sidePanelOpen },
                     )}
                 >
                     <CategoryChips
@@ -632,9 +637,16 @@ export const MapScreen = (props: MapScreenProps) => {
                         selected={query.categories}
                         free={query.free === true}
                         onChange={applyFilter}
-                        className="max-md:flex-wrap max-md:justify-center md:min-w-0"
+                        className={cn("max-md:flex-wrap max-md:justify-center", {
+                            "md:min-w-0": !sidePanelOpen,
+                            "md:flex-wrap md:justify-center": sidePanelOpen,
+                        })}
                     />
-                    <Separator className="pointer-events-none md:h-7 md:w-0.5" />
+                    <Separator
+                        className={cn("pointer-events-none", {
+                            "md:h-7 md:w-0.5": !sidePanelOpen,
+                        })}
+                    />
                     <DateChips
                         route={props.route}
                         query={query}

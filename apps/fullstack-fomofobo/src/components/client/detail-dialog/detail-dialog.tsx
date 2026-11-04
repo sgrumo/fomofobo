@@ -55,7 +55,8 @@ export const DetailSheet = (props: DetailSheetProps) => (
             }
         }}
     >
-        <BottomSheetContent>
+        {/* Stops below the search field and the kind chips of the map on a short screen */}
+        <BottomSheetContent className="max-h-[min(85dvh,calc(100dvh-7.5rem))]">
             <BottomSheetTitle className="sr-only">{props.label}</BottomSheetTitle>
             {props.children}
         </BottomSheetContent>
