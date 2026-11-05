@@ -5,7 +5,7 @@ The app runs on Vercel, the database on Turso, the event photos on Cloudflare R2
 | Environment | Branch | Vercel project  | Turso database  | R2 bucket              |
 | ----------- | ------ | --------------- | --------------- | ---------------------- |
 | `prod`      | `main` | `fomofobo-prod` | `fomofobo-prod` | `fomofobo-prod-photos` |
-| `dev`       | `dev`  | `fomofobo-dev`  | `fomofobo-dev`  | `fomofobo-dev-photos`  |
+| `dev`       | `dev`  | `fomofobo-dev`  | `fomofobo-dev`  | `fomofobo-dev`         |
 
 `dev` runs the `preview` shape of `APP_ENV`, and `prod` runs `vercel`. `preview` serves the `/dev/*` pages, the API documentation and detailed errors to anyone who opens its URL. `apps/fullstack-fomofobo/src/server/config/app-config.ts` lists what each shape serves.
 
