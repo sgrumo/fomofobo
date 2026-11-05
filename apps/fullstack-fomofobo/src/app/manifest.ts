@@ -12,8 +12,8 @@ const manifest = (): MetadataRoute.Manifest => {
     const t = getTranslation(defaultLanguage)
     return {
         id: "/",
-        name: "Fomofobo",
-        short_name: "Fomofobo",
+        name: "Zonzo",
+        short_name: "Zonzo",
         description: t("App.Description"),
         lang: defaultLanguage,
         start_url: routes.root.path({ parameters: { lang: defaultLanguage }, query: {} }),

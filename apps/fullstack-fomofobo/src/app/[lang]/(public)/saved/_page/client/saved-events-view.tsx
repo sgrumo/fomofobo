@@ -17,6 +17,7 @@ import {
     DetailSidePanel,
 } from "@/components/client/detail-dialog/detail-dialog"
 import { EventDetail } from "@/components/client/event-detail/event-detail"
+import { LegalLinks } from "@/components/client/legal-links/legal-links"
 import { SavedEventsList } from "@/components/client/saved-events-list/saved-events-list"
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
@@ -119,6 +120,7 @@ export const SavedEventsView = (props: RouteClientComponentProps<"saved">) => {
                 </header>
                 <SavedEventsList now={now} onOpen={setSelectedRef} />
                 <InstallEntry route={props.route} />
+                <LegalLinks />
             </section>
             {selectedRef === undefined ? undefined : wide ? (
                 <div ref={panelRef} className="fixed top-4 right-4 bottom-4 w-[23.75rem]">

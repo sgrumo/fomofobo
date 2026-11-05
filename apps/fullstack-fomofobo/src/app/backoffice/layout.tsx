@@ -10,8 +10,8 @@ import { BACKOFFICE_LANGUAGE } from "@/lib/i18n/backoffice-language"
 
 export const metadata: Metadata = {
     title: {
-        default: "Fomofobo backoffice",
-        template: "%s · Fomofobo backoffice",
+        default: "Zonzo backoffice",
+        template: "%s · Zonzo backoffice",
     },
 }
 

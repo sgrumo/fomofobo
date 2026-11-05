@@ -2,3 +2,5 @@
 export const MAX_OCCURRENCES_PER_EVENT = 366
 export const MAX_SEARCH_RESULTS = 500
 export const MAX_PERMANENT_VENUE_RESULTS = 100
+
+export const CONTACT_EMAIL = "info@quinck.io"

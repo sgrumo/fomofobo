@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import { isVersionGateBlocking, resolveVersionGateScreen } from "./version-gate-state"
 
-const storeUrl = "market://details?id=it.quinck.fomofobo"
+const storeUrl = "market://details?id=it.quinck.zonzo"
 
 describe("resolveVersionGateScreen", () => {
     it("should hide the gate before the first answer arrives", () => {

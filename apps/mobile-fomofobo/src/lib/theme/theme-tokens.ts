@@ -75,7 +75,7 @@ const SEMANTIC_COLORS = {
 } as const
 
 /**
- * @remarks Holds the shadcn names that React Native Reusables copies use, so a fresh `add` renders in the fomofobo look
+ * @remarks Holds the shadcn names that React Native Reusables copies use, so a fresh `add` renders in the Zonzo look
  */
 const SHADCN_ALIASES = {
     background: SEMANTIC_COLORS.surface,

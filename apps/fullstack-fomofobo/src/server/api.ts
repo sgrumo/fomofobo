@@ -160,7 +160,7 @@ const buildApi = (): OpenAPIHono => {
         app.doc(`${apiBasePath}/doc`, {
             openapi: "3.0.0",
             info: {
-                title: "Fomofobo API",
+                title: "Zonzo API",
                 version: "1.0.0",
             },
         })

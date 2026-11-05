@@ -28,12 +28,12 @@ export const resolveTarget = (appEnv: AppEnv): Target =>
         .returnType<Target>()
         .with("local", "dev", () => ({
             appIdSuffix: ".dev",
-            scheme: "fomofobodev",
+            scheme: "zonzodev",
             firebaseDir: "firebase/dev",
         }))
         .with("prod", () => ({
             appIdSuffix: "",
-            scheme: "fomofobo",
+            scheme: "zonzo",
             firebaseDir: "firebase/prod",
         }))
         .exhaustive()

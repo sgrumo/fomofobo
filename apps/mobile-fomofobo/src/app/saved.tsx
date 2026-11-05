@@ -12,6 +12,7 @@ import { Pressable, ScrollView, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { z } from "zod"
 
+import { LegalLinks } from "@/components/links/legal-links"
 import { EntityDetailSheet } from "@/components/map/entity-detail-sheet"
 import { SaveToggle } from "@/components/saves/save-toggle"
 import { Badge } from "@/components/ui/badge/badge"
@@ -187,6 +188,7 @@ const SavedScreen = () => {
                     </Text>
                 </View>
                 {body}
+                <LegalLinks />
             </ScrollView>
             <EntityDetailSheet
                 open={selectedRef !== undefined}

@@ -72,7 +72,7 @@ lane, never the app on first launch.
 |                        | unset or `local`             | `dev`                                  | `prod`                           |
 | ---------------------- | ---------------------------- | -------------------------------------- | -------------------------------- |
 | `API_URL`              | defaults to `localhost:3000` | required, `https`                      | required, `https`                |
-| Application id, scheme | `.dev` id, `fomofobodev`     | `.dev` id, `fomofobodev`               | store id, `fomofobo`             |
+| Application id, scheme | `.dev` id, `zonzodev`        | `.dev` id, `zonzodev`                  | store id, `zonzo`                |
 | Firebase native config | `firebase/dev/`              | `firebase/dev/`                        | `firebase/prod/`                 |
 | Lanes                  | none                         | `ios distribute`, `android distribute` | `ios release`, `android release` |
 

@@ -9,6 +9,7 @@
         "./directions-url": "./src/directions-url.ts",
         "./event-clusters": "./src/event-clusters.ts",
         "./haversine-distance": "./src/haversine-distance.ts",
+        "./legal-urls": "./src/legal-urls.ts",
         "./local-format": "./src/local-format.ts",
         "./map-center": "./src/map-center.ts",
         "./map-filters": "./src/map-filters.ts",

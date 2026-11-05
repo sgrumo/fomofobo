@@ -49,7 +49,7 @@ export const generateMetadata = async (
         openGraph: {
             type: "website",
             url: path,
-            siteName: "Fomofobo",
+            siteName: "Zonzo",
             locale: "it_IT",
             ...card,
         },

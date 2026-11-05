@@ -180,5 +180,9 @@
         "More": "Mostra altri",
         "Offline": "Sei offline e questo locale non è ancora stato caricato.",
         "HistoryOffline": "Sei offline: gli eventi passati non sono ancora stati caricati."
+    },
+    "Legal": {
+        "Privacy": "Informativa sulla privacy",
+        "Support": "Assistenza"
     }
 }

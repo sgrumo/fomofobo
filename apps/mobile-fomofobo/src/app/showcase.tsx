@@ -81,7 +81,7 @@ const TypographyShowcase = () => (
     <ShowcaseSection title="Typography">
         {TYPE_SCALE_VARIANTS.map(variant => (
             <Text key={variant} variant={variant}>
-                {variant} fomofobo
+                {variant} zonzo
             </Text>
         ))}
         <Text variant="body-md" className="text-fg-muted">

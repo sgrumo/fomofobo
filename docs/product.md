@@ -1,12 +1,12 @@
 ---
 standard: draft
-title: fomofobo
+title: Zonzo
 summary: Mobile-first web app and native app that show events around a place on a map, with a backoffice where organizers publish them.
 ---
 
 ## Overview
 
-fomofobo is a responsive, mobile-first web app, with a native app for iOS and Android, for finding events around a place. Visitors open it with no account, see the events of the coming days as pins on a map, and narrow them by name, place, category and date. Each event opens a detail over the map that a visitor can open directly from a link or share. Organizers publish their events through a backoffice in the same app, and publishing needs no approval. Admins supervise the organizers, block organizers or events, and manage the shared catalogue of categories. The web app installs on the home screen, and both apps keep the events already loaded viewable offline.
+Zonzo is a responsive, mobile-first web app, with a native app for iOS and Android, for finding events around a place. Visitors open it with no account, see the events of the coming days as pins on a map, and narrow them by name, place, category and date. Each event opens a detail over the map that a visitor can open directly from a link or share. Organizers publish their events through a backoffice in the same app, and publishing needs no approval. Admins supervise the organizers, block organizers or events, and manage the shared catalogue of categories. The web app installs on the home screen, and both apps keep the events already loaded viewable offline.
 
 ## Perimeter
 
@@ -111,6 +111,12 @@ The saved list works offline for every saved event that the device showed online
 A native app for iOS and Android offers the features of the public web app: the map with its preview, search and filters, event and venue details, saved events and offline reads. It has no sign-in and no backoffice, and it speaks Italian alone.
 
 The stores install and update the app, in place of the install button and the update prompt of the web app. A version gate asks for a store update when the server marks the installed version as too old, and shows a maintenance notice when the server says so.
+
+### Privacy and support
+
+The public app has a privacy policy page and a support page, because the App Store and Google Play require both URLs for a listing. The saved list links both pages, on the web and in the native app, because Apple requires a link to the privacy policy inside the app. The native app opens them in the browser.
+
+The privacy policy names Quinck S.r.l. as the data controller. It lists what the apps send: the search center, which the server uses and does not store, the random device id of each save, and the IP address that the rate limits store. A change of what the apps collect needs a change of the policy and of the privacy answers of both stores.
 
 ### Backoffice access
 

@@ -31,7 +31,7 @@ test.describe("installed app offline", () => {
         expect(res.status()).toBe(200)
         const manifest: unknown = await res.json()
         expect(manifest).toMatchObject({
-            name: "Fomofobo",
+            name: "Zonzo",
             display: "standalone",
             start_url: expect.stringMatching(/^\/[a-z]{2}$/u),
             icons: expect.arrayContaining([

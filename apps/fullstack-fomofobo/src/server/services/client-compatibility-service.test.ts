@@ -8,7 +8,7 @@ import {
     resolveClientCompatibility,
 } from "./client-compatibility-service"
 
-const storeUrl = "market://details?id=it.quinck.fomofobo"
+const storeUrl = "market://details?id=it.quinck.zonzo"
 
 const livePolicy: PlatformPolicy = {
     minVersion: semverSchema.parse("1.4.0"),

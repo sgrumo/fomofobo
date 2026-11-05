@@ -3,7 +3,7 @@
 # therefore passes `app_identifier` / `package_name` explicitly from the evaluated
 # app.config.ts, and nothing here is load-bearing for a build. Add no action that relies on
 # these values without passing the id itself.
-app_identifier("it.quinck.fomofobo")
+app_identifier("it.quinck.zonzo")
 
 # No apple_id and no itc_team_id: every iOS action takes the App Store Connect API key, which
 # names the team.
@@ -12,6 +12,6 @@ for_platform :ios do
 end
 
 for_platform :android do
-  package_name("it.quinck.fomofobo")
+  package_name("it.quinck.zonzo")
   json_key_file(ENV["GOOGLE_PLAY_JSON_KEY_PATH"])
 end

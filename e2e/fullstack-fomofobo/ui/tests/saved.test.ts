@@ -130,4 +130,21 @@ test.describe("saved events", () => {
 
         await expect.poll(countOfSaturday).toBe(1)
     })
+
+    test("links the privacy policy and the support page under the list", async ({
+        page,
+    }) => {
+        await gotoPage(page, "/saved/")
+
+        await expect(
+            page.getByRole("link", { name: t("shared", "Legal.Support") }),
+        ).toHaveAttribute("href", "/it/support")
+
+        await page.getByRole("link", { name: t("shared", "Legal.Privacy") }).click()
+
+        await expect(page).toHaveURL(/\/privacy\/?$/u)
+        await expect(
+            page.getByRole("heading", { level: 1, name: t("shared", "Privacy.Title") }),
+        ).toBeVisible()
+    })
 })

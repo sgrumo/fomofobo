@@ -24,7 +24,7 @@ export const VERSION_GATE_ENV = {
     ANDROID_MIN_VERSION: "2.0.0",
     ANDROID_CURRENT_VERSION: "2.0.0",
     ANDROID_RELEASE_LIVE: "false",
-    ANDROID_STORE_URL: "market://details?id=it.quinck.fomofobo",
+    ANDROID_STORE_URL: "market://details?id=it.quinck.zonzo",
 }
 
 /**

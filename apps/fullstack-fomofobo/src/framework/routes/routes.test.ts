@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 
+import { privacyUrlOf, supportUrlOf } from "domain/legal-urls"
 import { camelCase, kebabCase } from "es-toolkit"
 import { languageKeys, languageKeySchema } from "i18n/i18n"
 import { match } from "ts-pattern"
@@ -395,5 +396,20 @@ describe("route handler objects", () => {
             Object.values(routeHandlers).map(handler => handler.segments.join("/")),
         )
         expect(ledger).toStrictEqual(appFileSegments("route.ts"))
+    })
+})
+
+describe("native app links", () => {
+    it("should build the path of the privacy and support routes", () => {
+        const baseUrl = "https://example.com"
+
+        for (const lang of languageKeys) {
+            expect(new URL(privacyUrlOf(baseUrl, lang)).pathname).toBe(
+                routes.privacy.path({ parameters: { lang }, query: {} }),
+            )
+            expect(new URL(supportUrlOf(baseUrl, lang)).pathname).toBe(
+                routes.support.path({ parameters: { lang }, query: {} }),
+            )
+        }
     })
 })

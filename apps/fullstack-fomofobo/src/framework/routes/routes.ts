@@ -40,6 +40,18 @@ export const routes = {
         parametersSchema: z.object({ lang: languageKeySchema }),
         generateStaticParams: () => languageKeys.map(lang => ({ lang })),
     }),
+    privacy: createStaticRoute({
+        segments: ["[lang]", "privacy"],
+        title: ({ t }) => t("PageTitle.Privacy"),
+        parametersSchema: z.object({ lang: languageKeySchema }),
+        generateStaticParams: () => languageKeys.map(lang => ({ lang })),
+    }),
+    support: createStaticRoute({
+        segments: ["[lang]", "support"],
+        title: ({ t }) => t("PageTitle.Support"),
+        parametersSchema: z.object({ lang: languageKeySchema }),
+        generateStaticParams: () => languageKeys.map(lang => ({ lang })),
+    }),
     devShowcase: createDynamicRoute({
         segments: ["[lang]", "dev", "showcase"],
         title: ({ t }) => t("PageTitle.DevShowcase"),

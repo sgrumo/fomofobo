@@ -7,9 +7,9 @@ ANDROID_DIR = File.join(PROJECT_ROOT, "android")
 # project, workspace and scheme, so a rename of the app means a rename of these too. `name`
 # is deliberately environment-independent, unlike the application id, so one path serves both
 # environments.
-XCODEPROJ = File.join(IOS_DIR, "fomofobo.xcodeproj")
-XCWORKSPACE = File.join(IOS_DIR, "fomofobo.xcworkspace")
-SCHEME = "fomofobo"
+XCODEPROJ = File.join(IOS_DIR, "Zonzo.xcodeproj")
+XCWORKSPACE = File.join(IOS_DIR, "Zonzo.xcworkspace")
+SCHEME = "Zonzo"
 AAB_PATH = File.join(ANDROID_DIR, "app/build/outputs/bundle/release/app-release.aab")
 APK_PATH = File.join(ANDROID_DIR, "app/build/outputs/apk/release/app-release.apk")
 # UDIDs of the iPhones allowed to install an ad-hoc build. Apple's sample format, which

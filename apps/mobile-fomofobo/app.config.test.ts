@@ -109,8 +109,8 @@ describe("app.config", () => {
     it("gives a dev build its own scheme", async () => {
         const prod = await loadConfigFor("prod")
         const dev = await loadConfigFor("dev")
-        expect(prod.scheme).toBe("fomofobo")
-        expect(dev.scheme).toBe("fomofobodev")
+        expect(prod.scheme).toBe("zonzo")
+        expect(dev.scheme).toBe("zonzodev")
     })
 
     it("takes the release version from APP_VERSION", async () => {

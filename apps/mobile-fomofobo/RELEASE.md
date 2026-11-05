@@ -23,7 +23,7 @@ If `bundle install` fails on an Intel Mac, run `bundle lock --add-platform x86_6
 
 ### Where each secret lives
 
-Keep every key file in one folder outside the repository, for example `~/.config/fomofobo-release/`. Keep a copy of each file and each password in your password manager.
+Keep every key file in one folder outside the repository, for example `~/.config/zonzo-release/`. Keep a copy of each file and each password in your password manager.
 
 | Value                                 | Kind                        | Comes from                        |
 | ------------------------------------- | --------------------------- | --------------------------------- |
@@ -42,8 +42,8 @@ The values go in `.env`. A `*_PATH` value is the absolute path of the file. `.en
 2. Download the `.p8` file. Apple lets you download it once.
 3. Write its key ID, the issuer ID and the path of the file in the `APP_STORE_CONNECT_API_*` values.
 4. Write `APPLE_TEAM_ID` from [developer.apple.com/account](https://developer.apple.com/account), under Membership details.
-5. Under Certificates, Identifiers & Profiles, register the identifiers `it.quinck.fomofobo` and `it.quinck.fomofobo.dev`. Match creates no App ID.
-6. In App Store Connect, create the app record of `it.quinck.fomofobo`. The dev id needs no record.
+5. Under Certificates, Identifiers & Profiles, register the identifiers `it.quinck.zonzo` and `it.quinck.zonzo.dev`. Match creates no App ID.
+6. In App Store Connect, create the app record of `it.quinck.zonzo`. The dev id needs no record.
 
 The first `certificates` run creates the distribution certificate, and that needs the Admin role. After it, you can replace the key with one of the App Manager role.
 
@@ -51,13 +51,13 @@ The first `certificates` run creates the distribution certificate, and that need
 
 Match keeps the signing certificate and the profiles, encrypted, in a git repository.
 
-1. Create an empty private GitHub repository, for example `fomofobo-certificates`.
+1. Create an empty private GitHub repository, for example `zonzo-certificates`.
 2. Write its SSH URL in `MATCH_GIT_URL`. The Mac reaches it with its own SSH key.
 3. Choose a `MATCH_PASSWORD`. Match encrypts the repository with it.
 4. Add the UDID of each tester iPhone to `fastlane/devices.txt`, as the comments of that file say.
 5. Run `bundle exec fastlane ios certificates`.
 
-The setup is done when the repository holds one certificate, an appstore profile of `it.quinck.fomofobo` and an ad-hoc profile of `it.quinck.fomofobo.dev`.
+The setup is done when the repository holds one certificate, an appstore profile of `it.quinck.zonzo` and an ad-hoc profile of `it.quinck.zonzo.dev`.
 
 CAUTION: Never run `fastlane match nuke distribution`. It revokes every distribution certificate of the team.
 
@@ -67,8 +67,8 @@ CAUTION: Renew the certificate before its end date. `match` refuses an expired c
 
 The dev builds reach the testers through Firebase App Distribution. A production build never goes to Firebase, so a prod project is not necessary.
 
-1. In the [Firebase console](https://console.firebase.google.com/), create a project, for example `fomofobo-dev`. The free Spark plan covers App Distribution.
-2. Add an iOS app with the bundle id `it.quinck.fomofobo.dev`, and an Android app with the package name `it.quinck.fomofobo.dev`. The app has no Firebase SDK, so it needs no config file.
+1. In the [Firebase console](https://console.firebase.google.com/), create a project, for example `zonzo-dev`. The free Spark plan covers App Distribution.
+2. Add an iOS app with the bundle id `it.quinck.zonzo.dev`, and an Android app with the package name `it.quinck.zonzo.dev`. The app has no Firebase SDK, so it needs no config file.
 3. Write the App ID of each app in `FIREBASE_IOS_APP_ID` and `FIREBASE_ANDROID_APP_ID`.
 4. In the Google Cloud console of the same project, create a service account with the Firebase App Distribution Admin role.
 5. Download its JSON key.
@@ -81,12 +81,12 @@ The dev builds reach the testers through Firebase App Distribution. A production
 1. Generate the release keystore, outside the repository:
 
     ```sh
-    keytool -genkey -v -keystore fomofobo-release.keystore -alias fomofobo \
+    keytool -genkey -v -keystore zonzo-release.keystore -alias zonzo \
       -keyalg RSA -keysize 2048 -validity 10000
     ```
 
 2. Write its path, its alias and both passwords in the `ANDROID_KEYSTORE_*` and `ANDROID_KEY_*` values.
-3. In the [Play Console](https://play.google.com/console), create the app with the package name `it.quinck.fomofobo`.
+3. In the [Play Console](https://play.google.com/console), create the app with the package name `it.quinck.zonzo`.
 4. Keep Play App Signing on.
 5. In Google Cloud, create a service account.
 6. Enable the Google Play Android Developer API in the project of the service account.
@@ -109,7 +109,7 @@ Each store asks for these before the first submission. Fill them by hand: the la
 
 - Name, short and full description, in Italian.
 - Screenshots of each required device size.
-- The URL of the privacy policy and a support URL.
+- The privacy policy URL, `<API_URL>/it/privacy`, and the support URL, `<API_URL>/it/support`. `API_URL` is the value of `.env.prod`.
 - Category, age rating (App Store) and content rating (Play).
 - The privacy answers below.
 

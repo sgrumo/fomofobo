@@ -11,13 +11,13 @@ import { MAP_GROUND_COLOR } from "@/lib/pwa/pwa-colors"
 
 export const metadata: Metadata = {
     title: {
-        default: "Fomofobo",
-        template: "%s · Fomofobo",
+        default: "Zonzo",
+        template: "%s · Zonzo",
     },
-    applicationName: "Fomofobo",
+    applicationName: "Zonzo",
     appleWebApp: {
         capable: true,
-        title: "Fomofobo",
+        title: "Zonzo",
         // The map screen has no safe-area insets, so the iOS status bar keeps its own band
         statusBarStyle: "default",
     },

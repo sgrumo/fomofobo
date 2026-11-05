@@ -2,7 +2,7 @@
     "ClearCache": "Pulisci la cache",
     "App": {
         "Description": "Gli eventi intorno a te, su una mappa",
-        "UpdateReady": "È pronta una nuova versione di Fomofobo.",
+        "UpdateReady": "È pronta una nuova versione di Zonzo.",
         "Reload": "Ricarica"
     },
     "Routes": {
@@ -26,7 +26,9 @@
             "Organizers": "Organizzatori",
             "Settings": "Impostazioni",
             "Venue": "Luogo"
-        }
+        },
+        "Privacy": "Privacy",
+        "Support": "Assistenza"
     },
     "Map": {
         "Label": "Mappa degli eventi",
@@ -218,7 +220,7 @@
         "Offline": "Sei offline: l'elenco mostra le copie salvate sul dispositivo."
     },
     "Backoffice": {
-        "Brand": "fomofobo backoffice",
+        "Brand": "zonzo backoffice",
         "Nav": {
             "Label": "Sezioni del backoffice",
             "Events": "Eventi",
@@ -628,5 +630,92 @@
         "Title": "Installa l'app",
         "Button": "Aggiungi alla schermata Home",
         "IosGuide": "Tocca Condividi, poi «Aggiungi alla schermata Home»."
+    },
+    "Legal": {
+        "Privacy": "Informativa sulla privacy",
+        "Support": "Assistenza",
+        "WriteTo": "Scrivi a {{email}}",
+        "BackHome": "Torna alla mappa"
+    },
+    "Privacy": {
+        "Title": "Informativa sulla privacy",
+        "Updated": "Ultimo aggiornamento: 5 novembre 2026",
+        "Intro": "Questa informativa spiega quali dati trattano il sito e l'app per iOS e Android quando cerchi eventi sulla mappa, e quali dati trattiamo per gli organizzatori che pubblicano dal backoffice.",
+        "Sections": {
+            "Controller": {
+                "Title": "Titolare del trattamento",
+                "Body": "Quinck S.r.l., Via Filippo Turati 15/C, Imola (BO), P.IVA 03916551207. Per ogni domanda sulla privacy scrivi a {{email}}."
+            },
+            "NotCollected": {
+                "Title": "Cosa non raccogliamo",
+                "Body": "Per usare la mappa non serve un account. Non mostriamo pubblicità, non seguiamo le tue attività su app e siti di altri e non usiamo strumenti di statistica o di profilazione."
+            },
+            "Location": {
+                "Title": "Posizione",
+                "Body": "Se lo consenti, il dispositivo legge la tua posizione mentre usi la mappa, per centrarla su di te. Per trovare gli eventi intorno, la mappa invia al nostro server il centro della ricerca: il server lo usa per rispondere e non lo salva. Puoi negare il permesso e cercare un luogo a mano."
+            },
+            "PlaceSearch": {
+                "Title": "Ricerca dei luoghi",
+                "Body": "Quando cerchi un luogo, il nostro server inoltra a Geoapify il testo cercato e il centro della ricerca arrotondato a circa un chilometro. Geoapify riceve la richiesta dal nostro server, non dal tuo dispositivo."
+            },
+            "Saves": {
+                "Title": "Eventi salvati",
+                "Body": "La lista degli eventi salvati resta sul tuo dispositivo. Quando salvi o togli un evento, l'app invia al server un identificativo casuale creato sul dispositivo, insieme all'evento e alla data, per contare le persone interessate. L'identificativo non contiene il tuo nome, la tua email né altri dati che ti identifichino. Il salvataggio resta sul server finché lo togli o finché l'evento viene eliminato."
+            },
+            "IpAddress": {
+                "Title": "Indirizzo IP e sicurezza",
+                "Body": "Il server usa l'indirizzo IP di ogni richiesta per limitare gli abusi: al massimo 60 salvataggi ogni 10 minuti e 30 ricerche di luoghi al minuto. Per contarle salva l'indirizzo con un contatore e l'ora di inizio del conteggio. Il fornitore di hosting registra le richieste nei suoi log tecnici."
+            },
+            "DeviceStorage": {
+                "Title": "Dati sul dispositivo e cookie",
+                "Body": "Il sito e l'app salvano sul dispositivo la lista degli eventi salvati, l'identificativo casuale e le pagine, le foto e le zone della mappa già caricate, per funzionare anche offline. La parte pubblica non usa cookie. Il backoffice usa un solo cookie tecnico, la sessione di accesso."
+            },
+            "Providers": {
+                "Title": "Fornitori",
+                "Body": "Per far funzionare il servizio usiamo Vercel (hosting del sito e del server), Turso (database), Cloudflare R2 (foto degli eventi), OpenFreeMap (mappe) e Geoapify (ricerca dei luoghi). Il tuo dispositivo scarica foto e mappe direttamente da Cloudflare e da OpenFreeMap, che vedono quindi il tuo indirizzo IP. Alcuni fornitori possono trattare i dati fuori dall'Unione europea, con le garanzie previste dal GDPR, come le clausole contrattuali standard."
+            },
+            "Organizers": {
+                "Title": "Organizzatori",
+                "Body": "Per gli account del backoffice trattiamo nome, email, l'impronta cifrata della password e le sessioni di accesso, oltre agli eventi e ai luoghi pubblicati. Li conserviamo finché l'account esiste."
+            },
+            "LegalBasis": {
+                "Title": "Base giuridica",
+                "Body": "Trattiamo questi dati per fornirti il servizio che chiedi (art. 6.1.b GDPR) e per il nostro legittimo interesse a proteggerlo dagli abusi (art. 6.1.f GDPR). Non vendiamo e non cediamo i dati a terzi."
+            },
+            "Rights": {
+                "Title": "I tuoi diritti",
+                "Body": "Puoi chiedere l'accesso, la rettifica, la cancellazione, la limitazione o la portabilità dei tuoi dati, e opporti al trattamento, scrivendo a {{email}}. Puoi anche presentare un reclamo al Garante per la protezione dei dati personali. Per cancellare un salvataggio dal server, toglilo dalla lista degli eventi salvati."
+            },
+            "Minors": {
+                "Title": "Minori",
+                "Body": "Il servizio non è rivolto ai minori di 14 anni."
+            },
+            "Changes": {
+                "Title": "Modifiche",
+                "Body": "Quando cambiamo questa informativa, aggiorniamo la data in cima alla pagina."
+            }
+        }
+    },
+    "Support": {
+        "Title": "Assistenza",
+        "Intro": "Hai un problema con la mappa o una domanda sugli eventi? Scrivici, indicando il dispositivo e cosa stavi facendo.",
+        "Questions": {
+            "Location": {
+                "Title": "La mappa non mostra gli eventi intorno a me",
+                "Body": "Controlla nelle impostazioni del dispositivo che l'app possa usare la posizione, oppure cerca un luogo nel campo di ricerca."
+            },
+            "Saved": {
+                "Title": "Dove trovo gli eventi salvati?",
+                "Body": "Nella lista degli eventi salvati, che resta sul dispositivo. Se disinstalli l'app o cancelli i dati del browser, la lista si svuota."
+            },
+            "Missing": {
+                "Title": "Un evento è sparito",
+                "Body": "Un evento resta sulla mappa per qualche giorno dopo la fine, poi esce. Un evento bloccato dagli amministratori esce subito."
+            },
+            "Publish": {
+                "Title": "Voglio pubblicare i miei eventi",
+                "Body": "Gli organizzatori pubblicano dal backoffice, con un account che creiamo noi. Scrivici per chiederne uno."
+            }
+        }
     }
 }

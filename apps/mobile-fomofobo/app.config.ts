@@ -20,7 +20,7 @@ const buildNumber = env.APP_BUILD_NUMBER ?? 1
 
 // The local and dev builds carry their own application id, so they install beside the store
 // build on one phone.
-const baseAppId = "it.quinck.fomofobo"
+const baseAppId = "it.quinck.zonzo"
 const appId = `${baseAppId}${target.appIdSuffix}`
 
 /**
@@ -53,8 +53,8 @@ const config: ExpoConfig = {
         // real release. The app then sends no version, so the gate leaves it alone.
         versioned: env.APP_VERSION !== undefined,
     },
-    name: "fomofobo",
-    slug: "fomofobo",
+    name: "Zonzo",
+    slug: "zonzo",
     version: env.APP_VERSION ?? "1.0.0",
     scheme: target.scheme,
     orientation: "portrait",
@@ -76,7 +76,7 @@ const config: ExpoConfig = {
         googleServicesFile: googleServicesFile("google-services.json"),
         adaptiveIcon: {
             foregroundImage: "./assets/adaptive-icon.png",
-            backgroundColor: "#ffffff",
+            backgroundColor: THEME_COLORS["map-ground"],
         },
         predictiveBackGestureEnabled: false,
     },
@@ -96,9 +96,11 @@ const config: ExpoConfig = {
         [
             "expo-splash-screen",
             {
+                // The Zonzo wordmark on the green of the brand, which the map ground carries on
                 image: "./assets/splash-icon.png",
+                imageWidth: 240,
                 resizeMode: "contain",
-                backgroundColor: THEME_COLORS.surface,
+                backgroundColor: THEME_COLORS["map-ground"],
             },
         ],
         // iOS takes the family name from the font file. Android takes it from `fontFamily`, which

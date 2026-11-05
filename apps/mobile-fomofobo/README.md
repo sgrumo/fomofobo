@@ -1,6 +1,6 @@
 # Mobile app
 
-Expo app of fomofobo: the public features of the web app, with no sign-in. It calls the Hono API that `apps/fullstack-fomofobo` serves under `/api/*`.
+Expo app of Zonzo: the public features of the web app, with no sign-in. It calls the Hono API that `apps/fullstack-fomofobo` serves under `/api/*`.
 
 ## Running the App
 
@@ -14,12 +14,12 @@ From the repo root, start the API with `pnpm dev:fomofobo`, then run `pnpm dev:m
 
 A lane builds against one of two environments, `dev` or `prod`. `APP_ENV` selects it, and `app.config.ts` keys every environment-dependent value off that one variable. Unset, it builds a `local` app with the dev identity.
 
-| Lane                 | Channel                   | Application id           | Reaches    |
-| -------------------- | ------------------------- | ------------------------ | ---------- |
-| `ios distribute`     | Firebase App Distribution | `it.quinck.fomofobo.dev` | testers    |
-| `android distribute` | Firebase App Distribution | `it.quinck.fomofobo.dev` | testers    |
-| `ios release`        | App Review                | `it.quinck.fomofobo`     | real users |
-| `android release`    | Play production track     | `it.quinck.fomofobo`     | real users |
+| Lane                 | Channel                   | Application id        | Reaches    |
+| -------------------- | ------------------------- | --------------------- | ---------- |
+| `ios distribute`     | Firebase App Distribution | `it.quinck.zonzo.dev` | testers    |
+| `android distribute` | Firebase App Distribution | `it.quinck.zonzo.dev` | testers    |
+| `ios release`        | App Review                | `it.quinck.zonzo`     | real users |
+| `android release`    | Play production track     | `it.quinck.zonzo`     | real users |
 
 The dev build carries its own application id, so both apps install side by side. No workflow runs the lanes: a person runs them by hand on a Mac.
 
