@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test"
 import { expectAlert } from "e2e-ui-components/alert"
+import { clickButton } from "e2e-ui-components/button"
 import { pressChip } from "e2e-ui-components/chip"
 import { clickIconButton } from "e2e-ui-components/icon-button"
 
@@ -55,9 +56,10 @@ test.describe("installed app offline", () => {
         const eventDetail = page
             .getByRole("dialog", { name: event.title, exact: true })
             .filter({ has: page.getByRole("heading", { level: 1, name: event.title }) })
-        const venueDetail = page
-            .getByRole("dialog", { name: venue.name, exact: true })
-            .filter({ has: page.getByRole("heading", { level: 1, name: venue.name }) })
+        const venueDialog = page.getByRole("dialog", { name: venue.name, exact: true })
+        const venueDetail = venueDialog.filter({
+            has: page.getByRole("heading", { level: 1, name: venue.name }),
+        })
 
         await gotoPage(page, mapPath(center))
         await page.waitForFunction("navigator.serviceWorker.controller !== null")
@@ -87,7 +89,9 @@ test.describe("installed app offline", () => {
         )
         await expect(eventDetail).toBeVisible()
         await eventDetail.getByRole("button", { name: venue.name }).click()
-        await expect(venueDetail.getByText(past.title)).toBeVisible()
+        await clickButton(venueDialog, t("shared", "Venue.ShowHistory"))
+        await expect(venueDialog.getByText(past.title)).toBeVisible()
+        await clickIconButton(venueDialog, t("shared", "Venue.BackToProfile"))
         await venueDetail.getByRole("button", { name: event.title }).click()
         await expect(eventDetail).toBeVisible()
 
@@ -107,7 +111,8 @@ test.describe("installed app offline", () => {
         await eventDetail.getByRole("button", { name: venue.name }).click()
 
         await expect(venueDetail.getByText(event.title)).toBeVisible()
-        await expect(venueDetail.getByText(past.title)).toBeVisible()
+        await clickButton(venueDialog, t("shared", "Venue.ShowHistory"))
+        await expect(venueDialog.getByText(past.title)).toBeVisible()
     })
 
     test("names the missing connection when a new filter cannot load offline", async ({

@@ -262,7 +262,7 @@ test.describe("map", () => {
         ).toHaveAttribute("href", cinema.programmeUrl)
     })
 
-    test("opens the live event of a cinema first, then pages to the cinema", async ({
+    test("opens the live event of a cinema first, with no count for the cinema, then pages to the cinema", async ({
         page,
     }) => {
         const center = buildArea()
@@ -279,11 +279,11 @@ test.describe("map", () => {
         await gotoPage(page, mapPath(center))
         await page
             .getByRole("button", {
-                name: `${t("shared", "Map.Pin", {
+                name: t("shared", "Map.Pin", {
                     title: screening.title,
                     status: t("shared", "Status.live"),
                     time: "11:00",
-                })}, ${t("shared", "Map.MoreHere_one", { count: 1 })}`,
+                }),
                 exact: true,
             })
             .click({ timeout: MAP_TIMEOUT_MS })
