@@ -13,7 +13,7 @@ Run every command of this file from the directory of the app.
 3. Install the JDK and the Android SDK, as `SETUP.md` says.
 4. Install `libyaml` and `gmp` with `brew`. The native extensions of the gems need them.
 5. Install the Ruby release of `.ruby-version` with a version manager, for example `rbenv` or `mise`.
-6. Run `bundle install`.
+6. Run `bundle config set --local path vendor/bundle`, then `bundle install`. The gems then stay in this directory, apart from a `GEM_HOME` that another Ruby release shares.
 7. Copy `.env.template` to `.env`.
 8. Write `API_URL=https://fomofobo-dev.vercel.app` in `.env.dev`, and the production `API_URL` in `.env.prod`.
 

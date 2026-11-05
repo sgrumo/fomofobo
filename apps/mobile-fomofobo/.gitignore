@@ -3,6 +3,7 @@
 # dependencies
 node_modules/
 /vendor/bundle/
+/.bundle/
 
 # Fastlane run artifacts
 /fastlane/report.xml
