@@ -45,15 +45,19 @@ At repository level, set the variable `VERCEL_ORG_ID` and the secret `VERCEL_TOK
 3. Set the CORS rule of the bucket with `pnpm dlx wrangler r2 bucket cors set fomofobo-<env>-photos --file cors.json`. The browser uploads with a presigned `PUT`, so the rule allows the app origin, the `PUT` method and the `Content-Type` header:
 
     ```json
-    [
-        {
-            "AllowedOrigins": ["https://<app origin>"],
-            "AllowedMethods": ["PUT"],
-            "AllowedHeaders": ["Content-Type"],
-            "ExposeHeaders": ["ETag"],
-            "MaxAgeSeconds": 3600
-        }
-    ]
+    {
+        "rules": [
+            {
+                "allowed": {
+                    "origins": ["https://<app origin>"],
+                    "methods": ["PUT"],
+                    "headers": ["Content-Type"]
+                },
+                "exposeHeaders": ["ETag"],
+                "maxAgeSeconds": 3600
+            }
+        ]
+    }
     ```
 
 4. Create an R2 API token with Object Read and Write on the bucket of the environment. The app and the photo purge job share it, and the job deletes objects with it.
