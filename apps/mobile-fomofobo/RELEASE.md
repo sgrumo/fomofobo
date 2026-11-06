@@ -15,7 +15,7 @@ Run every command of this file from the directory of the app.
 5. Install the Ruby release of `.ruby-version` with a version manager, for example `rbenv` or `mise`.
 6. Run `bundle config set --local path vendor/bundle`, then `bundle install`. The gems then stay in this directory, apart from a `GEM_HOME` that another Ruby release shares.
 7. Copy `.env.template` to `.env`.
-8. Write `API_URL=https://fomofobo-dev.vercel.app` in `.env.dev`, and the production `API_URL` in `.env.prod`.
+8. Write `API_URL=https://www.zonzo.live` in `.env.dev`, and the production `API_URL` in `.env.prod`.
 
 The Mac is ready when `bundle exec fastlane --version` prints the version that the `Gemfile` pins.
 
