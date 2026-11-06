@@ -15,6 +15,10 @@
         "Loading": "Caricamento eventi",
         "Position": "La tua posizione",
         "Locate": "Centra sulla mia posizione",
+        "Sounds": {
+            "Mute": "Disattiva i suoni",
+            "Unmute": "Attiva i suoni"
+        },
         "LocationOff": "La posizione è disattivata. Consentila per vedere gli eventi intorno a te, oppure cerca un luogo.",
         "AllowLocation": "Consenti la posizione",
         "LocationUnavailable": {

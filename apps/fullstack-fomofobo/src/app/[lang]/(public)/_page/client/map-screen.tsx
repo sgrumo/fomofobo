@@ -22,7 +22,9 @@ import {
     PixelIconClose,
     PixelIconFilter,
     PixelIconLocate,
+    PixelIconMuted,
     PixelIconSaved,
+    PixelIconSound,
 } from "ui-components/pixel-icons"
 import { Separator } from "ui-components/separator"
 import { Spinner } from "ui-components/spinner"
@@ -50,6 +52,7 @@ import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
 import { useGeolocation } from "@/lib/hooks/use-geolocation"
+import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import { useMediaQuery } from "@/lib/hooks/use-media-query"
 import { useNow } from "@/lib/hooks/use-now"
 import { useOnline } from "@/lib/hooks/use-online"
@@ -118,6 +121,7 @@ export const MapScreen = (props: MapScreenProps) => {
     const geolocation = useGeolocation()
     const now = useNow(CLOCK_TICK_MS)
     const online = useOnline()
+    const [soundsMuted, setSoundsMuted] = useLocalStorage("sounds-muted")
     const filtersId = useId()
     const [filtersOpen, setFiltersOpen] = useState(false)
     const [locateRequest, setLocateRequest] = useState<LocateRequest>()
@@ -689,6 +693,13 @@ export const MapScreen = (props: MapScreenProps) => {
                     icon={<PixelIconLocate />}
                     onClick={() => {
                         void locate()
+                    }}
+                />
+                <IconButton
+                    aria-label={t(soundsMuted ? "Map.Sounds.Unmute" : "Map.Sounds.Mute")}
+                    icon={soundsMuted ? <PixelIconMuted /> : <PixelIconSound />}
+                    onClick={() => {
+                        setSoundsMuted(!soundsMuted)
                     }}
                 />
             </div>

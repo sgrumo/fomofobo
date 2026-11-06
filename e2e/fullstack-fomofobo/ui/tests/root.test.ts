@@ -1499,6 +1499,54 @@ test.describe("detail over the map", () => {
         await expect(page).not.toHaveURL(/saved=true/u)
     })
 
+    test("plays a sound on a pin press and on a save, and none once the sounds are muted, after a reload too", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const event = await seedPublicEvent(
+            { venue: await seedVenue(center), category: await seedCategory() },
+            { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+        )
+        const pin = page.getByRole("button", {
+            name: t("shared", "Map.Pin", {
+                title: event.title,
+                status: t("shared", "Status.upcoming"),
+                time: "18:00",
+            }),
+        })
+        const detail = page.getByRole("dialog", { name: event.title, exact: true })
+        const toggle = detail.getByRole("button", { name: t("shared", "Saved.Toggle") })
+        // A string script: the suite compiles without the DOM types of the browser.
+        await page.addInitScript(
+            "window.playedSounds = []; const RecordedAudio = window.Audio; window.Audio = function (source) { window.playedSounds.push(source); return new RecordedAudio(source) }",
+        )
+
+        await gotoPage(page, mapPath(center))
+        await pin.click({ timeout: MAP_TIMEOUT_MS })
+        await expect(detail).toBeVisible()
+        await toggle.click()
+        await expect(toggle).toHaveAttribute("aria-pressed", "true")
+
+        await expect
+            .poll(async () => await page.evaluate("window.playedSounds.length"))
+            .toBe(2)
+
+        await clickIconButton(page, t("shared", "Map.Sounds.Mute"))
+        await toggle.click()
+        await expect(toggle).toHaveAttribute("aria-pressed", "false")
+
+        expect(await page.evaluate("window.playedSounds.length")).toBe(2)
+
+        await gotoPage(page, mapPath(center))
+        await pin.click({ timeout: MAP_TIMEOUT_MS })
+        await expect(detail).toBeVisible()
+
+        await expect(
+            page.getByRole("button", { name: t("shared", "Map.Sounds.Unmute") }),
+        ).toBeVisible()
+        expect(await page.evaluate("window.playedSounds.length")).toBe(0)
+    })
+
     test("names an event or a venue that is no longer visible", async ({ page }) => {
         const venue = await seedVenue(buildArea())
         const event = await seedPublicEvent({ venue, category: await seedCategory() }, {})

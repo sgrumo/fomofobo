@@ -44,6 +44,7 @@ import { Alert } from "ui-components/alert"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { FIXED_MAP_OPTIONS, fixMapGestures } from "@/lib/map/fixed-map"
+import { playSound } from "@/lib/sounds/play-sound"
 
 import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"
@@ -463,6 +464,7 @@ export const EventMap = (props: EventMapProps) => {
                             permanentCount={feature.properties.permanentCount}
                             emphasis={emphasis}
                             onExpand={() => {
+                                playSound("cluster")
                                 const zoom = clusters.getClusterExpansionZoom(clusterId)
                                 // Past the last cluster zoom the points share one spot, so no zoom splits them.
                                 const first =
@@ -549,6 +551,7 @@ export const EventMap = (props: EventMapProps) => {
                                 props.onSelectedClick()
                                 return
                             }
+                            playSound("event")
                             centerOnMarker()
                             props.onSelect({
                                 eventId: occurrence.eventId,

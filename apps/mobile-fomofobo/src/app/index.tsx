@@ -32,6 +32,7 @@ import { showToast } from "@/components/ui/toast/toast-store"
 import { ApiResponseError } from "@/lib/api/api-response-error"
 import { isSameSearchFilters, latestQueryData } from "@/lib/api/cached-answers"
 import { api } from "@/lib/api/client"
+import { useDeviceStorage } from "@/lib/hooks/use-device-storage"
 import { useNow } from "@/lib/hooks/use-now"
 import { useOnline } from "@/lib/hooks/use-online"
 
@@ -72,6 +73,7 @@ const MapScreen = () => {
     const location = useDeviceLocation()
     const now = useNow(CLOCK_TICK_MS)
     const online = useOnline()
+    const [soundsMuted, setSoundsMuted] = useDeviceStorage("sounds-muted")
     const [filtersOpen, setFiltersOpen] = useState(false)
     const [locateRequest, setLocateRequest] = useState<LocateRequest>()
     const filtersActive = hasActiveFilters(query)
@@ -405,6 +407,13 @@ const MapScreen = () => {
                     label={t("Map.Locate")}
                     onPress={() => {
                         void locate()
+                    }}
+                />
+                <IconButton
+                    icon={soundsMuted ? "muted" : "sound"}
+                    label={t(soundsMuted ? "Map.Sounds.Unmute" : "Map.Sounds.Mute")}
+                    onPress={() => {
+                        setSoundsMuted(!soundsMuted)
                     }}
                 />
             </View>

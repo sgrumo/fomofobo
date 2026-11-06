@@ -40,6 +40,8 @@ import { useEffect, useEffectEvent, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { View } from "react-native"
 
+import { playSound } from "@/lib/sounds/play-sound"
+
 import dotDitherPattern from "../../../assets/map/dot-dither.png"
 import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"
@@ -303,6 +305,7 @@ export const EventMap = (props: EventMapProps) => {
                             permanentCount={feature.properties.permanentCount}
                             emphasis={emphasis}
                             onExpand={() => {
+                                playSound("cluster")
                                 const zoom = clusters.getClusterExpansionZoom(clusterId)
                                 // Past the last cluster zoom the points share one spot, so no zoom splits them.
                                 const first =
@@ -364,6 +367,7 @@ export const EventMap = (props: EventMapProps) => {
                         moreCount={spot.moreCount}
                         emphasis={emphasis}
                         onSelect={() => {
+                            playSound("event")
                             centerOnMarker()
                             props.onSelect({
                                 eventId: occurrence.eventId,

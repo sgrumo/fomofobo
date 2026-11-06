@@ -50,6 +50,10 @@
         "Cluster": "{{count}} luoghi: {{live}} con eventi in corso, {{upcoming}} con eventi in arrivo, {{ended}} con eventi finiti, {{permanent}} tra cinema, musei e teatri. Ingrandisci",
         "Position": "La tua posizione",
         "Locate": "Centra sulla mia posizione",
+        "Sounds": {
+            "Mute": "Disattiva i suoni",
+            "Unmute": "Attiva i suoni"
+        },
         "LocationOff": "La posizione è disattivata. Consentila per vedere gli eventi intorno a te, oppure cerca un luogo.",
         "LocationBlocked": {
             "Title": "La posizione è bloccata",

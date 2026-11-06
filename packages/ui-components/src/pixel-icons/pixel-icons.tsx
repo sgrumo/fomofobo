@@ -77,6 +77,14 @@ export const PixelIconLink = (props: PixelIconProps) => (
     <PixelIcon name="link" {...props} />
 )
 
+export const PixelIconSound = (props: PixelIconProps) => (
+    <PixelIcon name="sound" {...props} />
+)
+
+export const PixelIconMuted = (props: PixelIconProps) => (
+    <PixelIcon name="muted" {...props} />
+)
+
 export const PixelIconSave = (props: PixelIconProps) => (
     <PixelIcon name="save" {...props} />
 )

@@ -20,6 +20,7 @@ export const localStorageSchema = {
     "save-sync": saveSyncStorageSchema,
     "device-id": z.uuid().nullable(),
     "event-form-mode": z.enum(["wizard", "form"]),
+    "sounds-muted": z.boolean(),
 }
 export type LocalStorageKey = keyof typeof localStorageSchema
 export type LocalStorageItem<K extends LocalStorageKey> = z.output<
@@ -35,6 +36,7 @@ export const localStorageDefaults: {
     "save-sync": { version: 1, queuedStoredSaves: false, pending: [] },
     "device-id": null,
     "event-form-mode": "wizard",
+    "sounds-muted": false,
 }
 
 export const localStorage = createWebStorage(

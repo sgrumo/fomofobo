@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { useSavedEvents } from "@/lib/hooks/use-saved-events"
 import { syncSaveChange } from "@/lib/saves/device-save-sync"
-import { playSaveSound } from "@/lib/saves/save-sound"
+import { playSound } from "@/lib/sounds/play-sound"
 
 interface SaveToggleProps {
     occurrence: OccurrenceRef
@@ -24,11 +24,11 @@ export const SaveToggle = (props: SaveToggleProps) => {
             selected={saved}
             size={props.size}
             onPress={() => {
+                playSound(saved ? "save-off" : "save-on")
                 if (saved) {
                     savedEvents.unsave(ref)
                 } else {
                     savedEvents.save(ref)
-                    playSaveSound()
                 }
                 void syncSaveChange({ ...ref, action: saved ? "unsave" : "save" })
             }}

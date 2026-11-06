@@ -8,8 +8,8 @@ import { PixelIconSave, PixelIconSaved } from "ui-components/pixel-icons"
 
 import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import { removeSavedSnapshot, storeSavedSnapshots } from "@/lib/pwa/saved-snapshots"
-import { playSaveSound } from "@/lib/saves/save-sound"
 import { syncSaveChange } from "@/lib/saves/save-sync"
+import { playSound } from "@/lib/sounds/play-sound"
 
 interface SaveToggleProps {
     occurrence: OccurrenceSummary
@@ -38,10 +38,9 @@ export const SaveToggle = (props: SaveToggleProps) => {
             icon={saved ? <PixelIconSaved /> : <PixelIconSave />}
             size={props.size}
             onClick={() => {
+                playSound(saved ? "save-off" : "save-on")
                 if (saved) {
                     void removeSavedSnapshot(props.occurrence)
-                } else {
-                    playSaveSound()
                 }
                 setSavedEvents({
                     ...savedEvents,
