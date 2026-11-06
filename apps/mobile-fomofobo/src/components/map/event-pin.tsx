@@ -4,10 +4,8 @@ import type { PinStart } from "domain/pin-tag"
 import {
     EVENT_DISC,
     LIVE_WAVE,
-    LIVE_WAVE_FRAME_MS,
     MARKER_CELL_PX,
     SELECTED_EVENT_DISC,
-    SELECTED_LIVE_WAVE,
 } from "domain/pixel-markers"
 import type { CategoryIcon, OccurrenceStatus } from "models"
 import { useTranslation } from "react-i18next"
@@ -100,14 +98,10 @@ export const EventPin = (props: EventPinProps) => {
                     icon={props.icon}
                     selected={props.emphasis === "selected"}
                     behind={
-                        props.status === "live" && (
+                        props.status === "live" &&
+                        props.emphasis !== "dimmed" && (
                             <PixelSprite
-                                sprite={
-                                    props.emphasis === "selected"
-                                        ? SELECTED_LIVE_WAVE
-                                        : LIVE_WAVE
-                                }
-                                frameMs={LIVE_WAVE_FRAME_MS}
+                                sprite={LIVE_WAVE}
                                 color={THEME_COLORS.live}
                                 box={
                                     (props.emphasis === "selected"

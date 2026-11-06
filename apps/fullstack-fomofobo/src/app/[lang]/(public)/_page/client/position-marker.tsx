@@ -1,11 +1,6 @@
 "use client"
 
-import {
-    MARKER_CELL_PX,
-    POSITION_CORE,
-    POSITION_HALO,
-    POSITION_HALO_FRAME_MS,
-} from "domain/pixel-markers"
+import { MARKER_CELL_PX, POSITION_CORE, POSITION_WAVE } from "domain/pixel-markers"
 import { useTranslation } from "react-i18next"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
@@ -26,8 +21,7 @@ export const PositionMarker = (props: RouteClientComponentProps<"root">) => {
         >
             <PixelSprite
                 route={props.route}
-                sprite={POSITION_HALO}
-                frameMs={POSITION_HALO_FRAME_MS}
+                sprite={POSITION_WAVE}
                 className="text-position"
             />
             <svg

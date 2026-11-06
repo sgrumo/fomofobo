@@ -3,7 +3,7 @@
 import type { MarkerEmphasis } from "domain/event-clusters"
 import { pinTagOf } from "domain/pin-tag"
 import type { PinStart } from "domain/pin-tag"
-import { LIVE_WAVE, LIVE_WAVE_FRAME_MS, SELECTED_LIVE_WAVE } from "domain/pixel-markers"
+import { LIVE_WAVE } from "domain/pixel-markers"
 import { cn } from "frontend-shared/styles"
 import type { CategoryIcon, OccurrenceStatus } from "models"
 import { useTranslation } from "react-i18next"
@@ -93,15 +93,10 @@ export const EventPin = (props: EventPinProps) => {
                     icon={props.icon}
                     selected={props.emphasis === "selected"}
                     behind={
-                        props.status === "live" ? (
+                        props.status === "live" && props.emphasis !== "dimmed" ? (
                             <PixelSprite
                                 route={props.route}
-                                sprite={
-                                    props.emphasis === "selected"
-                                        ? SELECTED_LIVE_WAVE
-                                        : LIVE_WAVE
-                                }
-                                frameMs={LIVE_WAVE_FRAME_MS}
+                                sprite={LIVE_WAVE}
                                 className="text-live"
                             />
                         ) : undefined

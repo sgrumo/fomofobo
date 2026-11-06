@@ -1,13 +1,13 @@
 "use client"
 
 import { MARKER_CELL_PX } from "domain/pixel-markers"
+import type { MarkerSprite } from "domain/pixel-markers"
 import { cn } from "frontend-shared/styles"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
 interface PixelSpriteProps extends RouteClientComponentProps<"root"> {
-    sprite: { cells: number; frames: number; path: string }
-    frameMs: number
+    sprite: MarkerSprite
     // Color of the cells, a `text-*` class
     className: string
 }
@@ -24,6 +24,17 @@ export const PixelSprite = (props: PixelSpriteProps) => {
             )}
             style={{ width: size, height: size }}
         >
+            {props.sprite.stillPath === "" ? undefined : (
+                <svg
+                    width={size}
+                    height={size}
+                    viewBox={`0 0 ${String(props.sprite.cells)} ${String(props.sprite.cells)}`}
+                    shapeRendering="crispEdges"
+                    className="absolute inset-0"
+                >
+                    <path d={props.sprite.stillPath} fill="currentColor" />
+                </svg>
+            )}
             <svg
                 width={size * props.sprite.frames}
                 height={size}
@@ -31,7 +42,7 @@ export const PixelSprite = (props: PixelSpriteProps) => {
                 shapeRendering="crispEdges"
                 className="animate-sprite block motion-reduce:animate-none"
                 style={{
-                    animationDuration: `${String(props.sprite.frames * props.frameMs)}ms`,
+                    animationDuration: `${String(props.sprite.cycleMs)}ms`,
                     animationTimingFunction: `steps(${String(props.sprite.frames)})`,
                 }}
             >

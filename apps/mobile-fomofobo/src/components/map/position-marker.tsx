@@ -1,9 +1,4 @@
-import {
-    MARKER_CELL_PX,
-    POSITION_CORE,
-    POSITION_HALO,
-    POSITION_HALO_FRAME_MS,
-} from "domain/pixel-markers"
+import { MARKER_CELL_PX, POSITION_CORE, POSITION_WAVE } from "domain/pixel-markers"
 import { useTranslation } from "react-i18next"
 import { View } from "react-native"
 import Svg, { Path } from "react-native-svg"
@@ -24,8 +19,7 @@ export const PositionMarker = () => {
             style={{ width: CORE_SIZE, height: CORE_SIZE }}
         >
             <PixelSprite
-                sprite={POSITION_HALO}
-                frameMs={POSITION_HALO_FRAME_MS}
+                sprite={POSITION_WAVE}
                 color={THEME_COLORS.position}
                 box={CORE_SIZE}
             />

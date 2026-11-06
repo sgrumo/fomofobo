@@ -1,11 +1,11 @@
 import { MARKER_CELL_PX } from "domain/pixel-markers"
+import type { MarkerSprite } from "domain/pixel-markers"
 import { View } from "react-native"
 import Animated, { steps, useReducedMotion } from "react-native-reanimated"
 import Svg, { Path } from "react-native-svg"
 
 interface PixelSpriteProps {
-    sprite: { cells: number; frames: number; path: string }
-    frameMs: number
+    sprite: MarkerSprite
     color: string
     // Side of the box the sprite centers on, in points
     box: number
@@ -27,6 +27,17 @@ export const PixelSprite = (props: PixelSpriteProps) => {
                 top: (props.box - size) / 2,
             }}
         >
+            {props.sprite.stillPath === "" ? undefined : (
+                <View className="absolute left-0 top-0">
+                    <Svg
+                        width={size}
+                        height={size}
+                        viewBox={`0 0 ${String(props.sprite.cells)} ${String(props.sprite.cells)}`}
+                    >
+                        <Path d={props.sprite.stillPath} fill={props.color} />
+                    </Svg>
+                </View>
+            )}
             <Animated.View
                 style={
                     reducedMotion
@@ -36,7 +47,7 @@ export const PixelSprite = (props: PixelSpriteProps) => {
                                   from: { transform: [{ translateX: 0 }] },
                                   to: { transform: [{ translateX: -strip }] },
                               },
-                              animationDuration: props.sprite.frames * props.frameMs,
+                              animationDuration: props.sprite.cycleMs,
                               animationIterationCount: "infinite",
                               animationTimingFunction: steps(props.sprite.frames),
                           }

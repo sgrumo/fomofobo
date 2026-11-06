@@ -6,9 +6,8 @@ import {
     LIVE_WAVE,
     MARKER_CELL_PX,
     POSITION_CORE,
-    POSITION_HALO,
+    POSITION_WAVE,
     SELECTED_EVENT_DISC,
-    SELECTED_LIVE_WAVE,
 } from "./pixel-markers"
 
 /**
@@ -33,12 +32,11 @@ describe("pixel markers", () => {
                 EVENT_DISC.cells,
                 SELECTED_EVENT_DISC.cells,
                 LIVE_WAVE.cells,
-                SELECTED_LIVE_WAVE.cells,
                 POSITION_CORE.cells,
-                POSITION_HALO.cells,
+                POSITION_WAVE.cells,
                 CLUSTER_SHAPE.cells,
             ].map(cells => cells * MARKER_CELL_PX),
-        ).toStrictEqual([44, 52, 80, 88, 28, 60, 60])
+        ).toStrictEqual([44, 52, 104, 28, 68, 60])
     })
 
     it("mirrors the disc across both axes", () => {
@@ -62,18 +60,41 @@ describe("pixel markers", () => {
         expect(fill.size).toBeGreaterThan(ring.size)
     })
 
-    it("lays the frames of each sprite side by side", () => {
-        const sprites = [LIVE_WAVE, SELECTED_LIVE_WAVE, POSITION_HALO]
+    it("lays the frames of each sprite side by side, the first one drawn", () => {
+        const sprites = [LIVE_WAVE, POSITION_WAVE]
 
-        expect(sprites.map(sprite => sprite.frames)).toStrictEqual([4, 4, 7])
+        expect(sprites.map(sprite => [sprite.frames, sprite.cycleMs])).toStrictEqual([
+            [24, 1600],
+            [37, 2470],
+        ])
         for (const sprite of sprites) {
             const columns = [...cellsOf(sprite.path)].map(key =>
                 Number(key.split(" ")[0]),
             )
             expect(Math.max(...columns)).toBeLessThan(sprite.cells * sprite.frames)
-            expect(Math.max(...columns)).toBeGreaterThanOrEqual(
-                sprite.cells * (sprite.frames - 1),
-            )
+            expect(Math.min(...columns)).toBeLessThan(sprite.cells)
         }
+    })
+
+    it("starts the live wave one cell clear of the disc ring", () => {
+        const center = LIVE_WAVE.cells / 2
+        const distances = [...cellsOf(LIVE_WAVE.path)]
+            .map(key => key.split(" ").map(Number))
+            .filter(([x = 0]) => x < LIVE_WAVE.cells)
+            .map(([x = 0, y = 0]) => Math.hypot(x + 0.5 - center, y + 0.5 - center))
+
+        expect(Math.min(...distances)).toBeGreaterThan(10)
+        expect(Math.max(...distances)).toBeLessThanOrEqual(11)
+    })
+
+    it("keeps the still grid of the position wave out of its frames", () => {
+        const still = cellsOf(POSITION_WAVE.stillPath)
+        const framed = [...cellsOf(POSITION_WAVE.path)].map(key => {
+            const [x = 0, y = 0] = key.split(" ").map(Number)
+            return `${String(x % POSITION_WAVE.cells)} ${String(y)}`
+        })
+
+        expect(still.size).toBeGreaterThan(0)
+        expect(framed.filter(key => still.has(key))).toStrictEqual([])
     })
 })
