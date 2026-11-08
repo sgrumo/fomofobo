@@ -60,6 +60,10 @@ describe("app.config", () => {
         expect(config.ios?.infoPlist?.CFBundleAllowMixedLocalizations).toBe(true)
     })
 
+    it("declares no encryption beyond HTTPS, so no build waits on export compliance", () => {
+        expect(config.ios?.infoPlist?.ITSAppUsesNonExemptEncryption).toBe(false)
+    })
+
     it("points every app language at a native locale file that exists", () => {
         const files = Object.fromEntries(
             languageKeys.map(language => [language, `./native-locales/${language}.json`]),

@@ -1,3 +1,4 @@
+require "dotenv"
 require "json"
 
 PROJECT_ROOT = File.expand_path("..", __dir__)
@@ -17,7 +18,8 @@ APK_PATH = File.join(ANDROID_DIR, "app/build/outputs/apk/release/app-release.apk
 # tab-separated row per device. Blank rows and rows starting with `#` are skipped. Tabs, never
 # spaces. Committed, since a UDID identifies a device and not a person, and the list has to be
 # reviewable: an ipa only installs on a device its profile already named.
-DEVICES_FILE = File.join(__dir__, "devices.txt")
+# Built on PROJECT_ROOT: `__dir__` is relative here, and a lane runs from the app directory.
+DEVICES_FILE = File.join(PROJECT_ROOT, "fastlane", "devices.txt")
 
 # Every Play track that can already hold a version code. Codes are global per package, so a
 # production release must clear whatever any track holds, not only the previous production
@@ -36,9 +38,20 @@ default_platform(:ios)
 # subprocess also gets APP_ENV explicitly, so the answer never depends on ambient state.
 APP_CONFIG_CACHE = {}
 
+# The `.env.<name>` file of the environment, on top of what the lane already loaded. `--env`
+# loads one such file, but `certificates` reads the config of both environments in one run,
+# and each one needs its own https API_URL: `.env` holds the local URL, which both reject.
+def env_file_values(env_name)
+  path = File.join(PROJECT_ROOT, ".env.#{env_name}")
+  File.exist?(path) ? Dotenv.parse(path) : {}
+end
+
 def app_config_for(env_name)
   APP_CONFIG_CACHE[env_name] ||= begin
-    raw = Dir.chdir(PROJECT_ROOT) { `APP_ENV=#{env_name} pnpm exec expo config --json` }
+    command_env = env_file_values(env_name).merge("APP_ENV" => env_name)
+    raw = Dir.chdir(PROJECT_ROOT) do
+      IO.popen(command_env, ["pnpm", "exec", "expo", "config", "--json"], &:read)
+    end
     # Ruby tags a command capture with the external encoding of the locale, and a shell
     # with no LANG set gets US-ASCII. A `name` in app.config.ts that carries an accent -
     # any real product name might - then raises `invalid byte sequence in US-ASCII` on the
@@ -135,15 +148,15 @@ def force_dev_env
   UI.important("APP_ENV=dev - building against the dev environment")
 end
 
-# Release lanes demand APP_ENV=prod at the call site. A store submission is the one build that
-# reaches real users, so it must be asked for and can never be inferred: unset or any other
-# value aborts instead of falling back, which keeps the failure mode fail-closed in both
-# directions. Use `pnpm release:<platform>:store`, which sets it.
+# Store lanes - the releases and the TestFlight upload - demand APP_ENV=prod at the call site.
+# They build the store id, which real users install, so it must be asked for and can never be
+# inferred: unset or any other value aborts instead of falling back, which keeps the failure
+# mode fail-closed in both directions. Use the `pnpm release:*` scripts, which set it.
 def require_prod_env
   unless ENV["APP_ENV"] == "prod"
     UI.user_error!(
-      "Release lanes require APP_ENV=prod (got #{ENV["APP_ENV"].inspect}). " \
-      "Run `pnpm release:ios:store` / `pnpm release:android:store`."
+      "Store lanes require APP_ENV=prod (got #{ENV["APP_ENV"].inspect}). " \
+      "Run `pnpm release:ios:store`, `pnpm release:ios:testflight` or `pnpm release:android:store`."
     )
   end
   app_config
@@ -184,11 +197,14 @@ def require_android_keystore
   )
 end
 
+# The .p8 path lives in APP_STORE_CONNECT_API_P8_PATH, not APP_STORE_CONNECT_API_KEY_PATH:
+# match, cert, sigh, pilot and deliver read that name as their own `api_key_path` option, a
+# JSON key file, and refuse a run that also passes this key.
 def app_store_api_key
   app_store_connect_api_key(
     key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
     issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
-    key_filepath: ENV["APP_STORE_CONNECT_API_KEY_PATH"]
+    key_filepath: ENV["APP_STORE_CONNECT_API_P8_PATH"]
   )
 end
 
@@ -315,6 +331,26 @@ platform :ios do
     )
   end
 
+  # `fastlane match import` signs in with an Apple ID, which Apple refuses with "Could not
+  # receive latest API key". This runs the same import with the API key of the other lanes.
+  # It exists for a team at the cap of distribution certificates: RELEASE.md, "Match repository".
+  desc "Import an existing distribution certificate of the team into match (cert_path:, p12_path:)"
+  lane :import_signing_certificate do |options|
+    require "match"
+    params = FastlaneCore::Configuration.create(
+      Match::Options.available_options,
+      { type: "appstore", api_key: app_store_api_key }
+    )
+    params.load_configuration_file("Matchfile")
+    Match::Importer.new.import_cert(
+      params,
+      cert_path: options[:cert_path],
+      p12_path: options[:p12_path],
+      # Empty skips the profile: `certificates` builds it from the imported certificate
+      profile_path: ""
+    )
+  end
+
   desc "Build an ad-hoc ipa and hand it to internal testers via Firebase App Distribution (dev environment)"
   lane :distribute do
     force_dev_env
@@ -331,6 +367,35 @@ platform :ios do
         groups: ENV["FIREBASE_TESTER_GROUPS"],
         release_notes: ENV["FIREBASE_RELEASE_NOTES"]
       )
+    ensure
+      restore_automatic_signing(bundle_id)
+    end
+  end
+
+  # Named `beta` because fastlane refuses a lane named after an action, and `testflight` is
+  # the alias of `upload_to_testflight`. Same store id and signing as `release`, so a build
+  # that passed TestFlight is the kind App Review gets, but nothing is submitted: the build
+  # reaches the internal testers of App Store Connect alone. No external group, since an
+  # external tester waits on a Beta App Review of its own.
+  desc "Build and upload to TestFlight for the internal testers (store id) - no App Review"
+  lane :beta do
+    require_prod_env
+    require_app_version
+    bundle_id = ios_bundle_id
+    prebuild("ios")
+    api_key = app_store_api_key
+    begin
+      build_number = build_ios_app(bundle_id, api_key)
+      # Processing takes minutes and needs no Mac: App Store Connect hands the build to the
+      # groups with automatic distribution once it is done.
+      upload_to_testflight(
+        api_key: api_key,
+        app_identifier: bundle_id,
+        distribute_external: false,
+        skip_submission: true,
+        skip_waiting_for_build_processing: true
+      )
+      UI.success("#{ENV["APP_VERSION"]} (#{build_number}) uploaded to TestFlight")
     ensure
       restore_automatic_signing(bundle_id)
     end

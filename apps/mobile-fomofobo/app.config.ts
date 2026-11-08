@@ -68,6 +68,8 @@ const config: ExpoConfig = {
         googleServicesFile: googleServicesFile("GoogleService-Info.plist"),
         infoPlist: {
             CFBundleAllowMixedLocalizations: true,
+            // HTTPS alone, so App Store Connect asks no export compliance question per build
+            ITSAppUsesNonExemptEncryption: false,
         },
     },
     android: {

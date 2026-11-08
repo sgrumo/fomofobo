@@ -9,6 +9,8 @@ node_modules/
 /fastlane/report.xml
 /fastlane/test_output/
 /fastlane/screenshots/
+/*.ipa
+/*.app.dSYM.zip
 
 # Expo
 .expo/

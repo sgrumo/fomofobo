@@ -59,6 +59,15 @@ Match keeps the signing certificate and the profiles, encrypted, in a git reposi
 
 The setup is done when the repository holds one certificate, an appstore profile of `it.quinck.zonzo` and an ad-hoc profile of `it.quinck.zonzo.dev`.
 
+If `certificates` stops at "reached the maximum number of available Distribution certificates", the team holds the three that Apple allows, and other apps use them. Import one of them in place of a new one:
+
+1. In Keychain Access, find the valid `Apple Distribution` certificate of the team under My Certificates. A certificate there carries its private key.
+2. Export the certificate alone as a `.cer` file.
+3. Export it again as a `.p12` file, with an empty password. Match stores it encrypted with `MATCH_PASSWORD`.
+4. Run `bundle exec fastlane ios import_signing_certificate cert_path:<cer> p12_path:<p12>`, with absolute paths. It signs in with the API key of `.env`.
+5. Delete the `.p12` file.
+6. Run `bundle exec fastlane ios certificates` again.
+
 CAUTION: Never run `fastlane match nuke distribution`. It revokes every distribution certificate of the team.
 
 CAUTION: Renew the certificate before its end date. `match` refuses an expired certificate, even with `readonly: true`, and every build stops.
@@ -120,7 +129,7 @@ The app has no account, no ads and no tracking. It sends these data to the API:
 | Device id | A random id that the app makes on the device. Each save and unsave sends it, for the interested count | Identifiers > Device ID: not linked to the user, not used for tracking, App Functionality | Device or other IDs: collected, not shared, App functionality |
 | Location  | The phone location, while the app is in use, to center the map                                        | Declare it only if a build sends it to the API                                            | Same rule                                                     |
 
-The `ios release` lane answers the export compliance question: the app uses HTTPS alone, so the lane declares no encryption.
+The app uses HTTPS alone, so `app.config.ts` declares no encryption, and App Store Connect asks no export compliance question.
 
 ## Add a tester
 
@@ -146,6 +155,18 @@ The lane builds the files of the directory as they are, uncommitted changes incl
 To send notes with the build, prefix the command with `FIREBASE_RELEASE_NOTES="<text>"`.
 
 The build is out when the testers of the `internal` group get the App Distribution email.
+
+## Ship a TestFlight build
+
+The TestFlight build carries the store id and the `API_URL` of `.env.prod`. It reaches the internal testers of App Store Connect, with no App Review.
+
+1. In App Store Connect, under TestFlight, create an internal group once, with automatic distribution on. An internal tester must be a user of the App Store Connect team.
+2. Check out the commit to ship, with a clean working tree.
+3. Run `APP_VERSION=x.y.z pnpm release:ios:testflight`.
+
+The build is out when the testers of the group get the TestFlight email. App Store Connect processes the build for some minutes after the lane ends.
+
+An external tester gets a build only after a Beta App Review. Add an external group to the build by hand in App Store Connect.
 
 ## Ship a store release
 

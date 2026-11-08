@@ -18,6 +18,7 @@ A lane builds against one of two environments, `dev` or `prod`. `APP_ENV` select
 | -------------------- | ------------------------- | --------------------- | ---------- |
 | `ios distribute`     | Firebase App Distribution | `it.quinck.zonzo.dev` | testers    |
 | `android distribute` | Firebase App Distribution | `it.quinck.zonzo.dev` | testers    |
+| `ios beta`           | TestFlight                | `it.quinck.zonzo`     | testers    |
 | `ios release`        | App Review                | `it.quinck.zonzo`     | real users |
 | `android release`    | Play production track     | `it.quinck.zonzo`     | real users |
 
@@ -30,6 +31,7 @@ Run the lanes through the pnpm scripts, which pass `APP_ENV`. Never set `APP_ENV
 ```sh
 pnpm release:ios:distribute
 pnpm release:android:distribute
+pnpm release:ios:testflight
 pnpm release:ios:store
 pnpm release:android:store
 ```
