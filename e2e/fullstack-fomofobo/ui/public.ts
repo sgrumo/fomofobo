@@ -49,7 +49,7 @@ export const keepMapOffline = async (page: Page): Promise<void> => {
 
 /**
  * @description Builds a search center of its own for one test, somewhere in Italy, so the
- * events of two tests never share a search radius
+ * events of two tests never share the first view of the map
  */
 export const buildArea = (): GeoPoint => ({
     latitude: faker.number.float({ min: 38, max: 46, fractionDigits: 3 }),

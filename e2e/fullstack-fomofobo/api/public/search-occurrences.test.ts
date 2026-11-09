@@ -15,10 +15,10 @@ import { updateSettings } from "../backoffice-settings/api"
 import { blockVenue, createVenue } from "../backoffice-venues/api"
 import { buildVenueCreation, seedCinema } from "../backoffice-venues/utils"
 import { searchOccurrences } from "./api"
-import { SATURDAY_NOON } from "./utils"
+import { boxAround, SATURDAY_NOON } from "./utils"
 
 describe("GET /api/public/occurrences", () => {
-    it("answers the occurrences of venues inside the radius, without a session", async () => {
+    it("answers the occurrences of venues inside the box, without a session", async () => {
         const { headers } = await signInAs("organizer")
         const admin = await signInAs("admin")
         const { categoryId, venue, venueId } = await seedEventReferences()
@@ -41,8 +41,7 @@ describe("GET /api/public/occurrences", () => {
         const res = await searchOccurrences({
             headers: { "x-test-now": SATURDAY_NOON },
             queryParams: {
-                lat: venue.coordinates.latitude,
-                lng: venue.coordinates.longitude,
+                ...boxAround(venue.coordinates),
             },
         })
 
@@ -81,6 +80,32 @@ describe("GET /api/public/occurrences", () => {
         })
     })
 
+    it("answers the occurrences of a box that spans two cities", async () => {
+        const { headers } = await signInAs("organizer")
+        const admin = await signInAs("admin")
+        const { categoryId, venueId } = await seedEventReferences()
+        const far = await createVenue({
+            headers: admin.headers,
+            body: {
+                ...buildVenueCreation(),
+                coordinates: { latitude: 44.4938, longitude: 11.3426 },
+            },
+        })
+        expectStatus(far, 201)
+        const near = await seedEvent(headers, { venueId, categoryId })
+        const farEvent = await seedEvent(headers, { venueId: far.data.id, categoryId })
+
+        const res = await searchOccurrences({
+            headers: { "x-test-now": SATURDAY_NOON },
+            queryParams: { west: 11.3, south: 44.3, east: 11.75, north: 44.55 },
+        })
+
+        expectStatus(res, 200)
+        expect(
+            res.data.occurrences.map(occurrence => occurrence.eventId).toSorted(),
+        ).toStrictEqual([near.id, farEvent.id].toSorted())
+    })
+
     it("answers the permanent venues of the area under any date filter, and counts them", async () => {
         const { headers } = await signInAs("organizer")
         const admin = await signInAs("admin")
@@ -105,8 +130,7 @@ describe("GET /api/public/occurrences", () => {
         const res = await searchOccurrences({
             headers: { "x-test-now": SATURDAY_NOON },
             queryParams: {
-                lat: venue.coordinates.latitude,
-                lng: venue.coordinates.longitude,
+                ...boxAround(venue.coordinates),
                 date: "tomorrow",
             },
         })
@@ -149,8 +173,7 @@ describe("GET /api/public/occurrences", () => {
         const res = await searchOccurrences({
             headers: { "x-test-now": SATURDAY_NOON },
             queryParams: {
-                lat: venue.coordinates.latitude,
-                lng: venue.coordinates.longitude,
+                ...boxAround(venue.coordinates),
                 free: "true",
             },
         })
@@ -189,8 +212,7 @@ describe("GET /api/public/occurrences", () => {
         const res = await searchOccurrences({
             headers: { "x-test-now": SATURDAY_NOON },
             queryParams: {
-                lat: venue.coordinates.latitude,
-                lng: venue.coordinates.longitude,
+                ...boxAround(venue.coordinates),
                 q: "astra",
                 categoryIds: [cinema],
             },
@@ -244,8 +266,7 @@ describe("GET /api/public/occurrences", () => {
         const res = await searchOccurrences({
             headers: { "x-test-now": SATURDAY_NOON },
             queryParams: {
-                lat: venue.coordinates.latitude,
-                lng: venue.coordinates.longitude,
+                ...boxAround(venue.coordinates),
             },
         })
 
@@ -280,8 +301,7 @@ describe("GET /api/public/occurrences", () => {
         const res = await searchOccurrences({
             headers: { "x-test-now": SATURDAY_NOON },
             queryParams: {
-                lat: venue.coordinates.latitude,
-                lng: venue.coordinates.longitude,
+                ...boxAround(venue.coordinates),
                 q: "jazz",
                 categoryIds: [music],
             },
@@ -315,8 +335,7 @@ describe("GET /api/public/occurrences", () => {
         const res = await searchOccurrences({
             headers: { "x-test-now": SATURDAY_NOON },
             queryParams: {
-                lat: venue.coordinates.latitude,
-                lng: venue.coordinates.longitude,
+                ...boxAround(venue.coordinates),
                 date: "tomorrow",
             },
         })
@@ -339,8 +358,7 @@ describe("GET /api/public/occurrences", () => {
         const before = await searchOccurrences({
             headers: { "x-test-now": SATURDAY_NOON },
             queryParams: {
-                lat: venue.coordinates.latitude,
-                lng: venue.coordinates.longitude,
+                ...boxAround(venue.coordinates),
                 date: "today",
             },
         })
@@ -359,8 +377,7 @@ describe("GET /api/public/occurrences", () => {
         const after = await searchOccurrences({
             headers: { "x-test-now": SATURDAY_NOON },
             queryParams: {
-                lat: venue.coordinates.latitude,
-                lng: venue.coordinates.longitude,
+                ...boxAround(venue.coordinates),
                 date: "today",
             },
         })
@@ -373,8 +390,7 @@ describe("GET /api/public/occurrences", () => {
         const res = await searchOccurrences({
             headers: { "x-test-now": SATURDAY_NOON },
             queryParams: {
-                lat: 44.35,
-                lng: 11.71,
+                ...boxAround({ latitude: 44.35, longitude: 11.71 }),
                 date: "range",
                 from: "2026-10-23",
                 to: "2026-10-25",
@@ -410,8 +426,7 @@ describe("GET /api/public/occurrences", () => {
         const res = await searchOccurrences({
             headers: { "x-test-now": SATURDAY_NOON },
             queryParams: {
-                lat: venue.coordinates.latitude,
-                lng: venue.coordinates.longitude,
+                ...boxAround(venue.coordinates),
             },
         })
 

@@ -1,7 +1,6 @@
 import "server-only"
-import { boundingBox } from "domain/bounding-box"
 import { localDateOf } from "domain/local-format"
-import { PLATFORM_TIME_ZONE, SEARCH_RADIUS_METERS } from "domain/platform"
+import { PLATFORM_TIME_ZONE } from "domain/platform"
 import type {
     OccurrenceDetail,
     OccurrenceLookupQuery,
@@ -57,8 +56,8 @@ export class PublicOccurrencesService {
     }
 
     /**
-     * @description Fetches the visible occurrences of the area and the date window, live first, the permanent venues of the area, and the counts per category
-     * @param query Center, text, categories and date filter
+     * @description Fetches the visible occurrences of the box and the date window, live first, the permanent venues of the box, and the counts per category
+     * @param query Box, text, categories and date filter
      * @param now Instant that sets today, the status order and the occurrences ended too long ago
      */
     public async search(
@@ -76,7 +75,6 @@ export class PublicOccurrencesService {
 
         const window = dateWindow(query, now, PLATFORM_TIME_ZONE)
         const endedVisibleSince = await this.settings.endedVisibleSince(now)
-        const center = { latitude: query.lat, longitude: query.lng }
         const result = await this.occurrencesStorage.search({
             window: {
                 from: new Date(
@@ -84,9 +82,12 @@ export class PublicOccurrencesService {
                 ),
                 to: window.to,
             },
-            center,
-            radiusMeters: SEARCH_RADIUS_METERS,
-            box: boundingBox(center, SEARCH_RADIUS_METERS),
+            box: {
+                minLatitude: query.south,
+                maxLatitude: query.north,
+                minLongitude: query.west,
+                maxLongitude: query.east,
+            },
             q: query.q,
             categoryIds: query.categoryIds,
             free: query.free,

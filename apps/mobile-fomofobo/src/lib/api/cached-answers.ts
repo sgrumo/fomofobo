@@ -4,7 +4,7 @@ import { z } from "zod"
 
 const searchKeyVariablesSchema = z.object({ query: z.record(z.string(), z.unknown()) })
 
-const SEARCH_CENTER_KEYS = ["lat", "lng"]
+const SEARCH_BOX_KEYS = ["west", "south", "east", "north"]
 
 /**
  * @description Returns the data of the newest cached answer of the same kind as the query: the
@@ -40,7 +40,7 @@ export const latestQueryData = <TData>(
     )?.data
 
 /**
- * @description True when the cached search has the filters of the query, whatever its center
+ * @description True when the cached search has the filters of the query, whatever its box
  * @param queryKey Key of a cached occurrence search
  * @param query Query of the current search
  */
@@ -51,9 +51,6 @@ export const isSameSearchFilters = (
     const variables = searchKeyVariablesSchema.safeParse(queryKey[2])
     return (
         variables.success &&
-        isEqual(
-            omit(variables.data.query, SEARCH_CENTER_KEYS),
-            omit(query, SEARCH_CENTER_KEYS),
-        )
+        isEqual(omit(variables.data.query, SEARCH_BOX_KEYS), omit(query, SEARCH_BOX_KEYS))
     )
 }

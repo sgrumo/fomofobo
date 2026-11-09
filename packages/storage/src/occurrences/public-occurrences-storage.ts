@@ -32,16 +32,22 @@ import { toLimitOffset } from "../utils/pagination"
 
 const EARTH_RADIUS_METERS = 6_371_000
 
-export interface PublicOccurrenceSearch {
-    window: { from: Date; to: Date }
+export interface PublicSearchBox {
+    minLatitude: number
+    maxLatitude: number
+    minLongitude: number
+    maxLongitude: number
+}
+
+export interface PublicSearchCircle {
     center: GeoPoint
     radiusMeters: number
-    box: {
-        minLatitude: number
-        maxLatitude: number
-        minLongitude: number
-        maxLongitude: number
-    }
+    box: PublicSearchBox
+}
+
+export interface PublicOccurrenceSearch {
+    window: { from: Date; to: Date }
+    box: PublicSearchBox
     q?: string
     categoryIds?: string[]
     free?: boolean
@@ -102,16 +108,23 @@ const distanceFrom = (center: GeoPoint): SQL<number> =>
     sql<number>`${EARTH_RADIUS_METERS} * acos(min(1, cos(radians(${center.latitude})) * cos(radians(${venues.latitude})) * cos(radians(${venues.longitude}) - radians(${center.longitude})) + sin(radians(${center.latitude})) * sin(radians(${venues.latitude}))))`
 
 /**
- * @description Builds the condition of a venue inside the box and within the radius of the center
- * @param area Center, radius and the box that holds the circle
+ * @description Builds the condition of a venue inside the box
+ * @param box Edges of the box
  */
-const insideArea = (
-    area: Pick<PublicOccurrenceSearch, "center" | "radiusMeters" | "box">,
-): SQL | undefined =>
+const insideBox = (box: PublicSearchBox): SQL | undefined =>
     and(
-        sql`${venues.latitude} between ${area.box.minLatitude} and ${area.box.maxLatitude}`,
-        sql`${venues.longitude} between ${area.box.minLongitude} and ${area.box.maxLongitude}`,
-        sql`${distanceFrom(area.center)} <= ${area.radiusMeters}`,
+        sql`${venues.latitude} between ${box.minLatitude} and ${box.maxLatitude}`,
+        sql`${venues.longitude} between ${box.minLongitude} and ${box.maxLongitude}`,
+    )
+
+/**
+ * @description Builds the condition of a venue within the radius of the center
+ * @param circle Center, radius and the box that holds the circle
+ */
+const insideCircle = (circle: PublicSearchCircle): SQL | undefined =>
+    and(
+        insideBox(circle.box),
+        sql`${distanceFrom(circle.center)} <= ${circle.radiusMeters}`,
     )
 
 const primaryCategoryOfEvent = sql<string>`(select ${eventCategories.categoryId} from ${eventCategories} where ${eventCategories.eventId} = ${events.id} and ${eventCategories.isPrimary} = 1)`
@@ -225,7 +238,7 @@ export class PublicOccurrencesStorage {
             // PLACEHOLDER(OP-08): overlap with the window
             gt(eventOccurrences.endsAt, search.window.from),
             lt(eventOccurrences.startsAt, search.window.to),
-            insideArea(search),
+            insideBox(search.box),
             search.q === undefined ? undefined : likeContains(events.title, search.q),
             search.free === true ? eq(events.isFree, true) : undefined,
         )
@@ -237,7 +250,7 @@ export class PublicOccurrencesStorage {
             search.free === true ? sql`0` : undefined,
             sql`${venues.isBlocked} = 0`,
             ne(venues.kind, "regular"),
-            insideArea(search),
+            insideBox(search.box),
             search.q === undefined ? undefined : likeContains(venues.name, search.q),
         )
         const categoryFilter =
@@ -413,12 +426,10 @@ export class PublicOccurrencesStorage {
      * @param search Text, area, clock and cap of the suggestions
      */
     public async suggestEvents(
-        search: Pick<
-            PublicOccurrenceSearch,
-            "center" | "radiusMeters" | "box" | "now" | "limit"
-        > & {
-            q: string
-        },
+        search: PublicSearchCircle &
+            Pick<PublicOccurrenceSearch, "now" | "limit"> & {
+                q: string
+            },
     ): Promise<Array<{ eventId: string; localDate: string; title: string }>> {
         const now = search.now.getTime()
         return await this.db
@@ -434,7 +445,7 @@ export class PublicOccurrencesStorage {
             .where(
                 and(
                     visibleEvent,
-                    insideArea(search),
+                    insideCircle(search),
                     likeContains(events.title, search.q),
                     sql`${eventOccurrences.startsAt} = (select min(next_occurrence.starts_at) from ${eventOccurrences} as next_occurrence where next_occurrence.event_id = ${eventOccurrences.eventId} and next_occurrence.ends_at > ${now})`,
                 ),
@@ -562,12 +573,10 @@ export class PublicOccurrencesStorage {
      * @param search Text, area and cap of the suggestions
      */
     public async suggestVenues(
-        search: Pick<
-            PublicOccurrenceSearch,
-            "center" | "radiusMeters" | "box" | "limit"
-        > & {
-            q: string
-        },
+        search: PublicSearchCircle &
+            Pick<PublicOccurrenceSearch, "limit"> & {
+                q: string
+            },
     ): Promise<SearchSuggestions["venues"]> {
         return await this.db
             .select({
@@ -580,7 +589,7 @@ export class PublicOccurrencesStorage {
             .where(
                 and(
                     sql`${venues.isBlocked} = 0`,
-                    insideArea(search),
+                    insideCircle(search),
                     likeContains(venues.name, search.q),
                 ),
             )

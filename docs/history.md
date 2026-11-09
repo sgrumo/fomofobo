@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-09 · The map search follows the area in view
+
+### Changed
+
+The results of the map are the events inside the area that the map shows, on the web and in the native app, in place of a fixed radius around the search center. A pan or a zoom out now reaches the events of another city with no place search.
+
+### Why
+
+A decision. A test of the native app far from Imola showed that a zoom out never reached the events of Imola.
+
+### Check next time
+
+Agree whether the map searches a fixed radius or the area in view before the search API is built.
+
 ## 2026-11-04 · Permanent venues show on the map by default
 
 ### Changed

@@ -171,6 +171,8 @@ interface EventMapProps extends RouteClientComponentProps<"root"> {
     onSelectedClick: () => void
     // A drag of the map by the visitor
     onDragStart: () => void
+    // West, south, east and north edges of the map once it loads and after each move
+    onViewportChange: (bbox: [number, number, number, number]) => void
     // True when a press on a pin moves the map to center it, as on a phone
     centersSelection: boolean
 }
@@ -189,6 +191,9 @@ export const EventMap = (props: EventMapProps) => {
     })
     const startDrag = useEffectEvent(() => {
         props.onDragStart()
+    })
+    const reportViewport = useEffectEvent((shown: Viewport) => {
+        props.onViewportChange(shown.bbox)
     })
 
     useEffect(() => {
@@ -218,7 +223,9 @@ export const EventMap = (props: EventMapProps) => {
         })
         const releaseGestures = fixMapGestures(instance)
         const publishViewport = () => {
-            setViewport(viewportOf(instance))
+            const shown = viewportOf(instance)
+            setViewport(shown)
+            reportViewport(shown)
         }
         instance.on("load", () => {
             setMap(instance)

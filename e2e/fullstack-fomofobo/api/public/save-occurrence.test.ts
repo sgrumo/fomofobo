@@ -5,7 +5,7 @@ import { signInAs } from "../auth/utils"
 import { seedEvent, seedEventReferences } from "../backoffice-events/utils"
 import { updateSettings } from "../backoffice-settings/api"
 import { getOccurrence, saveOccurrence, searchOccurrences, unsaveOccurrence } from "./api"
-import { SATURDAY_NOON } from "./utils"
+import { boxAround, SATURDAY_NOON } from "./utils"
 
 describe("PUT /api/public/saves/{eventId}/{date}", () => {
     it("counts each device once, and shows the count from the threshold up", async () => {
@@ -51,8 +51,7 @@ describe("PUT /api/public/saves/{eventId}/{date}", () => {
         const search = await searchOccurrences({
             headers: client,
             queryParams: {
-                lat: venue.coordinates.latitude,
-                lng: venue.coordinates.longitude,
+                ...boxAround(venue.coordinates),
             },
         })
         expectStatus(search, 200)

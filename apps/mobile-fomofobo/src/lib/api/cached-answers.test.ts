@@ -5,8 +5,10 @@ import { describe, expect, it, vi } from "vitest"
 import { isSameSearchFilters, latestQueryData } from "./cached-answers"
 
 const searchQuery = {
-    lat: 44.3536,
-    lng: 11.7149,
+    west: 11.65,
+    south: 44.3,
+    east: 11.78,
+    north: 44.4,
     q: undefined,
     categoryIds: undefined,
     free: true,
@@ -16,11 +18,14 @@ const searchQuery = {
 }
 
 describe("isSameSearchFilters", () => {
-    it("ignores the center of the search", () => {
+    it("ignores the box of the search", () => {
         const key = [
             "publicOccurrences",
             "search",
-            { params: {}, query: { ...searchQuery, lat: 41.9, lng: 12.5 } },
+            {
+                params: {},
+                query: { ...searchQuery, west: 12.4, south: 41.8, east: 12.6, north: 42 },
+            },
         ]
 
         expect(isSameSearchFilters(key, searchQuery)).toBe(true)

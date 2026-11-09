@@ -32,7 +32,7 @@
         "MoreHere_other": "{{count}} altri eventi in corso o in arrivo qui",
         "Cluster": "{{count}} luoghi: {{live}} con eventi in corso, {{upcoming}} con eventi in arrivo, {{ended}} con eventi finiti, {{permanent}} tra cinema, musei e teatri. Ingrandisci",
         "Error": "Non è stato possibile caricare gli eventi. Mostro gli ultimi risultati.",
-        "Truncated": "Troppi eventi per mostrarli tutti. Restringi la ricerca.",
+        "Truncated": "Troppi eventi per mostrarli tutti. Avvicina la mappa o restringi la ricerca.",
         "PastDateRange": "Le date scelte iniziano prima di oggi. Scegline di nuove.",
         "Offline": "Sei offline. La mappa mostra gli eventi già caricati."
     },

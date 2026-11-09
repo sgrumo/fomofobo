@@ -31,6 +31,7 @@
         "./price-summary": "./src/price-summary.ts",
         "./round-center": "./src/round-center.ts",
         "./save-queue": "./src/save-queue.ts",
+        "./search-box": "./src/search-box.ts",
         "./share-summary": "./src/share-summary.ts",
         "./share-urls": "./src/share-urls.ts",
         "./spot-entries": "./src/spot-entries.ts",

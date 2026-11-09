@@ -70,7 +70,7 @@ export const PublicRoutes = {
         tags: ["Public"],
         summary: "Search occurrences",
         description:
-            "Returns the visible occurrences at venues within the search radius of the center, in the date window, with the event count of each category under the other filters.",
+            "Returns the visible occurrences at venues inside the box, in the date window, with the event count of each category under the other filters.",
     }),
 
     lookupOccurrences: createRoute({

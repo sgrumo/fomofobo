@@ -7,6 +7,8 @@ import type { LocateRequest } from "domain/map-center"
 import { hasActiveFilters, shownKindsOf, shownResultsOf } from "domain/map-filters"
 import type { MapQuery } from "domain/map-query"
 import { placeQueryOf, textQueryOf } from "domain/map-search"
+import { nextSearchArea, searchBoxOf } from "domain/search-box"
+import type { SearchArea } from "domain/search-box"
 import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
 import { cn } from "frontend-shared/styles"
 import type { OccurrenceRef, OccurrenceSummary } from "models"
@@ -125,6 +127,7 @@ export const MapScreen = (props: MapScreenProps) => {
     const filtersId = useId()
     const [filtersOpen, setFiltersOpen] = useState(false)
     const [locateRequest, setLocateRequest] = useState<LocateRequest>()
+    const [searchArea, setSearchArea] = useState<SearchArea>()
     const [previewSheetHeight, setPreviewSheetHeight] = useState(0)
     const filtersActive = hasActiveFilters(query)
     const overlayRef = useRef<HTMLDivElement>(null)
@@ -155,8 +158,7 @@ export const MapScreen = (props: MapScreenProps) => {
         ...api.searchOccurrencesQuery({
             params: {},
             query: {
-                lat: center.latitude,
-                lng: center.longitude,
+                ...searchBoxOf(searchArea, center),
                 q: query.q,
                 categoryIds: query.categories,
                 free: query.free,
@@ -571,6 +573,11 @@ export const MapScreen = (props: MapScreenProps) => {
                     if (previewCard !== undefined) {
                         closePreview()
                     }
+                }}
+                onViewportChange={bbox => {
+                    setSearchArea(area =>
+                        nextSearchArea(bbox, center, area, results?.truncated === true),
+                    )
                 }}
             />
             <div

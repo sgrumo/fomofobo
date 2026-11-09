@@ -3,6 +3,8 @@ import { centerQueryOf, nextLocateRequest, searchCenterOf } from "domain/map-cen
 import type { LocateRequest } from "domain/map-center"
 import { hasActiveFilters, shownKindsOf, shownResultsOf } from "domain/map-filters"
 import { placeQueryOf, textQueryOf } from "domain/map-search"
+import { nextSearchArea, searchBoxOf } from "domain/search-box"
+import type { SearchArea } from "domain/search-box"
 import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
 import { Link, router } from "expo-router"
 import type { OccurrenceSummary } from "models"
@@ -76,6 +78,7 @@ const MapScreen = () => {
     const [soundsMuted, setSoundsMuted] = useDeviceStorage("sounds-muted")
     const [filtersOpen, setFiltersOpen] = useState(false)
     const [locateRequest, setLocateRequest] = useState<LocateRequest>()
+    const [searchArea, setSearchArea] = useState<SearchArea>()
     const filtersActive = hasActiveFilters(query)
     const { center, hasQueryCenter, locationOff, searchReady } = searchCenterOf(
         query,
@@ -97,8 +100,7 @@ const MapScreen = () => {
         api.listCategoriesQuery({ params: {}, query: {} }),
     )
     const searchQuery = {
-        lat: center.latitude,
-        lng: center.longitude,
+        ...searchBoxOf(searchArea, center),
         q: query.q,
         categoryIds: query.categories,
         free: query.free,
@@ -112,7 +114,7 @@ const MapScreen = () => {
         isFetching: searchFetching,
         error: searchError,
     } = useQuery({ ...searchOptions, enabled: searchReady })
-    // With no answer, offline or failed, the last search of the same filters stands in, whatever its center
+    // With no answer, offline or failed, the last search of the same filters stands in, whatever its box
     const search =
         searchAnswer ??
         (searchError !== null || !online
@@ -253,6 +255,11 @@ const MapScreen = () => {
                 iconOf={iconOf}
                 selectedVenueId={spotVenueId}
                 now={now}
+                onViewportChange={bbox => {
+                    setSearchArea(area =>
+                        nextSearchArea(bbox, center, area, results?.truncated === true),
+                    )
+                }}
                 onSelect={ref => {
                     setQuery({
                         event: ref.eventId,

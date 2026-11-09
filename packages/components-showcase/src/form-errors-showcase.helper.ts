@@ -495,7 +495,14 @@ export const formErrorsShowcaseFields: Record<FormIssueKey, FormErrorsShowcaseFi
     "FormErrors.Custom.range-incomplete": {
         schema: publicSearchQuerySchema,
         initial: shown(
-            { lat: "44.35", lng: "11.71", date: "range", from: "2026-10-14" },
+            {
+                west: "11.65",
+                south: "44.3",
+                east: "11.78",
+                north: "44.4",
+                date: "range",
+                from: "2026-10-14",
+            },
             "range from 2026-10-14 with no end",
         ),
     },

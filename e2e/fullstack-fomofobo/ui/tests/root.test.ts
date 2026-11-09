@@ -680,6 +680,49 @@ test.describe("map", () => {
         await expect(farPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
     })
 
+    test("shows the events of another city once the map zooms out to it, with no place search", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const category = await seedCategory()
+        const nearEvent = await seedPublicEvent(
+            { venue: await seedVenue(center), category },
+            { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+        )
+        // About 33 km north: outside the first view and outside the search radius of the center
+        const farEvent = await seedPublicEvent(
+            {
+                venue: await seedVenue(
+                    offsetPoint(center, { latitude: 0.3, longitude: 0 }),
+                ),
+                category,
+            },
+            { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+        )
+        const pinOf = (title: string) =>
+            page.getByRole("button", {
+                name: t("shared", "Map.Pin", {
+                    title,
+                    status: t("shared", "Status.upcoming"),
+                    time: "18:00",
+                }),
+            })
+        const farPin = pinOf(farEvent.title)
+
+        await gotoPage(page, mapPath(center))
+        await expect(pinOf(nearEvent.title)).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+        await expect(farPin).toBeHidden()
+
+        // The left edge of the map, clear of the controls and of the pin at the center
+        await page.mouse.move(40, 400)
+        // One wheel step zooms out one level at most, so the steps go on until the pin shows
+        await expect(async () => {
+            await page.mouse.wheel(0, 500)
+            await expect(farPin).toBeVisible({ timeout: 2000 })
+        }).toPass({ timeout: MAP_TIMEOUT_MS })
+        await expect(page).not.toHaveURL(/place=/u)
+    })
+
     test("moves to the first suggested place on Enter when no event or venue matches the text", async ({
         page,
     }) => {

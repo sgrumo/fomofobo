@@ -109,6 +109,8 @@ interface EventMapProps {
     iconOf: (categoryId: string) => CategoryIcon
     selectedVenueId: string | undefined
     now: Date
+    // West, south, east and north edges of the map once it loads and after each move
+    onViewportChange: (bbox: [number, number, number, number]) => void
     onSelect: (ref: OccurrenceRef) => void
     onSelectVenue: (venueId: string) => void
     onPress: () => void
@@ -256,10 +258,14 @@ export const EventMap = (props: EventMapProps) => {
         ),
     ].toSorted((first, second) => first.layer - second.layer)
 
+    const showViewport = (next: Viewport) => {
+        setViewport(next)
+        props.onViewportChange(next.bbox)
+    }
     const readViewport = async () => {
         const view = await mapRef.current?.getViewState()
         if (view !== undefined) {
-            setViewport(viewportOf(view))
+            showViewport(viewportOf(view))
         }
     }
 
@@ -400,7 +406,7 @@ export const EventMap = (props: EventMapProps) => {
                     }
                 }}
                 onRegionDidChange={event => {
-                    setViewport(viewportOf(event.nativeEvent))
+                    showViewport(viewportOf(event.nativeEvent))
                 }}
             >
                 <Images images={MAP_IMAGES} />

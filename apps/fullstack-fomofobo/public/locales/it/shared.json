@@ -34,7 +34,7 @@
         "Label": "Mappa degli eventi",
         "Loading": "Caricamento eventi",
         "Error": "Non è stato possibile caricare gli eventi. Mostro gli ultimi risultati.",
-        "Truncated": "Troppi eventi per mostrarli tutti. Restringi la ricerca.",
+        "Truncated": "Troppi eventi per mostrarli tutti. Avvicina la mappa o restringi la ricerca.",
         "Unsupported": "Questo browser non riesce a disegnare la mappa.",
         "Credits": "Fonti della mappa",
         "Attribution": {
@@ -656,7 +656,7 @@
             },
             "Location": {
                 "Title": "Posizione",
-                "Body": "Se lo consenti, il dispositivo legge la tua posizione mentre usi la mappa, per centrarla su di te. Per trovare gli eventi intorno, la mappa invia al nostro server il centro della ricerca: il server lo usa per rispondere e non lo salva. Puoi negare il permesso e cercare un luogo a mano."
+                "Body": "Se lo consenti, il dispositivo legge la tua posizione mentre usi la mappa, per centrarla su di te. Per trovare gli eventi, la mappa invia al nostro server l'area che mostra e il centro della ricerca: il server li usa per rispondere e non li salva. Puoi negare il permesso e cercare un luogo a mano."
             },
             "PlaceSearch": {
                 "Title": "Ricerca dei luoghi",

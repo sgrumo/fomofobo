@@ -56,7 +56,7 @@ Once every occurrence of an event ended more than the retention days ago, a dail
 
 ### Search area
 
-The search center is the position of the device when the visitor grants location, else a default city until the visitor picks a place. Only occurrences at venues inside a fixed radius around the search center are results. The app shows no distance to an event.
+The search center is the position of the device when the visitor grants location, else a default city until the visitor picks a place. The first search covers a fixed radius around the search center. Then the results are the occurrences at venues inside the area that the map shows, so a pan or a zoom out reaches the events of another city. The app shows no distance to an event.
 
 ### Map
 
@@ -72,7 +72,7 @@ The map stays inside Italy, and it never turns or tilts, because it draws no com
 
 ### Search and filters
 
-Results match every active filter. A permanent venue ignores the date filter, and the free filter leaves it out, since it has no price. One search field matches event titles and the names of the venues in the area, and sets a place as the search center. A submitted text picks the first suggested place when no event or venue matches it, else it filters the events by text. A venue result opens the detail of the venue, and permanent venues come in a group of their own. Category chips select one or more categories, and the results hold any of them. With no category chip pressed, the results hold every category. The date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days. A "Gratis" chip after the category chips keeps the events marked free, membership card or not. The category of the `other` icon comes last among the category chips, and a line parts them from the date chips. On a phone, the category, date and price chips sit in a panel that a filter button opens.
+Results match every active filter. A permanent venue ignores the date filter, and the free filter leaves it out, since it has no price. One search field matches event titles and the names of the venues within the fixed radius of the search center, and sets a place as the search center. A submitted text picks the first suggested place when no event or venue matches it, else it filters the events by text. A venue result opens the detail of the venue, and permanent venues come in a group of their own. Category chips select one or more categories, and the results hold any of them. With no category chip pressed, the results hold every category. The date filter offers today, tomorrow, weekend and a custom range, with a default window of today and the following days. A "Gratis" chip after the category chips keeps the events marked free, membership card or not. The category of the `other` icon comes last among the category chips, and a line parts them from the date chips. On a phone, the category, date and price chips sit in a panel that a filter button opens.
 
 Four kind chips under the search field are the legend of the pins, and each one shows or hides one kind on the map: live, upcoming, permanent venues and ended. Each chip carries the color of its kind, see-through while off. The map opens with every kind but ended events, so they do not crowd it. The kind chips stay in sight on a phone, and they leave the results of the search as they are.
 
@@ -116,7 +116,7 @@ The stores install and update the app, in place of the install button and the up
 
 The public app has a privacy policy page and a support page, because the App Store and Google Play require both URLs for a listing. The saved list links both pages, on the web and in the native app, because Apple requires a link to the privacy policy inside the app. The native app opens them in the browser.
 
-The privacy policy names Quinck S.r.l. as the data controller. It lists what the apps send: the search center, which the server uses and does not store, the random device id of each save, and the IP address that the rate limits store. A change of what the apps collect needs a change of the policy and of the privacy answers of both stores.
+The privacy policy names Quinck S.r.l. as the data controller. It lists what the apps send: the area of the map and the search center, which the server uses and does not store, the random device id of each save, and the IP address that the rate limits store. A change of what the apps collect needs a change of the policy and of the privacy answers of both stores.
 
 ### Backoffice access
 
@@ -157,7 +157,7 @@ The event detail and the map preview show the count of saves of an occurrence on
 - Cloudflare R2 holds the event photos in a public bucket, because shared and offline pages need a stable photo URL. The backoffice resizes and dithers each photo in the browser, then uploads the 1-bit PNG straight to the bucket, because a dither on the server would spend the CPU budget of the free plan.
 - A command-line helper signs in like the backoffice and calls its API from the machine of the user, for the event writes from Claude Code. It dithers each photo on that machine before the upload, for the same reason as the backoffice.
 - A daily GitHub workflow runs the photo purge job against the database and the bucket of each environment, on the branch of that environment. The job is a program of its own, so it lives in its own app and not in the Next.js application.
-- One package holds the rules that the web app and the native app both apply: status, time formats, the map query and its search center, the search and filter rules, map pins, prices, the facts of the event page, the save queue and the share links. It holds no text and no screens, because each app owns its translations and its UI. The apps share it because two copies of a rule drift apart.
+- One package holds the rules that the web app and the native app both apply: status, time formats, the map query, its search center and the area searched, the search and filter rules, map pins, prices, the facts of the event page, the save queue and the share links. It holds no text and no screens, because each app owns its translations and its UI. The apps share it because two copies of a rule drift apart.
 - Geoapify: place suggestions of the search field, from all of Italy, with the places nearest to the search center first. Each client gets 30 calls a minute, because the free plan has a daily credit limit. Phones on mobile data often share one public address, so the native app tells the visitor to retry in a minute when the limit answers.
 - OpenFreeMap: the tiles of the event map. The device keeps at most 500 viewed tiles, because the provider caps an offline download at 3,000 tiles.
 - A service worker of the public app keeps what a visitor loaded and serves it offline. It sends the backoffice, the sign-in and every write straight to the network, because a worker at the root of the site controls the backoffice pages too.

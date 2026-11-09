@@ -2,11 +2,26 @@ import { describe, expect, it } from "vitest"
 
 import { publicSearchQuerySchema } from "./public-search"
 
+const box = { west: "11.65", south: "44.3", east: "11.78", north: "44.4" }
+
 describe("publicSearchQuerySchema", () => {
     it("parses the values of a URL query string", () => {
         expect(
-            publicSearchQuerySchema.parse({ lat: "44.3533", lng: "11.7147", q: "jazz" }),
-        ).toStrictEqual({ lat: 44.3533, lng: 11.7147, q: "jazz", date: "default" })
+            publicSearchQuerySchema.parse({
+                west: "11.65",
+                south: "44.3",
+                east: "11.78",
+                north: "44.4",
+                q: "jazz",
+            }),
+        ).toStrictEqual({
+            west: 11.65,
+            south: 44.3,
+            east: 11.78,
+            north: 44.4,
+            q: "jazz",
+            date: "default",
+        })
     })
 
     it("reads one category of a URL query as a list", () => {
@@ -14,8 +29,7 @@ describe("publicSearchQuerySchema", () => {
 
         expect(
             publicSearchQuerySchema.parse({
-                lat: "44.35",
-                lng: "11.71",
+                ...box,
                 categoryIds: categoryId,
             }).categoryIds,
         ).toStrictEqual([categoryId])
@@ -24,8 +38,7 @@ describe("publicSearchQuerySchema", () => {
     it("accepts a complete range", () => {
         expect(
             publicSearchQuerySchema.safeParse({
-                lat: "44.35",
-                lng: "11.71",
+                ...box,
                 date: "range",
                 from: "2026-10-14",
                 to: "2026-10-18",
@@ -35,8 +48,7 @@ describe("publicSearchQuerySchema", () => {
 
     it("rejects a range with no end", () => {
         const result = publicSearchQuerySchema.safeParse({
-            lat: "44.35",
-            lng: "11.71",
+            ...box,
             date: "range",
             from: "2026-10-14",
         })
@@ -48,8 +60,7 @@ describe("publicSearchQuerySchema", () => {
 
     it("rejects a range that ends before it starts", () => {
         const result = publicSearchQuerySchema.safeParse({
-            lat: "44.35",
-            lng: "11.71",
+            ...box,
             date: "range",
             from: "2026-10-14",
             to: "2026-10-13",

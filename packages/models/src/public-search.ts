@@ -22,8 +22,10 @@ export type DateFilterKind = z.infer<typeof dateFilterKindSchema>
  */
 export const publicSearchQuerySchema = z
     .object({
-        lat: z.coerce.number().min(-90).max(90),
-        lng: z.coerce.number().min(-180).max(180),
+        west: z.coerce.number().min(-180).max(180),
+        south: z.coerce.number().min(-90).max(90),
+        east: z.coerce.number().min(-180).max(180),
+        north: z.coerce.number().min(-90).max(90),
         q: z.string().trim().min(1).optional(),
         categoryIds: queryArraySchema(z.uuid(), MAX_SEARCH_CATEGORIES).optional(),
         free: z.stringbool().optional(),
