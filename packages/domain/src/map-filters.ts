@@ -1,4 +1,4 @@
-import { format, isBefore, parseISO } from "date-fns"
+import { format, isAfter, isBefore, parseISO } from "date-fns"
 import { partition } from "es-toolkit"
 import type { CategoryIcon } from "models"
 import { match } from "ts-pattern"
@@ -202,6 +202,33 @@ export const earliestRangeDayOf = (now: Date): Date =>
  */
 export const isValidRange = (from: Date, to: Date, earliest: Date): boolean =>
     !isBefore(from, earliest) && !isBefore(to, from)
+
+export interface RangeDraft {
+    from: Date | undefined
+    to: Date | undefined
+}
+
+/**
+ * @description Returns the custom range a tap on a calendar day leaves: the day ends an open
+ * range that it does not precede, and starts a new range otherwise
+ * @param draft Range picked before the tap
+ * @param day Day tapped
+ */
+export const rangeDraftOf = (draft: RangeDraft, day: Date): RangeDraft =>
+    draft.from !== undefined && draft.to === undefined && !isBefore(day, draft.from)
+        ? { from: draft.from, to: day }
+        : { from: day, to: undefined }
+
+/**
+ * @description True when a day falls inside the custom range, from its first day to its last,
+ * or is the first day of an open range
+ * @param draft Range picked
+ * @param day Day checked
+ */
+export const isInRange = (draft: RangeDraft, day: Date): boolean =>
+    draft.from !== undefined &&
+    !isBefore(day, draft.from) &&
+    !isAfter(day, draft.to ?? draft.from)
 
 /**
  * @description Returns the `dd/MM–dd/MM` label of the custom range of the map query, undefined

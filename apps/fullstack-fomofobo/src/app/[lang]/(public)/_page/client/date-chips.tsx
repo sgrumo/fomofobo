@@ -1,27 +1,30 @@
 "use client"
 
 import { isBefore, parseISO } from "date-fns"
+import type { RangeDraft } from "domain/map-filters"
 import {
     earliestRangeDayOf,
-    isValidRange,
+    isInRange,
     NO_DATE_FILTER,
     QUICK_DATE_KINDS,
     quickDateQueryOf,
+    rangeDraftOf,
     rangeLabelOf,
     rangeQueryOf,
 } from "domain/map-filters"
 import type { MapQuery } from "domain/map-query"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import {
-    BottomSheetContent,
-    BottomSheetRoot,
-    BottomSheetTitle,
-} from "ui-components/bottom-sheet"
 import { Button } from "ui-components/button"
 import { Chip, ChipBar, ChipRow } from "ui-components/chip"
-import { DateInput } from "ui-components/date-input"
-import { Field } from "ui-components/field"
+import { DayPicker } from "ui-components/day-picker"
+import {
+    PopoverContent,
+    PopoverDescription,
+    PopoverRoot,
+    PopoverTitle,
+    PopoverTrigger,
+} from "ui-components/popover"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
@@ -34,100 +37,83 @@ interface DateChipsProps extends RouteClientComponentProps<"root"> {
 
 export const DateChips = (props: DateChipsProps) => {
     const { t } = useTranslation("shared")
-    const [sheetOpen, setSheetOpen] = useState(false)
-    const [draftFrom, setDraftFrom] = useState<Date>()
-    const [draftTo, setDraftTo] = useState<Date>()
+    const [calendarOpen, setCalendarOpen] = useState(false)
+    const [draft, setDraft] = useState<RangeDraft>({ from: undefined, to: undefined })
 
+    const rangeActive = props.query.date === "range"
     const rangeLabel = rangeLabelOf(props.query) ?? t("Filters.Range")
     const today = earliestRangeDayOf(props.now)
-    const draftValid =
-        draftFrom !== undefined &&
-        draftTo !== undefined &&
-        isValidRange(draftFrom, draftTo, today)
 
-    const openSheet = () => {
-        setDraftFrom(
-            props.query.from === undefined ? undefined : parseISO(props.query.from),
-        )
-        setDraftTo(props.query.to === undefined ? undefined : parseISO(props.query.to))
-        setSheetOpen(true)
+    const changeCalendarOpen = (open: boolean) => {
+        if (open) {
+            setDraft({
+                from:
+                    props.query.from === undefined
+                        ? undefined
+                        : parseISO(props.query.from),
+                to: props.query.to === undefined ? undefined : parseISO(props.query.to),
+            })
+        }
+        setCalendarOpen(open)
+    }
+    const pickDay = (day: Date) => {
+        const next = rangeDraftOf(draft, day)
+        setDraft(next)
+        if (next.from !== undefined && next.to !== undefined) {
+            setCalendarOpen(false)
+            props.onChange(rangeQueryOf(next.from, next.to))
+        }
     }
 
     return (
-        <>
-            <ChipRow label={t("Filters.Dates")} className={props.className}>
-                <ChipBar label={t("Filters.QuickDates")}>
-                    {QUICK_DATE_KINDS.map(kind => (
-                        <Chip
-                            key={kind}
-                            label={t(`Filters.${kind}`)}
-                            pressed={props.query.date === kind}
-                            onPressedChange={pressed => {
-                                props.onChange(quickDateQueryOf(kind, pressed))
-                            }}
-                        />
-                    ))}
+        <ChipRow label={t("Filters.Dates")} className={props.className}>
+            <ChipBar label={t("Filters.QuickDates")}>
+                {QUICK_DATE_KINDS.map(kind => (
                     <Chip
-                        label={rangeLabel}
-                        pressed={props.query.date === "range"}
-                        onPressedChange={openSheet}
+                        key={kind}
+                        label={t(`Filters.${kind}`)}
+                        pressed={props.query.date === kind}
+                        onPressedChange={pressed => {
+                            props.onChange(quickDateQueryOf(kind, pressed))
+                        }}
                     />
-                </ChipBar>
-            </ChipRow>
-            <BottomSheetRoot open={sheetOpen} onOpenChange={setSheetOpen}>
-                <BottomSheetContent>
-                    <BottomSheetTitle>{t("Filters.RangeTitle")}</BottomSheetTitle>
-                    <div className="flex flex-col gap-4">
-                        <Field label={t("Filters.From")} required={true}>
-                            <DateInput
-                                mode="custom"
-                                value={draftFrom}
-                                onValueChange={setDraftFrom}
-                                isDayDisabled={day => isBefore(day, today)}
-                                className="w-full"
-                            />
-                        </Field>
-                        <Field label={t("Filters.To")} required={true}>
-                            <DateInput
-                                mode="custom"
-                                value={draftTo}
-                                onValueChange={setDraftTo}
-                                isDayDisabled={day => isBefore(day, draftFrom ?? today)}
-                                className="w-full"
-                            />
-                        </Field>
-                        <div className="flex justify-end gap-2">
+                ))}
+                <PopoverRoot open={calendarOpen} onOpenChange={changeCalendarOpen}>
+                    <PopoverTrigger
+                        render={<Chip label={rangeLabel} pressed={rangeActive} />}
+                    />
+                    <PopoverContent
+                        className="gap-2 p-3"
+                        positionerProps={{ side: "bottom", align: "start" }}
+                    >
+                        <PopoverTitle>{t("Filters.RangeTitle")}</PopoverTitle>
+                        <PopoverDescription>
+                            {draft.from !== undefined && draft.to === undefined
+                                ? t("Filters.RangeEnd")
+                                : t("Filters.RangeStart")}
+                        </PopoverDescription>
+                        <DayPicker
+                            value={draft.to ?? draft.from}
+                            onValueChange={pickDay}
+                            isDayDisabled={day => isBefore(day, today)}
+                            isDaySelected={day => isInRange(draft, day)}
+                        />
+                        {rangeActive ? (
                             <Button
                                 variant="secondary"
-                                size="md"
+                                size="sm"
+                                className="self-end"
                                 onClick={() => {
-                                    setSheetOpen(false)
+                                    setCalendarOpen(false)
                                     props.onChange(NO_DATE_FILTER)
                                 }}
                             >
                                 {t("Filters.Clear")}
                             </Button>
-                            <Button
-                                variant="primary"
-                                size="md"
-                                disabled={!draftValid}
-                                onClick={() => {
-                                    if (
-                                        draftFrom === undefined ||
-                                        draftTo === undefined
-                                    ) {
-                                        return
-                                    }
-                                    setSheetOpen(false)
-                                    props.onChange(rangeQueryOf(draftFrom, draftTo))
-                                }}
-                            >
-                                {t("Filters.Apply")}
-                            </Button>
-                        </div>
-                    </div>
-                </BottomSheetContent>
-            </BottomSheetRoot>
-        </>
+                        ) : undefined}
+                    </PopoverContent>
+                </PopoverRoot>
+            </ChipBar>
+        </ChipRow>
     )
 }

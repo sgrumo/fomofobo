@@ -4,7 +4,11 @@ import { expectAlert } from "e2e-ui-components/alert"
 import { getBottomSheet } from "e2e-ui-components/bottom-sheet"
 import { clickButton } from "e2e-ui-components/button"
 import { getChip, pressChip, unpressChip } from "e2e-ui-components/chip"
-import { pickDate } from "e2e-ui-components/date-input"
+import {
+    clickDayPickerDay,
+    expectDayPickerSelectedDay,
+    pickDayPickerDay,
+} from "e2e-ui-components/day-picker"
 import { clickIconButton } from "e2e-ui-components/icon-button"
 import { fillSearchField } from "e2e-ui-components/search-field"
 import { dismissToast, expectToast } from "e2e-ui-components/toast"
@@ -591,7 +595,9 @@ test.describe("map", () => {
         await expect(todayPin).toBeHidden()
     })
 
-    test("keeps the results of a custom range picked in the sheet", async ({ page }) => {
+    test("keeps the results of a custom range picked in the calendar of its chip, which a second press of the chip closes, and shows every result again once cleared", async ({
+        page,
+    }) => {
         const center = buildArea()
         const category = await seedCategory()
         const today = await seedPublicEvent(
@@ -626,27 +632,40 @@ test.describe("map", () => {
                 time: "26/10 18:00",
             }),
         })
+        const calendar = page.getByRole("dialog", {
+            name: t("shared", "Filters.RangeTitle"),
+            exact: true,
+        })
 
         await gotoPage(page, mapPath(center))
         await expect(todayPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
 
         await getChip(page, t("shared", "Filters.Range")).click()
-        const sheet = getBottomSheet(page, t("shared", "Filters.RangeTitle"))
-        await pickDate(sheet, t("shared", "Filters.From"), {
-            year: 2026,
-            month: 10,
-            day: 25,
-        })
-        await pickDate(sheet, t("shared", "Filters.To"), {
-            year: 2026,
-            month: 10,
-            day: 26,
-        })
-        await clickButton(sheet, t("shared", "Filters.Apply"))
+        await expect(calendar).toBeVisible()
+        await getChip(page, t("shared", "Filters.Range")).click()
 
+        await expect(calendar).toBeHidden()
+
+        await getChip(page, t("shared", "Filters.Range")).click()
+        await pickDayPickerDay(calendar, 25)
+        await clickDayPickerDay(calendar, 26)
+
+        await expect(calendar).toBeHidden()
         await expect(getChip(page, "25/10–26/10")).toHaveAttribute("aria-pressed", "true")
         await expect(mondayPin).toBeVisible()
         await expect(todayPin).toBeHidden()
+
+        await getChip(page, "25/10–26/10").click()
+        await expectDayPickerSelectedDay(calendar, 25)
+        await expectDayPickerSelectedDay(calendar, 26)
+        await clickButton(calendar, t("shared", "Filters.Clear"))
+
+        await expect(calendar).toBeHidden()
+        await expect(getChip(page, t("shared", "Filters.Range"))).toHaveAttribute(
+            "aria-pressed",
+            "false",
+        )
+        await expect(todayPin).toBeVisible()
     })
 
     test("moves the center and the results to a suggested place", async ({ page }) => {
@@ -1484,7 +1503,7 @@ test.describe("detail over the map", () => {
         ).toBeHidden()
     })
 
-    test("opens the saved events in a panel over the map, over an open preview too, a saved event over the list, and the list again once its detail closes", async ({
+    test("opens the saved events in a panel over the map, over an open preview too, a saved event over the list, the list again once its detail closes, and closes the panel on a click on the map", async ({
         page,
     }) => {
         const center = buildArea()
@@ -1537,6 +1556,16 @@ test.describe("detail over the map", () => {
         await expect(detail).toBeHidden()
         await expect(savedPanel).toBeVisible()
         await clickIconButton(savedPanel, t("shared", "Preview.Close"))
+
+        await expect(savedPanel).toBeHidden()
+        await expect(page).not.toHaveURL(/saved=true/u)
+
+        await page.getByRole("button", { name: t("shared", "Saved.Open") }).click()
+        await expect(savedPanel).toBeVisible()
+        // The lower left corner of the map, below the category chips, which wrap beside the panel
+        await page
+            .getByRole("region", { name: t("shared", "Map.Label") })
+            .click({ position: { x: 40, y: 650 } })
 
         await expect(savedPanel).toBeHidden()
         await expect(page).not.toHaveURL(/saved=true/u)

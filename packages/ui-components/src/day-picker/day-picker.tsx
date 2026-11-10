@@ -317,6 +317,8 @@ export interface DayPickerProps {
     min?: Date
     max?: Date
     isDayDisabled?: (date: Date) => boolean
+    // Replaces the day of `value` as the selection, such as for a range
+    isDaySelected?: (date: Date) => boolean
     yearStep?: number
     disabled?: boolean
     suppressFieldCallbacks?: boolean
@@ -621,7 +623,11 @@ export const DayPicker = (props: DayPickerProps) => {
     }
 
     const matchesDay = (day: Date) =>
-        isDefined(props.value) && isValid(props.value) && isSameDay(props.value, day)
+        props.isDaySelected
+            ? props.isDaySelected(day)
+            : isDefined(props.value) &&
+              isValid(props.value) &&
+              isSameDay(props.value, day)
     const matchesMonth = (month: Date) =>
         isDefined(props.value) && isValid(props.value) && isSameMonth(props.value, month)
     const matchesYear = (year: Date) =>

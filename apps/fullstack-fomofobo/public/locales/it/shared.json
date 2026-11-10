@@ -125,9 +125,8 @@
         "weekend": "Weekend",
         "Range": "Date…",
         "RangeTitle": "Scegli le date",
-        "From": "Dal",
-        "To": "Al",
-        "Apply": "Applica",
+        "RangeStart": "Tocca il primo giorno",
+        "RangeEnd": "Tocca l'ultimo giorno",
         "Clear": "Cancella"
     },
     "Preview": {

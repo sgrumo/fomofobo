@@ -25,6 +25,16 @@ export const pickDayPickerDay = async (scope: Scope, day: number) => {
 }
 
 /**
+ * @description Clicks the in-month day cell
+ * @param scope Search root
+ * @param day Day of month
+ * @remarks Asserts nothing, for a pick that closes the picker
+ */
+export const clickDayPickerDay = async (scope: Scope, day: number) => {
+    await dayCell(scope, day).click()
+}
+
+/**
  * @description Clicks the next-month button
  * @param scope Search root
  */

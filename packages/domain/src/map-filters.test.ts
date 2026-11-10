@@ -7,10 +7,12 @@ import {
     earliestRangeDayOf,
     freeQueryOf,
     hasActiveFilters,
+    isInRange,
     isValidRange,
     kindQueryOf,
     quickDateQueryOf,
     rangeLabelOf,
+    rangeDraftOf,
     rangeQueryOf,
     shownKindsOf,
     shownResultsOf,
@@ -187,6 +189,70 @@ describe("isValidRange", () => {
         expect(
             isValidRange(parseISO("2026-10-25"), parseISO("2026-10-24"), earliest),
         ).toBe(false)
+    })
+})
+
+describe("rangeDraftOf", () => {
+    const from = parseISO("2026-10-24")
+
+    it("starts a range on the first tap", () => {
+        expect(rangeDraftOf({ from: undefined, to: undefined }, from)).toStrictEqual({
+            from,
+            to: undefined,
+        })
+    })
+
+    it("ends an open range on a tap of its first day or a later one", () => {
+        for (const day of [from, parseISO("2026-10-26")]) {
+            expect(rangeDraftOf({ from, to: undefined }, day)).toStrictEqual({
+                from,
+                to: day,
+            })
+        }
+    })
+
+    it("starts a new range on a tap before the first day of an open range", () => {
+        const earlier = parseISO("2026-10-23")
+
+        expect(rangeDraftOf({ from, to: undefined }, earlier)).toStrictEqual({
+            from: earlier,
+            to: undefined,
+        })
+    })
+
+    it("starts a new range on a tap after a complete range", () => {
+        const day = parseISO("2026-10-30")
+
+        expect(rangeDraftOf({ from, to: parseISO("2026-10-26") }, day)).toStrictEqual({
+            from: day,
+            to: undefined,
+        })
+    })
+})
+
+describe("isInRange", () => {
+    const from = parseISO("2026-10-24")
+    const to = parseISO("2026-10-26")
+
+    it("holds the days of a complete range, its edges included", () => {
+        for (const day of ["2026-10-24", "2026-10-25", "2026-10-26"]) {
+            expect(isInRange({ from, to }, parseISO(day))).toBe(true)
+        }
+    })
+
+    it("leaves out the days around a complete range", () => {
+        for (const day of ["2026-10-23", "2026-10-27"]) {
+            expect(isInRange({ from, to }, parseISO(day))).toBe(false)
+        }
+    })
+
+    it("holds the first day of an open range alone", () => {
+        expect(isInRange({ from, to: undefined }, from)).toBe(true)
+        expect(isInRange({ from, to: undefined }, to)).toBe(false)
+    })
+
+    it("holds no day of an empty range", () => {
+        expect(isInRange({ from: undefined, to: undefined }, from)).toBe(false)
     })
 })
 

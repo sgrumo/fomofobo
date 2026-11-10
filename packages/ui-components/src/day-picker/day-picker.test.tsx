@@ -109,6 +109,26 @@ describe("DayPicker", () => {
             ).toBeInTheDocument()
         })
 
+        it("marks every day that isDaySelected names as selected, and no other", () => {
+            const selectedDays = new Set([12, 13, 14])
+            render(
+                <DayPicker
+                    value={new Date(2024, 6, 15, 12)}
+                    onValueChange={noop}
+                    isDaySelected={d => selectedDays.has(d.getDate())}
+                />,
+            )
+
+            for (const day of ["12", "13", "14"]) {
+                expect(
+                    screen.getByRole("gridcell", { name: day, selected: true }),
+                ).toBeInTheDocument()
+            }
+            expect(
+                screen.getByRole("gridcell", { name: "15", selected: false }),
+            ).toBeInTheDocument()
+        })
+
         it("disables days that fall outside the visible month", () => {
             render(<DayPicker value={new Date(2024, 6, 15, 12)} onValueChange={noop} />)
 

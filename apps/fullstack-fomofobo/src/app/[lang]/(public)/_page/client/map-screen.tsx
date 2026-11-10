@@ -475,6 +475,10 @@ export const MapScreen = (props: MapScreenProps) => {
     const closeWideSelection = () => {
         if (previewCard !== undefined || detailSide) {
             closePreview()
+            return
+        }
+        if (savedSide) {
+            closeSaved()
         }
     }
     // The preview sheet stays open on a press on a pin, so its own pin closes it

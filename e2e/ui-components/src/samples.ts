@@ -77,6 +77,7 @@ import {
     resetDateInput,
 } from "./date-input"
 import {
+    clickDayPickerDay,
     expectDayPickerView,
     goToDayPickerNextMonth,
     pickDayPickerDay,
@@ -476,6 +477,14 @@ export const defineUiSamplesTests = (app: UiSamplesApp) => {
                 scope,
                 `${nextMonthName} ${String(nextMonth.getFullYear())}`,
             )
+
+            const nextIsoMonth = String(nextMonth.getMonth() + 1).padStart(2, "0")
+            await clickDayPickerDay(scope, 10)
+            await expect(
+                scope.getByText(
+                    `Picked day: ${String(nextMonth.getFullYear())}-${nextIsoMonth}-10`,
+                ),
+            ).toBeVisible()
         })
 
         test("dialog", async ({ page }) => {
