@@ -131,7 +131,6 @@ export const MapScreen = (props: MapScreenProps) => {
     const [creditOpen, setCreditOpen] = useState(false)
     const [locateRequest, setLocateRequest] = useState<LocateRequest>()
     const [searchArea, setSearchArea] = useState<SearchArea>()
-    const [previewSheetHeight, setPreviewSheetHeight] = useState(0)
     const filtersActive = hasActiveFilters(query)
     const overlayRef = useRef<HTMLDivElement>(null)
     const panelRef = useRef<HTMLDivElement>(null)
@@ -415,21 +414,9 @@ export const MapScreen = (props: MapScreenProps) => {
 
     // True while the open saved list owns the history entry that a close pops
     const savedPushedRef = useRef(false)
-    // The saved list takes the place of an open preview or detail, and its history entry
     const openSaved = () => {
-        savedPushedRef.current = previewOpen ? previewPushedRef.current : true
-        previewPushedRef.current = false
-        setDetailPushed(false)
-        setQuery(
-            {
-                saved: true,
-                event: undefined,
-                occurrence: undefined,
-                venue: undefined,
-                detail: undefined,
-            },
-            { history: previewOpen ? "replace" : "push" },
-        )
+        savedPushedRef.current = true
+        setQuery({ saved: true }, { history: "push" })
     }
     const closeSaved = () => {
         if (savedPushedRef.current) {
@@ -591,7 +578,7 @@ export const MapScreen = (props: MapScreenProps) => {
                     setCreditOpen(false)
                 }}
                 onDragStart={() => {
-                    if (previewCard !== undefined) {
+                    if (previewOpen && !detailOpen) {
                         closePreview()
                     }
                 }}
@@ -693,17 +680,12 @@ export const MapScreen = (props: MapScreenProps) => {
                 </div>
                 {notices}
             </div>
-            {/* Rises above the preview sheet. A phone hides it under a preview, which it would crowd. */}
+            {/* A preview or a detail hides it, as it covers the bottom of the map */}
             <div
                 className={cn("absolute right-4 bottom-8 flex flex-col items-end gap-2", {
                     "right-[25.75rem]": sidePanelOpen,
-                    hidden: narrow && previewOpen,
+                    hidden: previewOpen,
                 })}
-                style={
-                    previewSheetHeight > 0
-                        ? { bottom: previewSheetHeight + 16 }
-                        : undefined
-                }
             >
                 <MapCredit
                     route={props.route}
@@ -777,7 +759,6 @@ export const MapScreen = (props: MapScreenProps) => {
             </DetailSheet>
             <EventPreview
                 keepsOpenOn={isResultMarkerTarget}
-                onHeightChange={setPreviewSheetHeight}
                 open={
                     previewCard === undefined &&
                     (wide || narrow) &&

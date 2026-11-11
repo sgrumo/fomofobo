@@ -207,6 +207,13 @@ const MapScreen = () => {
             : spotEntriesOf(shownResults, spotVenueId)
     const spotIndex = sameSpot.findIndex(entry => isSameSpotEntry(entry, selected))
 
+    // A press or a pan of the map closes the preview, not the detail over it
+    const closePreview = () => {
+        if (previewOpen && !detailOpen) {
+            setQuery(CLEARED_SELECTION)
+        }
+    }
+
     const showSpotEntry = (index: number) => {
         const entry = sameSpot[index]
         if (entry === undefined) {
@@ -263,6 +270,7 @@ const MapScreen = () => {
                     )
                 }}
                 onSelect={ref => {
+                    setFiltersOpen(false)
                     setQuery({
                         event: ref.eventId,
                         occurrence: ref.date,
@@ -271,6 +279,7 @@ const MapScreen = () => {
                     })
                 }}
                 onSelectVenue={venueId => {
+                    setFiltersOpen(false)
                     setQuery({
                         event: undefined,
                         occurrence: undefined,
@@ -280,9 +289,12 @@ const MapScreen = () => {
                 }}
                 onPress={() => {
                     Keyboard.dismiss()
+                    setFiltersOpen(false)
+                    closePreview()
                 }}
                 onUserMoveStart={() => {
                     setCreditOpen(false)
+                    closePreview()
                 }}
             />
             <View
@@ -402,36 +414,41 @@ const MapScreen = () => {
                     <Notice tone="warning" lines={[t("Map.Truncated")]} />
                 )}
             </View>
-            <View
-                className="absolute right-4 items-end gap-2"
-                style={{ bottom: insets.bottom + CONTROLS_BOTTOM_OFFSET }}
-            >
-                <MapAttribution open={creditOpen} onOpenChange={setCreditOpen} />
-                <View className="flex-row items-center gap-2">
-                    {searchFetching && <Spinner label={t("Map.Loading")} size="sm" />}
-                    <IconButton
-                        icon="saved"
-                        label={t("Saved.Open")}
-                        onPress={() => {
-                            router.push("/saved")
-                        }}
-                    />
-                    <IconButton
-                        icon="locate"
-                        label={t("Map.Locate")}
-                        onPress={() => {
-                            void locate()
-                        }}
-                    />
-                    <IconButton
-                        icon={soundsMuted ? "muted" : "sound"}
-                        label={t(soundsMuted ? "Map.Sounds.Unmute" : "Map.Sounds.Mute")}
-                        onPress={() => {
-                            setSoundsMuted(!soundsMuted)
-                        }}
-                    />
+            {/* A preview or a detail covers the bottom of the map, so the controls give way */}
+            {!previewOpen && (
+                <View
+                    className="absolute right-4 items-end gap-2"
+                    style={{ bottom: insets.bottom + CONTROLS_BOTTOM_OFFSET }}
+                >
+                    <MapAttribution open={creditOpen} onOpenChange={setCreditOpen} />
+                    <View className="flex-row items-center gap-2">
+                        {searchFetching && <Spinner label={t("Map.Loading")} size="sm" />}
+                        <IconButton
+                            icon="saved"
+                            label={t("Saved.Open")}
+                            onPress={() => {
+                                router.push("/saved")
+                            }}
+                        />
+                        <IconButton
+                            icon="locate"
+                            label={t("Map.Locate")}
+                            onPress={() => {
+                                void locate()
+                            }}
+                        />
+                        <IconButton
+                            icon={soundsMuted ? "muted" : "sound"}
+                            label={t(
+                                soundsMuted ? "Map.Sounds.Unmute" : "Map.Sounds.Mute",
+                            )}
+                            onPress={() => {
+                                setSoundsMuted(!soundsMuted)
+                            }}
+                        />
+                    </View>
                 </View>
-            </View>
+            )}
             <EventPreview
                 open={previewOpen && !detailOpen}
                 entry={selected}

@@ -52,6 +52,9 @@ import { VenuePin } from "./venue-pin"
 const INITIAL_ZOOM = 13
 const MAP_IMAGES = { "dot-dither": dotDitherPattern }
 
+// The map reports a press on a marker as a press of its own, right after the marker
+const MARKER_PRESS_ECHO_MS = 250
+
 interface Viewport {
     bbox: [number, number, number, number]
     zoom: number
@@ -112,6 +115,7 @@ interface EventMapProps {
     onViewportChange: (bbox: [number, number, number, number]) => void
     onSelect: (ref: OccurrenceRef) => void
     onSelectVenue: (venueId: string) => void
+    // A press on the map itself, outside every marker
     onPress: () => void
     // A pan or a zoom of the map by the visitor
     onUserMoveStart: () => void
@@ -122,6 +126,7 @@ export const EventMap = (props: EventMapProps) => {
     const mapRef = useRef<MapRef>(null)
     const cameraRef = useRef<CameraRef>(null)
     const [viewport, setViewport] = useState<Viewport>()
+    const markerPressedAtRef = useRef(0)
     const { latitude, longitude } = props.center
 
     const readLocateRequest = useEffectEvent(() => props.locateRequest)
@@ -291,8 +296,9 @@ export const EventMap = (props: EventMapProps) => {
         const { feature, coordinates } = marker
         const lngLat: [number, number] = [coordinates.longitude, coordinates.latitude]
         const layerStyle = { zIndex: layer }
-        // A press on a pin centers the map on it
+        // A press on a pin centers the map on it, and its time drops the map press that echoes it
         const centerOnMarker = () => {
+            markerPressedAtRef.current = Date.now()
             cameraRef.current?.easeTo({ center: lngLat })
         }
         const key = `${move?.type === "leave" ? "leaving" : "shown"}:${marker.key}`
@@ -310,6 +316,7 @@ export const EventMap = (props: EventMapProps) => {
                             permanentCount={feature.properties.permanentCount}
                             emphasis={emphasis}
                             onExpand={() => {
+                                markerPressedAtRef.current = Date.now()
                                 playSound("cluster")
                                 const zoom = clusters.getClusterExpansionZoom(clusterId)
                                 // Past the last cluster zoom the points share one spot, so no zoom splits them.
@@ -395,7 +402,11 @@ export const EventMap = (props: EventMapProps) => {
                 compass={false}
                 touchRotate={false}
                 touchPitch={false}
-                onPress={props.onPress}
+                onPress={() => {
+                    if (Date.now() - markerPressedAtRef.current > MARKER_PRESS_ECHO_MS) {
+                        props.onPress()
+                    }
+                }}
                 onDidFinishLoadingMap={() => {
                     void readViewport()
                 }}

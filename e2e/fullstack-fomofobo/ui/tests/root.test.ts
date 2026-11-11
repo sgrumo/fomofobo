@@ -346,7 +346,7 @@ test.describe("map", () => {
         )
     })
 
-    test("switches the preview of a phone to the pin that a tap names, hides the map buttons under it, and the pin of the open preview closes it", async ({
+    test("switches the preview of a phone to the pin that a tap names, hides the map buttons under it, and the pin of the open preview or a drag of the map closes it", async ({
         page,
     }) => {
         const center = buildArea()
@@ -407,6 +407,17 @@ test.describe("map", () => {
         await expect(getBottomSheet(page, upcoming.title)).toBeHidden()
         await expect(page).not.toHaveURL(/event=/u)
         await expect(locateButton).toBeVisible()
+
+        await livePin.click()
+        await expect(getBottomSheet(page, live.title)).toBeVisible()
+        // The left edge of the map, under the filters and clear of both pins
+        await page.mouse.move(20, 300)
+        await page.mouse.down()
+        await page.mouse.move(80, 340, { steps: 5 })
+        await page.mouse.up()
+
+        await expect(getBottomSheet(page, live.title)).toBeHidden()
+        await expect(page).not.toHaveURL(/event=/u)
     })
 
     test("narrows the pins to any pressed category, and shows every category again once unpressed", async ({
@@ -959,7 +970,7 @@ test.describe("map", () => {
         await expect(pin).toBeFocused()
     })
 
-    test("closes the preview of a wide screen on a click on the map or on its pin, a filter, a drag of the map, and Escape with the focus outside it", async ({
+    test("hides the map buttons under the preview of a wide screen, and closes it on a click on the map or on its pin, a filter, a drag of the map, and Escape with the focus outside it", async ({
         page,
     }) => {
         const center = buildArea()
@@ -980,10 +991,14 @@ test.describe("map", () => {
             }),
         })
         const preview = page.getByRole("dialog", { name: event.title, exact: true })
+        const muteButton = page.getByRole("button", {
+            name: t("shared", "Map.Sounds.Mute"),
+        })
 
         await gotoPage(page, mapPath(center))
         await pin.click({ timeout: MAP_TIMEOUT_MS })
         await expect(preview).toBeVisible()
+        await expect(muteButton).toBeHidden()
         // The left edge of the map, clear of the controls and of the pin at the center
         await page
             .getByRole("region", { name: t("shared", "Map.Label") })
@@ -991,6 +1006,7 @@ test.describe("map", () => {
 
         await expect(preview).toBeHidden()
         await expect(page).not.toHaveURL(/event=/u)
+        await expect(muteButton).toBeVisible()
 
         await pin.click()
         await expect(preview).toBeVisible()
@@ -1520,7 +1536,7 @@ test.describe("detail over the map", () => {
         ).toBeHidden()
     })
 
-    test("opens the saved events in a panel over the map, over an open preview too, a saved event over the list, the list again once its detail closes, and closes the panel on a click on the map", async ({
+    test("opens the saved events in a panel over the map, a saved event over the list, the list again once its detail closes, and closes the panel on a click on the map", async ({
         page,
     }) => {
         const center = buildArea()
@@ -1545,20 +1561,9 @@ test.describe("detail over the map", () => {
         await expect(toggle).toHaveAttribute("aria-pressed", "true")
 
         await gotoPage(page, mapPath(center))
-        await page
-            .getByRole("button", {
-                name: t("shared", "Map.Pin", {
-                    title: event.title,
-                    status: t("shared", "Status.upcoming"),
-                    time: "18:00",
-                }),
-            })
-            .click({ timeout: MAP_TIMEOUT_MS })
-        await expect(detail).toBeVisible()
         await page.getByRole("button", { name: t("shared", "Saved.Open") }).click()
 
         await expect(savedPanel).toBeVisible()
-        await expect(detail).toBeHidden()
         await expect(page).toHaveURL(/saved=true/u)
         await savedPanel
             .getByRole("listitem")
@@ -1620,19 +1625,25 @@ test.describe("detail over the map", () => {
             .poll(async () => await page.evaluate("window.playedSounds.length"))
             .toBe(2)
 
+        await clickIconButton(detail, t("shared", "Preview.Close"))
+        await expect(detail).toBeHidden()
         await clickIconButton(page, t("shared", "Map.Sounds.Mute"))
+        await pin.click()
+        await expect(detail).toBeVisible()
         await toggle.click()
         await expect(toggle).toHaveAttribute("aria-pressed", "false")
 
         expect(await page.evaluate("window.playedSounds.length")).toBe(2)
 
         await gotoPage(page, mapPath(center))
-        await pin.click({ timeout: MAP_TIMEOUT_MS })
-        await expect(detail).toBeVisible()
 
         await expect(
             page.getByRole("button", { name: t("shared", "Map.Sounds.Unmute") }),
         ).toBeVisible()
+
+        await pin.click({ timeout: MAP_TIMEOUT_MS })
+        await expect(detail).toBeVisible()
+
         expect(await page.evaluate("window.playedSounds.length")).toBe(0)
     })
 
