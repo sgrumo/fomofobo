@@ -1,8 +1,10 @@
 import type { PixelIconName } from "domain/pixel-icons"
+import type { CategoryIcon } from "models"
 import { createContext, useContext } from "react"
 import type { ReactNode } from "react"
 import { Pressable, ScrollView, View } from "react-native"
 
+import { PixelGlyph } from "@/components/ui/pixel-glyph/pixel-glyph"
 import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
 import { Text } from "@/components/ui/text/text"
 import { hardShadow } from "@/lib/theme/hard-shadow"
@@ -79,6 +81,8 @@ interface ChipProps {
     pressed: boolean
     onPressedChange: (pressed: boolean) => void
     icon?: PixelIconName
+    // The 7 x 7 glyph of a category, in place of `icon`
+    glyph?: CategoryIcon
     count?: number
     tone?: ChipTone
     // Shares the width of its row with the other growing chips
@@ -121,6 +125,9 @@ const Chip = (props: ChipProps) => {
                     size={CHIP_ICON_SIZE}
                     color={inverse ? "fg-inverse" : "fg"}
                 />
+            )}
+            {props.glyph !== undefined && (
+                <PixelGlyph icon={props.glyph} color={inverse ? "fg-inverse" : "fg"} />
             )}
             <Text className={chipLabelVariants({ inverse })} maxFontSizeMultiplier={1.5}>
                 {props.label}

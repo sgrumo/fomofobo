@@ -1,6 +1,4 @@
 import type { MapPointKind } from "domain/event-clusters"
-import { PIXEL_GLYPH_GRID, PIXEL_GLYPHS } from "domain/pixel-glyphs"
-import { pixelIconPath } from "domain/pixel-icons"
 import { EVENT_DISC, MARKER_CELL_PX, SELECTED_EVENT_DISC } from "domain/pixel-markers"
 import type { CategoryIcon } from "models"
 import { useId } from "react"
@@ -8,13 +6,13 @@ import type { ReactNode } from "react"
 import { View } from "react-native"
 import Svg, { ClipPath, Defs, Path } from "react-native-svg"
 
+import { PixelGlyph } from "@/components/ui/pixel-glyph/pixel-glyph"
+import { PIXEL_GLYPH_SIZE } from "@/components/ui/pixel-glyph/pixel-glyph.styles"
 import { dashWedgesPath } from "@/lib/pixel/pixel-shapes"
 import { THEME_COLORS } from "@/lib/theme/theme-tokens"
 
 // Shadow cells of a selected disc, right and down
 const SHADOW_CELLS = 2
-
-const GLYPH_SIZE = PIXEL_GLYPH_GRID * MARKER_CELL_PX
 
 interface PixelDiscProps {
     kind: MapPointKind
@@ -61,18 +59,12 @@ export const PixelDisc = (props: PixelDiscProps) => {
             <View
                 pointerEvents="none"
                 className="absolute"
-                style={{ left: (size - GLYPH_SIZE) / 2, top: (size - GLYPH_SIZE) / 2 }}
+                style={{
+                    left: (size - PIXEL_GLYPH_SIZE) / 2,
+                    top: (size - PIXEL_GLYPH_SIZE) / 2,
+                }}
             >
-                <Svg
-                    width={GLYPH_SIZE}
-                    height={GLYPH_SIZE}
-                    viewBox={`0 0 ${String(PIXEL_GLYPH_GRID)} ${String(PIXEL_GLYPH_GRID)}`}
-                >
-                    <Path
-                        d={pixelIconPath(PIXEL_GLYPHS[props.icon])}
-                        fill={THEME_COLORS.line}
-                    />
-                </Svg>
+                <PixelGlyph icon={props.icon} color="line" />
             </View>
         </View>
     )
