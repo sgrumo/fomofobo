@@ -22,11 +22,11 @@ export const MapCredit = (props: MapCreditProps) => {
     const { t } = useTranslation("shared")
 
     return (
-        <div className="pointer-events-none absolute right-4 bottom-1.5 left-4 flex items-center justify-end gap-1">
+        <div className="flex max-w-[calc(100vw-2rem)] items-center justify-end gap-1">
             {props.open ? (
                 <p
                     id={CREDIT_ID}
-                    className="tp-body-sm text-fg-inverse pointer-events-auto flex min-w-0 gap-1 [&>a]:truncate [&>a]:underline"
+                    className="tp-body-sm text-fg-inverse flex min-w-0 gap-1 [&>a]:truncate [&>a]:underline"
                 >
                     {SOURCES.map(source => (
                         <a
@@ -45,7 +45,7 @@ export const MapCredit = (props: MapCreditProps) => {
                 aria-label={t("Map.Credits")}
                 aria-expanded={props.open}
                 aria-controls={props.open ? CREDIT_ID : undefined}
-                className="text-fg-inverse pointer-events-auto shrink-0 cursor-pointer p-1 [&>svg]:size-4"
+                className="text-fg-inverse shrink-0 cursor-pointer p-1 [&>svg]:size-4"
                 onClick={() => {
                     props.onOpenChange(!props.open)
                 }}

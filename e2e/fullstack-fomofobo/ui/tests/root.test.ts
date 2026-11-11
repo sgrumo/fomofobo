@@ -1026,7 +1026,7 @@ test.describe("map", () => {
         await expect(page).not.toHaveURL(/event=/u)
     })
 
-    test("shows the map credit on load, folds it into its button on a drag of the map, and the button opens it again", async ({
+    test("folds the map credit into its button on load, the button opens it, and a drag of the map folds it again", async ({
         page,
     }) => {
         const center = buildArea()
@@ -1052,6 +1052,11 @@ test.describe("map", () => {
             }),
         ).toBeVisible({ timeout: MAP_TIMEOUT_MS })
 
+        await expect(osmLink).toBeHidden()
+        await expect(creditButton).toHaveAttribute("aria-expanded", "false")
+
+        await creditButton.click()
+
         await expect(osmLink).toHaveAttribute(
             "href",
             "https://www.openstreetmap.org/copyright",
@@ -1066,11 +1071,6 @@ test.describe("map", () => {
 
         await expect(osmLink).toBeHidden()
         await expect(creditButton).toHaveAttribute("aria-expanded", "false")
-
-        await creditButton.click()
-
-        await expect(osmLink).toBeVisible()
-        await expect(creditButton).toHaveAttribute("aria-expanded", "true")
     })
 
     test("opens the preview of a pin, free when it has no price, then its detail over the map, a side panel on a wide screen and a sheet on a phone", async ({

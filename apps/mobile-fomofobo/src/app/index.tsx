@@ -21,6 +21,7 @@ import { EventMap } from "@/components/map/event-map"
 import { EventPreview } from "@/components/map/event-preview"
 import type { PreviewEntry, PreviewVenue } from "@/components/map/event-preview"
 import { KindChips } from "@/components/map/kind-chips"
+import { MapAttribution } from "@/components/map/map-attribution"
 import { PlaceSearch } from "@/components/map/place-search"
 import { useDeviceLocation } from "@/components/map/use-device-location"
 import { useMapQuery } from "@/components/map/use-map-query"
@@ -42,7 +43,6 @@ const TOAST_DURATION_MS = 5000
 
 const CLOCK_TICK_MS = 60_000
 
-// Clears the attribution line at the bottom edge
 const CONTROLS_BOTTOM_OFFSET = 32
 
 const CLEARED_SELECTION = {
@@ -77,6 +77,8 @@ const MapScreen = () => {
     const online = useOnline()
     const [soundsMuted, setSoundsMuted] = useDeviceStorage("sounds-muted")
     const [filtersOpen, setFiltersOpen] = useState(false)
+    // Folded on load and by a pan or a zoom of the visitor
+    const [creditOpen, setCreditOpen] = useState(false)
     const [locateRequest, setLocateRequest] = useState<LocateRequest>()
     const [searchArea, setSearchArea] = useState<SearchArea>()
     const filtersActive = hasActiveFilters(query)
@@ -279,6 +281,9 @@ const MapScreen = () => {
                 onPress={() => {
                     Keyboard.dismiss()
                 }}
+                onUserMoveStart={() => {
+                    setCreditOpen(false)
+                }}
             />
             <View
                 className="absolute inset-x-4 gap-2"
@@ -398,31 +403,34 @@ const MapScreen = () => {
                 )}
             </View>
             <View
-                className="absolute right-4 flex-row items-center gap-2"
+                className="absolute right-4 items-end gap-2"
                 style={{ bottom: insets.bottom + CONTROLS_BOTTOM_OFFSET }}
             >
-                {searchFetching && <Spinner label={t("Map.Loading")} size="sm" />}
-                <IconButton
-                    icon="saved"
-                    label={t("Saved.Open")}
-                    onPress={() => {
-                        router.push("/saved")
-                    }}
-                />
-                <IconButton
-                    icon="locate"
-                    label={t("Map.Locate")}
-                    onPress={() => {
-                        void locate()
-                    }}
-                />
-                <IconButton
-                    icon={soundsMuted ? "muted" : "sound"}
-                    label={t(soundsMuted ? "Map.Sounds.Unmute" : "Map.Sounds.Mute")}
-                    onPress={() => {
-                        setSoundsMuted(!soundsMuted)
-                    }}
-                />
+                <MapAttribution open={creditOpen} onOpenChange={setCreditOpen} />
+                <View className="flex-row items-center gap-2">
+                    {searchFetching && <Spinner label={t("Map.Loading")} size="sm" />}
+                    <IconButton
+                        icon="saved"
+                        label={t("Saved.Open")}
+                        onPress={() => {
+                            router.push("/saved")
+                        }}
+                    />
+                    <IconButton
+                        icon="locate"
+                        label={t("Map.Locate")}
+                        onPress={() => {
+                            void locate()
+                        }}
+                    />
+                    <IconButton
+                        icon={soundsMuted ? "muted" : "sound"}
+                        label={t(soundsMuted ? "Map.Sounds.Unmute" : "Map.Sounds.Mute")}
+                        onPress={() => {
+                            setSoundsMuted(!soundsMuted)
+                        }}
+                    />
+                </View>
             </View>
             <EventPreview
                 open={previewOpen && !detailOpen}

@@ -62,6 +62,7 @@ import { useOnline } from "@/lib/hooks/use-online"
 import { CategoryChips } from "./category-chips"
 import { DateChips } from "./date-chips"
 import { KindChips } from "./kind-chips"
+import { MapCredit } from "./map-credit"
 import { PlaceSearch } from "./place-search"
 import { isResultMarkerTarget } from "./result-marker"
 
@@ -126,6 +127,8 @@ export const MapScreen = (props: MapScreenProps) => {
     const [soundsMuted, setSoundsMuted] = useLocalStorage("sounds-muted")
     const filtersId = useId()
     const [filtersOpen, setFiltersOpen] = useState(false)
+    // Folded on load and by a pan or a zoom of the visitor
+    const [creditOpen, setCreditOpen] = useState(false)
     const [locateRequest, setLocateRequest] = useState<LocateRequest>()
     const [searchArea, setSearchArea] = useState<SearchArea>()
     const [previewSheetHeight, setPreviewSheetHeight] = useState(0)
@@ -584,6 +587,9 @@ export const MapScreen = (props: MapScreenProps) => {
                 onBackgroundClick={pressMap}
                 onSelectedClick={closeSelection}
                 centersSelection={narrow}
+                onUserMoveStart={() => {
+                    setCreditOpen(false)
+                }}
                 onDragStart={() => {
                     if (previewCard !== undefined) {
                         closePreview()
@@ -687,9 +693,9 @@ export const MapScreen = (props: MapScreenProps) => {
                 </div>
                 {notices}
             </div>
-            {/* Clears the map attribution, which sits in the bottom corner, and rises above the preview sheet. A phone hides it under a preview, which it would crowd. */}
+            {/* Rises above the preview sheet. A phone hides it under a preview, which it would crowd. */}
             <div
-                className={cn("absolute right-4 bottom-8 flex items-center gap-2", {
+                className={cn("absolute right-4 bottom-8 flex flex-col items-end gap-2", {
                     "right-[25.75rem]": sidePanelOpen,
                     hidden: narrow && previewOpen,
                 })}
@@ -699,32 +705,41 @@ export const MapScreen = (props: MapScreenProps) => {
                         : undefined
                 }
             >
-                {search.isFetching ? (
-                    <Spinner title={t("Map.Loading")} size="xs" />
-                ) : undefined}
-                <button
-                    type="button"
-                    aria-label={t("Saved.Open")}
-                    aria-expanded={savedOpen}
-                    className="pixel-circle-40 drop-shadow-hard-md press-bounce active:drop-shadow-hard-sm text-fg relative inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full [&>svg]:size-4"
-                    onClick={savedOpen ? closeSaved : openSaved}
-                >
-                    <PixelIconSaved />
-                </button>
-                <IconButton
-                    aria-label={t("Map.Locate")}
-                    icon={<PixelIconLocate />}
-                    onClick={() => {
-                        void locate()
-                    }}
+                <MapCredit
+                    route={props.route}
+                    open={creditOpen}
+                    onOpenChange={setCreditOpen}
                 />
-                <IconButton
-                    aria-label={t(soundsMuted ? "Map.Sounds.Unmute" : "Map.Sounds.Mute")}
-                    icon={soundsMuted ? <PixelIconMuted /> : <PixelIconSound />}
-                    onClick={() => {
-                        setSoundsMuted(!soundsMuted)
-                    }}
-                />
+                <div className="flex items-center gap-2">
+                    {search.isFetching ? (
+                        <Spinner title={t("Map.Loading")} size="xs" />
+                    ) : undefined}
+                    <button
+                        type="button"
+                        aria-label={t("Saved.Open")}
+                        aria-expanded={savedOpen}
+                        className="pixel-circle-40 drop-shadow-hard-md press-bounce active:drop-shadow-hard-sm text-fg relative inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full [&>svg]:size-4"
+                        onClick={savedOpen ? closeSaved : openSaved}
+                    >
+                        <PixelIconSaved />
+                    </button>
+                    <IconButton
+                        aria-label={t("Map.Locate")}
+                        icon={<PixelIconLocate />}
+                        onClick={() => {
+                            void locate()
+                        }}
+                    />
+                    <IconButton
+                        aria-label={t(
+                            soundsMuted ? "Map.Sounds.Unmute" : "Map.Sounds.Mute",
+                        )}
+                        icon={soundsMuted ? <PixelIconMuted /> : <PixelIconSound />}
+                        onClick={() => {
+                            setSoundsMuted(!soundsMuted)
+                        }}
+                    />
+                </div>
             </div>
             {detailSide ? (
                 <div

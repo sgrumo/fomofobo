@@ -45,7 +45,6 @@ import { playSound } from "@/lib/sounds/play-sound"
 import dotDitherPattern from "../../../assets/map/dot-dither.png"
 import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"
-import { MapAttribution } from "./map-attribution"
 import { MarkerMotion } from "./marker-motion"
 import { PositionMarker } from "./position-marker"
 import { VenuePin } from "./venue-pin"
@@ -114,6 +113,8 @@ interface EventMapProps {
     onSelect: (ref: OccurrenceRef) => void
     onSelectVenue: (venueId: string) => void
     onPress: () => void
+    // A pan or a zoom of the map by the visitor
+    onUserMoveStart: () => void
 }
 
 export const EventMap = (props: EventMapProps) => {
@@ -121,8 +122,6 @@ export const EventMap = (props: EventMapProps) => {
     const mapRef = useRef<MapRef>(null)
     const cameraRef = useRef<CameraRef>(null)
     const [viewport, setViewport] = useState<Viewport>()
-    // Shown on load, folded by the first pan or zoom of the visitor
-    const [attributionOpen, setAttributionOpen] = useState(true)
     const { latitude, longitude } = props.center
 
     const readLocateRequest = useEffectEvent(() => props.locateRequest)
@@ -402,7 +401,7 @@ export const EventMap = (props: EventMapProps) => {
                 }}
                 onRegionWillChange={event => {
                     if (event.nativeEvent.userInteraction) {
-                        setAttributionOpen(false)
+                        props.onUserMoveStart()
                     }
                 }}
                 onRegionDidChange={event => {
@@ -430,7 +429,6 @@ export const EventMap = (props: EventMapProps) => {
                     </Marker>
                 )}
             </Map>
-            <MapAttribution open={attributionOpen} onOpenChange={setAttributionOpen} />
         </View>
     )
 }

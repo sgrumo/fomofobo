@@ -1,10 +1,10 @@
 import { Info } from "lucide-react-native"
 import { useTranslation } from "react-i18next"
 import { Linking, Pressable, View } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { Text } from "@/components/ui/text/text"
 import { THEME_COLORS } from "@/lib/theme/theme-tokens"
+import { cn } from "@/lib/utils/class-names"
 
 const SOURCES = [
     { key: "OpenFreeMap", url: "https://openfreemap.org" },
@@ -25,15 +25,15 @@ interface MapAttributionProps {
     onOpenChange: (open: boolean) => void
 }
 
-// Paper on the map green is under AA, so the line sits on an ink strip
 export const MapAttribution = (props: MapAttributionProps) => {
     const { t } = useTranslation("shared")
-    const insets = useSafeAreaInsets()
 
     return (
+        // Paper text on the map green is under AA, so the open line sits on an ink strip
         <View
-            className="absolute right-4 flex-row items-center gap-1 bg-surface-inverse px-1"
-            style={{ bottom: insets.bottom }}
+            className={cn("flex-row items-center gap-1 px-1", {
+                "bg-surface-inverse": props.open,
+            })}
         >
             {props.open
                 ? SOURCES.map(source => (

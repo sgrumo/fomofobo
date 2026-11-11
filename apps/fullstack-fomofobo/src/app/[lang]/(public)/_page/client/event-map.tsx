@@ -48,7 +48,6 @@ import { playSound } from "@/lib/sounds/play-sound"
 
 import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"
-import { MapCredit } from "./map-credit"
 import { MapMarker } from "./map-marker"
 import { MarkerMotion } from "./marker-motion"
 import { PositionMarker } from "./position-marker"
@@ -169,6 +168,8 @@ interface EventMapProps extends RouteClientComponentProps<"root"> {
     onSelectedClick: () => void
     // A drag of the map by the visitor
     onDragStart: () => void
+    // A pan or a zoom of the map by the visitor
+    onUserMoveStart: () => void
     // West, south, east and north edges of the map once it loads and after each move
     onViewportChange: (bbox: [number, number, number, number]) => void
     // True when a press on a pin moves the map to center it, as on a phone
@@ -181,14 +182,15 @@ export const EventMap = (props: EventMapProps) => {
     const supported = useMemo(() => supportsWebGl2(), [])
     const [map, setMap] = useState<MapLibreMap>()
     const [viewport, setViewport] = useState<Viewport>()
-    // Shown on load, folded by the first pan or zoom of the visitor
-    const [creditOpen, setCreditOpen] = useState(true)
     const readCenter = useEffectEvent(() => props.center)
     const clickBackground = useEffectEvent(() => {
         props.onBackgroundClick()
     })
     const startDrag = useEffectEvent(() => {
         props.onDragStart()
+    })
+    const startUserMove = useEffectEvent(() => {
+        props.onUserMoveStart()
     })
     const reportViewport = useEffectEvent((shown: Viewport) => {
         props.onViewportChange(shown.bbox)
@@ -209,13 +211,13 @@ export const EventMap = (props: EventMapProps) => {
             zoom: LOCATE_ZOOM,
             ...FIXED_MAP_OPTIONS,
             // The expanded control wraps over the bottom controls on a phone, so the map
-            // draws its own one-line credit below, which folds into a button.
+            // screen draws its own credit, which folds into a button.
             attributionControl: false,
         })
         instance.on("movestart", event => {
             // A move with no original event is a fly of the app, not of the visitor
             if (event.originalEvent !== undefined) {
-                setCreditOpen(false)
+                startUserMove()
             }
         })
         const releaseGestures = fixMapGestures(instance)
@@ -579,11 +581,6 @@ export const EventMap = (props: EventMapProps) => {
             <div className="absolute inset-0 isolate">
                 <div ref={containerRef} className="size-full" />
             </div>
-            <MapCredit
-                route={props.route}
-                open={creditOpen}
-                onOpenChange={setCreditOpen}
-            />
             {map === undefined || viewport === undefined
                 ? undefined
                 : [
