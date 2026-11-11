@@ -106,6 +106,7 @@ export type ThemeColor = keyof typeof THEME_COLORS
 export const FONT_FAMILIES = {
     display: "Space Mono",
     sans: "Funnel Sans",
+    count: "Departure Mono",
 } as const
 
 /**

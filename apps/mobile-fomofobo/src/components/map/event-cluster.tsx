@@ -80,7 +80,7 @@ export const EventCluster = (props: EventClusterProps) => {
                     </G>
                 </Svg>
             </View>
-            <Text variant="pixel-lg" maxFontSizeMultiplier={1.5}>
+            <Text variant="count" maxFontSizeMultiplier={1.5}>
                 {String(props.count)}
             </Text>
         </Pressable>

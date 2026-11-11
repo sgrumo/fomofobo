@@ -11,6 +11,8 @@ export const textVariants = cva("text-fg", {
             "body-lg": "tp-body-lg",
             "body-md": "tp-body-md",
             "body-sm": "tp-body-sm",
+            // The count of a map cluster, as the `font-count` text of the web cluster
+            count: "pt-px font-count text-[22px] leading-[22px]",
         },
     },
     defaultVariants: {

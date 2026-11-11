@@ -39,6 +39,7 @@ module.exports = {
                 sans: [`"${FONT_FAMILIES.sans}"`],
                 display: [`"${FONT_FAMILIES.display}"`],
                 mono: [`"${FONT_FAMILIES.display}"`],
+                count: [`"${FONT_FAMILIES.count}"`],
             },
         },
     },

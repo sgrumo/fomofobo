@@ -43,6 +43,8 @@ const fontFiles = {
         "./node_modules/@expo-google-fonts/funnel-sans/400Regular/FunnelSans_400Regular.ttf",
     sansBold:
         "./node_modules/@expo-google-fonts/funnel-sans/700Bold/FunnelSans_700Bold.ttf",
+    // SIL Open Font License 1.1, decoded from the woff2 of `packages/styles`: the counts of the map clusters
+    countRegular: "./assets/fonts/DepartureMono-Regular.otf",
 }
 
 const config: ExpoConfig = {
@@ -125,6 +127,12 @@ const config: ExpoConfig = {
                             fontDefinitions: [
                                 { path: fontFiles.sansRegular, weight: 400 },
                                 { path: fontFiles.sansBold, weight: 700 },
+                            ],
+                        },
+                        {
+                            fontFamily: FONT_FAMILIES.count,
+                            fontDefinitions: [
+                                { path: fontFiles.countRegular, weight: 400 },
                             ],
                         },
                     ],

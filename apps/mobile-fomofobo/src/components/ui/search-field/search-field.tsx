@@ -1,9 +1,11 @@
 import { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Pressable, TextInput, View } from "react-native"
+import Animated from "react-native-reanimated"
 
 import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
 import { PixelPanel } from "@/components/ui/pixel-panel/pixel-panel"
+import { Text } from "@/components/ui/text/text"
 import { THEME_COLORS } from "@/lib/theme/theme-tokens"
 
 import {
@@ -11,7 +13,11 @@ import {
     SEARCH_FIELD_CLEAR_ICON_SIZE,
     SEARCH_FIELD_ICON_SIZE,
     searchFieldClearStyles,
+    searchFieldCursorStyle,
+    searchFieldInputContainerStyles,
     searchFieldInputStyles,
+    searchFieldPlaceholderStyles,
+    searchFieldPlaceholderTextStyles,
     searchFieldStyles,
 } from "./search-field.styles"
 
@@ -39,27 +45,45 @@ const SearchField = (props: SearchFieldProps) => {
         >
             <View className={searchFieldStyles}>
                 <PixelIcon name="search" size={SEARCH_FIELD_ICON_SIZE} />
-                <TextInput
-                    ref={inputRef}
-                    accessibilityLabel={props.label}
-                    placeholder={props.placeholder}
-                    value={props.value}
-                    onChangeText={props.onValueChange}
-                    onSubmitEditing={props.onSubmitEditing}
-                    onFocus={() => {
-                        setFocused(true)
-                        props.onFocus?.()
-                    }}
-                    onBlur={() => {
-                        setFocused(false)
-                        props.onBlur?.()
-                    }}
-                    returnKeyType="search"
-                    autoCorrect={false}
-                    selectionColor={THEME_COLORS.live}
-                    cursorColor={THEME_COLORS.live}
-                    className={searchFieldInputStyles}
-                />
+                <View className={searchFieldInputContainerStyles}>
+                    <TextInput
+                        ref={inputRef}
+                        accessibilityLabel={props.label}
+                        accessibilityHint={props.placeholder}
+                        value={props.value}
+                        onChangeText={props.onValueChange}
+                        onSubmitEditing={props.onSubmitEditing}
+                        onFocus={() => {
+                            setFocused(true)
+                            props.onFocus?.()
+                        }}
+                        onBlur={() => {
+                            setFocused(false)
+                            props.onBlur?.()
+                        }}
+                        returnKeyType="search"
+                        autoCorrect={false}
+                        selectionColor={THEME_COLORS.live}
+                        cursorColor={THEME_COLORS.live}
+                        className={searchFieldInputStyles}
+                    />
+                    {/* The placeholder of the web field, drawn in place of the native one */}
+                    {props.value === "" && (
+                        <View
+                            pointerEvents="none"
+                            className={searchFieldPlaceholderStyles}
+                        >
+                            <Text
+                                variant="pixel-md"
+                                numberOfLines={1}
+                                className={searchFieldPlaceholderTextStyles}
+                            >
+                                {props.placeholder}
+                            </Text>
+                            {!focused && <Animated.View style={searchFieldCursorStyle} />}
+                        </View>
+                    )}
+                </View>
                 {props.value !== "" && (
                     <Pressable
                         accessibilityRole="button"
