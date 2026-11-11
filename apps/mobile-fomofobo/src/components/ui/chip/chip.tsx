@@ -2,15 +2,17 @@ import type { PixelIconName } from "domain/pixel-icons"
 import type { CategoryIcon } from "models"
 import { createContext, useContext } from "react"
 import type { ReactNode } from "react"
-import { Pressable, ScrollView, View } from "react-native"
+import { ScrollView, View } from "react-native"
 
 import { PixelGlyph } from "@/components/ui/pixel-glyph/pixel-glyph"
 import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
+import { PressBounce } from "@/components/ui/press-bounce/press-bounce"
 import { Text } from "@/components/ui/text/text"
 import { hardShadow } from "@/lib/theme/hard-shadow"
 import { cn } from "@/lib/utils/class-names"
 
 import {
+    CHIP_BOUNCE,
     CHIP_HIT_SLOP,
     CHIP_ICON_SIZE,
     chipBarStyles,
@@ -96,7 +98,7 @@ const Chip = (props: ChipProps) => {
     const inverse = props.pressed && tone === "inverse"
 
     return (
-        <Pressable
+        <PressBounce
             accessibilityRole="togglebutton"
             accessibilityLabel={
                 props.count === undefined
@@ -117,7 +119,8 @@ const Chip = (props: ChipProps) => {
                 props.grow === true && "grow justify-center",
                 props.disabled === true && "opacity-50",
             )}
-            style={inBar ? undefined : hardShadow("sm")}
+            bounce={CHIP_BOUNCE}
+            styleOf={() => (inBar ? undefined : hardShadow("sm"))}
         >
             {props.icon !== undefined && (
                 <PixelIcon
@@ -143,7 +146,7 @@ const Chip = (props: ChipProps) => {
                     {props.count}
                 </Text>
             )}
-        </Pressable>
+        </PressBounce>
     )
 }
 

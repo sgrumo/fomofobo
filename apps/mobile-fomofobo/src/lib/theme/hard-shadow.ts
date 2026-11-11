@@ -18,12 +18,3 @@ export const hardShadow = (
     const offset = `${String(HARD_SHADOW_OFFSETS[size])}px`
     return { boxShadow: `${offset} ${offset} 0px 0px ${THEME_COLORS[color]}` }
 }
-
-/**
- * @description Returns the style of a pressed control: moved onto its shadow, the shadow one step smaller
- * @param color Shadow color
- */
-export const pressedHardShadow = (color: ThemeColor = "line"): ViewStyle => ({
-    ...hardShadow("sm", color),
-    transform: [{ translateX: 2 }, { translateY: 2 }],
-})

@@ -16,8 +16,6 @@ export const iconButtonTones = {
 
 export const ICON_BUTTON_TARGET = 44
 
-export const iconButtonPressedStyle = {
-    transform: [{ translateX: 2 }, { translateY: 2 }, { scale: 0.9 }],
-}
+export const ICON_BUTTON_BOUNCE = { scale: 0.9, shift: true }
 
 export const iconButtonMirroredStyles = "-scale-x-100"

@@ -3,9 +3,10 @@ import type { MarkerEmphasis } from "domain/event-clusters"
 import { CLUSTER_SHAPE, MARKER_CELL_PX } from "domain/pixel-markers"
 import { useId } from "react"
 import { useTranslation } from "react-i18next"
-import { Pressable, View } from "react-native"
+import { View } from "react-native"
 import Svg, { ClipPath, Defs, G, Path } from "react-native-svg"
 
+import { PressBounce } from "@/components/ui/press-bounce/press-bounce"
 import { Text } from "@/components/ui/text/text"
 import { wedgePath } from "@/lib/pixel/pixel-shapes"
 import { THEME_COLORS } from "@/lib/theme/theme-tokens"
@@ -13,6 +14,8 @@ import { cn } from "@/lib/utils/class-names"
 
 const CLUSTER_SIZE = CLUSTER_SHAPE.cells * MARKER_CELL_PX
 const DEGREES_PER_PERCENT = 3.6
+
+const MARKER_BOUNCE = { scale: 0.9, shift: false }
 
 interface EventClusterProps {
     count: number
@@ -29,7 +32,7 @@ export const EventCluster = (props: EventClusterProps) => {
     const id = useId()
 
     return (
-        <Pressable
+        <PressBounce
             accessibilityRole="button"
             accessibilityLabel={t("Map.Cluster", {
                 count: props.count,
@@ -39,10 +42,11 @@ export const EventCluster = (props: EventClusterProps) => {
                 permanent: props.permanentCount,
             })}
             onPress={props.onExpand}
+            bounce={MARKER_BOUNCE}
             className={cn("items-center justify-center", {
                 "opacity-35": props.emphasis === "dimmed",
             })}
-            style={{ width: CLUSTER_SIZE, height: CLUSTER_SIZE }}
+            styleOf={() => ({ width: CLUSTER_SIZE, height: CLUSTER_SIZE })}
         >
             <View className="absolute left-0 top-0" pointerEvents="none">
                 <Svg
@@ -83,6 +87,6 @@ export const EventCluster = (props: EventClusterProps) => {
             <Text variant="count" maxFontSizeMultiplier={1.5}>
                 {String(props.count)}
             </Text>
-        </Pressable>
+        </PressBounce>
     )
 }

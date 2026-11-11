@@ -70,5 +70,7 @@ export const chipCountVariants = cva("tp-pixel-sm", {
 
 export const CHIP_ICON_SIZE = 12
 
+export const CHIP_BOUNCE = { scale: 0.95, shift: false }
+
 // Brings the 28 pt chip to the 44 pt target
 export const CHIP_HIT_SLOP = 8

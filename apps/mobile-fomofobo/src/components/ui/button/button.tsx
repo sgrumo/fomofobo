@@ -1,13 +1,13 @@
 import type { VariantProps } from "class-variance-authority"
 import type { PixelIconName } from "domain/pixel-icons"
-import { useState } from "react"
 import type { ReactNode } from "react"
-import { Pressable } from "react-native"
+import type { Pressable } from "react-native"
 import type { StrictOmit } from "shared/types"
 
 import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
+import { PressBounce } from "@/components/ui/press-bounce/press-bounce"
 import { TextClassContext } from "@/components/ui/text/text"
-import { hardShadow, pressedHardShadow } from "@/lib/theme/hard-shadow"
+import { hardShadow } from "@/lib/theme/hard-shadow"
 import { cn } from "@/lib/utils/class-names"
 
 import {
@@ -29,20 +29,15 @@ type ButtonProps = StrictOmit<
         children?: ReactNode
     }
 
-// The pressed state lives in React state: NativeWind drops a `style` function next to
-// `className`. The spread comes first, so a `Link asChild` cannot replace the shadow style
 const Button = ({
     className,
     variant,
     size,
     destructive,
     icon,
-    onPressIn,
-    onPressOut,
     children,
     ...props
 }: ButtonProps) => {
-    const [pressed, setPressed] = useState(false)
     const tone = variant ?? "primary"
     const scale = size ?? "md"
     const shadowColor = buttonShadowColor(tone, destructive === true)
@@ -52,7 +47,7 @@ const Button = ({
         <TextClassContext.Provider
             value={buttonTextVariants({ variant: tone, size: scale })}
         >
-            <Pressable
+            <PressBounce
                 {...props}
                 role="button"
                 hitSlop={buttonHitSlops[scale]}
@@ -61,21 +56,10 @@ const Button = ({
                     props.disabled === true && "opacity-50",
                     className,
                 )}
-                style={
-                    flat
-                        ? undefined
-                        : pressed
-                          ? pressedHardShadow(shadowColor)
-                          : hardShadow("md", shadowColor)
+                bounce={{ scale: 0.95, shift: !flat }}
+                styleOf={pressed =>
+                    flat ? undefined : hardShadow(pressed ? "sm" : "md", shadowColor)
                 }
-                onPressIn={event => {
-                    setPressed(true)
-                    onPressIn?.(event)
-                }}
-                onPressOut={event => {
-                    setPressed(false)
-                    onPressOut?.(event)
-                }}
             >
                 {icon !== undefined && (
                     <PixelIcon
@@ -85,7 +69,7 @@ const Button = ({
                     />
                 )}
                 {children}
-            </Pressable>
+            </PressBounce>
         </TextClassContext.Provider>
     )
 }

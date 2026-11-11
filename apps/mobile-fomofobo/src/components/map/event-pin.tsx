@@ -9,18 +9,21 @@ import {
 } from "domain/pixel-markers"
 import type { CategoryIcon, OccurrenceStatus } from "models"
 import { useTranslation } from "react-i18next"
-import { Pressable, View } from "react-native"
+import { View } from "react-native"
 import { isDefined } from "shared/values"
 import { match } from "ts-pattern"
 
 import { PixelDisc } from "@/components/map/pixel-disc"
 import { PixelSprite } from "@/components/map/pixel-sprite"
 import { Badge } from "@/components/ui/badge/badge"
+import { PressBounce } from "@/components/ui/press-bounce/press-bounce"
 import { THEME_COLORS } from "@/lib/theme/theme-tokens"
 import { cn } from "@/lib/utils/class-names"
 
 // Widens the press of the disc to 44 pt across and below it, clear of the tag above
 const PIN_HIT_SLOP = { top: 4, bottom: 13, left: 13, right: 13 }
+
+const MARKER_BOUNCE = { scale: 0.9, shift: false }
 
 interface EventPinProps {
     title: string
@@ -73,7 +76,7 @@ export const EventPin = (props: EventPinProps) => {
                 )}
             </View>
             {/* The disc alone opens the preview: the tag above it takes no press */}
-            <Pressable
+            <PressBounce
                 accessibilityRole="button"
                 accessibilityLabel={[
                     t("Map.Pin", {
@@ -92,6 +95,7 @@ export const EventPin = (props: EventPinProps) => {
                     .join(", ")}
                 onPress={props.onSelect}
                 hitSlop={PIN_HIT_SLOP}
+                bounce={MARKER_BOUNCE}
             >
                 <PixelDisc
                     kind={props.status}
@@ -113,7 +117,7 @@ export const EventPin = (props: EventPinProps) => {
                         )
                     }
                 />
-            </Pressable>
+            </PressBounce>
         </View>
     )
 }

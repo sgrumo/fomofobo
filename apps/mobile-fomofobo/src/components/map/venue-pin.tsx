@@ -1,14 +1,17 @@
 import type { MarkerEmphasis } from "domain/event-clusters"
 import type { CategoryIcon, PermanentVenueKind } from "models"
 import { useTranslation } from "react-i18next"
-import { Pressable, View } from "react-native"
+import { View } from "react-native"
 
 import { PixelDisc } from "@/components/map/pixel-disc"
 import { Badge } from "@/components/ui/badge/badge"
+import { PressBounce } from "@/components/ui/press-bounce/press-bounce"
 import { cn } from "@/lib/utils/class-names"
 
 // Widens the press of the disc to 44 pt across and below it, clear of the tag above
 const PIN_HIT_SLOP = { top: 4, bottom: 13, left: 13, right: 13 }
+
+const MARKER_BOUNCE = { scale: 0.9, shift: false }
 
 interface VenuePinProps {
     name: string
@@ -33,7 +36,7 @@ export const VenuePin = (props: VenuePinProps) => {
                 </Badge>
             </View>
             {/* The disc alone opens the preview: the tag above it takes no press */}
-            <Pressable
+            <PressBounce
                 accessibilityRole="button"
                 accessibilityLabel={t("Map.VenuePin", {
                     name: props.name,
@@ -41,13 +44,14 @@ export const VenuePin = (props: VenuePinProps) => {
                 })}
                 onPress={props.onSelect}
                 hitSlop={PIN_HIT_SLOP}
+                bounce={MARKER_BOUNCE}
             >
                 <PixelDisc
                     kind="permanent"
                     icon={props.icon}
                     selected={props.emphasis === "selected"}
                 />
-            </Pressable>
+            </PressBounce>
         </View>
     )
 }
