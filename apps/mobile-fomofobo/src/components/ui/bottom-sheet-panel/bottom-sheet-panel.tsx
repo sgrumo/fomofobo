@@ -9,6 +9,7 @@ import type {
 import { createContext, use, useEffect, useRef } from "react"
 import type { ReactNode } from "react"
 import { View } from "react-native"
+import { GestureDetector, usePanGesture } from "react-native-gesture-handler"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { BottomSheetBackground } from "@/components/ui/bottom-sheet/bottom-sheet"
@@ -23,6 +24,9 @@ import {
     bottomSheetTabbedBackgroundStyle,
     bottomSheetTabRowStyle,
     bottomSheetTabRowStyles,
+    DRAG_DOWN_OFFSETS,
+    SWIPE_UP_ACTIVE_OFFSETS,
+    SWIPE_UP_DISTANCE,
 } from "./bottom-sheet-panel.styles"
 
 // gorhom takes the handle as a component: the tab goes through context, so the handle keeps
@@ -55,6 +59,7 @@ interface BottomSheetPanelProps {
     onClose: () => void
     // A tab that peeks out above the sheet
     tab?: ReactNode
+    onSwipeUp?: () => void
     children?: ReactNode
 }
 
@@ -63,6 +68,19 @@ interface BottomSheetPanelProps {
 const BottomSheetPanel = (props: BottomSheetPanelProps) => {
     const ref = useRef<GorhomBottomSheet>(null)
     const insets = useSafeAreaInsets()
+    const onSwipeUp = props.onSwipeUp
+    const swipeUp = usePanGesture({
+        enabled: onSwipeUp !== undefined,
+        // JS-thread callbacks: `onSwipeUp` is no worklet, and the swipe drives no animation
+        disableReanimated: true,
+        activeOffsetY: SWIPE_UP_ACTIVE_OFFSETS,
+        failOffsetY: DRAG_DOWN_OFFSETS,
+        onDeactivate: event => {
+            if (event.translationY <= -SWIPE_UP_DISTANCE) {
+                onSwipeUp?.()
+            }
+        },
+    })
 
     useEffect(() => {
         if (props.open) {
@@ -78,6 +96,8 @@ const BottomSheetPanel = (props: BottomSheetPanelProps) => {
                 ref={ref}
                 index={-1}
                 enableDynamicSizing={true}
+                // The sheet pans on a drag down alone, so a drag up reaches the swipe of the content
+                activeOffsetY={onSwipeUp === undefined ? undefined : DRAG_DOWN_OFFSETS}
                 enablePanDownToClose={true}
                 detached={true}
                 bottomInset={insets.bottom + BOTTOM_SHEET_INSET}
@@ -95,9 +115,11 @@ const BottomSheetPanel = (props: BottomSheetPanelProps) => {
                 }}
             >
                 <BottomSheetView>
-                    <View className={bottomSheetPanelContentStyles}>
-                        {props.children}
-                    </View>
+                    <GestureDetector gesture={swipeUp}>
+                        <View className={bottomSheetPanelContentStyles}>
+                            {props.children}
+                        </View>
+                    </GestureDetector>
                 </BottomSheetView>
             </GorhomBottomSheet>
         </TabContext>

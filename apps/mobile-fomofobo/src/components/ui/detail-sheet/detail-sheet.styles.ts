@@ -1,7 +1,9 @@
 import { BOTTOM_SHEET_INSET } from "@/components/ui/bottom-sheet/bottom-sheet.styles"
 
-// Leaves the top of the map in view, as the mockup of the event sheet
-export const DETAIL_SHEET_SNAP_POINTS = ["88%"]
+export const DETAIL_SHEET_SNAP_POINTS = ["100%"]
+
+// Stops the sheet under the search row of the map, over its filter chips: 8 pt, the 44 pt row, 8 pt
+export const DETAIL_SHEET_TOP_GAP = 60
 
 export const detailSheetStyle = { marginHorizontal: BOTTOM_SHEET_INSET }
 

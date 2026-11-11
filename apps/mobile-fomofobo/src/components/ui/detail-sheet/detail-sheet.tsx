@@ -16,6 +16,7 @@ import {
 
 import {
     DETAIL_SHEET_SNAP_POINTS,
+    DETAIL_SHEET_TOP_GAP,
     detailSheetContentStyle,
     detailSheetContentWithFooterStyle,
     detailSheetFooterStyles,
@@ -30,7 +31,7 @@ interface DetailSheetProps {
 }
 
 // A tall sheet in the screen tree, with no backdrop, that scrolls its content and keeps the
-// top of the screen behind in view
+// search row of the screen behind in view
 const DetailSheet = (props: DetailSheetProps) => {
     const ref = useRef<GorhomBottomSheet>(null)
     const insets = useSafeAreaInsets()
@@ -52,7 +53,7 @@ const DetailSheet = (props: DetailSheetProps) => {
             enableDynamicSizing={false}
             enablePanDownToClose={true}
             detached={true}
-            topInset={insets.top}
+            topInset={insets.top + DETAIL_SHEET_TOP_GAP}
             bottomInset={insets.bottom + BOTTOM_SHEET_INSET}
             style={detailSheetStyle}
             backgroundComponent={BottomSheetBackground}

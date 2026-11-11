@@ -279,6 +279,7 @@ export const EventPreview = (props: EventPreviewProps) => {
         <BottomSheetPanel
             open={props.open}
             onClose={props.onClose}
+            onSwipeUp={props.entry === undefined ? undefined : props.onOpenDetail}
             tab={
                 props.paging === undefined ? undefined : (
                     <PagingTab paging={props.paging} />
