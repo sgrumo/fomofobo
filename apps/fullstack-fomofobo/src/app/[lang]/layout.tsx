@@ -25,6 +25,10 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
     themeColor: MAP_GROUND_COLOR,
+    width: "device-width",
+    initialScale: 1,
+    // iOS Safari zooms the page on the focus of a field under 16px, and keeps a pinch zoom
+    maximumScale: 1,
 }
 
 const RootLayout = async (props: LayoutProps<"/[lang]">) => {

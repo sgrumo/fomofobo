@@ -346,7 +346,7 @@ test.describe("map", () => {
         )
     })
 
-    test("switches the preview of a phone to the pin that a tap names, and the pin of the open preview closes it", async ({
+    test("switches the preview of a phone to the pin that a tap names, hides the map buttons under it, and the pin of the open preview closes it", async ({
         page,
     }) => {
         const center = buildArea()
@@ -354,7 +354,7 @@ test.describe("map", () => {
         const live = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0, longitude: -0.006 }),
+                    offsetPoint(center, { latitude: 0, longitude: -0.003 }),
                 ),
                 category,
             },
@@ -363,7 +363,7 @@ test.describe("map", () => {
         const upcoming = await seedPublicEvent(
             {
                 venue: await seedVenue(
-                    offsetPoint(center, { latitude: 0, longitude: 0.006 }),
+                    offsetPoint(center, { latitude: 0, longitude: 0.003 }),
                 ),
                 category,
             },
@@ -384,11 +384,17 @@ test.describe("map", () => {
             }),
         })
 
+        const locateButton = page.getByRole("button", { name: t("shared", "Map.Locate") })
+
         await page.setViewportSize({ width: 375, height: 812 })
         await gotoPage(page, mapPath(center))
         await livePin.click({ timeout: MAP_TIMEOUT_MS })
 
         await expect(getBottomSheet(page, live.title)).toBeVisible()
+        await expect(locateButton).toBeHidden()
+        await expect(
+            page.getByRole("button", { name: t("shared", "Saved.Open") }),
+        ).toBeHidden()
 
         await upcomingPin.click()
 
@@ -400,6 +406,7 @@ test.describe("map", () => {
 
         await expect(getBottomSheet(page, upcoming.title)).toBeHidden()
         await expect(page).not.toHaveURL(/event=/u)
+        await expect(locateButton).toBeVisible()
     })
 
     test("narrows the pins to any pressed category, and shows every category again once unpressed", async ({
@@ -485,7 +492,7 @@ test.describe("map", () => {
         await expect(page).not.toHaveURL(/categories=/u)
     })
 
-    test("keeps the kind chips in sight on a phone, opens the other filters from the filter button, and Escape closes them", async ({
+    test("keeps the kind chips in sight on a phone, opens the other filters from the filter button, and Escape or a press on the map closes them", async ({
         page,
     }) => {
         await page.setViewportSize({ width: 375, height: 812 })
@@ -544,6 +551,16 @@ test.describe("map", () => {
         await clickIconButton(page, t("shared", "Filters.Label"))
         await expect(tomorrowChip).toBeVisible()
         await page.keyboard.press("Escape")
+
+        await expect(tomorrowChip).toBeHidden()
+
+        await clickIconButton(page, t("shared", "Filters.Label"))
+        await expect(tomorrowChip).toBeVisible()
+        // The left gutter of the map beside the panel, which the chips of every category can
+        // stretch to the height of a phone
+        await page
+            .getByRole("region", { name: t("shared", "Map.Label") })
+            .click({ position: { x: 8, y: 400 } })
 
         await expect(tomorrowChip).toBeHidden()
     })

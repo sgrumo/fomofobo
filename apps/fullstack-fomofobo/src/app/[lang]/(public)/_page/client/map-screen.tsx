@@ -152,6 +152,9 @@ export const MapScreen = (props: MapScreenProps) => {
             setQuery(centerQueryOf(position))
         }
     }, [position, hasUrlCenter, setQuery])
+    // Until a locate of the visitor, the map shows a center at the position as a locate does
+    const shownLocateRequest =
+        locateRequest ?? (position === undefined ? undefined : { position, count: 0 })
 
     const categories = useQuery(api.listCategoriesQuery({ params: {}, query: {} }))
     const search = useQuery({
@@ -256,6 +259,10 @@ export const MapScreen = (props: MapScreenProps) => {
     const openPreview = (target: PreviewTarget, withDetail = false) => {
         const opening = selectedRef === undefined && selectedVenueId === undefined
         previewPushedRef.current = opening || previewPushedRef.current
+        // A press outside the filter panel of a phone closes it
+        if (narrow) {
+            setFiltersOpen(false)
+        }
         setQuery(
             { ...selectionQueryOf(target), detail: withDetail ? true : undefined },
             { history: opening ? "push" : "replace" },
@@ -481,6 +488,10 @@ export const MapScreen = (props: MapScreenProps) => {
             closeSaved()
         }
     }
+    const pressMap = () => {
+        setFiltersOpen(false)
+        closeWideSelection()
+    }
     // The preview sheet stays open on a press on a pin, so its own pin closes it
     const closeSelection = () => {
         if (narrow && previewOpen && !detailOpen) {
@@ -553,7 +564,7 @@ export const MapScreen = (props: MapScreenProps) => {
             <EventMap
                 route={props.route}
                 center={center}
-                locateRequest={locateRequest}
+                locateRequest={shownLocateRequest}
                 position={position}
                 occurrences={shownResults?.occurrences ?? []}
                 permanentVenues={shownResults?.permanentVenues ?? []}
@@ -570,7 +581,7 @@ export const MapScreen = (props: MapScreenProps) => {
                 onSelectVenue={venueId => {
                     openPreview({ type: "venue", venueId })
                 }}
-                onBackgroundClick={closeWideSelection}
+                onBackgroundClick={pressMap}
                 onSelectedClick={closeSelection}
                 centersSelection={narrow}
                 onDragStart={() => {
@@ -676,10 +687,11 @@ export const MapScreen = (props: MapScreenProps) => {
                 </div>
                 {notices}
             </div>
-            {/* Clears the map attribution, which sits in the bottom corner, and rises above the preview sheet of a phone */}
+            {/* Clears the map attribution, which sits in the bottom corner, and rises above the preview sheet. A phone hides it under a preview, which it would crowd. */}
             <div
                 className={cn("absolute right-4 bottom-8 flex items-center gap-2", {
                     "right-[25.75rem]": sidePanelOpen,
+                    hidden: narrow && previewOpen,
                 })}
                 style={
                     previewSheetHeight > 0

@@ -58,8 +58,6 @@ setWorkerUrl(
     new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).toString(),
 )
 
-// A wide screen opens at the zoom of a locate, a phone one level out to show more of the area
-const PHONE_INITIAL_ZOOM = LOCATE_ZOOM - 1
 const DOT_DITHER_IMAGE = "dot-dither"
 
 interface Viewport {
@@ -207,9 +205,8 @@ export const EventMap = (props: EventMapProps) => {
             container,
             style: mapStyle,
             center: [longitude, latitude],
-            zoom: globalThis.matchMedia("(min-width: 48rem)").matches
-                ? LOCATE_ZOOM
-                : PHONE_INITIAL_ZOOM,
+            // The map opens at the zoom of a locate
+            zoom: LOCATE_ZOOM,
             ...FIXED_MAP_OPTIONS,
             // The expanded control wraps over the bottom controls on a phone, so the map
             // draws its own one-line credit below, which folds into a button.
