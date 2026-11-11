@@ -60,6 +60,23 @@ describe("pixel markers", () => {
         expect(fill.size).toBeGreaterThan(ring.size)
     })
 
+    it("fills every cell of the cluster inside its outer ring once", () => {
+        const drawn = [
+            CLUSTER_SHAPE.fillPath,
+            CLUSTER_SHAPE.inkPath,
+            CLUSTER_SHAPE.bandPath,
+        ].flatMap(path => Array.from(cellsOf(path)))
+        const center = CLUSTER_SHAPE.cells / 2
+        const offsets = Array.from({ length: CLUSTER_SHAPE.cells }, (_, index) => index)
+        const inside = offsets.flatMap(y =>
+            offsets
+                .filter(x => Math.hypot(x + 0.5 - center, y + 0.5 - center) <= 14)
+                .map(x => `${String(x)} ${String(y)}`),
+        )
+
+        expect(drawn.toSorted()).toStrictEqual(inside.toSorted())
+    })
+
     it("lays the frames of each sprite side by side, the first one drawn", () => {
         const sprites = [LIVE_WAVE, POSITION_WAVE]
 

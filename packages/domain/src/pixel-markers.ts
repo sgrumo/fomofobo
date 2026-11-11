@@ -128,6 +128,6 @@ export const CLUSTER_SHAPE = {
         distance =>
             (distance > 10 && distance <= 11) || (distance > 13 && distance <= 14),
     ),
-    // The band between the two rings that the progress ring fills
-    bandPath: cellsPathOf(CLUSTER_REACH, distance => distance > 11.5 && distance <= 13),
+    // The band between the two ink rings, flush with both, that the progress ring fills
+    bandPath: cellsPathOf(CLUSTER_REACH, distance => distance > 11 && distance <= 13),
 }
