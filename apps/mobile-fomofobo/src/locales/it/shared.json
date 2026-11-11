@@ -100,7 +100,6 @@
         "NotFound": "Questo evento non esiste o non è più visibile.",
         "LoadFailed": "Non è stato possibile caricare l'evento.",
         "Retry": "Riprova",
-        "Back": "Indietro",
         "Gallery": "Foto di {{title}}",
         "Photo": "Foto {{index}} di {{total}}",
         "PhotoCounter": "Foto {{index}}/{{total}}",

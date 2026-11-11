@@ -6,7 +6,7 @@ import { placeQueryOf, textQueryOf } from "domain/map-search"
 import { nextSearchArea, searchBoxOf } from "domain/search-box"
 import type { SearchArea } from "domain/search-box"
 import { isSameSpotEntry, spotEntriesOf } from "domain/spot-entries"
-import { Link, router } from "expo-router"
+import { Link } from "expo-router"
 import type { OccurrenceSummary } from "models"
 import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -25,7 +25,9 @@ import { MapAttribution } from "@/components/map/map-attribution"
 import { PlaceSearch } from "@/components/map/place-search"
 import { useDeviceLocation } from "@/components/map/use-device-location"
 import { useMapQuery } from "@/components/map/use-map-query"
+import { SavedList } from "@/components/saves/saved-list"
 import { Button } from "@/components/ui/button/button"
+import { DetailSheet } from "@/components/ui/detail-sheet/detail-sheet"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { Notice } from "@/components/ui/notice/notice"
 import { PixelPanel } from "@/components/ui/pixel-panel/pixel-panel"
@@ -168,20 +170,22 @@ const MapScreen = () => {
     const selectedVenueId = selectedRef === undefined ? query.venue : undefined
     const previewOpen = selectedRef !== undefined || selectedVenueId !== undefined
     const detailOpen = previewOpen && query.detail === true
+    // An event opened from the list shows over it, and the list comes back once it closes
+    const savedOpen = query.saved === true && !previewOpen
 
-    // The Android back button leaves the detail for the preview
+    // The Android back button leaves the detail for the preview, and closes the saved list
     useEffect(() => {
-        if (!detailOpen) {
+        if (!detailOpen && !savedOpen) {
             return undefined
         }
         const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-            setQuery({ detail: undefined })
+            setQuery(detailOpen ? { detail: undefined } : { saved: undefined })
             return true
         })
         return () => {
             subscription.remove()
         }
-    }, [detailOpen, setQuery])
+    }, [detailOpen, savedOpen, setQuery])
     const venueFromResults = results?.permanentVenues.find(
         venue => venue.id === selectedVenueId,
     )
@@ -291,6 +295,9 @@ const MapScreen = () => {
                     Keyboard.dismiss()
                     setFiltersOpen(false)
                     closePreview()
+                    if (savedOpen) {
+                        setQuery({ saved: undefined })
+                    }
                 }}
                 onUserMoveStart={() => {
                     setCreditOpen(false)
@@ -414,8 +421,8 @@ const MapScreen = () => {
                     <Notice tone="warning" lines={[t("Map.Truncated")]} />
                 )}
             </View>
-            {/* A preview or a detail covers the bottom of the map, so the controls give way */}
-            {!previewOpen && (
+            {/* A preview, a detail or the saved list covers the bottom of the map, so the controls give way */}
+            {!previewOpen && !savedOpen && (
                 <View
                     className="absolute right-4 items-end gap-2"
                     style={{ bottom: insets.bottom + CONTROLS_BOTTOM_OFFSET }}
@@ -427,7 +434,7 @@ const MapScreen = () => {
                             icon="saved"
                             label={t("Saved.Open")}
                             onPress={() => {
-                                router.push("/saved")
+                                setQuery({ saved: true })
                             }}
                         />
                         <IconButton
@@ -484,6 +491,27 @@ const MapScreen = () => {
                     setQuery(CLEARED_SELECTION)
                 }}
             />
+            <DetailSheet
+                open={savedOpen}
+                onClose={() => {
+                    setQuery({ saved: undefined })
+                }}
+            >
+                <SavedList
+                    now={now}
+                    onOpen={ref => {
+                        setQuery({
+                            event: ref.eventId,
+                            occurrence: ref.date,
+                            venue: undefined,
+                            detail: true,
+                        })
+                    }}
+                    onClose={() => {
+                        setQuery({ saved: undefined })
+                    }}
+                />
+            </DetailSheet>
             <EntityDetailSheet
                 open={detailOpen}
                 selection={

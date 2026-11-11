@@ -1,19 +1,13 @@
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query"
 import { localTimeOf, weekdayDateOf } from "domain/local-format"
-import { mapQuerySchema } from "domain/map-query"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
-import { router, Stack } from "expo-router"
 import type { OccurrenceRef, OccurrenceSummary } from "models"
-import { useState } from "react"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
-import { Pressable, ScrollView, View } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { z } from "zod"
+import { Pressable, View } from "react-native"
 
 import { LegalLinks } from "@/components/links/legal-links"
-import { EntityDetailSheet } from "@/components/map/entity-detail-sheet"
 import { SaveToggle } from "@/components/saves/save-toggle"
 import { Badge } from "@/components/ui/badge/badge"
 import { Button } from "@/components/ui/button/button"
@@ -23,12 +17,8 @@ import { PixelPanel } from "@/components/ui/pixel-panel/pixel-panel"
 import { Text } from "@/components/ui/text/text"
 import { latestQueryData } from "@/lib/api/cached-answers"
 import { api } from "@/lib/api/client"
-import { useNow } from "@/lib/hooks/use-now"
 import { useOnline } from "@/lib/hooks/use-online"
 import { useSavedEvents } from "@/lib/hooks/use-saved-events"
-import { backToMap } from "@/lib/navigation/back-to-map"
-
-const CLOCK_TICK_MS = 60_000
 
 interface SavedRowProps {
     occurrence: OccurrenceSummary
@@ -80,17 +70,17 @@ const SavedRow = (props: SavedRowProps) => {
     )
 }
 
-const SavedScreen = () => {
+interface SavedListProps {
+    now: Date
+    onOpen: (ref: OccurrenceRef) => void
+    onClose: () => void
+}
+
+export const SavedList = (props: SavedListProps) => {
     const { t } = useTranslation("shared")
-    const insets = useSafeAreaInsets()
-    const now = useNow(CLOCK_TICK_MS)
     const online = useOnline()
     const queryClient = useQueryClient()
     const savedEvents = useSavedEvents()
-    const [selectedRef, setSelectedRef] = useState<OccurrenceRef>()
-    const closeDetail = () => {
-        setSelectedRef(undefined)
-    }
 
     const newestFirst = savedEvents.events.toSorted((first, second) =>
         second.savedAt.localeCompare(first.savedAt),
@@ -155,62 +145,32 @@ const SavedScreen = () => {
                     <SavedRow
                         key={`${occurrence.eventId}:${occurrence.date}`}
                         occurrence={occurrence}
-                        now={now}
-                        onOpen={setSelectedRef}
+                        now={props.now}
+                        onOpen={props.onOpen}
                     />
                 ))}
             </View>
         )
 
     return (
-        <>
-            <Stack.Screen options={{ headerShown: false }} />
-            <ScrollView
-                className="flex-1 bg-surface"
-                contentContainerClassName="gap-4 p-4"
-                contentContainerStyle={{
-                    paddingTop: insets.top + 8,
-                    paddingBottom: insets.bottom + 16,
-                }}
-            >
-                <View className="flex-row items-center gap-3">
-                    <IconButton
-                        icon="back"
-                        label={t("Detail.Back")}
-                        onPress={backToMap}
-                    />
-                    <Text
-                        variant="pixel-2xl"
-                        accessibilityRole="header"
-                        className="uppercase"
-                    >
-                        {t("Saved.Title")}
-                    </Text>
-                </View>
-                {body}
-                <LegalLinks />
-            </ScrollView>
-            <EntityDetailSheet
-                open={selectedRef !== undefined}
-                selection={
-                    selectedRef === undefined
-                        ? undefined
-                        : { type: "occurrence", ref: selectedRef }
-                }
-                onClose={closeDetail}
-                onOpenVenue={venueId => {
-                    router.dismissTo({
-                        pathname: "/",
-                        params: z.encode(mapQuerySchema, {
-                            venue: venueId,
-                            detail: true,
-                        }),
-                    })
-                }}
-                onOpenEvent={setSelectedRef}
-            />
-        </>
+        <View className="gap-4">
+            <View className="flex-row items-center justify-between gap-3">
+                <Text
+                    variant="pixel-2xl"
+                    accessibilityRole="header"
+                    className="uppercase"
+                >
+                    {t("Saved.Title")}
+                </Text>
+                <IconButton
+                    icon="close"
+                    size="sm"
+                    label={t("Preview.Close")}
+                    onPress={props.onClose}
+                />
+            </View>
+            {body}
+            <LegalLinks />
+        </View>
     )
 }
-
-export default SavedScreen
