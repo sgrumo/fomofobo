@@ -5,6 +5,14 @@ import type { ClusterFeature, PointFeature } from "supercluster"
 
 export const CLUSTER_MAX_ZOOM = 17
 
+/**
+ * @description Returns the zoom that the cluster index reads at: past the last cluster zoom while a spot is selected, so every spot shows as a pin
+ * @param zoom Whole zoom level the map shows
+ * @param spotSelected True when a preview or a detail of a spot is open
+ */
+export const clusterZoomOf = (zoom: number, spotSelected: boolean): number =>
+    spotSelected ? CLUSTER_MAX_ZOOM + 1 : zoom
+
 const CLUSTER_RADIUS = 48
 
 export type MapPointKind = OccurrenceStatus | "permanent"

@@ -4,6 +4,7 @@ import {
     buildEventClusters,
     clusterArcs,
     clusterLayer,
+    clusterZoomOf,
     firstLeafIndex,
     markerEmphasis,
     markerLayer,
@@ -111,6 +112,31 @@ describe("buildEventClusters", () => {
                 { index: 1, kind: "permanent", moreCount: 0 },
             ]),
         )
+    })
+})
+
+describe("clusterZoomOf", () => {
+    const world: [number, number, number, number] = [-180, -85, 180, 85]
+    const clusters = buildEventClusters(
+        [0, 1].map(index => ({
+            venueIds: [`venue-${String(index)}`],
+            coordinates: { latitude: 44.3533, longitude: 11.7147 + index * 0.0005 },
+            kind: "live",
+            index,
+            moreCount: 0,
+        })),
+    )
+
+    it("merges close spots with no selection, and shows each spot while one is selected", () => {
+        expect(clusters.getClusters(world, clusterZoomOf(12, false))).toHaveLength(1)
+        expect(
+            clusters
+                .getClusters(world, clusterZoomOf(12, true))
+                .map(feature => feature.properties),
+        ).toStrictEqual([
+            { index: 0, kind: "live", moreCount: 0 },
+            { index: 1, kind: "live", moreCount: 0 },
+        ])
     })
 })
 

@@ -145,13 +145,13 @@ describe("sceneTransitionsOf", () => {
             leaving: [],
         })
         expect(
-            sceneTransitionsOf({ markers, viewport: { zoom: 12 } }, true, 12, markers),
+            sceneTransitionsOf({ markers, clusterZoom: 12 }, true, 12, markers),
         ).toStrictEqual({ entering: new Map(), leaving: [] })
     })
 
     it("fades the markers of new results", () => {
         expect(
-            sceneTransitionsOf({ markers, viewport: { zoom: 12 } }, false, 12, renamed),
+            sceneTransitionsOf({ markers, clusterZoom: 12 }, false, 12, renamed),
         ).toStrictEqual(resultTransitions(markers, renamed))
     })
 })

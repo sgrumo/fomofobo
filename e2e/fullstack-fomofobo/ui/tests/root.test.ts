@@ -174,6 +174,59 @@ test.describe("map", () => {
         ).toBeVisible({ timeout: MAP_TIMEOUT_MS })
     })
 
+    test("shows every venue of a cluster as its own pin while a preview is open, and the cluster again once it closes", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const category = await seedCategory()
+        const [courtyard, loggia] = await Promise.all([
+            seedVenue(offsetPoint(center, { latitude: 0.005, longitude: 0 })),
+            seedVenue(offsetPoint(center, { latitude: 0.0055, longitude: 0 })),
+        ])
+        const [live, upcoming] = await Promise.all([
+            seedPublicEvent(
+                { venue: courtyard, category },
+                { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
+            ),
+            seedPublicEvent(
+                { venue: loggia, category },
+                { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+            ),
+        ])
+        const cluster = page.getByRole("button", {
+            name: t("shared", "Map.Cluster", {
+                count: 2,
+                live: 1,
+                upcoming: 1,
+                ended: 0,
+                permanent: 0,
+            }),
+        })
+        const upcomingPin = page.getByRole("button", {
+            name: t("shared", "Map.Pin", {
+                title: upcoming.title,
+                status: t("shared", "Status.upcoming"),
+                time: "18:00",
+            }),
+        })
+        const preview = page.getByRole("dialog", { name: live.title, exact: true })
+
+        await gotoPage(page, mapPath(center))
+        await expect(cluster).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+
+        await gotoPage(page, `${mapPath(center)}&event=${live.id}&occurrence=2026-10-24`)
+
+        await expect(preview).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+        await expect(upcomingPin).toBeVisible()
+        await expect(cluster).toBeHidden()
+
+        await clickIconButton(preview, t("shared", "Preview.Close"))
+
+        await expect(preview).toBeHidden()
+        await expect(cluster).toBeVisible()
+        await expect(upcomingPin).toBeHidden()
+    })
+
     test("keeps the free events alone under the free chip, and every event again once unpressed", async ({
         page,
     }) => {

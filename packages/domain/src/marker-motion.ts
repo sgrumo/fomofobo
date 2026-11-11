@@ -154,16 +154,16 @@ export const resultTransitions = (
 
 /**
  * @description Returns the transitions of a new scene of the map: the markers fade between two
- * result sets, and move between two zoom levels of the same results
- * @param previous Markers and whole zoom level shown before, if any
+ * result sets, and move between two cluster zooms of the same results
+ * @param previous Markers and cluster zoom shown before, if any
  * @param sameResults True when the results did not change
- * @param zoom Whole zoom level of the new scene
+ * @param clusterZoom Zoom that the cluster index of the new scene reads at
  * @param markers Markers of the new scene
  */
 export const sceneTransitionsOf = (
-    previous: { markers: readonly ShownMarker[]; viewport: { zoom: number } } | undefined,
+    previous: { markers: readonly ShownMarker[]; clusterZoom: number } | undefined,
     sameResults: boolean,
-    zoom: number,
+    clusterZoom: number,
     markers: readonly ShownMarker[],
 ): MarkerTransitions => {
     if (previous === undefined) {
@@ -172,7 +172,7 @@ export const sceneTransitionsOf = (
     if (!sameResults) {
         return resultTransitions(previous.markers, markers)
     }
-    return previous.viewport.zoom === zoom
+    return previous.clusterZoom === clusterZoom
         ? NO_MARKER_TRANSITIONS
         : markerTransitions(previous.markers, markers)
 }

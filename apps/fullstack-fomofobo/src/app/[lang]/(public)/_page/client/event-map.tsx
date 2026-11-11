@@ -4,6 +4,7 @@ import {
     buildEventClusters,
     CLUSTER_MAX_ZOOM,
     clusterLayer,
+    clusterZoomOf,
     firstLeafIndex,
     markerEmphasis,
     markerLayer,
@@ -72,6 +73,7 @@ interface ResultSource {
 
 interface MarkerScene extends ResultSource {
     viewport: Viewport
+    clusterZoom: number
     markers: ShownMarker[]
     transitions: MarkerTransitions
     // Results the leaving markers read, the replaced ones while new results fade in
@@ -371,11 +373,15 @@ export const EventMap = (props: EventMapProps) => {
             props.onSelectVenue(venue.id)
         }
     }
-    const markers =
+    const clusterZoom =
         viewport === undefined
+            ? undefined
+            : clusterZoomOf(viewport.zoom, selectedIndex !== undefined)
+    const markers =
+        viewport === undefined || clusterZoom === undefined
             ? []
             : shownMarkersOf(
-                  clusters.getClusters(viewport.bbox, viewport.zoom),
+                  clusters.getClusters(viewport.bbox, clusterZoom),
                   clusters,
                   index => resultIdOf(props, index),
               )
@@ -386,16 +392,18 @@ export const EventMap = (props: EventMapProps) => {
         scene.permanentVenues === props.permanentVenues
     if (
         viewport !== undefined &&
+        clusterZoom !== undefined &&
         (scene?.viewport !== viewport ||
             !sameResults ||
             scene.selectedIndex !== selectedIndex)
     ) {
         setScene({
             viewport,
+            clusterZoom,
             occurrences: props.occurrences,
             permanentVenues: props.permanentVenues,
             markers,
-            transitions: sceneTransitionsOf(scene, sameResults, viewport.zoom, markers),
+            transitions: sceneTransitionsOf(scene, sameResults, clusterZoom, markers),
             leavingFrom:
                 scene === undefined || sameResults
                     ? props
