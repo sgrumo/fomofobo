@@ -32,6 +32,7 @@ import { VersionGate } from "@/components/version-gate/version-gate"
 import { isPersistedQuery, PERSISTED_CACHE_MAX_AGE_MS } from "@/lib/api/persisted-queries"
 import { nativeI18n } from "@/lib/i18n/native-i18n"
 import { startDeviceSaveSync } from "@/lib/saves/device-save-sync"
+import { loadSounds } from "@/lib/sounds/play-sound"
 import { hydrateDeviceStorage } from "@/lib/storage/device-storage"
 import { QUERY_CACHE_STORAGE_KEY } from "@/lib/storage/storage-keys"
 import { FONT_FAMILIES, THEME_COLORS } from "@/lib/theme/theme-tokens"
@@ -66,6 +67,7 @@ const deviceStorageReady = lazyAsync(() =>
 const appReady = lazyAsync(() =>
     Promise.all([nativeI18n.init(), deviceStorageReady()]).finally(() => {
         void hideAsync()
+        loadSounds()
     }),
 )
 
