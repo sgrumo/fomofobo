@@ -41,15 +41,16 @@ export type PreviewEntry =
     | { type: "occurrence"; occurrence: OccurrenceSummary }
     | { type: "venue"; venue: PreviewVenue }
 
-interface PagingControlsProps {
+interface PagingTabProps {
     paging: PreviewPaging
 }
 
-const PagingControls = (props: PagingControlsProps) => {
+// A tab with no bottom edge, so the top line of the sheet frame runs under it
+const PagingTab = (props: PagingTabProps) => {
     const { t } = useTranslation("shared")
 
     return (
-        <View className="flex-row items-center justify-center gap-2">
+        <View className="flex-row items-center justify-center gap-2 border-2 border-b-0 border-line bg-surface px-2 pt-0.5">
             <IconButton
                 icon="back"
                 size="sm"
@@ -102,7 +103,6 @@ interface OccurrenceBodyProps {
     occurrence: OccurrenceSummary
     categories: ReadonlyMap<string, Category>
     now: Date
-    paging: PreviewPaging | undefined
     closeButton: ReactNode
     onOpenDetail: () => void
     onOpenVenue: (venueId: string) => void
@@ -137,7 +137,6 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                     {props.closeButton}
                 </View>
             </View>
-            {props.paging !== undefined && <PagingControls paging={props.paging} />}
             <View className="flex-row gap-3 border-t-2 border-line pt-3">
                 <TonedPhoto
                     uri={occurrence.coverPhotoUrl}
@@ -200,7 +199,6 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
 
 interface VenueBodyProps {
     venue: PreviewVenue
-    paging: PreviewPaging | undefined
     closeButton: ReactNode
     onOpenDetail: () => void
 }
@@ -220,7 +218,6 @@ const VenueBody = (props: VenueBodyProps) => {
                 )}
                 {props.closeButton}
             </View>
-            {props.paging !== undefined && <PagingControls paging={props.paging} />}
             <View className="flex-row gap-3 border-t-2 border-line pt-3">
                 {venue.coverPhotoUrl !== null && (
                     <TonedPhoto
@@ -279,7 +276,15 @@ export const EventPreview = (props: EventPreviewProps) => {
     )
 
     return (
-        <BottomSheetPanel open={props.open} onClose={props.onClose}>
+        <BottomSheetPanel
+            open={props.open}
+            onClose={props.onClose}
+            tab={
+                props.paging === undefined ? undefined : (
+                    <PagingTab paging={props.paging} />
+                )
+            }
+        >
             {props.entry === undefined ? (
                 <>
                     <View className="flex-row items-center justify-between gap-2">
@@ -302,7 +307,6 @@ export const EventPreview = (props: EventPreviewProps) => {
                     occurrence={props.entry.occurrence}
                     categories={props.categories}
                     now={props.now}
-                    paging={props.paging}
                     closeButton={closeButton}
                     onOpenDetail={props.onOpenDetail}
                     onOpenVenue={props.onOpenVenue}
@@ -310,7 +314,6 @@ export const EventPreview = (props: EventPreviewProps) => {
             ) : (
                 <VenueBody
                     venue={props.entry.venue}
-                    paging={props.paging}
                     closeButton={closeButton}
                     onOpenDetail={props.onOpenDetail}
                 />

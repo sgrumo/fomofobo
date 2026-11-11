@@ -8,6 +8,7 @@ import {
     bottomSheetContentStyles,
     bottomSheetHandleStyles,
     bottomSheetPopupStyles,
+    bottomSheetTabStyles,
 } from "./bottom-sheet.styles"
 
 export {
@@ -30,6 +31,8 @@ interface BottomSheetContentProps extends Pick<
     ComponentProps<typeof DrawerPrimitive.Popup>,
     "className" | "ref"
 > {
+    // A tab that peeks out above the sheet, outside the scrolling content
+    tab?: ReactNode
     children?: ReactNode
 }
 export const BottomSheetContent = ({ ref, ...props }: BottomSheetContentProps) => (
@@ -44,6 +47,9 @@ export const BottomSheetContent = ({ ref, ...props }: BottomSheetContentProps) =
                     )
                 }
             >
+                {props.tab === undefined ? undefined : (
+                    <div className={bottomSheetTabStyles()}>{props.tab}</div>
+                )}
                 <div className={bottomSheetHandleStyles()} />
                 <DrawerPrimitive.Content className={bottomSheetContentStyles()}>
                     {props.children}

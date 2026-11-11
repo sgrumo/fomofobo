@@ -36,6 +36,22 @@ describe("BottomSheet", () => {
         expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
     })
 
+    it("renders its tab in the sheet", () => {
+        render(
+            <BottomSheetRoot defaultOpen={true}>
+                <BottomSheetContent tab={<button type="button">Next result</button>}>
+                    <BottomSheetTitle>Jazz at the cloister</BottomSheetTitle>
+                </BottomSheetContent>
+            </BottomSheetRoot>,
+        )
+
+        expect(
+            screen
+                .getByRole("dialog", { name: "Jazz at the cloister" })
+                .contains(screen.getByRole("button", { name: "Next result" })),
+        ).toBe(true)
+    })
+
     it("keeps the sheet open while a custom date input picks a day", async () => {
         const user = userEvent.setup()
         const handleChange = vi.fn<(value: Date | undefined) => void>()

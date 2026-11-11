@@ -13,3 +13,8 @@ export const bottomSheetHandleStyles = styles(
 export const bottomSheetContentStyles = styles(
     () => "-mb-1 flex min-h-0 flex-col gap-3 overflow-x-hidden overflow-y-auto px-4 pb-1",
 )
+
+// Peeks above the top edge, and its lower part sits behind the sheet frame
+export const bottomSheetTabStyles = styles(
+    () => "absolute bottom-[calc(100%-0.5rem)] left-1/2 -z-10 -translate-x-1/2",
+)

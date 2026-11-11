@@ -53,23 +53,23 @@ interface PreviewPanelProps {
     loadFailed: boolean
     categories: ReadonlyMap<string, Category>
     now: Date
-    paging: PreviewPaging | undefined
     renderTitle: RenderTitle
     onOpenDetail: () => void
     onOpenVenue: (venueId: string) => void
     onClose: () => void
 }
 
-interface PagingControlsProps {
+interface PagingTabProps {
     paging: PreviewPaging
 }
 
-const PagingControls = (props: PagingControlsProps) => {
+// A tab that peeks out behind the top of the preview
+const PagingTab = (props: PagingTabProps) => {
     const { t } = useTranslation("shared")
     const paging = props.paging
 
     return (
-        <div className="flex items-center justify-center gap-2">
+        <div className="pixel-corners relative flex items-center justify-center gap-2 px-2 pt-1 pb-3">
             <IconButton
                 aria-label={t("Preview.Previous")}
                 icon={<PixelIconBack />}
@@ -139,9 +139,6 @@ const PreviewBody = (props: PreviewBodyProps) => {
                     {props.closeButton}
                 </div>
             </div>
-            {props.paging === undefined ? undefined : (
-                <PagingControls paging={props.paging} />
-            )}
             <div className="border-line flex gap-3 border-t-2 pt-3">
                 <TonedImage
                     src={occurrence.coverPhotoUrl}
@@ -214,7 +211,6 @@ const PreviewBody = (props: PreviewBodyProps) => {
 
 interface VenuePreviewBodyProps {
     venue: PreviewVenue
-    paging: PreviewPaging | undefined
     renderTitle: RenderTitle
     closeButton: ReactNode
     onOpenDetail: () => void
@@ -233,9 +229,6 @@ const VenuePreviewBody = (props: VenuePreviewBodyProps) => {
                 )}
                 <div className="ml-auto">{props.closeButton}</div>
             </div>
-            {props.paging === undefined ? undefined : (
-                <PagingControls paging={props.paging} />
-            )}
             <div className="border-line flex gap-3 border-t-2 pt-3">
                 {venue.coverPhotoUrl === null ? undefined : (
                     <TonedImage
@@ -302,7 +295,6 @@ const PreviewPanel = (props: PreviewPanelProps) => {
             occurrence={props.entry.occurrence}
             categories={props.categories}
             now={props.now}
-            paging={props.paging}
             renderTitle={props.renderTitle}
             closeButton={closeButton}
             onOpenDetail={props.onOpenDetail}
@@ -311,7 +303,6 @@ const PreviewPanel = (props: PreviewPanelProps) => {
     ) : (
         <VenuePreviewBody
             venue={props.entry.venue}
-            paging={props.paging}
             renderTitle={props.renderTitle}
             closeButton={closeButton}
             onOpenDetail={props.onOpenDetail}
@@ -321,6 +312,7 @@ const PreviewPanel = (props: PreviewPanelProps) => {
 
 interface EventPreviewProps extends StrictOmit<PreviewPanelProps, "renderTitle"> {
     open: boolean
+    paging: PreviewPaging | undefined
     // True when a press outside the sheet leaves it open, as the press opens another entry
     keepsOpenOn: (target: EventTarget | null) => boolean
 }
@@ -377,13 +369,19 @@ export const EventPreview = (props: EventPreviewProps) => {
                 props.onClose()
             }}
         >
-            <BottomSheetContent ref={setSheet}>
+            <BottomSheetContent
+                ref={setSheet}
+                tab={
+                    props.paging === undefined ? undefined : (
+                        <PagingTab paging={props.paging} />
+                    )
+                }
+            >
                 <PreviewPanel
                     entry={props.entry}
                     loadFailed={props.loadFailed}
                     categories={props.categories}
                     now={props.now}
-                    paging={props.paging}
                     renderTitle={(text, className) => (
                         <BottomSheetTitle className={className}>{text}</BottomSheetTitle>
                     )}
@@ -401,6 +399,7 @@ interface NonModalPreviewProps extends StrictOmit<
     "entry" | "loadFailed" | "renderTitle"
 > {
     entry: PreviewEntry
+    paging: PreviewPaging | undefined
 }
 
 // Native events on the card that the map below it would handle
@@ -436,23 +435,30 @@ export const EventPreviewCard = (props: NonModalPreviewProps) => {
             aria-modal={false}
             aria-labelledby={titleId}
             tabIndex={-1}
-            className="pixel-corners drop-shadow-hard-lg relative w-[23.75rem] cursor-auto p-4 outline-none"
+            className="drop-shadow-hard-lg flex w-[23.75rem] cursor-auto flex-col items-center outline-none"
         >
-            <PreviewPanel
-                entry={props.entry}
-                loadFailed={false}
-                categories={props.categories}
-                now={props.now}
-                paging={props.paging}
-                renderTitle={(text, className) => (
-                    <h2 id={titleId} className={cn("text-fg tp-pixel-lg", className)}>
-                        {text}
-                    </h2>
-                )}
-                onOpenDetail={props.onOpenDetail}
-                onOpenVenue={props.onOpenVenue}
-                onClose={props.onClose}
-            />
+            {/* In flow, so the map pans the tab clear of the controls too */}
+            {props.paging === undefined ? undefined : (
+                <div className="-mb-2">
+                    <PagingTab paging={props.paging} />
+                </div>
+            )}
+            <div className="pixel-corners relative w-full p-4">
+                <PreviewPanel
+                    entry={props.entry}
+                    loadFailed={false}
+                    categories={props.categories}
+                    now={props.now}
+                    renderTitle={(text, className) => (
+                        <h2 id={titleId} className={cn("text-fg tp-pixel-lg", className)}>
+                            {text}
+                        </h2>
+                    )}
+                    onOpenDetail={props.onOpenDetail}
+                    onOpenVenue={props.onOpenVenue}
+                    onClose={props.onClose}
+                />
+            </div>
         </section>
     )
 }
