@@ -16,7 +16,7 @@ describe("photo-purge", () => {
         await deleteAllRows(testDb)
     })
 
-    it("deletes the photos of an event ended over three days ago and keeps the rest of the event", async () => {
+    it("deletes the photos of an event ended over three days ago, originals included, and keeps the rest of the event", async () => {
         const ended = await seedEventWithPhotos([daysFromNow(-10), daysFromNow(-4)])
 
         runPurge()
@@ -36,10 +36,10 @@ describe("photo-purge", () => {
                     .select()
                     .from(eventCategories)
                     .where(eq(eventCategories.eventId, ended.eventId)),
-                Promise.all(ended.photoKeys.map(key => photoStorage.headObject(key))),
+                Promise.all(ended.objectKeys.map(key => photoStorage.headObject(key))),
             ])
         expect(photoRows).toStrictEqual([])
-        expect(heads).toStrictEqual([null, null])
+        expect(heads).toStrictEqual([null, null, null])
         expect(eventRows).toHaveLength(1)
         expect(occurrenceRows).toHaveLength(2)
         expect(categoryRows).toHaveLength(1)

@@ -43,6 +43,7 @@ export const occurrenceDetailSchema = occurrenceSummarySchema.extend({
         isBlocked: true,
     }),
     photos: z.array(eventPhotoSchema),
+    coverNaturalUrl: z.url().nullable().default(null),
     externalLinks: eventExternalLinksSchema,
     capacity: eventSchema.shape.capacity,
 })

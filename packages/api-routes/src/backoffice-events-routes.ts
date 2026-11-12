@@ -8,7 +8,7 @@ import {
     occurrenceSaveCountSchema,
     paginatedResponseSchema,
     photoUploadRequestSchema,
-    presignedUploadSchema,
+    photoUploadTicketSchema,
 } from "models"
 
 import {
@@ -180,7 +180,7 @@ export const BackofficeEventsRoutes = {
             200: {
                 content: {
                     "application/json": {
-                        schema: presignedUploadSchema.openapi("PresignedUpload"),
+                        schema: photoUploadTicketSchema.openapi("PhotoUploadTicket"),
                     },
                 },
                 description: "Presigned PUT of one photo",

@@ -54,12 +54,12 @@ const buildOccurrence = (endsAt: Date): StoredOccurrence => ({
 })
 
 /**
- * @description Persists an organizer, a venue and a category, uploads two photos, and persists an event with one occurrence per end
+ * @description Persists an organizer, a venue and a category, uploads two photos and the original of the first, and persists an event with one occurrence per end
  * @param occurrenceEnds End of each occurrence, one per day at most
  */
 export const seedEventWithPhotos = async (
     occurrenceEnds: Date[],
-): Promise<{ eventId: string; photoKeys: string[] }> => {
+): Promise<{ eventId: string; photoKeys: string[]; objectKeys: string[] }> => {
     const at = new Date()
     const organizerId = crypto.randomUUID()
     const venueId = crypto.randomUUID()
@@ -93,8 +93,11 @@ export const seedEventWithPhotos = async (
     const photoKeys = [crypto.randomUUID(), crypto.randomUUID()].map(
         id => `events/${organizerId}/${id}`,
     )
+    // The first photo carries an original, under the key the upload ticket gives it
+    const originalKey = `${photoKeys[0] ?? ""}-original`
+    const objectKeys = [...photoKeys, originalKey]
     await Promise.all(
-        photoKeys.map(async key => {
+        objectKeys.map(async key => {
             const upload = await photoStorage.createUploadUrl(
                 key,
                 "image/png",
@@ -142,13 +145,14 @@ export const seedEventWithPhotos = async (
             photos: photoKeys.map((objectKey, position) => ({
                 id: crypto.randomUUID(),
                 objectKey,
+                originalObjectKey: position === 0 ? originalKey : null,
                 position,
             })),
             occurrences: occurrenceEnds.map(buildOccurrence),
         },
         at,
     )
-    return { eventId, photoKeys }
+    return { eventId, photoKeys, objectKeys }
 }
 
 /**

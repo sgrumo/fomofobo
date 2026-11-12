@@ -14,7 +14,12 @@ import { fillSearchField } from "e2e-ui-components/search-field"
 import { dismissToast, expectToast } from "e2e-ui-components/toast"
 
 import { signInAs } from "../../api/auth/utils"
-import { buildFreePriceScheme } from "../../api/backoffice-events/utils"
+import { createEvent } from "../../api/backoffice-events/api"
+import {
+    buildEventUpsert,
+    buildFreePriceScheme,
+    uploadPhotoWithOriginal,
+} from "../../api/backoffice-events/utils"
 import { blockVenue, updateVenue } from "../../api/backoffice-venues/api"
 import { saveOccurrence } from "../../api/public/api"
 import { SATURDAY_NOON } from "../../api/public/utils"
@@ -1334,6 +1339,37 @@ test.describe("detail over the map", () => {
             "content",
             iconImage,
         )
+    })
+
+    test("shows the original of a photo in the detail, uploaded beside its dither", async ({
+        page,
+    }) => {
+        const { headers } = await signInAs("organizer")
+        const [venue, category, photo] = await Promise.all([
+            seedVenue(buildArea()),
+            seedCategory(),
+            uploadPhotoWithOriginal(headers),
+        ])
+        // The session that uploads the photo writes the event, which owns its key
+        const created = await createEvent({
+            headers,
+            body: buildEventUpsert(
+                { venueId: venue.id, categoryId: category.id, photoKeys: [photo.key] },
+                { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+            ),
+        })
+        expectStatus(created, 201)
+        const event = created.data
+        const naturalUrl = event.photos[0]?.naturalUrl
+        expectToBeDefined(naturalUrl)
+
+        await gotoPage(page, eventDetailPath(event.id, "2026-10-24"))
+
+        await expect(
+            page.getByRole("img", {
+                name: t("shared", "Detail.Photo", { index: 1, total: 1 }),
+            }),
+        ).toHaveAttribute("src", naturalUrl)
     })
 
     test("titles the page and describes the card of a shared link with the event or the venue it opens", async ({

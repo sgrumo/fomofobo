@@ -85,6 +85,7 @@ export const EventDetail = (props: EventDetailProps) => {
                 photos={occurrence.photos}
                 tone={status}
                 coverPhotoUrl={occurrence.coverPhotoUrl}
+                coverNaturalUrl={occurrence.coverNaturalUrl}
                 controls={
                     <>
                         <IconButton

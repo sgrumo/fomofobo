@@ -111,6 +111,7 @@ export const VenueDetail = (props: VenueDetailProps) => {
             {venue.coverPhotoUrl === null ? undefined : (
                 <TonedImage
                     src={venue.coverPhotoUrl}
+                    naturalSrc={venue.coverNaturalUrl}
                     tone={venuePhotoToneOf(venue.kind)}
                     width={1200}
                     height={900}

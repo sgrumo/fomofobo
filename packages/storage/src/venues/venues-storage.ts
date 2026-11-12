@@ -15,10 +15,12 @@ import { toLimitOffset } from "../utils/pagination"
 
 export type StoredVenue = StrictOmit<Venue, "coverPhotoUrl"> & {
     coverObjectKey: string | null
+    coverOriginalObjectKey: string | null
 }
 
 export type VenueWrite = StrictOmit<VenueUpdate, "coverPhotoKey"> & {
     coverObjectKey?: string | null
+    coverOriginalObjectKey?: string | null
 }
 
 /**
@@ -35,6 +37,7 @@ const toStoredVenue = (row: {
     coordinates: { latitude: row.venue.latitude, longitude: row.venue.longitude },
     description: row.venue.description,
     coverObjectKey: row.venue.coverObjectKey,
+    coverOriginalObjectKey: row.venue.coverOriginalObjectKey,
     links: {
         websiteUrl: row.venue.websiteUrl,
         instagramUrl: row.venue.instagramUrl,
@@ -168,6 +171,7 @@ export class VenuesStorage {
                 longitude: fields.coordinates?.longitude,
                 description: fields.description,
                 coverObjectKey: fields.coverObjectKey,
+                coverOriginalObjectKey: fields.coverOriginalObjectKey,
                 websiteUrl: fields.links?.websiteUrl,
                 instagramUrl: fields.links?.instagramUrl,
                 facebookUrl: fields.links?.facebookUrl,

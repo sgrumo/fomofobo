@@ -12,6 +12,7 @@ interface PhotoGalleryProps {
     title: string
     photos: readonly EventPhoto[]
     coverPhotoUrl: string
+    coverNaturalUrl: string | null
     tone: PhotoTone
     controls: ReactNode
 }
@@ -39,6 +40,7 @@ export const PhotoGallery = (props: PhotoGalleryProps) => {
                     <View style={{ width: pageWidth }}>
                         <TonedPhoto
                             uri={props.coverPhotoUrl}
+                            naturalUri={props.coverNaturalUrl}
                             tone={props.tone}
                             label={t("Detail.Cover", { title: props.title })}
                             className="aspect-[4/3] w-full"
@@ -49,6 +51,7 @@ export const PhotoGallery = (props: PhotoGalleryProps) => {
                         <View key={photo.id} style={{ width: pageWidth }}>
                             <TonedPhoto
                                 uri={photo.url}
+                                naturalUri={photo.naturalUrl}
                                 tone={props.tone}
                                 label={t("Detail.Photo", {
                                     index: position + 1,

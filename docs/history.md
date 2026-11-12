@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-12 · The original photo is kept beside its dither
+
+### Changed
+
+Each uploaded event photo, venue cover and category image is stored as uploaded beside its two-color dither, and the event and venue details show the original on the web and in the native app. Photos stored before the change have lost their original and keep showing the dither.
+
+### Why
+
+A client request. The client wants the previews dithered and the details natural, and reverses the earlier rule that deleted the original once the dither was stored.
+
+### Check next time
+
+Agree which screens show a processed image and which the original before the upload pipeline decides what it keeps.
+
 ## 2026-11-09 · The map search follows the area in view
 
 ### Changed

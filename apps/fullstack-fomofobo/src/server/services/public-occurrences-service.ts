@@ -15,6 +15,7 @@ import type { StrictOmit } from "shared/types"
 import type {
     PublicOccurrencesStorage,
     SavesStorage,
+    StoredOccurrenceDetail,
     StoredOccurrenceSummary,
     StoredPermanentVenue,
 } from "storage"
@@ -34,6 +35,24 @@ import type { SettingsService } from "./settings-service"
  */
 const interestedCountOf = (saveCount: number, threshold: number): number | null =>
     saveCount >= threshold ? saveCount : null
+
+/**
+ * @description Returns the key of the original of the image that the cover of an occurrence shows, `null` when that image has none
+ * @param occurrence Stored occurrence detail
+ * @remarks Repeats the fallback order of `coverUrlOf`, so a change of that order changes both
+ */
+const coverOriginalKeyOf = (occurrence: StoredOccurrenceDetail): string | null => {
+    const [firstPhoto] = occurrence.photos
+    if (firstPhoto !== undefined) {
+        return firstPhoto.originalObjectKey
+    }
+    if (occurrence.fallback.venueCoverObjectKey !== null) {
+        return occurrence.naturalFallback.venueCoverOriginalObjectKey
+    }
+    return occurrence.fallback.categoryImageObjectKey === null
+        ? null
+        : occurrence.naturalFallback.categoryImageOriginalObjectKey
+}
 
 export class PublicOccurrencesService {
     private readonly occurrencesStorage: PublicOccurrencesStorage
@@ -124,13 +143,15 @@ export class PublicOccurrencesService {
                           photos: stored.photos.map(photo => ({
                               id: photo.id,
                               url: photoUrl(this.photosPublicBaseUrl, photo.objectKey),
+                              naturalUrl: this.naturalUrlOf(photo.originalObjectKey),
                               position: photo.position,
                           })),
+                          coverNaturalUrl: this.naturalUrlOf(coverOriginalKeyOf(stored)),
                           externalLinks: stored.externalLinks,
                           capacity: stored.capacity,
                       }
             },
-            ["occurrence-detail-v3", ref.eventId, ref.date],
+            ["occurrence-detail-v4", ref.eventId, ref.date],
             { tags: [PUBLIC_TAG, eventTag(ref.eventId)] },
         )()
         const endedVisibleSince = await this.settings.endedVisibleSince(now)
@@ -223,6 +244,16 @@ export class PublicOccurrencesService {
                     ? null
                     : photoUrl(this.photosPublicBaseUrl, coverObjectKey),
         }
+    }
+
+    /**
+     * @description Returns the public URL of an original, or `null` for an image uploaded with none
+     * @param originalObjectKey Key of the original
+     */
+    private naturalUrlOf(originalObjectKey: string | null): string | null {
+        return originalObjectKey === null
+            ? null
+            : photoUrl(this.photosPublicBaseUrl, originalObjectKey)
     }
 
     /**

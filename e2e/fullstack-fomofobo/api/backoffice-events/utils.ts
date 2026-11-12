@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker"
-import { expectRawStatus, expectStatus } from "e2e-kit/assertions"
+import { expectRawStatus, expectStatus, expectToBeDefined } from "e2e-kit/assertions"
 import type { Event, EventUpsert, PriceScheme, Recurrence, Venue } from "models"
 
 import { signInAs } from "../auth/utils"
@@ -98,6 +98,45 @@ export const uploadPhoto = async (headers: {
     })
     expectRawStatus(upload, 200)
     return { key: ticket.data.key, bytes }
+}
+
+/**
+ * @description Uploads random bytes as a photo and other random bytes as its original through one photo upload ticket of the session, and returns the key and both bodies
+ * @param headers Headers of the session that uploads
+ */
+export const uploadPhotoWithOriginal = async (headers: {
+    Cookie: string
+}): Promise<{ key: string; bytes: Uint8Array; originalBytes: Uint8Array }> => {
+    const bytes = crypto.getRandomValues(new Uint8Array(256))
+    const originalBytes = crypto.getRandomValues(new Uint8Array(512))
+    const ticket = await createPhotoUploadTicket({
+        headers,
+        body: {
+            fileName: "photo.jpg",
+            contentType: "image/png",
+            sizeBytes: bytes.byteLength,
+            original: { contentType: "image/jpeg", sizeBytes: originalBytes.byteLength },
+        },
+    })
+    expectStatus(ticket, 200)
+    const original = ticket.data.original
+    expectToBeDefined(original)
+    const uploads = await Promise.all([
+        fetch(ticket.data.url, {
+            method: "PUT",
+            headers: ticket.data.headers,
+            body: bytes,
+        }),
+        fetch(original.url, {
+            method: "PUT",
+            headers: original.headers,
+            body: originalBytes,
+        }),
+    ])
+    for (const upload of uploads) {
+        expectRawStatus(upload, 200)
+    }
+    return { key: ticket.data.key, bytes, originalBytes }
 }
 
 /**

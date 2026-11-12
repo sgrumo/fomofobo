@@ -4,7 +4,7 @@ import {
     categorySchema,
     categoryUpdateSchema,
     photoUploadRequestSchema,
-    presignedUploadSchema,
+    photoUploadTicketSchema,
 } from "models"
 
 import {
@@ -105,7 +105,7 @@ export const BackofficeCategoriesRoutes = {
             200: {
                 content: {
                     "application/json": {
-                        schema: presignedUploadSchema.openapi("PresignedUpload"),
+                        schema: photoUploadTicketSchema.openapi("PhotoUploadTicket"),
                     },
                 },
                 description: "Presigned PUT of one category image",

@@ -3,7 +3,7 @@ import type { S3ObjectStorage } from "backend-shared"
 import type {
     Account,
     PhotoUploadRequest,
-    PresignedUpload,
+    PhotoUploadTicket,
     Venue,
     VenueCreation,
     VenueKindChange,
@@ -11,6 +11,7 @@ import type {
     VenueUpdate,
 } from "models"
 import { weekDays } from "shared/temporal"
+import { isDefined } from "shared/values"
 import type {
     AccountsStorage,
     CategoriesStorage,
@@ -25,6 +26,7 @@ import {
     assertUploadedPhoto,
     deleteReplacedObject,
     photoUrl,
+    uploadedOriginalKeyOf,
     venueCoverKeyPrefix,
 } from "./photos-service"
 import type { Page } from "./to-page"
@@ -110,20 +112,26 @@ export class VenuesService {
     ): Promise<Venue> {
         const current = await this.findEditable(id, account)
         const { coverPhotoKey, ...rest } = fields
-        if (
+        const newCover =
             coverPhotoKey !== undefined &&
             coverPhotoKey !== null &&
             coverPhotoKey !== current.coverObjectKey
-        ) {
+        if (newCover) {
             await assertUploadedPhoto(
                 this.photoStorage,
                 coverPhotoKey,
                 venueCoverKeyPrefix(id),
             )
         }
+        // A kept cover keeps its original, a cleared one loses it
+        const coverOriginalObjectKey = newCover
+            ? await uploadedOriginalKeyOf(this.photoStorage, coverPhotoKey)
+            : coverPhotoKey === null
+              ? null
+              : undefined
         const written = await this.venuesStorage.update(
             id,
-            { ...rest, coverObjectKey: coverPhotoKey },
+            { ...rest, coverObjectKey: coverPhotoKey, coverOriginalObjectKey },
             new Date(),
             account.role === "organizer" ? account.id : undefined,
         )
@@ -137,10 +145,12 @@ export class VenuesService {
             current.coverObjectKey !== null &&
             current.coverObjectKey !== coverPhotoKey
         ) {
-            await deleteReplacedObject(
-                this.photoStorage,
-                current.coverObjectKey,
-                "Venue cover",
+            await Promise.all(
+                [current.coverObjectKey, current.coverOriginalObjectKey]
+                    .filter(isDefined)
+                    .map(async key => {
+                        await deleteReplacedObject(this.photoStorage, key, "Venue cover")
+                    }),
             )
         }
         return await this.getById(id)
@@ -156,7 +166,7 @@ export class VenuesService {
         id: string,
         request: PhotoUploadRequest,
         account: Account,
-    ): Promise<PresignedUpload> {
+    ): Promise<PhotoUploadTicket> {
         await this.findEditable(id, account)
         return await this.photos.createTicketUnder(venueCoverKeyPrefix(id), request)
     }

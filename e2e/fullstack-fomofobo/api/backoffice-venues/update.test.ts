@@ -4,7 +4,8 @@ import { describe, expect, it } from "vitest"
 
 import { signInAs } from "../auth/utils"
 import { downloadPhoto, uploadPhoto } from "../backoffice-events/utils"
-import { createVenue, getVenue, updateVenue } from "./api"
+import { getPublicVenue } from "../public/api"
+import { createVenue, createVenueCoverUploadTicket, getVenue, updateVenue } from "./api"
 import { buildVenueCreation, uploadVenueCover } from "./utils"
 
 describe("PATCH /api/backoffice/venues/{id}", () => {
@@ -76,6 +77,63 @@ describe("PATCH /api/backoffice/venues/{id}", () => {
         expectStatus(withoutCover, 200)
         expect(withoutCover.data.coverPhotoUrl).toBeNull()
         expect(await downloadPhoto(coverUrl)).toBeNull()
+    })
+
+    it("shows the original uploaded beside a cover on the public profile, and deletes both once the cover goes", async () => {
+        const { headers } = await signInAs("organizer")
+        const created = await createVenue({ headers, body: buildVenueCreation() })
+        expectStatus(created, 201)
+        const bytes = crypto.getRandomValues(new Uint8Array(256))
+        const originalBytes = crypto.getRandomValues(new Uint8Array(512))
+        const ticket = await createVenueCoverUploadTicket({
+            headers,
+            pathParams: { id: created.data.id },
+            body: {
+                fileName: "cover.jpg",
+                contentType: "image/png",
+                sizeBytes: bytes.byteLength,
+                original: {
+                    contentType: "image/jpeg",
+                    sizeBytes: originalBytes.byteLength,
+                },
+            },
+        })
+        expectStatus(ticket, 200)
+        const original = ticket.data.original
+        expectToBeDefined(original)
+        const uploads = await Promise.all([
+            fetch(ticket.data.url, {
+                method: "PUT",
+                headers: ticket.data.headers,
+                body: bytes,
+            }),
+            fetch(original.url, {
+                method: "PUT",
+                headers: original.headers,
+                body: originalBytes,
+            }),
+        ])
+        expect(uploads.map(upload => upload.status)).toStrictEqual([200, 200])
+        const withCover = await updateVenue({
+            headers,
+            pathParams: { id: created.data.id },
+            body: { coverPhotoKey: ticket.data.key },
+        })
+        expectStatus(withCover, 200)
+
+        const profile = await getPublicVenue({ pathParams: { venueId: created.data.id } })
+
+        expectStatus(profile, 200)
+        const naturalUrl = profile.data.coverNaturalUrl
+        expectToBeDefined(naturalUrl)
+        expect(await downloadPhoto(naturalUrl)).toStrictEqual(originalBytes)
+        const withoutCover = await updateVenue({
+            headers,
+            pathParams: { id: created.data.id },
+            body: { coverPhotoKey: null },
+        })
+        expectStatus(withoutCover, 200)
+        expect(await downloadPhoto(naturalUrl)).toBeNull()
     })
 
     it("answers 400 to a cover key outside the uploads of the venue", async () => {

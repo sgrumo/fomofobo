@@ -19,7 +19,10 @@ export const publicVenueSchema = venueSchema
         programmeUrl: true,
         closingDays: true,
     })
-    .extend({ upcoming: z.array(occurrenceSummarySchema) })
+    .extend({
+        coverNaturalUrl: z.url().nullable().default(null),
+        upcoming: z.array(occurrenceSummarySchema),
+    })
 export type PublicVenue = z.infer<typeof publicVenueSchema>
 
 export const permanentVenueSummarySchema = venueSchema

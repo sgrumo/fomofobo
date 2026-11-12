@@ -7,13 +7,15 @@ import {
     buildCategoryCreation,
     uploadCategoryImage,
 } from "../backoffice-categories/utils"
-import { blockEvent, updateEvent } from "../backoffice-events/api"
+import { blockEvent, createEvent, updateEvent } from "../backoffice-events/api"
 import {
     buildEventUpsert,
     buildWeeklyRecurrence,
+    downloadPhoto,
     seedEvent,
     seedEventReferences,
     uploadPhoto,
+    uploadPhotoWithOriginal,
 } from "../backoffice-events/utils"
 import { updateSettings } from "../backoffice-settings/api"
 import { blockVenue, createVenue, updateVenue } from "../backoffice-venues/api"
@@ -52,10 +54,43 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
             coverPhotoUrl: event.photos[0]?.url,
             priceScheme: event.priceScheme,
             interestedCount: null,
-            photos: event.photos.map(({ id, url, position }) => ({ id, url, position })),
+            photos: event.photos.map(({ id, url, naturalUrl, position }) => ({
+                id,
+                url,
+                naturalUrl,
+                position,
+            })),
+            coverNaturalUrl: null,
             externalLinks: event.externalLinks,
             capacity: event.capacity,
         })
+    })
+
+    it("answers the original uploaded beside a photo, for the photo and for the cover", async () => {
+        const { headers } = await signInAs("organizer")
+        const { categoryId, venueId } = await seedEventReferences()
+        const photo = await uploadPhotoWithOriginal(headers)
+        const created = await createEvent({
+            headers,
+            body: buildEventUpsert({ venueId, categoryId, photoKeys: [photo.key] }),
+        })
+        expectStatus(created, 201)
+
+        const res = await getOccurrence({
+            headers: { "x-test-now": SATURDAY_NOON },
+            pathParams: { eventId: created.data.id, date: "2026-10-24" },
+        })
+
+        expectStatus(res, 200)
+        const naturalUrl = res.data.photos[0]?.naturalUrl
+        expectToBeDefined(naturalUrl)
+        expect(res.data.coverNaturalUrl).toBe(naturalUrl)
+        expect(
+            await Promise.all([
+                downloadPhoto(res.data.coverPhotoUrl),
+                downloadPhoto(naturalUrl),
+            ]),
+        ).toStrictEqual([photo.bytes, photo.originalBytes])
     })
 
     it("covers an event with no photo by the venue cover, else the category image, else the icon image", async () => {

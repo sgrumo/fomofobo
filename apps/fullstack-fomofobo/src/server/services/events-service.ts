@@ -10,13 +10,19 @@ import type {
     EventUpsert,
     OccurrenceSaveCount,
 } from "models"
-import type { EventsStorage, SavesStorage, StoredEvent } from "storage"
+import { isDefined } from "shared/values"
+import type { EventsStorage, SavesStorage, StoredEvent, StoredEventPhoto } from "storage"
 
 import { expandOccurrences } from "@/lib/events/expand-occurrences"
 
 import { eventTag, expireTags } from "../cache"
 import { appError } from "../errors"
-import { assertUploadedPhoto, photoKeyPrefix, photoUrl } from "./photos-service"
+import {
+    assertUploadedPhoto,
+    photoKeyPrefix,
+    photoUrl,
+    uploadedOriginalKeyOf,
+} from "./photos-service"
 import type { Page } from "./to-page"
 import { toPage } from "./to-page"
 
@@ -44,6 +50,13 @@ const organizerOf = (
     }
     return organizerId
 }
+
+/**
+ * @description Returns the bucket keys of one photo: the dithered copy, and the original when one was uploaded
+ * @param photo Stored photo
+ */
+const photoObjectKeysOf = (photo: StoredEventPhoto): string[] =>
+    [photo.objectKey, photo.originalObjectKey].filter(isDefined)
 
 export class EventsService {
     private readonly eventsStorage: EventsStorage
@@ -130,7 +143,7 @@ export class EventsService {
             throw appError("EventNotFound", `Event ${id} not found`)
         }
         expireTags(eventTag(id))
-        await this.deletePhotoObjects(current.photos.map(photo => photo.objectKey))
+        await this.deletePhotoObjects(current.photos.flatMap(photoObjectKeysOf))
     }
 
     /**
@@ -205,18 +218,21 @@ export class EventsService {
         if (new Set(upsert.photoKeys).size !== upsert.photoKeys.length) {
             throw appError("InvalidPhotoUpload", "A photo is listed twice")
         }
-        const currentPhotoIds = new Map(
-            current?.photos.map(photo => [photo.objectKey, photo.id]),
+        const currentPhotos = new Map(
+            current?.photos.map(photo => [photo.objectKey, photo]),
         )
-        const newKeys = upsert.photoKeys.filter(key => !currentPhotoIds.has(key))
-        await Promise.all(
-            newKeys.map(async key => {
-                await assertUploadedPhoto(
-                    this.photoStorage,
-                    key,
-                    photoKeyPrefix(account.id),
-                )
-            }),
+        const newKeys = upsert.photoKeys.filter(key => !currentPhotos.has(key))
+        const newOriginalKeys = new Map(
+            await Promise.all(
+                newKeys.map(async (key): Promise<[string, string | null]> => {
+                    await assertUploadedPhoto(
+                        this.photoStorage,
+                        key,
+                        photoKeyPrefix(account.id),
+                    )
+                    return [key, await uploadedOriginalKeyOf(this.photoStorage, key)]
+                }),
+            ),
         )
 
         const refs = await this.eventsStorage.findWriteReferences({
@@ -271,11 +287,18 @@ export class EventsService {
             capacity: upsert.capacity,
             categoryIds: upsert.categoryIds,
             primaryCategoryId: upsert.primaryCategoryId,
-            photos: upsert.photoKeys.map((objectKey, position) => ({
-                id: currentPhotoIds.get(objectKey) ?? crypto.randomUUID(),
-                objectKey,
-                position,
-            })),
+            photos: upsert.photoKeys.map((objectKey, position) => {
+                const currentPhoto = currentPhotos.get(objectKey)
+                return {
+                    id: currentPhoto?.id ?? crypto.randomUUID(),
+                    objectKey,
+                    originalObjectKey:
+                        currentPhoto?.originalObjectKey ??
+                        newOriginalKeys.get(objectKey) ??
+                        null,
+                    position,
+                }
+            }),
             occurrences: occurrences.value,
         }
         await (current === null
@@ -285,7 +308,9 @@ export class EventsService {
 
         const keptKeys = new Set(upsert.photoKeys)
         await this.deletePhotoObjects(
-            [...currentPhotoIds.keys()].filter(key => !keptKeys.has(key)),
+            [...currentPhotos.values()]
+                .filter(photo => !keptKeys.has(photo.objectKey))
+                .flatMap(photoObjectKeysOf),
         )
     }
 
@@ -320,6 +345,10 @@ export class EventsService {
             photos: event.photos.map(photo => ({
                 id: photo.id,
                 url: photoUrl(this.photosPublicBaseUrl, photo.objectKey),
+                naturalUrl:
+                    photo.originalObjectKey === null
+                        ? null
+                        : photoUrl(this.photosPublicBaseUrl, photo.originalObjectKey),
                 position: photo.position,
                 key: photo.objectKey,
             })),

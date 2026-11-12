@@ -31,6 +31,8 @@ const cachedFileQuery = (uri: string) =>
 
 interface TonedPhotoProps {
     uri: string
+    // The original of the photo, drawn as it is in place of the toned dither
+    naturalUri?: string | null
     tone: PhotoTone
     // Absent on a decorative photo
     label?: string
@@ -43,8 +45,18 @@ const TonedPhoto = (props: TonedPhotoProps) => {
     const id = useId()
     const { data: file, isError: fileFailed } = useQuery({
         ...cachedFileQuery(props.uri),
-        enabled: props.tone !== "live",
+        enabled: props.tone !== "live" && typeof props.naturalUri !== "string",
     })
+
+    if (typeof props.naturalUri === "string") {
+        return (
+            <DitheredPhoto
+                uri={props.naturalUri}
+                label={props.label}
+                className={props.className}
+            />
+        )
+    }
 
     if (props.tone === "live" || file === null || fileFailed) {
         return (

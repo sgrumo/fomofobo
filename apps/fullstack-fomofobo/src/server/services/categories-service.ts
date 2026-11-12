@@ -5,9 +5,10 @@ import type {
     CategoryCreation,
     CategoryUpdate,
     PhotoUploadRequest,
-    PresignedUpload,
+    PhotoUploadTicket,
 } from "models"
 import { unstable_cache } from "next/cache"
+import { isDefined } from "shared/values"
 import type { CategoriesStorage, StoredCategory } from "storage"
 
 import { CATEGORIES_TAG, expireTags, PUBLIC_TAG } from "../cache"
@@ -18,6 +19,7 @@ import {
     categoryImageKeyPrefix,
     deleteReplacedObject,
     photoUrl,
+    uploadedOriginalKeyOf,
 } from "./photos-service"
 
 export class CategoriesService {
@@ -77,20 +79,27 @@ export class CategoriesService {
             throw appError("CategoryNotFound", `Category ${id} not found`)
         }
         const { imageKey, ...rest } = fields
-        if (
+        const newImage =
             imageKey !== undefined &&
             imageKey !== null &&
             imageKey !== current.imageObjectKey
-        ) {
+        if (newImage) {
             await assertUploadedPhoto(
                 this.photoStorage,
                 imageKey,
                 categoryImageKeyPrefix(id),
             )
         }
+        // A kept image keeps its original, a cleared one loses it
+        const imageOriginalObjectKey = newImage
+            ? await uploadedOriginalKeyOf(this.photoStorage, imageKey)
+            : imageKey === null
+              ? null
+              : undefined
         const category = await this.categoriesStorage.update(id, {
             ...rest,
             imageObjectKey: imageKey,
+            imageOriginalObjectKey,
         })
         if (category === null) {
             throw appError("CategoryNotFound", `Category ${id} not found`)
@@ -103,11 +112,7 @@ export class CategoriesService {
             current.imageObjectKey !== null &&
             current.imageObjectKey !== imageKey
         ) {
-            await deleteReplacedObject(
-                this.photoStorage,
-                current.imageObjectKey,
-                "Category image",
-            )
+            await this.deleteImageObjects(current)
         }
         return this.toCategory(category)
     }
@@ -120,7 +125,7 @@ export class CategoriesService {
     public async createImageUploadTicket(
         id: string,
         request: PhotoUploadRequest,
-    ): Promise<PresignedUpload> {
+    ): Promise<PhotoUploadTicket> {
         if ((await this.categoriesStorage.findById(id)) === null) {
             throw appError("CategoryNotFound", `Category ${id} not found`)
         }
@@ -141,13 +146,21 @@ export class CategoriesService {
             throw appError("CategoryNotFound", `Category ${id} not found`)
         }
         expireTags(CATEGORIES_TAG)
-        if (deleted.imageObjectKey !== null) {
-            await deleteReplacedObject(
-                this.photoStorage,
-                deleted.imageObjectKey,
-                "Category image",
-            )
-        }
+        await this.deleteImageObjects(deleted)
+    }
+
+    /**
+     * @description Deletes the image of a category and its original from the bucket, and logs each failure
+     * @param category Category whose image goes
+     */
+    private async deleteImageObjects(category: StoredCategory): Promise<void> {
+        await Promise.all(
+            [category.imageObjectKey, category.imageOriginalObjectKey]
+                .filter(isDefined)
+                .map(async key => {
+                    await deleteReplacedObject(this.photoStorage, key, "Category image")
+                }),
+        )
     }
 
     /**

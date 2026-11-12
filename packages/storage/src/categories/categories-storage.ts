@@ -7,10 +7,12 @@ import { categories, eventCategories, events, venues } from "../db-schema"
 
 export type StoredCategory = StrictOmit<Category, "imageUrl"> & {
     imageObjectKey: string | null
+    imageOriginalObjectKey: string | null
 }
 
 export type CategoryWrite = StrictOmit<CategoryUpdate, "imageKey"> & {
     imageObjectKey?: string | null
+    imageOriginalObjectKey?: string | null
 }
 
 /**
@@ -22,6 +24,7 @@ const toStoredCategory = (row: typeof categories.$inferSelect): StoredCategory =
     name: row.name,
     icon: row.icon,
     imageObjectKey: row.imageObjectKey,
+    imageOriginalObjectKey: row.imageOriginalObjectKey,
 })
 
 export class CategoriesStorage {
@@ -91,6 +94,7 @@ export class CategoriesStorage {
                 name: fields.name,
                 icon: fields.icon,
                 imageObjectKey: fields.imageObjectKey,
+                imageOriginalObjectKey: fields.imageOriginalObjectKey,
             })
             .where(eq(categories.id, id))
             .returning()

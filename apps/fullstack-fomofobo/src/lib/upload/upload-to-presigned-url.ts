@@ -8,7 +8,7 @@ import type { PresignedUpload } from "models"
  * @throws When the upload fails or answers outside the `2xx` range
  */
 export const uploadToPresignedUrl = (
-    presigned: PresignedUpload,
+    presigned: Pick<PresignedUpload, "url" | "headers">,
     body: Blob,
     onProgress: (share: number) => void,
 ): Promise<void> =>

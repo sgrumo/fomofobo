@@ -78,8 +78,12 @@ export interface StoredOccurrenceSummary {
     priceScheme: PriceScheme
 }
 
-export type StoredPublicVenue = StrictOmit<PublicVenue, "coverPhotoUrl" | "upcoming"> & {
+export type StoredPublicVenue = StrictOmit<
+    PublicVenue,
+    "coverPhotoUrl" | "coverNaturalUrl" | "upcoming"
+> & {
     coverObjectKey: string | null
+    coverOriginalObjectKey: string | null
 }
 
 export type StoredPermanentVenue = StrictOmit<PermanentVenueSummary, "coverPhotoUrl"> & {
@@ -89,6 +93,10 @@ export type StoredPermanentVenue = StrictOmit<PermanentVenueSummary, "coverPhoto
 export interface StoredOccurrenceDetail extends StoredOccurrenceSummary {
     venueAddress: string
     photos: StoredEventPhoto[]
+    naturalFallback: {
+        venueCoverOriginalObjectKey: string | null
+        categoryImageOriginalObjectKey: string | null
+    }
     externalLinks: { instagramUrl: string | null; facebookUrl: string | null }
     capacity: number | null
 }
@@ -359,6 +367,10 @@ export class PublicOccurrencesStorage {
                 .select({
                     ...summaryColumns,
                     venueAddress: venues.address,
+                    venueCoverOriginalObjectKey: venues.coverOriginalObjectKey,
+                    categoryImageOriginalObjectKey: sql<
+                        string | null
+                    >`(select ${categories.imageOriginalObjectKey} from ${categories} where ${categories.id} = ${primaryCategoryOfEvent})`,
                     instagramUrl: events.instagramUrl,
                     facebookUrl: events.facebookUrl,
                     capacity: events.capacity,
@@ -382,8 +394,13 @@ export class PublicOccurrencesStorage {
                   photos: photoRows.map(photo => ({
                       id: photo.id,
                       objectKey: photo.objectKey,
+                      originalObjectKey: photo.originalObjectKey,
                       position: photo.position,
                   })),
+                  naturalFallback: {
+                      venueCoverOriginalObjectKey: row.venueCoverOriginalObjectKey,
+                      categoryImageOriginalObjectKey: row.categoryImageOriginalObjectKey,
+                  },
                   externalLinks: {
                       instagramUrl: row.instagramUrl,
                       facebookUrl: row.facebookUrl,
@@ -471,6 +488,7 @@ export class PublicOccurrencesStorage {
                   coordinates: { latitude: row.latitude, longitude: row.longitude },
                   description: row.description,
                   coverObjectKey: row.coverObjectKey,
+                  coverOriginalObjectKey: row.coverOriginalObjectKey,
                   links: {
                       websiteUrl: row.websiteUrl,
                       instagramUrl: row.instagramUrl,

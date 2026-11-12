@@ -7,6 +7,8 @@ import { useId } from "react"
 
 interface TonedImageProps {
     src: string
+    // The original of the photo, drawn as it is in place of the toned dither
+    naturalSrc?: string | null
     tone: PhotoTone
     width: number
     height: number
@@ -18,6 +20,19 @@ interface TonedImageProps {
 // A stored photo is ink and red, so the live tone draws it as it is
 export const TonedImage = (props: TonedImageProps) => {
     const filterId = useId()
+    if (typeof props.naturalSrc === "string") {
+        return (
+            <Image
+                src={props.naturalSrc}
+                width={props.width}
+                height={props.height}
+                unoptimized={true}
+                loading={props.loading}
+                alt={props.alt}
+                className={props.className}
+            />
+        )
+    }
     const image = (
         <Image
             src={props.src}

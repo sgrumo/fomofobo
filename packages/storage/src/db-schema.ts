@@ -137,6 +137,7 @@ export const categories = sqliteTable(
         name: text("name").notNull().unique(),
         icon: text("icon", { enum: categoryIconValues }).notNull(),
         imageObjectKey: text("image_object_key").unique(),
+        imageOriginalObjectKey: text("image_original_object_key").unique(),
         createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
     },
     table => [
@@ -157,6 +158,7 @@ export const venues = sqliteTable(
         longitude: real("longitude").notNull(),
         description: text("description"),
         coverObjectKey: text("cover_object_key").unique(),
+        coverOriginalObjectKey: text("cover_original_object_key").unique(),
         websiteUrl: text("website_url"),
         instagramUrl: text("instagram_url"),
         facebookUrl: text("facebook_url"),
@@ -258,6 +260,7 @@ export const eventPhotos = sqliteTable(
             .notNull()
             .references(() => events.id, { onDelete: "cascade" }),
         objectKey: text("object_key").notNull().unique(),
+        originalObjectKey: text("original_object_key").unique(),
         position: integer("position").notNull(),
         createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
     },

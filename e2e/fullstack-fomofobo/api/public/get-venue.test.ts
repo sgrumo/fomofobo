@@ -42,6 +42,7 @@ describe("GET /api/public/venues/{venueId}", () => {
             coordinates: venue.coordinates,
             description: null,
             coverPhotoUrl: null,
+            coverNaturalUrl: null,
             links: { websiteUrl: null, instagramUrl: null, facebookUrl: null },
             kind: "regular",
             programmeUrl: null,

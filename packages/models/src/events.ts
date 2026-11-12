@@ -9,7 +9,11 @@ import { facebookUrlSchema, instagramUrlSchema } from "./lib/social-links"
 import { withTimeRange } from "./lib/time-range"
 import { priceSchemeSchema } from "./price-scheme"
 import { recurrenceSchema } from "./recurrence"
-import { uploadContentTypeSchema, uploadRequestSchema } from "./uploads"
+import {
+    presignedUploadSchema,
+    uploadContentTypeSchema,
+    uploadRequestSchema,
+} from "./uploads"
 import { venueSchema } from "./venues"
 
 export const photoContentTypeSchema = uploadContentTypeSchema.extract([
@@ -26,12 +30,22 @@ export type DitheredPhotoContentType = z.infer<typeof ditheredPhotoContentTypeSc
 
 export const photoUploadRequestSchema = uploadRequestSchema.extend({
     contentType: ditheredPhotoContentTypeSchema,
+    original: uploadRequestSchema
+        .pick({ sizeBytes: true })
+        .extend({ contentType: photoContentTypeSchema })
+        .optional(),
 })
 export type PhotoUploadRequest = z.infer<typeof photoUploadRequestSchema>
+
+export const photoUploadTicketSchema = presignedUploadSchema.extend({
+    original: presignedUploadSchema.pick({ url: true, headers: true }).optional(),
+})
+export type PhotoUploadTicket = z.infer<typeof photoUploadTicketSchema>
 
 export const eventPhotoSchema = z.object({
     id: z.uuid(),
     url: z.url(),
+    naturalUrl: z.url().nullable().default(null),
     position: z.int().nonnegative(),
 })
 export type EventPhoto = z.infer<typeof eventPhotoSchema>

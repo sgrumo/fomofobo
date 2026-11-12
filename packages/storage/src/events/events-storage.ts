@@ -10,6 +10,7 @@ import type {
     Recurrence,
 } from "models"
 import type { StrictOmit } from "shared/types"
+import { isDefined } from "shared/values"
 
 import type { DbInstanceFromSchema } from "../db-config"
 import {
@@ -34,6 +35,7 @@ const OCCURRENCE_ROWS_PER_INSERT = 1000
 export interface StoredEventPhoto {
     id: string
     objectKey: string
+    originalObjectKey: string | null
     position: number
 }
 
@@ -97,6 +99,7 @@ const toStoredEvent = (
     photos: photoRows.map(photo => ({
         id: photo.id,
         objectKey: photo.objectKey,
+        originalObjectKey: photo.originalObjectKey,
         position: photo.position,
     })),
     externalLinks: {
@@ -340,7 +343,7 @@ export class EventsStorage {
     }
 
     /**
-     * @description Persists the deletion of the photo rows of the events with no occurrence that ends after an instant, and returns their object keys
+     * @description Persists the deletion of the photo rows of the events with no occurrence that ends after an instant, and returns their object keys, originals included
      * @param endedBefore Instant every occurrence of the event ends at or before
      * @param limit Cap of the photo rows deleted
      */
@@ -376,8 +379,13 @@ export class EventsStorage {
                         .limit(limit),
                 ),
             )
-            .returning({ objectKey: eventPhotos.objectKey })
-        return rows.map(row => row.objectKey)
+            .returning({
+                objectKey: eventPhotos.objectKey,
+                originalObjectKey: eventPhotos.originalObjectKey,
+            })
+        return rows.flatMap(row =>
+            [row.objectKey, row.originalObjectKey].filter(isDefined),
+        )
     }
 
     /**
@@ -431,6 +439,7 @@ export class EventsStorage {
                               id: photo.id,
                               eventId: event.id,
                               objectKey: photo.objectKey,
+                              originalObjectKey: photo.originalObjectKey,
                               position: photo.position,
                               createdAt: at,
                           })),

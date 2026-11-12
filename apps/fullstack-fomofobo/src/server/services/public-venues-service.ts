@@ -77,7 +77,7 @@ export class PublicVenuesService {
                 const stored = await this.occurrencesStorage.findPublicVenue(venueId)
                 return stored === null ? null : this.toProfile(stored)
             },
-            ["venue-profile-v3", venueId],
+            ["venue-profile-v4", venueId],
             { tags: [PUBLIC_TAG, venueTag(venueId)] },
         )()
         if (venue === null) {
@@ -91,13 +91,17 @@ export class PublicVenuesService {
      * @param venue Stored venue
      */
     private toProfile(venue: StoredPublicVenue): StrictOmit<PublicVenue, "upcoming"> {
-        const { coverObjectKey, ...rest } = venue
+        const { coverObjectKey, coverOriginalObjectKey, ...rest } = venue
         return {
             ...rest,
             coverPhotoUrl:
                 coverObjectKey === null
                     ? null
                     : photoUrl(this.photosPublicBaseUrl, coverObjectKey),
+            coverNaturalUrl:
+                coverOriginalObjectKey === null
+                    ? null
+                    : photoUrl(this.photosPublicBaseUrl, coverOriginalObjectKey),
         }
     }
 }

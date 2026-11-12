@@ -103,6 +103,7 @@ export const EventDetail = (props: EventDetailProps) => {
                 title={occurrence.title}
                 photos={occurrence.photos}
                 coverPhotoUrl={occurrence.coverPhotoUrl}
+                coverNaturalUrl={occurrence.coverNaturalUrl}
                 tone={status}
                 controls={
                     <>

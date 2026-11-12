@@ -2,7 +2,7 @@ import { createRoute, z } from "@hono/zod-openapi"
 import {
     paginatedResponseSchema,
     photoUploadRequestSchema,
-    presignedUploadSchema,
+    photoUploadTicketSchema,
     venueBlockSchema,
     venueCreationSchema,
     venueKindChangeSchema,
@@ -239,7 +239,7 @@ export const BackofficeVenuesRoutes = {
             200: {
                 content: {
                     "application/json": {
-                        schema: presignedUploadSchema.openapi("PresignedUpload"),
+                        schema: photoUploadTicketSchema.openapi("PhotoUploadTicket"),
                     },
                 },
                 description: "Presigned PUT of one cover",

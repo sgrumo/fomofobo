@@ -1,8 +1,12 @@
 import "server-only"
 import type { S3ObjectStorage } from "backend-shared"
 import { logger } from "backend-shared"
-import { ditheredPhotoContentTypeSchema, MAX_UPLOAD_SIZE_BYTES } from "models"
-import type { PhotoUploadRequest, PresignedUpload } from "models"
+import {
+    ditheredPhotoContentTypeSchema,
+    MAX_UPLOAD_SIZE_BYTES,
+    photoContentTypeSchema,
+} from "models"
+import type { PhotoUploadRequest, PhotoUploadTicket } from "models"
 
 import { appError } from "../errors"
 
@@ -24,6 +28,39 @@ export const venueCoverKeyPrefix = (venueId: string): string => `venues/${venueI
  */
 export const categoryImageKeyPrefix = (categoryId: string): string =>
     `categories/${categoryId}/`
+
+/**
+ * @description Returns the key of the original upload of a dithered photo
+ * @param key Key of the dithered photo
+ */
+const originalKeyOf = (key: string): string => `${key}-original`
+
+/**
+ * @description Fetches the key of the original of a dithered photo, or `null` when none was uploaded
+ * @param photoStorage Bucket of the photos
+ * @param key Key of the dithered photo
+ * @throws When the original is not an allowed photo or is too large
+ */
+export const uploadedOriginalKeyOf = async (
+    photoStorage: S3ObjectStorage,
+    key: string,
+): Promise<string | null> => {
+    const originalKey = originalKeyOf(key)
+    const head = await photoStorage.headObject(originalKey)
+    if (head === null) {
+        return null
+    }
+    if (
+        !photoContentTypeSchema.safeParse(head.contentType).success ||
+        head.sizeBytes > MAX_UPLOAD_SIZE_BYTES
+    ) {
+        throw appError(
+            "InvalidPhotoUpload",
+            `Original ${originalKey} is not an allowed image`,
+        )
+    }
+    return originalKey
+}
 
 /**
  * @description Throws unless the key sits under the prefix and holds a dithered photo within the size limit
@@ -93,32 +130,41 @@ export class PhotosService {
     }
 
     /**
-     * @description Builds a presigned PUT of one photo under a new key of the account
-     * @param request Content type and size of the photo
+     * @description Builds a presigned PUT of one photo under a new key of the account, and of its original when asked
+     * @param request Content type and size of the photo and of its original
      * @param accountId Account that uploads
      */
     public async createUploadTicket(
         request: PhotoUploadRequest,
         accountId: string,
-    ): Promise<PresignedUpload> {
+    ): Promise<PhotoUploadTicket> {
         return await this.createTicketUnder(photoKeyPrefix(accountId), request)
     }
 
     /**
-     * @description Builds a presigned PUT of one photo under a new key of the prefix
+     * @description Builds a presigned PUT of one photo under a new key of the prefix, and of its original when asked
      * @param prefix Prefix of the new key
-     * @param request Content type and size of the photo
+     * @param request Content type and size of the photo and of its original
      */
     public async createTicketUnder(
         prefix: string,
         request: PhotoUploadRequest,
-    ): Promise<PresignedUpload> {
+    ): Promise<PhotoUploadTicket> {
         const key = `${prefix}${crypto.randomUUID()}`
-        const upload = await this.photoStorage.createUploadUrl(
-            key,
-            request.contentType,
-            request.sizeBytes,
-        )
-        return { ...upload, key }
+        const [upload, original] = await Promise.all([
+            this.photoStorage.createUploadUrl(
+                key,
+                request.contentType,
+                request.sizeBytes,
+            ),
+            request.original === undefined
+                ? undefined
+                : this.photoStorage.createUploadUrl(
+                      originalKeyOf(key),
+                      request.original.contentType,
+                      request.original.sizeBytes,
+                  ),
+        ])
+        return { ...upload, key, original }
     }
 }

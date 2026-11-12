@@ -80,6 +80,7 @@ export const VenueDetail = (props: VenueDetailProps) => {
             {venue.coverPhotoUrl !== null && (
                 <TonedPhoto
                     uri={venue.coverPhotoUrl}
+                    naturalUri={venue.coverNaturalUrl}
                     tone={venuePhotoToneOf(venue.kind)}
                     label={t("Venue.Cover", { name: venue.name })}
                     className="aspect-[4/3] w-full rounded-md border-2 border-line"

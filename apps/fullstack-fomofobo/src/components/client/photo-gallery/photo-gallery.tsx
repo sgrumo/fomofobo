@@ -1,6 +1,7 @@
 "use client"
 
 import type { PhotoTone } from "domain/photo-tone"
+import { cn } from "frontend-shared/styles"
 import type { EventPhoto } from "models"
 import type { ReactNode } from "react"
 import { useState } from "react"
@@ -13,6 +14,7 @@ interface PhotoGalleryProps {
     title: string
     photos: EventPhoto[]
     coverPhotoUrl: string
+    coverNaturalUrl: string | null
     tone: PhotoTone
     controls: ReactNode
 }
@@ -36,11 +38,14 @@ export const PhotoGallery = (props: PhotoGalleryProps) => {
                     <TonedImage
                         tone={props.tone}
                         src={props.coverPhotoUrl}
+                        naturalSrc={props.coverNaturalUrl}
                         width={1200}
                         height={900}
                         loading="eager"
                         alt={t("Detail.Cover", { title: props.title })}
-                        className="size-full shrink-0 object-cover [image-rendering:pixelated]"
+                        className={cn("size-full shrink-0 object-cover", {
+                            "[image-rendering:pixelated]": props.coverNaturalUrl === null,
+                        })}
                     />
                 ) : undefined}
                 {props.photos.map((photo, position) => (
@@ -48,6 +53,7 @@ export const PhotoGallery = (props: PhotoGalleryProps) => {
                         tone={props.tone}
                         key={photo.id}
                         src={photo.url}
+                        naturalSrc={photo.naturalUrl}
                         width={1200}
                         height={900}
                         loading={position === 0 ? "eager" : "lazy"}
@@ -55,7 +61,9 @@ export const PhotoGallery = (props: PhotoGalleryProps) => {
                             index: position + 1,
                             total: props.photos.length,
                         })}
-                        className="size-full shrink-0 snap-center object-cover [image-rendering:pixelated]"
+                        className={cn("size-full shrink-0 snap-center object-cover", {
+                            "[image-rendering:pixelated]": photo.naturalUrl === null,
+                        })}
                     />
                 ))}
             </div>

@@ -1,8 +1,8 @@
 "use client"
 
 import { noop } from "es-toolkit"
-import { ditheredPhotoContentTypeSchema, photoContentTypeSchema } from "models"
-import type { PhotoUploadRequest, PresignedUpload } from "models"
+import { photoContentTypeSchema } from "models"
+import type { PhotoUploadRequest, PhotoUploadTicket } from "models"
 import Image from "next/image"
 import type { ChangeEvent } from "react"
 import { useState } from "react"
@@ -12,8 +12,7 @@ import { Field } from "ui-components/field"
 import { Spinner } from "ui-components/spinner"
 import { useToast } from "ui-components/toast"
 
-import { ditherPhoto } from "@/lib/upload/dither-photo"
-import { uploadToPresignedUrl } from "@/lib/upload/upload-to-presigned-url"
+import { uploadPhoto } from "@/lib/upload/upload-photo"
 import { validatePhotoFile } from "@/lib/upload/validate-photo-file"
 
 const PHOTO_ACCEPT = photoContentTypeSchema.options.join(",")
@@ -30,7 +29,7 @@ interface DitheredImageFieldProps {
     imageUrl: string | null
     disabled: boolean
     saving: boolean
-    createTicket: (request: PhotoUploadRequest) => Promise<PresignedUpload>
+    createTicket: (request: PhotoUploadRequest) => Promise<PhotoUploadTicket>
     onSave: (key: string | null) => void
 }
 
@@ -43,14 +42,8 @@ export const DitheredImageField = (props: DitheredImageFieldProps) => {
     const upload = async (file: File) => {
         setUploading(true)
         try {
-            const dithered = await ditherPhoto(file)
-            const ticket = await props.createTicket({
-                fileName: file.name,
-                contentType: ditheredPhotoContentTypeSchema.enum["image/png"],
-                sizeBytes: dithered.size,
-            })
-            await uploadToPresignedUrl(ticket, dithered, noop)
-            props.onSave(ticket.key)
+            const uploaded = await uploadPhoto(file, props.createTicket, noop)
+            props.onSave(uploaded.key)
         } catch {
             toast.add({
                 type: "error",

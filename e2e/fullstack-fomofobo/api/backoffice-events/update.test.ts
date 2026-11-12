@@ -1,4 +1,4 @@
-import { expectApiError, expectStatus } from "e2e-kit/assertions"
+import { expectApiError, expectStatus, expectToBeDefined } from "e2e-kit/assertions"
 import { describe, expect, it } from "vitest"
 
 import { signInAs } from "../auth/utils"
@@ -10,9 +10,47 @@ import {
     downloadPhoto,
     seedEventReferences,
     uploadPhoto,
+    uploadPhotoWithOriginal,
 } from "./utils"
 
 describe("PUT /api/backoffice/events/{id}", () => {
+    it("keeps the original of a kept photo, and deletes the original of a removed photo from the bucket", async () => {
+        const { headers } = await signInAs("organizer")
+        const { categoryId, venueId } = await seedEventReferences()
+        const removed = await uploadPhotoWithOriginal(headers)
+        const kept = await uploadPhotoWithOriginal(headers)
+        const created = await createEvent({
+            headers,
+            body: buildEventUpsert({
+                venueId,
+                categoryId,
+                photoKeys: [removed.key, kept.key],
+            }),
+        })
+        expectStatus(created, 201)
+
+        const res = await updateEvent({
+            headers,
+            pathParams: { id: created.data.id },
+            body: buildEventUpsert({ venueId, categoryId, photoKeys: [kept.key] }),
+        })
+
+        expectStatus(res, 200)
+        expect(res.data.photos.map(photo => photo.naturalUrl)).toStrictEqual([
+            created.data.photos[1]?.naturalUrl,
+        ])
+        const removedNaturalUrl = created.data.photos[0]?.naturalUrl
+        const keptNaturalUrl = res.data.photos[0]?.naturalUrl
+        expectToBeDefined(removedNaturalUrl)
+        expectToBeDefined(keptNaturalUrl)
+        expect(
+            await Promise.all([
+                downloadPhoto(removedNaturalUrl),
+                downloadPhoto(keptNaturalUrl),
+            ]),
+        ).toStrictEqual([null, kept.originalBytes])
+    })
+
     it("replaces the fields and the photos, and deletes a removed photo from the bucket", async () => {
         const { headers } = await signInAs("organizer")
         const { categoryId, venueId } = await seedEventReferences()
