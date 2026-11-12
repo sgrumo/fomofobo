@@ -208,6 +208,15 @@ export class EventsStorage {
             query.isBlocked === undefined
                 ? undefined
                 : eq(events.isBlocked, query.isBlocked),
+            query.categoryIds === undefined
+                ? undefined
+                : inArray(
+                      events.id,
+                      this.db
+                          .select({ eventId: eventCategories.eventId })
+                          .from(eventCategories)
+                          .where(inArray(eventCategories.categoryId, query.categoryIds)),
+                  ),
         )
         const { limit, offset } = toLimitOffset(query)
 

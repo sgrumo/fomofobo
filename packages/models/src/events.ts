@@ -2,9 +2,10 @@ import { z } from "@hono/zod-openapi"
 
 import { accountSchema } from "./accounts"
 import { customErrorParamsSchema } from "./lib/custom-errors"
-import { MAX_EVENT_PHOTOS } from "./lib/limits"
+import { MAX_EVENT_PHOTOS, MAX_SEARCH_CATEGORIES } from "./lib/limits"
 import { instantSchema, localDateTimeSchema } from "./lib/local-time"
 import { paginationQuerySchema } from "./lib/pagination"
+import { queryArraySchema } from "./lib/query-array"
 import { facebookUrlSchema, instagramUrlSchema } from "./lib/social-links"
 import { withTimeRange } from "./lib/time-range"
 import { priceSchemeSchema } from "./price-scheme"
@@ -155,6 +156,7 @@ export const eventListQuerySchema = paginationQuerySchema.extend({
     q: z.string().trim().min(1).optional(),
     organizerId: z.uuid().optional(),
     isBlocked: z.stringbool().optional(),
+    categoryIds: queryArraySchema(z.uuid(), MAX_SEARCH_CATEGORIES).optional(),
 })
 export type EventListQuery = z.infer<typeof eventListQuerySchema>
 

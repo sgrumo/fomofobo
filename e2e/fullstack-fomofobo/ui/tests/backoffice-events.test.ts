@@ -3,6 +3,7 @@ import { confirmAlertDialog, getAlertDialog } from "e2e-ui-components/alert-dial
 import { clickButton } from "e2e-ui-components/button"
 import { getDialog } from "e2e-ui-components/dialog"
 import { fillInput } from "e2e-ui-components/input"
+import { resetSelect, selectSelectItems } from "e2e-ui-components/select"
 import {
     clickTableRowAction,
     expectNoTableRow,
@@ -15,6 +16,7 @@ import { signInAs } from "../../api/auth/utils"
 import { seedEvent, seedEventReferences } from "../../api/backoffice-events/utils"
 import { gotoBackofficePage, t } from "../app"
 import { signInBrowser } from "../backoffice"
+import { buildArea, seedCategory, seedVenue } from "../public"
 
 test.describe("backoffice events", () => {
     test("lists the own events of an Organizer, and every event with its organizer for an Admin", async ({
@@ -45,6 +47,39 @@ test.describe("backoffice events", () => {
                 ["exact", organizerName],
             ])
         }
+    })
+
+    test("narrows the list to the events of the categories picked in the filter, and lists every event again once reset", async ({
+        page,
+    }) => {
+        const venue = await seedVenue(buildArea())
+        const [music, theatre] = await Promise.all([seedCategory(), seedCategory()])
+        const musicTitle = `Music ${crypto.randomUUID()}`
+        const theatreTitle = `Theatre ${crypto.randomUUID()}`
+        const organizer = await signInBrowser(page, "organizer")
+        await seedEvent(
+            organizer.headers,
+            { venueId: venue.id, categoryId: music.id },
+            { title: musicTitle },
+        )
+        await seedEvent(
+            organizer.headers,
+            { venueId: venue.id, categoryId: theatre.id },
+            { title: theatreTitle },
+        )
+        const categoriesLabel = t("shared", "Backoffice.Events.Categories")
+
+        await gotoBackofficePage(page, "/backoffice/events")
+        await selectSelectItems(page, categoriesLabel, [["exact", music.name]])
+
+        await expectTableRow(page, ["exact", musicTitle])
+        await expectNoTableRow(page, ["exact", theatreTitle])
+        await expect(page).toHaveURL(new RegExp(`categories=${music.id}`, "u"))
+
+        await resetSelect(page, categoriesLabel)
+
+        await expectTableRow(page, ["exact", musicTitle])
+        await expectTableRow(page, ["exact", theatreTitle])
     })
 
     test("blocks an event with a reason, then unblocks it", async ({ page }) => {

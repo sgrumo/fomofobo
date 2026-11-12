@@ -53,9 +53,12 @@ export const BackofficeEventsView = (
                 organizerId: isAdmin ? query.organizer : undefined,
                 isBlocked:
                     query.state === undefined ? undefined : query.state === "blocked",
+                categoryIds: query.categories,
             },
         }),
     )
+    const categories = useQuery(api.listCategoriesQuery({ params: {}, query: {} }))
+    const categoryItems = categories.data ?? []
     const organizers = useQuery({
         ...api.listOrganizersQuery({
             params: {},
@@ -97,6 +100,33 @@ export const BackofficeEventsView = (
                             value={query.state}
                             onValueChange={state => {
                                 setQuery({ state, page: undefined })
+                            }}
+                        />
+                    </Field>
+                    <Field
+                        label={t("Backoffice.Events.Categories")}
+                        required={false}
+                        className="w-72"
+                    >
+                        <Select
+                            multiple={true}
+                            resettable={true}
+                            loading={categories.isPending}
+                            items={categoryItems}
+                            getItemId={category => category.id}
+                            renderItem={({ item }) => item.name}
+                            placeholder={t("Backoffice.Filters.Any")}
+                            value={categoryItems.filter(category =>
+                                query.categories?.includes(category.id),
+                            )}
+                            onValueChange={picked => {
+                                setQuery({
+                                    categories:
+                                        picked.length === 0
+                                            ? undefined
+                                            : picked.map(category => category.id),
+                                    page: undefined,
+                                })
                             }}
                         />
                     </Field>

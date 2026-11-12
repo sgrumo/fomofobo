@@ -6,6 +6,36 @@ import { createEvent, listEvents } from "./api"
 import { buildEventUpsert, seedEventReferences, uploadPhoto } from "./utils"
 
 describe("GET /api/backoffice/events", () => {
+    it("narrows the events to any of the categories sent", async () => {
+        const { headers } = await signInAs("organizer")
+        const [music, theatre, market] = await Promise.all([
+            seedEventReferences(),
+            seedEventReferences(),
+            seedEventReferences(),
+        ])
+        const created = await Promise.all(
+            [music, theatre, market].map(async refs => {
+                const photo = await uploadPhoto(headers)
+                const res = await createEvent({
+                    headers,
+                    body: buildEventUpsert({ ...refs, photoKeys: [photo.key] }),
+                })
+                expectStatus(res, 201)
+                return res.data
+            }),
+        )
+
+        const res = await listEvents({
+            headers,
+            queryParams: { categoryIds: [music.categoryId, market.categoryId] },
+        })
+
+        expectStatus(res, 200)
+        expect(new Set(res.data.items.map(event => event.id))).toStrictEqual(
+            new Set([created[0]?.id, created[2]?.id]),
+        )
+    })
+
     it("answers an Organizer its own events, whatever organizerId it sends", async () => {
         const owner = await signInAs("organizer")
         const other = await signInAs("organizer")

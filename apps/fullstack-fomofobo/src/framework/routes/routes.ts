@@ -1,5 +1,6 @@
 import { mapQuerySchema } from "domain/map-query"
 import { languageKeys, languageKeySchema } from "i18n/i18n"
+import { MAX_SEARCH_CATEGORIES } from "models"
 import { z } from "zod"
 
 import {
@@ -87,6 +88,13 @@ export const routes = {
             ...backofficeListQuery,
             state: blockedFilterSchema.optional().catch(undefined),
             organizer: z.uuid().optional().catch(undefined),
+            categories: z
+                .codec(z.string(), z.array(z.uuid()).min(1).max(MAX_SEARCH_CATEGORIES), {
+                    decode: value => value.split(","),
+                    encode: ids => ids.join(","),
+                })
+                .optional()
+                .catch(undefined),
         }),
     }),
     backofficeEventNew: createDynamicRoute({
