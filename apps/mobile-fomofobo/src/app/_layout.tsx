@@ -25,6 +25,7 @@ import { View } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { lazyAsync } from "shared/function"
 
+import { SplashRadar } from "@/components/splash/splash-radar"
 import { Button } from "@/components/ui/button/button"
 import { Text } from "@/components/ui/text/text"
 import { ToastHost } from "@/components/ui/toast/toast-host"
@@ -64,11 +65,15 @@ const deviceStorageReady = lazyAsync(() =>
     hydrateDeviceStorage().then(startDeviceSaveSync),
 )
 
+// On success the splash radar hides the native splash once it covers the screen, so no frame
+// of the screen behind shows between them. A failed init hides it for the error screen.
 const appReady = lazyAsync(() =>
-    Promise.all([nativeI18n.init(), deviceStorageReady()]).finally(() => {
-        void hideAsync()
-        loadSounds()
-    }),
+    Promise.all([nativeI18n.init(), deviceStorageReady()])
+        .catch((error: unknown) => {
+            void hideAsync()
+            throw error
+        })
+        .finally(loadSounds),
 )
 
 const AppReadyGate = (props: PropsWithChildren) => {
@@ -152,6 +157,7 @@ const RootLayout = () => (
                         </BottomSheetModalProvider>
                     </VersionGate>
                     <ToastHost />
+                    <SplashRadar />
                 </PersistQueryClientProvider>
             </AppReadyGate>
         </Suspense>

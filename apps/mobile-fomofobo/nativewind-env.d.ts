@@ -9,3 +9,8 @@ declare module "*.flac" {
     const source: number
     export default source
 }
+
+declare module "*.gif" {
+    const source: number
+    export default source
+}
