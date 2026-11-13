@@ -6,12 +6,16 @@ import type { ClusterFeature, PointFeature } from "supercluster"
 export const CLUSTER_MAX_ZOOM = 17
 
 /**
- * @description Returns the zoom that the cluster index reads at: past the last cluster zoom while a spot is selected, so every spot shows as a pin
- * @param zoom Whole zoom level the map shows
+ * @description Returns the zoom that the clusters freeze at while a spot is selected: the zoom frozen before, else the zoom the map shows as the selection begins
+ * @param frozen Zoom frozen before, if any
+ * @param zoom Whole zoom level the map shows, if known
  * @param spotSelected True when a preview or a detail of a spot is open
  */
-export const clusterZoomOf = (zoom: number, spotSelected: boolean): number =>
-    spotSelected ? CLUSTER_MAX_ZOOM + 1 : zoom
+export const frozenClusterZoomOf = (
+    frozen: number | undefined,
+    zoom: number | undefined,
+    spotSelected: boolean,
+): number | undefined => (spotSelected ? (frozen ?? zoom) : undefined)
 
 const CLUSTER_RADIUS = 48
 
@@ -168,6 +172,29 @@ export const buildEventClusters = (
             properties: { index: spot.index, kind: spot.kind, moreCount: spot.moreCount },
         })),
     )
+
+/**
+ * @description Returns the clusters and spots of a box at a zoom, with the cluster that holds the selected spot opened into its spots
+ * @param clusters Cluster index of the spots
+ * @param bbox West, south, east and north edges of the box
+ * @param zoom Zoom that the cluster index reads at
+ * @param selectedIndex Result index of the selected spot, if any
+ */
+export const shownFeaturesOf = (
+    clusters: Supercluster<EventPointProperties, EventClusterProperties>,
+    bbox: [number, number, number, number],
+    zoom: number,
+    selectedIndex: number | undefined,
+): EventMapFeature[] =>
+    clusters.getClusters(bbox, zoom).flatMap(feature => {
+        if (selectedIndex === undefined || !("cluster" in feature.properties)) {
+            return [feature]
+        }
+        const leaves = clusters.getLeaves(feature.properties.cluster_id, Infinity)
+        return leaves.some(leaf => leaf.properties.index === selectedIndex)
+            ? leaves
+            : [feature]
+    })
 
 /**
  * @description Returns the counts of a cluster per kind

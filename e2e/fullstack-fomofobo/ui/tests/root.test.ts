@@ -179,7 +179,74 @@ test.describe("map", () => {
         ).toBeVisible({ timeout: MAP_TIMEOUT_MS })
     })
 
-    test("shows every venue of a cluster as its own pin while a preview is open, and the cluster again once it closes", async ({
+    test("keeps a cluster while the preview of another pin is open, and after a switch to a third pin", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const category = await seedCategory()
+        const [courtyard, loggia, theatre, garden] = await Promise.all([
+            seedVenue(offsetPoint(center, { latitude: 0.005, longitude: 0 })),
+            seedVenue(offsetPoint(center, { latitude: 0.0055, longitude: 0 })),
+            seedVenue(offsetPoint(center, { latitude: -0.005, longitude: 0 })),
+            seedVenue(offsetPoint(center, { latitude: 0, longitude: 0.0075 })),
+        ])
+        await Promise.all([
+            seedPublicEvent(
+                { venue: courtyard, category },
+                { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
+            ),
+            seedPublicEvent(
+                { venue: loggia, category },
+                { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+            ),
+        ])
+        const [play, picnic] = await Promise.all([
+            seedPublicEvent(
+                { venue: theatre, category },
+                { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
+            ),
+            seedPublicEvent(
+                { venue: garden, category },
+                { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+            ),
+        ])
+        const cluster = page.getByRole("button", {
+            name: t("shared", "Map.Cluster", {
+                count: 2,
+                live: 1,
+                upcoming: 1,
+                ended: 0,
+                permanent: 0,
+            }),
+        })
+        const playPin = page.getByRole("button", {
+            name: t("shared", "Map.Pin", {
+                title: play.title,
+                status: t("shared", "Status.live"),
+                time: "11:00",
+            }),
+        })
+
+        // The preview of the garden opens above it, clear of the theatre to the south
+        await gotoPage(
+            page,
+            `${mapPath(center)}&event=${picnic.id}&occurrence=2026-10-24`,
+        )
+
+        await expect(
+            page.getByRole("dialog", { name: picnic.title, exact: true }),
+        ).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+        await expect(cluster).toBeVisible()
+
+        await playPin.click()
+
+        await expect(
+            page.getByRole("dialog", { name: play.title, exact: true }),
+        ).toBeVisible()
+        await expect(cluster).toBeVisible()
+    })
+
+    test("opens the cluster that holds the event of a preview into its pins, and groups it again once the preview closes", async ({
         page,
     }) => {
         const center = buildArea()

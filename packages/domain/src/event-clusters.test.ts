@@ -4,13 +4,14 @@ import {
     buildEventClusters,
     clusterArcs,
     clusterLayer,
-    clusterZoomOf,
     firstLeafIndex,
+    frozenClusterZoomOf,
     markerEmphasis,
     markerLayer,
     POSITION_MARKER_LAYER,
     SELECTED_MARKER_LAYER,
     sharedSpotsOf,
+    shownFeaturesOf,
     venueSpots,
 } from "./event-clusters"
 import type { MapPointKind } from "./event-clusters"
@@ -115,28 +116,43 @@ describe("buildEventClusters", () => {
     })
 })
 
-describe("clusterZoomOf", () => {
+describe("frozenClusterZoomOf", () => {
+    it("freezes the zoom the map shows as a selection begins, and keeps it until the selection ends", () => {
+        expect(frozenClusterZoomOf(undefined, 12, true)).toBe(12)
+        expect(frozenClusterZoomOf(12, 15, true)).toBe(12)
+        expect(frozenClusterZoomOf(12, 15, false)).toBeUndefined()
+        expect(frozenClusterZoomOf(undefined, undefined, true)).toBeUndefined()
+    })
+})
+
+describe("shownFeaturesOf", () => {
     const world: [number, number, number, number] = [-180, -85, 180, 85]
+    // Two pairs of close spots, the pairs far apart
     const clusters = buildEventClusters(
-        [0, 1].map(index => ({
+        [0, 1, 2, 3].map(index => ({
             venueIds: [`venue-${String(index)}`],
-            coordinates: { latitude: 44.3533, longitude: 11.7147 + index * 0.0005 },
+            coordinates: {
+                latitude: index < 2 ? 44.3533 : 44.5,
+                longitude: 11.7147 + (index % 2) * 0.0005,
+            },
             kind: "live",
             index,
             moreCount: 0,
         })),
     )
+    const shownAt = (selectedIndex: number | undefined) =>
+        shownFeaturesOf(clusters, world, 12, selectedIndex).map(feature =>
+            "cluster" in feature.properties
+                ? `cluster of ${String(feature.properties.point_count)}`
+                : `spot ${String(feature.properties.index)}`,
+        )
 
-    it("merges close spots with no selection, and shows each spot while one is selected", () => {
-        expect(clusters.getClusters(world, clusterZoomOf(12, false))).toHaveLength(1)
-        expect(
-            clusters
-                .getClusters(world, clusterZoomOf(12, true))
-                .map(feature => feature.properties),
-        ).toStrictEqual([
-            { index: 0, kind: "live", moreCount: 0 },
-            { index: 1, kind: "live", moreCount: 0 },
-        ])
+    it("shows the clusters of the zoom with no selection", () => {
+        expect(shownAt(undefined)).toStrictEqual(["cluster of 2", "cluster of 2"])
+    })
+
+    it("opens the cluster that holds the selected spot, and keeps every other cluster", () => {
+        expect(shownAt(0).toSorted()).toStrictEqual(["cluster of 2", "spot 0", "spot 1"])
     })
 })
 

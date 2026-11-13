@@ -4,12 +4,13 @@ import {
     buildEventClusters,
     CLUSTER_MAX_ZOOM,
     clusterLayer,
-    clusterZoomOf,
     firstLeafIndex,
+    frozenClusterZoomOf,
     markerEmphasis,
     markerLayer,
     POSITION_MARKER_LAYER,
     SELECTED_MARKER_LAYER,
+    shownFeaturesOf,
     venueSpots,
 } from "domain/event-clusters"
 import type { MapPointKind } from "domain/event-clusters"
@@ -373,15 +374,22 @@ export const EventMap = (props: EventMapProps) => {
             props.onSelectVenue(venue.id)
         }
     }
-    const clusterZoom =
-        viewport === undefined
-            ? undefined
-            : clusterZoomOf(viewport.zoom, selectedIndex !== undefined)
+    // A preview or a detail freezes the clusters, so a move to another pin never regroups them
+    const [frozenZoom, setFrozenZoom] = useState<number>()
+    const nextFrozenZoom = frozenClusterZoomOf(
+        frozenZoom,
+        viewport?.zoom,
+        selectedIndex !== undefined,
+    )
+    if (nextFrozenZoom !== frozenZoom) {
+        setFrozenZoom(nextFrozenZoom)
+    }
+    const clusterZoom = nextFrozenZoom ?? viewport?.zoom
     const markers =
         viewport === undefined || clusterZoom === undefined
             ? []
             : shownMarkersOf(
-                  clusters.getClusters(viewport.bbox, clusterZoom),
+                  shownFeaturesOf(clusters, viewport.bbox, clusterZoom, selectedIndex),
                   clusters,
                   index => resultIdOf(props, index),
               )
@@ -403,7 +411,12 @@ export const EventMap = (props: EventMapProps) => {
             occurrences: props.occurrences,
             permanentVenues: props.permanentVenues,
             markers,
-            transitions: sceneTransitionsOf(scene, sameResults, clusterZoom, markers),
+            transitions: sceneTransitionsOf(
+                scene,
+                sameResults,
+                { clusterZoom, selectedIndex },
+                markers,
+            ),
             leavingFrom:
                 scene === undefined || sameResults
                     ? props

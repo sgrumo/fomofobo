@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { buildEventClusters } from "./event-clusters"
+import { buildEventClusters, shownFeaturesOf } from "./event-clusters"
 import {
     enterMoveOf,
     leaveMoveOf,
@@ -123,36 +123,58 @@ describe("resultTransitions", () => {
 
 describe("sceneTransitionsOf", () => {
     const world: [number, number, number, number] = [-180, -85, 180, 85]
-    const clusters = buildEventClusters([
-        {
-            venueIds: ["piazza"],
-            coordinates: { latitude: 44.3533, longitude: 11.7147 },
+    const clusters = buildEventClusters(
+        [0, 1].map(index => ({
+            venueIds: [`venue-${String(index)}`],
+            coordinates: { latitude: 44.3533, longitude: 11.7147 + index * 0.0005 },
             kind: "live",
-            index: 0,
+            index,
             moreCount: 0,
-        },
-    ])
-    const markers = shownMarkersOf(clusters.getClusters(world, 12), clusters, String)
+        })),
+    )
+    const markers = shownMarkersOf(
+        shownFeaturesOf(clusters, world, 12, undefined),
+        clusters,
+        String,
+    )
+    const opened = shownMarkersOf(
+        shownFeaturesOf(clusters, world, 12, 0),
+        clusters,
+        String,
+    )
     const renamed = shownMarkersOf(
-        clusters.getClusters(world, 12),
+        shownFeaturesOf(clusters, world, 12, undefined),
         clusters,
         () => "other",
     )
+    const unselected = { clusterZoom: 12, selectedIndex: undefined }
 
     it("moves nothing on the first scene, or on a pan of the same results", () => {
-        expect(sceneTransitionsOf(undefined, true, 12, markers)).toStrictEqual({
+        expect(sceneTransitionsOf(undefined, true, unselected, markers)).toStrictEqual({
             entering: new Map(),
             leaving: [],
         })
         expect(
-            sceneTransitionsOf({ markers, clusterZoom: 12 }, true, 12, markers),
+            sceneTransitionsOf({ markers, ...unselected }, true, unselected, markers),
         ).toStrictEqual({ entering: new Map(), leaving: [] })
     })
 
     it("fades the markers of new results", () => {
         expect(
-            sceneTransitionsOf({ markers, clusterZoom: 12 }, false, 12, renamed),
+            sceneTransitionsOf({ markers, ...unselected }, false, unselected, renamed),
         ).toStrictEqual(resultTransitions(markers, renamed))
+    })
+
+    it("moves the spots out of the cluster that a new selection opens, at the same zoom", () => {
+        expect(
+            sceneTransitionsOf(
+                { markers, ...unselected },
+                true,
+                { clusterZoom: 12, selectedIndex: 0 },
+                opened,
+            ),
+        ).toStrictEqual(markerTransitions(markers, opened))
+        expect(markerTransitions(markers, opened).entering.size).toBe(2)
     })
 })
 
