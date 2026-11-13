@@ -309,7 +309,9 @@ export const EventMap = (props: EventMapProps) => {
             markerPressedAtRef.current = Date.now()
             cameraRef.current?.easeTo({ center: lngLat })
         }
-        const key = `${move?.type === "leave" ? "leaving" : "shown"}:${marker.key}`
+        // A leaving marker keeps its key, so it stays on its native annotation: a new annotation
+        // reaches the screen a few frames late, and the move would play before it shows
+        const key = marker.key
 
         if ("cluster" in feature.properties) {
             const clusterId = feature.properties.cluster_id
