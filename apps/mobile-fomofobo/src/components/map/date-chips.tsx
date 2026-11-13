@@ -42,17 +42,23 @@ const RangeSheetContent = (props: RangeSheetContentProps) => {
         from !== undefined && to !== undefined && isValidRange(from, to, props.earliest)
 
     return (
-        <View className="gap-4">
+        <View className="gap-3">
             <DateRangePicker
                 defaultValue={draft}
                 onValueChange={setDraft}
                 minDate={props.earliest}
             />
+            {/* Square corners, as the 8-bit controls of the map */}
             <View className="flex-row justify-end gap-2">
-                <Button variant="secondary" onPress={props.onClear}>
+                <Button
+                    variant="secondary"
+                    className="rounded-none"
+                    onPress={props.onClear}
+                >
                     <Text>{t("Filters.Clear")}</Text>
                 </Button>
                 <Button
+                    className="rounded-none"
                     disabled={!valid}
                     onPress={() => {
                         if (from !== undefined && to !== undefined) {

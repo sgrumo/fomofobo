@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils/class-names"
 import type { DateRange } from "./date-range"
 import { monthWeeks, nextDateRange } from "./date-range"
 import {
+    DATE_RANGE_DAY_HIT_SLOP,
     dateRangeDayTextVariants,
     dateRangeDayVariants,
     dateRangeEmptyStyles,
@@ -128,6 +129,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                                     disabled,
                                 }}
                                 disabled={disabled}
+                                hitSlop={DATE_RANGE_DAY_HIT_SLOP}
                                 onPress={() => {
                                     const next = nextDateRange(range, day)
                                     setRange(next)
