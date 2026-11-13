@@ -14,8 +14,8 @@ import { THEME_COLORS } from "@/lib/theme/theme-tokens"
 // Shadow cells of a selected disc, right and down
 const SHADOW_CELLS = 2
 
-// One icon cell is one disc cell, so the icon keeps the pixel grid of the disc
-const ICON_SIZE = PIXEL_ICON_GRID * MARKER_CELL_PX
+// One pt per icon cell: the 12-cell icon spans about the 14 pt of the 7-cell web glyph, on whole pixels
+const ICON_SIZE = PIXEL_ICON_GRID
 
 interface PixelDiscProps {
     kind: MapPointKind
