@@ -30,7 +30,7 @@ export const VenuePin = (props: VenuePinProps) => {
             <Badge tone="permanent" className="rounded-none">
                 {t(`VenueKind.${props.kind}`)}
             </Badge>
-            {/* The disc alone opens the preview: the tag above it takes no press */}
+            {/* The disc alone opens the preview: a press on the tag reaches the pin below */}
             <button
                 type="button"
                 aria-label={t("Map.VenuePin", {
@@ -38,7 +38,7 @@ export const VenuePin = (props: VenuePinProps) => {
                     kind: t(`VenueKind.${props.kind}`),
                 })}
                 onClick={props.onSelect}
-                className="cursor-pointer transition-[scale] duration-150 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-90 motion-reduce:active:scale-100"
+                className="pointer-events-auto cursor-pointer transition-[scale] duration-150 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-90 motion-reduce:active:scale-100"
             >
                 <PixelDisc
                     route={props.route}

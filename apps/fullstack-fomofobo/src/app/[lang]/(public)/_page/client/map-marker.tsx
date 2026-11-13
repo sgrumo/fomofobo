@@ -23,6 +23,8 @@ interface MapMarkerProps extends RouteClientComponentProps<"root"> {
 export const MapMarker = (props: MapMarkerProps) => {
     const element = useMemo(() => {
         const created = document.createElement("div")
+        // The buttons inside take the press, so a tag passes it to the pin below
+        created.style.pointerEvents = "none"
         // A double click on a marker leaves the zoom of the map as it is
         created.addEventListener("dblclick", event => {
             event.stopPropagation()

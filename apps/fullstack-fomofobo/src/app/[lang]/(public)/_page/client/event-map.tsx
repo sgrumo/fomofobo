@@ -620,7 +620,7 @@ export const EventMap = (props: EventMapProps) => {
                 >
                     <div
                         ref={cardRef}
-                        className="animate-in [--tw-enter-opacity:0] [--tw-enter-scale:0.95] [--tw-enter-translate-y:0.5rem] motion-reduce:animate-none"
+                        className="animate-in pointer-events-auto [--tw-enter-opacity:0] [--tw-enter-scale:0.95] [--tw-enter-translate-y:0.5rem] motion-reduce:animate-none"
                     >
                         {props.previewCard.content}
                     </div>

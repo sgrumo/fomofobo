@@ -29,13 +29,14 @@ export const VenuePin = (props: VenuePinProps) => {
             className={cn("items-center gap-0.5", {
                 "opacity-35": props.emphasis === "dimmed",
             })}
+            pointerEvents="box-none"
         >
             <View pointerEvents="none">
                 <Badge tone="permanent" className="rounded-none">
                     {t(`VenueKind.${props.kind}`)}
                 </Badge>
             </View>
-            {/* The disc alone opens the preview: the tag above it takes no press */}
+            {/* The disc alone opens the preview: a press on the tag reaches the pin below */}
             <PressBounce
                 accessibilityRole="button"
                 accessibilityLabel={t("Map.VenuePin", {

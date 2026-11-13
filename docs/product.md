@@ -60,7 +60,7 @@ The search center is the position of the device when the visitor grants location
 
 ### Map
 
-Each venue with results is one pin. The pin shows the result of the venue with the highest status, in the order live, upcoming, permanent, ended. It takes the icon of that category and the look of that status. A tag above the pin reads live for a live result, the start time for an upcoming result of today, and the date for an upcoming result of another day. When the venue holds more live or upcoming events, the tag adds their count as "+N". Ended events and the permanent venue do not count.
+Each venue with results is one pin. The pin shows the result of the venue with the highest status, in the order live, upcoming, permanent, ended. It takes the icon of that category and the look of that status. A tag above the pin reads live for a live result, the start time for an upcoming result of today, and the date for an upcoming result of another day. When the venue holds more live or upcoming events, the tag adds their count as "+N". Ended events and the permanent venue do not count. The tag takes no press, so a press on it reaches the pin below.
 
 Venues within about 20 meters of each other share one pin, because no zoom draws their pins apart. The pin counts the live and upcoming events of every venue it holds. Venues farther apart but too close to tell apart merge into a cluster that counts the venues. Its ring shows the share of venues whose pin is live, upcoming, ended or permanent. While a preview or a detail is open, the map shows no cluster, so a move to another pin never regroups the pins. Pins draw in the same order as the result of a pin: live on top, then upcoming, permanent and ended. The position of the visitor draws below every pin and cluster.
 

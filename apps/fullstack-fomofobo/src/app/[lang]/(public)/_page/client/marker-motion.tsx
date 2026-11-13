@@ -70,7 +70,7 @@ export const MarkerMotion = (props: MarkerMotionProps) => {
             ref={ref}
             {...{ [RESULT_MARKER_ATTRIBUTE]: true }}
             className={cn("block", {
-                "pointer-events-none": props.move?.type === "leave",
+                "[&_button]:pointer-events-none": props.move?.type === "leave",
             })}
         >
             {props.children}

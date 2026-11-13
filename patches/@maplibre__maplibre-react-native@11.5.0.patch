@@ -1,3 +1,22 @@
+diff --git a/ios/components/annotations/point-annotation/MLRNPointAnnotation.m b/ios/components/annotations/point-annotation/MLRNPointAnnotation.m
+index 71ee64d14f2892373cfb4556dfd35ee3c005f4ce..1bdfd3ce4f20a6275e0628aa0bf7fdbedb67cecd 100644
+--- a/ios/components/annotations/point-annotation/MLRNPointAnnotation.m
++++ b/ios/components/annotations/point-annotation/MLRNPointAnnotation.m
+@@ -199,6 +199,14 @@ - (CGFloat)_getZPosition {
+   return latitudeMax - self.coordinate.latitude;
+ }
+ 
++// A custom view takes a touch only on a React child that accepts it, so a touch on a child
++// with no pointer events, such as a tag over the pin, reaches the annotation below.
++- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
++  UIView *hit = [super hitTest:point withEvent:event];
++  BOOL hasCustomChildren = (self.reactSubviews.count > 0) || (self.customChildCount > 0);
++  return hit == self && hasCustomChildren ? nil : hit;
++}
++
+ - (void)_handleTap:(UITapGestureRecognizer *)recognizer {
+   if ([_map isKindOfClass:[MLRNMapView class]]) {
+     ((MLRNMapView *)_map).annotationSelected = YES;
 diff --git a/ios/components/images/MLRNImages.m b/ios/components/images/MLRNImages.m
 index 8ab57eb85c0f55bfc1a75e3916e94dbc47f3ad90..9aa3f1ee4bffafdce2d6db7a7ebc8930fe280f58 100644
 --- a/ios/components/images/MLRNImages.m

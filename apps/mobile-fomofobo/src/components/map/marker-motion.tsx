@@ -59,7 +59,7 @@ export const MarkerMotion = (props: MarkerMotionProps) => {
 
     return (
         <Animated.View
-            pointerEvents={move?.type === "leave" ? "none" : "auto"}
+            pointerEvents={move?.type === "leave" ? "none" : "box-none"}
             style={style}
         >
             {props.children}

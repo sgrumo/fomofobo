@@ -62,6 +62,7 @@ export const EventPin = (props: EventPinProps) => {
             className={cn("items-center gap-0.5", {
                 "opacity-35": props.emphasis === "dimmed",
             })}
+            pointerEvents="box-none"
         >
             {/* Draws above the live wave of the disc */}
             <View className="z-10 flex-row" pointerEvents="none">
@@ -75,7 +76,7 @@ export const EventPin = (props: EventPinProps) => {
                     </Badge>
                 )}
             </View>
-            {/* The disc alone opens the preview: the tag above it takes no press */}
+            {/* The disc alone opens the preview: a press on the tag reaches the pin below */}
             <PressBounce
                 accessibilityRole="button"
                 accessibilityLabel={[
