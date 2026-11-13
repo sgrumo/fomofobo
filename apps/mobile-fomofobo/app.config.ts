@@ -57,6 +57,9 @@ const config: ExpoConfig = {
     },
     name: "Zonzo",
     slug: "zonzo",
+    // Memoizes the components as the web does, so a tap on the map screen re-renders only what
+    // it changes, not every marker
+    experiments: { reactCompiler: true },
     version: env.APP_VERSION ?? "1.0.0",
     scheme: target.scheme,
     orientation: "portrait",

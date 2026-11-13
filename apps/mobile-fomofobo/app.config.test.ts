@@ -60,6 +60,10 @@ describe("app.config", () => {
         expect(config.ios?.infoPlist?.CFBundleAllowMixedLocalizations).toBe(true)
     })
 
+    it("compiles the app with the React Compiler, as the web app", () => {
+        expect(config.experiments?.reactCompiler).toBe(true)
+    })
+
     it("declares no encryption beyond HTTPS, so no build waits on export compliance", () => {
         expect(config.ios?.infoPlist?.ITSAppUsesNonExemptEncryption).toBe(false)
     })
