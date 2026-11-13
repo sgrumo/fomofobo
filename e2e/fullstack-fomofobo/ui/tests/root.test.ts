@@ -269,6 +269,7 @@ test.describe("map", () => {
 
         await gotoPage(page, mapPath(center))
         await expect(pinOf(paid.title)).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+        await clickIconButton(page, t("shared", "Filters.Label"))
         await pressChip(page, t("shared", "Price.Free"))
 
         await expect(page).toHaveURL(/free=true/u)
@@ -547,6 +548,7 @@ test.describe("map", () => {
 
         await gotoPage(page, mapPath(center))
         await expect(marketPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+        await clickIconButton(page, t("shared", "Filters.Label"))
         await expect(getChip(page, markets.name)).toBeVisible()
 
         await pressChip(page, concerts.name)
@@ -686,6 +688,7 @@ test.describe("map", () => {
         await gotoPage(page, mapPath(center))
         await expect(todayPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
 
+        await clickIconButton(page, t("shared", "Filters.Label"))
         await pressChip(page, t("shared", "Filters.tomorrow"))
 
         await expect(tomorrowPin).toBeVisible()
@@ -737,6 +740,7 @@ test.describe("map", () => {
         await gotoPage(page, mapPath(center))
         await expect(todayPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
 
+        await clickIconButton(page, t("shared", "Filters.Label"))
         await getChip(page, t("shared", "Filters.Range")).click()
         await expect(calendar).toBeVisible()
         await getChip(page, t("shared", "Filters.Range")).click()

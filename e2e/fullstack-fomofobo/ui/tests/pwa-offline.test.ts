@@ -138,6 +138,7 @@ test.describe("installed app offline", () => {
 
         await context.setOffline(true)
         await expectAlert(page, { type: "warning", text: t("shared", "Map.Offline") })
+        await clickIconButton(page, t("shared", "Filters.Label"))
         await pressChip(page, t("shared", "Filters.tomorrow"))
 
         await expectAlert(page, {

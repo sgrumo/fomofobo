@@ -262,10 +262,8 @@ export const MapScreen = (props: MapScreenProps) => {
     const openPreview = (target: PreviewTarget, withDetail = false) => {
         const opening = selectedRef === undefined && selectedVenueId === undefined
         previewPushedRef.current = opening || previewPushedRef.current
-        // A press outside the filter panel of a phone closes it
-        if (narrow) {
-            setFiltersOpen(false)
-        }
+        // A press outside the filter panel closes it
+        setFiltersOpen(false)
         setQuery(
             { ...selectionQueryOf(target), detail: withDetail ? true : undefined },
             { history: opening ? "push" : "replace" },
@@ -398,7 +396,7 @@ export const MapScreen = (props: MapScreenProps) => {
             />
         )
 
-    // Escape closes the filter panel of a phone
+    // Escape closes the filter panel
     useEffect(() => {
         if (!filtersOpen) {
             return undefined
@@ -616,7 +614,7 @@ export const MapScreen = (props: MapScreenProps) => {
                             }}
                         />
                     </div>
-                    <div className="relative md:hidden">
+                    <div className="relative">
                         <IconButton
                             aria-label={t("Filters.Label")}
                             aria-expanded={filtersOpen}
@@ -642,15 +640,12 @@ export const MapScreen = (props: MapScreenProps) => {
                     onChange={applyFilter}
                     className="max-w-full md:self-center"
                 />
-                {/* Below `md` the filters sit in a panel that the filter button opens. Each row takes the width of its chips, so the map stays clickable beside them. A side panel leaves too little width for one row, so the dates go below the categories. */}
+                {/* The filters sit in a panel that the filter button opens. On a phone each row takes the width of its chips, so the map stays clickable beside them. */}
                 <div
                     id={filtersId}
                     className={cn(
-                        "flex flex-col gap-2 md:max-w-full md:items-center md:self-center",
-                        filtersOpen
-                            ? "max-md:pixel-corners max-md:drop-shadow-hard-md max-md:relative max-md:p-2"
-                            : "max-md:hidden",
-                        { "md:flex-row": !sidePanelOpen },
+                        "pixel-corners drop-shadow-hard-md relative flex flex-col gap-2 p-2 md:w-fit md:max-w-2xl md:self-end",
+                        { hidden: !filtersOpen },
                     )}
                 >
                     <CategoryChips
@@ -659,22 +654,15 @@ export const MapScreen = (props: MapScreenProps) => {
                         selected={query.categories}
                         free={query.free === true}
                         onChange={applyFilter}
-                        className={cn("max-md:flex-wrap max-md:justify-center", {
-                            "md:min-w-0": !sidePanelOpen,
-                            "md:flex-wrap md:justify-center": sidePanelOpen,
-                        })}
+                        className="flex-wrap justify-center"
                     />
-                    <Separator
-                        className={cn("pointer-events-none", {
-                            "md:h-7 md:w-0.5": !sidePanelOpen,
-                        })}
-                    />
+                    <Separator className="pointer-events-none" />
                     <DateChips
                         route={props.route}
                         query={query}
                         now={now}
                         onChange={applyFilter}
-                        className="max-md:flex-wrap max-md:justify-center md:shrink-0"
+                        className="flex-wrap justify-center"
                     />
                 </div>
                 {notices}
