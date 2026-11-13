@@ -30,6 +30,8 @@ import {
 } from "ui-components/pixel-icons"
 import { Spinner } from "ui-components/spinner"
 
+import { DetailActionBar } from "@/components/client/detail-action-bar/detail-action-bar"
+import { detailActionClassName } from "@/components/client/detail-action-bar/detail-action-bar.styles"
 import { DirectionsLink } from "@/components/client/directions-link/directions-link"
 import { ShareRow } from "@/components/client/share-row/share-row"
 import { TonedImage } from "@/components/client/toned-image/toned-image"
@@ -87,9 +89,11 @@ export const VenueDetail = (props: VenueDetailProps) => {
         )
     }
 
+    const permanent = venue.kind !== "regular"
+    // The programme link of a permanent venue leads to its website
     const links = [
         {
-            url: venue.links.websiteUrl,
+            url: permanent ? null : venue.links.websiteUrl,
             label: t("Venue.Website"),
             icon: <PixelIconLink />,
         },
@@ -134,24 +138,16 @@ export const VenueDetail = (props: VenueDetailProps) => {
                     <p className="tp-body-lg">{venue.description}</p>
                 )}
             </div>
-            <div className="flex flex-wrap gap-3">
-                {venue.programmeUrl === null ? undefined : (
-                    <a
-                        href={venue.programmeUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={`${linkClassName} bg-permanent text-fg`}
+            <div className="flex flex-wrap gap-3 empty:hidden">
+                {permanent ? undefined : (
+                    <DirectionsLink
+                        coordinates={venue.coordinates}
+                        className={`${linkClassName} bg-surface-inverse text-fg-inverse`}
                     >
-                        {t("Preview.Programme")}
-                    </a>
+                        <PixelIconDirections />
+                        {t("Detail.Directions")}
+                    </DirectionsLink>
                 )}
-                <DirectionsLink
-                    coordinates={venue.coordinates}
-                    className={`${linkClassName} bg-surface-inverse text-fg-inverse`}
-                >
-                    <PixelIconDirections />
-                    {t("Detail.Directions")}
-                </DirectionsLink>
                 {links.map(link =>
                     link.url === null ? undefined : (
                         <a
@@ -184,19 +180,42 @@ export const VenueDetail = (props: VenueDetailProps) => {
                     </ul>
                 )}
             </section>
-            <Button
-                variant="secondary"
-                size="md"
-                icon={<PixelIconBack className="rotate-180" />}
-                iconPosition="end"
-                className="self-start"
-                onClick={() => {
-                    showPage("history")
-                }}
-            >
-                {t("Venue.ShowHistory")}
-            </Button>
+            {permanent ? undefined : (
+                <Button
+                    variant="secondary"
+                    size="md"
+                    icon={<PixelIconBack className="rotate-180" />}
+                    iconPosition="end"
+                    className="self-start"
+                    onClick={() => {
+                        showPage("history")
+                    }}
+                >
+                    {t("Venue.ShowHistory")}
+                </Button>
+            )}
             <ShareRow url={props.shareUrl} text={venueShareTextOf(venue)} />
+            {permanent ? (
+                <DetailActionBar label={t("Detail.Actions")}>
+                    {venue.programmeUrl === null ? undefined : (
+                        <a
+                            href={venue.programmeUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={`${detailActionClassName} bg-permanent text-fg`}
+                        >
+                            {t("Preview.Programme")}
+                        </a>
+                    )}
+                    <DirectionsLink
+                        coordinates={venue.coordinates}
+                        className={`${detailActionClassName} bg-surface-inverse text-fg-inverse`}
+                    >
+                        <PixelIconDirections />
+                        {t("Detail.Directions")}
+                    </DirectionsLink>
+                </DetailActionBar>
+            ) : undefined}
         </article>
     )
 }

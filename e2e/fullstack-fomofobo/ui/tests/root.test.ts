@@ -280,7 +280,7 @@ test.describe("map", () => {
         await expect(pinOf(paid.title)).toBeVisible({ timeout: MAP_TIMEOUT_MS })
     })
 
-    test("shows a cinema under any date filter once its kind chip is pressed, and opens its detail with the programme from the preview", async ({
+    test("shows a cinema under any date filter once its kind chip is pressed, and opens its detail with the programme and the directions at its bottom and no past events", async ({
         page,
     }) => {
         const center = buildArea()
@@ -321,9 +321,18 @@ test.describe("map", () => {
         await expect(
             detail.getByText(t("shared", "VenueKind.cinema"), { exact: true }),
         ).toBeVisible()
+        const actions = detail.getByRole("navigation", {
+            name: t("shared", "Detail.Actions"),
+        })
         await expect(
-            detail.getByRole("link", { name: t("shared", "Preview.Programme") }),
+            actions.getByRole("link", { name: t("shared", "Preview.Programme") }),
         ).toHaveAttribute("href", cinema.programmeUrl)
+        await expect(
+            actions.getByRole("link", { name: t("shared", "Detail.Directions") }),
+        ).toBeVisible()
+        await expect(
+            detail.getByRole("button", { name: t("shared", "Venue.ShowHistory") }),
+        ).toBeHidden()
     })
 
     test("opens the live event of a cinema first, with no count for the cinema, then pages to the cinema", async ({

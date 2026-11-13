@@ -56,17 +56,28 @@ export const VenueDetail = (props: VenueDetailProps) => {
     const { t } = useTranslation("shared")
     const language = useLanguage()
     const venue = props.venue
-    const programmeUrl = venue.programmeUrl
+    const permanent = venue.kind !== "regular"
     const closingText = useClosingText()(venue.closingDays)
-    const links: readonly VenueLink[] = [
-        { url: venue.links.websiteUrl, label: t("Venue.Website"), icon: "link" },
-        {
-            url: venue.links.instagramUrl,
-            label: t("Detail.Instagram"),
-            icon: "instagram",
-        },
-        { url: venue.links.facebookUrl, label: t("Detail.Facebook"), icon: "facebook" },
-    ]
+    // The programme link of a permanent venue leads to its website
+    const links = (
+        [
+            {
+                url: permanent ? null : venue.links.websiteUrl,
+                label: t("Venue.Website"),
+                icon: "link",
+            },
+            {
+                url: venue.links.instagramUrl,
+                label: t("Detail.Instagram"),
+                icon: "instagram",
+            },
+            {
+                url: venue.links.facebookUrl,
+                label: t("Detail.Facebook"),
+                icon: "facebook",
+            },
+        ] satisfies VenueLink[]
+    ).flatMap(link => (link.url === null ? [] : [{ ...link, url: link.url }]))
 
     return (
         <>
@@ -87,7 +98,7 @@ export const VenueDetail = (props: VenueDetailProps) => {
                 />
             )}
             <View className="gap-2">
-                {venue.kind !== "regular" && (
+                {permanent && (
                     <Badge tone="permanent" className="self-start">
                         {t(`VenueKind.${venue.kind}`)}
                     </Badge>
@@ -111,39 +122,54 @@ export const VenueDetail = (props: VenueDetailProps) => {
                     <Text variant="body-lg">{venue.description}</Text>
                 )}
             </View>
-            <View className="flex-row flex-wrap gap-3">
-                {programmeUrl !== null && (
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        className="bg-permanent"
-                        accessibilityRole="link"
-                        accessibilityLabel={t("Preview.Programme")}
-                        onPress={() => {
-                            void Linking.openURL(programmeUrl)
-                        }}
-                    >
-                        <Text>{t("Preview.Programme")}</Text>
-                    </Button>
-                )}
-                <DirectionsButton coordinates={venue.coordinates} />
-                {links.map(link =>
-                    link.url === null ? undefined : (
+            {(!permanent || links.length > 0) && (
+                <View className="flex-row flex-wrap gap-3">
+                    {!permanent && <DirectionsButton coordinates={venue.coordinates} />}
+                    {links.map(link => (
                         <VenueLinkButton
                             key={link.icon}
                             url={link.url}
                             label={link.label}
                             icon={link.icon}
                         />
-                    ),
-                )}
-            </View>
+                    ))}
+                </View>
+            )}
             <VenueUpcoming upcoming={venue.upcoming} onOpenEvent={props.onOpenEvent} />
-            <VenueHistory venueId={venue.id} />
+            {!permanent && <VenueHistory venueId={venue.id} />}
             <ShareRow
                 url={venueDetailUrlOf(env.apiUrl, language, venue.id)}
                 text={venueShareTextOf(venue)}
             />
         </>
+    )
+}
+
+interface VenueDetailActionsProps {
+    venue: PublicVenue
+}
+
+export const VenueDetailActions = (props: VenueDetailActionsProps) => {
+    const { t } = useTranslation("shared")
+    const programmeUrl = props.venue.programmeUrl
+
+    return (
+        <View accessibilityLabel={t("Detail.Actions")} className="flex-1 flex-row gap-3">
+            {programmeUrl !== null && (
+                <Button
+                    variant="secondary"
+                    size="sm"
+                    accessibilityRole="link"
+                    accessibilityLabel={t("Preview.Programme")}
+                    className="flex-1 bg-permanent"
+                    onPress={() => {
+                        void Linking.openURL(programmeUrl)
+                    }}
+                >
+                    <Text>{t("Preview.Programme")}</Text>
+                </Button>
+            )}
+            <DirectionsButton coordinates={props.venue.coordinates} className="flex-1" />
+        </View>
     )
 }

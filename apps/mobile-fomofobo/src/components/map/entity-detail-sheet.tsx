@@ -9,7 +9,7 @@ import { DetailSheet } from "@/components/ui/detail-sheet/detail-sheet"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { Notice } from "@/components/ui/notice/notice"
 import { Text } from "@/components/ui/text/text"
-import { VenueDetail } from "@/components/venue/venue-detail"
+import { VenueDetail, VenueDetailActions } from "@/components/venue/venue-detail"
 import { isNotFoundError, retryUnlessNotFound } from "@/lib/api/api-response-error"
 import { api } from "@/lib/api/client"
 import { useOnline } from "@/lib/hooks/use-online"
@@ -125,15 +125,20 @@ export const EntityDetailSheet = (props: EntityDetailSheetProps) => {
         />
     )
 
+    const venueActions =
+        venue === undefined || venue.kind === "regular" ? undefined : (
+            <VenueDetailActions venue={venue} />
+        )
+    const eventActions =
+        occurrence === undefined ? undefined : (
+            <EventDetailActions occurrence={occurrence} />
+        )
+
     return (
         <DetailSheet
             open={props.open}
             onClose={props.onClose}
-            footer={
-                !isVenue && occurrence !== undefined ? (
-                    <EventDetailActions occurrence={occurrence} />
-                ) : undefined
-            }
+            footer={isVenue ? venueActions : eventActions}
         >
             {isVenue && venue !== undefined ? (
                 <VenueDetail

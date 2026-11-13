@@ -23,14 +23,13 @@ import {
 import { StatGrid } from "ui-components/stat-grid"
 import { Timeline } from "ui-components/timeline"
 
+import { DetailActionBar } from "@/components/client/detail-action-bar/detail-action-bar"
+import { detailActionClassName } from "@/components/client/detail-action-bar/detail-action-bar.styles"
 import { DirectionsLink } from "@/components/client/directions-link/directions-link"
 import { PhotoGallery } from "@/components/client/photo-gallery/photo-gallery"
 import { SaveToggle } from "@/components/client/save-toggle/save-toggle"
 import { ShareRow } from "@/components/client/share-row/share-row"
 import { usePriceSummary } from "@/lib/hooks/use-price-summary"
-
-const actionClassName =
-    "border-line shadow-hard-md press-bounce active:shadow-hard-sm tp-pixel-md flex flex-1 items-center justify-center gap-2 rounded-md border-2 px-4 py-3 uppercase [&>svg]:size-4"
 
 interface EventDetailProps {
     occurrence: OccurrenceDetail
@@ -144,14 +143,10 @@ export const EventDetail = (props: EventDetailProps) => {
                 url={props.shareUrl}
                 text={occurrenceShareTextOf(occurrence, language)}
             />
-            <nav
-                aria-label={t("Detail.Actions")}
-                // The shadow covers the bottom padding of the scroll area, which content would show through
-                className="bg-surface border-line sticky bottom-0 -mx-4 flex gap-3 border-t-2 p-4 shadow-[0_1rem_0_0_var(--color-surface)]"
-            >
+            <DetailActionBar label={t("Detail.Actions")}>
                 <DirectionsLink
                     coordinates={occurrence.venue.coordinates}
-                    className={`${actionClassName} bg-surface-inverse text-fg-inverse`}
+                    className={`${detailActionClassName} bg-surface-inverse text-fg-inverse`}
                 >
                     <PixelIconDirections />
                     {t("Detail.Directions")}
@@ -161,7 +156,7 @@ export const EventDetail = (props: EventDetailProps) => {
                         href={occurrence.externalLinks.instagramUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className={`${actionClassName} bg-social text-fg`}
+                        className={`${detailActionClassName} bg-social text-fg`}
                     >
                         <PixelIconInstagram />
                         {t("Detail.Instagram")}
@@ -172,13 +167,13 @@ export const EventDetail = (props: EventDetailProps) => {
                         href={occurrence.externalLinks.facebookUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className={`${actionClassName} bg-social text-fg`}
+                        className={`${detailActionClassName} bg-social text-fg`}
                     >
                         <PixelIconFacebook />
                         {t("Detail.Facebook")}
                     </a>
                 )}
-            </nav>
+            </DetailActionBar>
         </article>
     )
 }
