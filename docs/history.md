@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-13 · Night events count for the day before
+
+### Changed
+
+An event that starts in the first two hours after midnight also matches the date filter of the day before, on the web and in the native app. It still matches its own day too.
+
+### Why
+
+A client request. A party that starts at midnight on Sunday belongs to Saturday night for the visitor.
+
+### Check next time
+
+Agree where a day ends for the date filters before the search API is built, since nightlife runs past midnight.
+
 ## 2026-11-13 · A theatre shows only with a running programme
 
 ### Changed

@@ -4,6 +4,11 @@ import { DEFAULT_WINDOW_DAYS } from "domain/platform"
 import type { PublicSearchQuery } from "models"
 import { match } from "ts-pattern"
 
+/**
+ * @remarks Lets an occurrence that starts in the first hours after a date window count for it, as a party at 00:30 belongs to the night before
+ */
+export const NIGHT_START_GRACE_MS = 2 * 60 * 60 * 1000
+
 export interface DateWindow {
     from: Date
     to: Date

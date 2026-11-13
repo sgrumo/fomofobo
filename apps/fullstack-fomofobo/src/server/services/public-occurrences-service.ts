@@ -20,7 +20,7 @@ import type {
     StoredPermanentVenue,
 } from "storage"
 
-import { dateWindow } from "@/lib/events/date-window"
+import { dateWindow, NIGHT_START_GRACE_MS } from "@/lib/events/date-window"
 import { MAX_PERMANENT_VENUE_RESULTS, MAX_SEARCH_RESULTS } from "@/lib/platform/platform"
 
 import { eventTag, PUBLIC_TAG } from "../cache"
@@ -99,7 +99,7 @@ export class PublicOccurrencesService {
                 from: new Date(
                     Math.max(window.from.getTime(), endedVisibleSince.getTime()),
                 ),
-                to: window.to,
+                to: new Date(window.to.getTime() + NIGHT_START_GRACE_MS),
             },
             box: {
                 minLatitude: query.south,

@@ -382,6 +382,51 @@ describe("GET /api/public/occurrences", () => {
         ])
     })
 
+    it("counts an occurrence that starts in the two hours after midnight for the day before, and for its own day", async () => {
+        const { headers } = await signInAs("organizer")
+        const { categoryId, venue, venueId } = await seedEventReferences()
+        const [party, late] = await Promise.all([
+            seedEvent(
+                headers,
+                { venueId, categoryId },
+                { startsAt: "2026-10-31T01:30", endsAt: "2026-10-31T05:00" },
+            ),
+            seedEvent(
+                headers,
+                { venueId, categoryId },
+                { startsAt: "2026-10-31T02:00", endsAt: "2026-10-31T05:00" },
+            ),
+        ])
+
+        const friday = await searchOccurrences({
+            headers: { "x-test-now": SATURDAY_NOON },
+            queryParams: {
+                ...boxAround(venue.coordinates),
+                date: "range",
+                from: "2026-10-30",
+                to: "2026-10-30",
+            },
+        })
+        const saturday = await searchOccurrences({
+            headers: { "x-test-now": SATURDAY_NOON },
+            queryParams: {
+                ...boxAround(venue.coordinates),
+                date: "range",
+                from: "2026-10-31",
+                to: "2026-10-31",
+            },
+        })
+
+        expectStatus(friday, 200)
+        expectStatus(saturday, 200)
+        expect(
+            friday.data.occurrences.map(occurrence => occurrence.eventId),
+        ).toStrictEqual([party.id])
+        expect(
+            new Set(saturday.data.occurrences.map(occurrence => occurrence.eventId)),
+        ).toStrictEqual(new Set([party.id, late.id]))
+    })
+
     it("hides an occurrence ended today once an Admin saved zero retention days", async () => {
         const { headers } = await signInAs("organizer")
         const admin = await signInAs("admin")
