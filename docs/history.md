@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-13 · A theatre shows only with a running programme
+
+### Changed
+
+A theatre is a pin on the map only while it holds a visible event that has not ended, on the web and in the native app. Cinemas and museums stay pins with no event, and a permanent venue with no closing days set shows that it has no closing day.
+
+### Why
+
+A client request. A theatre between seasons has nothing on, so a permanent pin for it misleads the visitor.
+
+### Check next time
+
+Agree, for each kind of permanent venue, what keeps it on the map before the permanent pins are built.
+
 ## 2026-11-12 · Permanent venues leave the default view again
 
 ### Changed

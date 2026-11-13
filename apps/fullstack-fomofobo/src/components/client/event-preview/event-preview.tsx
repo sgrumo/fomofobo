@@ -218,7 +218,7 @@ interface VenuePreviewBodyProps {
 
 const VenuePreviewBody = (props: VenuePreviewBodyProps) => {
     const { t } = useTranslation("shared")
-    const closingText = useClosingText()(props.venue.closingDays)
+    const closingText = useClosingText()(props.venue)
     const venue = props.venue
 
     return (

@@ -54,7 +54,7 @@ type VenuePage = "profile" | "history"
 export const VenueDetail = (props: VenueDetailProps) => {
     const { t } = useTranslation("shared")
     const { venue } = props
-    const closingText = useClosingText()(venue.closingDays)
+    const closingText = useClosingText()(venue)
     const [page, setPage] = useState<VenuePage>("profile")
     const articleRef = useRef<HTMLElement>(null)
     // Each page opens at its top, inside the panel or the sheet that scrolls it

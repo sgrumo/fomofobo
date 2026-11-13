@@ -57,7 +57,7 @@ export const VenueDetail = (props: VenueDetailProps) => {
     const language = useLanguage()
     const venue = props.venue
     const permanent = venue.kind !== "regular"
-    const closingText = useClosingText()(venue.closingDays)
+    const closingText = useClosingText()(venue)
     // The programme link of a permanent venue leads to its website
     const links = (
         [

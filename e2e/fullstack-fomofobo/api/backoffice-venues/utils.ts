@@ -1,6 +1,11 @@
 import { faker } from "@faker-js/faker"
 import { expectRawStatus, expectStatus } from "e2e-kit/assertions"
-import type { PermanentVenueKindChange, Venue, VenueCreation } from "models"
+import type {
+    PermanentVenueKind,
+    PermanentVenueKindChange,
+    Venue,
+    VenueCreation,
+} from "models"
 
 import { signInAs } from "../auth/utils"
 import { createVenue, createVenueCoverUploadTicket, setVenueKind } from "./api"
@@ -30,12 +35,14 @@ export const buildCinemaKind = (categoryId: string): PermanentVenueKindChange =>
 })
 
 /**
- * @description Persists a venue through an Admin and makes it a cinema in the category
- * @param categoryId Category the cinema matches
+ * @description Persists a venue through an Admin and gives it a permanent kind in the category
+ * @param categoryId Category the venue matches
+ * @param kind Permanent kind given
  * @param overrides Fields of the creation replaced, such as the name and the coordinates
  */
-export const seedCinema = async (
+export const seedPermanentVenue = async (
     categoryId: string,
+    kind: PermanentVenueKind,
     overrides: Partial<VenueCreation> = {},
 ): Promise<Venue> => {
     const { headers } = await signInAs("admin")
@@ -44,14 +51,24 @@ export const seedCinema = async (
         body: { ...buildVenueCreation(), ...overrides },
     })
     expectStatus(created, 201)
-    const cinema = await setVenueKind({
+    const permanent = await setVenueKind({
         headers,
         pathParams: { id: created.data.id },
-        body: buildCinemaKind(categoryId),
+        body: { ...buildCinemaKind(categoryId), kind },
     })
-    expectStatus(cinema, 200)
-    return cinema.data
+    expectStatus(permanent, 200)
+    return permanent.data
 }
+
+/**
+ * @description Persists a venue through an Admin and makes it a cinema in the category
+ * @param categoryId Category the cinema matches
+ * @param overrides Fields of the creation replaced, such as the name and the coordinates
+ */
+export const seedCinema = (
+    categoryId: string,
+    overrides: Partial<VenueCreation> = {},
+): Promise<Venue> => seedPermanentVenue(categoryId, "cinema", overrides)
 
 /**
  * @description Uploads random bytes through a cover ticket of the venue, and returns the key and the bytes

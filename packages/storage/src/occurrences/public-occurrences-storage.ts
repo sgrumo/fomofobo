@@ -1,5 +1,18 @@
 import type { SQL } from "drizzle-orm"
-import { and, count, desc, eq, gt, inArray, isNull, lt, ne, or, sql } from "drizzle-orm"
+import {
+    and,
+    count,
+    desc,
+    eq,
+    exists,
+    gt,
+    inArray,
+    isNull,
+    lt,
+    ne,
+    or,
+    sql,
+} from "drizzle-orm"
 import { unionAll } from "drizzle-orm/sqlite-core"
 import type {
     CategoryIcon,
@@ -258,6 +271,23 @@ export class PublicOccurrencesStorage {
             search.free === true ? sql`0` : undefined,
             sql`${venues.isBlocked} = 0`,
             ne(venues.kind, "regular"),
+            or(
+                ne(venues.kind, "theatre"),
+                exists(
+                    this.db
+                        .select({ one: sql`1` })
+                        .from(eventOccurrences)
+                        .innerJoin(events, eq(events.id, eventOccurrences.eventId))
+                        .innerJoin(accounts, eq(accounts.id, events.organizerId))
+                        .where(
+                            and(
+                                eq(events.venueId, venues.id),
+                                visibleEvent,
+                                gt(eventOccurrences.endsAt, search.now),
+                            ),
+                        ),
+                ),
+            ),
             insideBox(search.box),
             search.q === undefined ? undefined : likeContains(venues.name, search.q),
         )

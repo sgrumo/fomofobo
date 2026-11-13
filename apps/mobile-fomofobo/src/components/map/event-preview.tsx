@@ -206,7 +206,7 @@ interface VenueBodyProps {
 const VenueBody = (props: VenueBodyProps) => {
     const { t } = useTranslation("shared")
     const venue = props.venue
-    const closingText = useClosingText()(venue.closingDays)
+    const closingText = useClosingText()(venue)
 
     return (
         <>

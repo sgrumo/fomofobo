@@ -13,7 +13,11 @@ import {
 import { blockOrganizer } from "../backoffice-organizers/api"
 import { updateSettings } from "../backoffice-settings/api"
 import { blockVenue, createVenue } from "../backoffice-venues/api"
-import { buildVenueCreation, seedCinema } from "../backoffice-venues/utils"
+import {
+    buildVenueCreation,
+    seedCinema,
+    seedPermanentVenue,
+} from "../backoffice-venues/utils"
 import { searchOccurrences } from "./api"
 import { boxAround, SATURDAY_NOON } from "./utils"
 
@@ -157,6 +161,38 @@ describe("GET /api/public/occurrences", () => {
             ],
             [{ categoryId, count: 1 }],
         ])
+    })
+
+    it("answers a theatre while it holds an event that has not ended, under any date filter, and a cinema with no event", async () => {
+        const { headers } = await signInAs("organizer")
+        const { categoryId, venue } = await seedEventReferences()
+        const coordinates = venue.coordinates
+        const [running, ended, , cinema] = await Promise.all([
+            seedPermanentVenue(categoryId, "theatre", { coordinates }),
+            seedPermanentVenue(categoryId, "theatre", { coordinates }),
+            seedPermanentVenue(categoryId, "theatre", { coordinates }),
+            seedCinema(categoryId, { coordinates }),
+        ])
+        await seedEvent(headers, { venueId: running.id, categoryId })
+        await seedEvent(
+            headers,
+            { venueId: ended.id, categoryId },
+            { startsAt: "2026-10-24T08:00", endsAt: "2026-10-24T09:00" },
+        )
+
+        const res = await searchOccurrences({
+            headers: { "x-test-now": SATURDAY_NOON },
+            queryParams: {
+                ...boxAround(coordinates),
+                date: "tomorrow",
+            },
+        })
+
+        expectStatus(res, 200)
+        expect(
+            new Set(res.data.permanentVenues.map(permanent => permanent.id)),
+        ).toStrictEqual(new Set([running.id, cinema.id]))
+        expect(res.data.categoryCounts).toStrictEqual([{ categoryId, count: 2 }])
     })
 
     it("keeps the free events alone under the free filter, and counts them", async () => {
