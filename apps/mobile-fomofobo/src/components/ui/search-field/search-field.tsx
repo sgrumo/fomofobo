@@ -6,6 +6,7 @@ import Animated from "react-native-reanimated"
 import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
 import { PixelPanel } from "@/components/ui/pixel-panel/pixel-panel"
 import { Text } from "@/components/ui/text/text"
+import { COMPACT_MAX_FONT_SCALE } from "@/lib/theme/font-scale"
 import { THEME_COLORS } from "@/lib/theme/theme-tokens"
 
 import {
@@ -65,6 +66,7 @@ const SearchField = (props: SearchFieldProps) => {
                         autoCorrect={false}
                         selectionColor={THEME_COLORS.live}
                         cursorColor={THEME_COLORS.live}
+                        maxFontSizeMultiplier={COMPACT_MAX_FONT_SCALE}
                         className={searchFieldInputStyles}
                     />
                     {/* The placeholder of the web field, drawn in place of the native one */}
@@ -76,6 +78,7 @@ const SearchField = (props: SearchFieldProps) => {
                             <Text
                                 variant="pixel-md"
                                 numberOfLines={1}
+                                maxFontSizeMultiplier={COMPACT_MAX_FONT_SCALE}
                                 className={searchFieldPlaceholderTextStyles}
                             >
                                 {props.placeholder}

@@ -1,6 +1,7 @@
 import { TextInput } from "react-native"
 import type { TextInputProps } from "react-native"
 
+import { MAX_FONT_SCALE } from "@/lib/theme/font-scale"
 import { THEME_COLORS } from "@/lib/theme/theme-tokens"
 import { cn } from "@/lib/utils/class-names"
 
@@ -18,6 +19,7 @@ const Input = ({
         )}
         selectionColor={THEME_COLORS.live}
         cursorColor={THEME_COLORS.live}
+        maxFontSizeMultiplier={MAX_FONT_SCALE}
         {...props}
     />
 )

@@ -3,6 +3,7 @@ import { View } from "react-native"
 import Animated, { useReducedMotion } from "react-native-reanimated"
 
 import { Text } from "@/components/ui/text/text"
+import { COMPACT_MAX_FONT_SCALE } from "@/lib/theme/font-scale"
 import { cn } from "@/lib/utils/class-names"
 
 import {
@@ -34,7 +35,10 @@ const Badge = (props: BadgeProps) => {
                     <View className={badgeDotVariants({ tone })} />
                 </Animated.View>
             )}
-            <Text className={badgeTextVariants({ tone })} maxFontSizeMultiplier={1.5}>
+            <Text
+                className={badgeTextVariants({ tone })}
+                maxFontSizeMultiplier={COMPACT_MAX_FONT_SCALE}
+            >
                 {props.children}
             </Text>
         </View>

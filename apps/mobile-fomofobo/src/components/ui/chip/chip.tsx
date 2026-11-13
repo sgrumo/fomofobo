@@ -6,6 +6,7 @@ import { ScrollView, View } from "react-native"
 import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
 import { PressBounce } from "@/components/ui/press-bounce/press-bounce"
 import { Text } from "@/components/ui/text/text"
+import { COMPACT_MAX_FONT_SCALE } from "@/lib/theme/font-scale"
 import { hardShadow } from "@/lib/theme/hard-shadow"
 import { cn } from "@/lib/utils/class-names"
 
@@ -125,7 +126,10 @@ const Chip = (props: ChipProps) => {
                     color={inverse ? "fg-inverse" : "fg"}
                 />
             )}
-            <Text className={chipLabelVariants({ inverse })} maxFontSizeMultiplier={1.5}>
+            <Text
+                className={chipLabelVariants({ inverse })}
+                maxFontSizeMultiplier={COMPACT_MAX_FONT_SCALE}
+            >
                 {props.label}
             </Text>
             {props.count !== undefined && (
@@ -134,7 +138,7 @@ const Chip = (props: ChipProps) => {
                         pressed: props.pressed,
                         inverseTone: tone === "inverse",
                     })}
-                    maxFontSizeMultiplier={1.5}
+                    maxFontSizeMultiplier={COMPACT_MAX_FONT_SCALE}
                 >
                     {props.count}
                 </Text>

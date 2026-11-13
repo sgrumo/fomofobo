@@ -5,7 +5,7 @@ import { Text as RNText } from "react-native"
 
 import { cn } from "@/lib/utils/class-names"
 
-import { textVariants } from "./text.styles"
+import { maxFontScaleOf, textVariants } from "./text.styles"
 
 export const TextClassContext = createContext<string | undefined>(undefined)
 
@@ -21,6 +21,7 @@ const Text = ({ className, asChild = false, variant, ...props }: TextProps) => {
     return (
         <Component
             className={cn(textVariants({ variant }), textClass, className)}
+            maxFontSizeMultiplier={maxFontScaleOf(variant)}
             {...props}
         />
     )

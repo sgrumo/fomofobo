@@ -177,7 +177,8 @@ Every new component and screen must comply with these rules. Non-compliance will
 
 - Minimum font size: **10pt**. Prefer 12pt+ for body content.
 - Do not set `allowFontScaling={false}` unless absolutely necessary (e.g. fixed-size badge).
-- Use `maxFontSizeMultiplier={1.5}` on constrained layouts (tab bar, badges, counters) to prevent overflow.
+- The system text size scales text up to the caps of `src/lib/theme/font-scale.ts`: `MAX_FONT_SCALE` on body text, `COMPACT_MAX_FONT_SCALE` on display titles and fixed-size controls. `Text` sets the cap from its `variant`. A `TextInput`, a chip, a badge or a counter passes `maxFontSizeMultiplier` itself.
+- A row with a fixed-size control next to text gives the text `min-w-0 flex-1`, so the text wraps or shrinks and the control stays on screen. Check a new screen at the largest text size: `xcrun simctl ui <device> content_size accessibility-extra-extra-extra-large`, then relaunch the app.
 
 ### Color-Only Indicators
 

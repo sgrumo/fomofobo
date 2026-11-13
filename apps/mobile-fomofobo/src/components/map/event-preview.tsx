@@ -181,14 +181,18 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                 />
             )}
             <View className="flex-row items-center gap-2 border-t-2 border-line pt-3">
-                <View>
+                <View className="min-w-0 flex-1">
                     {localDateOf(span.startsAt, PLATFORM_TIME_ZONE) !==
                         localDateOf(props.now, PLATFORM_TIME_ZONE) && (
                         <Text variant="pixel-sm">
                             {dayMonthOf(span.startsAt, PLATFORM_TIME_ZONE)}
                         </Text>
                     )}
-                    <Text variant="pixel-xl">
+                    <Text
+                        variant="pixel-xl"
+                        numberOfLines={1}
+                        adjustsFontSizeToFit={true}
+                    >
                         {`${localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)}\u2009→\u2009${localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)}`}
                     </Text>
                 </View>
@@ -242,7 +246,7 @@ const VenueBody = (props: VenueBodyProps) => {
             </View>
             <View className="flex-row items-center gap-2 border-t-2 border-line pt-3">
                 {closingText !== undefined && (
-                    <Text variant="pixel-sm" className="uppercase">
+                    <Text variant="pixel-sm" className="min-w-0 flex-1 uppercase">
                         {closingText}
                     </Text>
                 )}
