@@ -34,7 +34,6 @@
         "Label": "Mappa degli eventi",
         "Loading": "Caricamento eventi",
         "Error": "Non è stato possibile caricare gli eventi. Mostro gli ultimi risultati.",
-        "Truncated": "Troppi eventi per mostrarli tutti. Avvicina la mappa o restringi la ricerca.",
         "Unsupported": "Questo browser non riesce a disegnare la mappa.",
         "Credits": "Fonti della mappa",
         "Attribution": {

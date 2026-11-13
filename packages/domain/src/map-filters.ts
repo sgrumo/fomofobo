@@ -81,11 +81,11 @@ export const KIND_FILTERS: readonly MapPointKind[] = [
     "ended",
 ]
 
-// Ended events stay off by default, so they do not crowd the map.
+// Permanent venues and ended events stay off by default, so they do not crowd the map.
 const SHOWN_BY_DEFAULT: Record<MapPointKind, boolean> = {
     live: true,
     upcoming: true,
-    permanent: true,
+    permanent: false,
     ended: false,
 }
 

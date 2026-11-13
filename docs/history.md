@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-12 · Permanent venues leave the default view again
+
+### Changed
+
+The map opens with live and upcoming pins alone on the web and in the native app. Permanent venues, like ended events, stay off until the visitor presses their chip.
+
+### Why
+
+A client request. The client reverses the default of 2026-11-04 for the second time, back to the rule of 2026-10-29.
+
+### Check next time
+
+Show the client the map with each default on real data before the pins are drawn, since this default changed three times.
+
 ## 2026-11-12 · The original photo is kept beside its dither
 
 ### Changed

@@ -280,7 +280,7 @@ test.describe("map", () => {
         await expect(pinOf(paid.title)).toBeVisible({ timeout: MAP_TIMEOUT_MS })
     })
 
-    test("shows a cinema by default under any date filter, and opens its detail with the programme from the preview", async ({
+    test("shows a cinema under any date filter once its kind chip is pressed, and opens its detail with the programme from the preview", async ({
         page,
     }) => {
         const center = buildArea()
@@ -290,6 +290,8 @@ test.describe("map", () => {
         )
 
         await gotoPage(page, `${mapPath(center)}&date=tomorrow`)
+        await pressChip(page, t("shared", "Filters.Kind.permanent"))
+        await expect(page).toHaveURL(/show-permanent=true/u)
         await page
             .getByRole("button", {
                 name: t("shared", "Map.VenuePin", {
@@ -338,7 +340,7 @@ test.describe("map", () => {
             { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
         )
 
-        await gotoPage(page, mapPath(center))
+        await gotoPage(page, mapPath(center, ["permanent"]))
         await page
             .getByRole("button", {
                 name: t("shared", "Map.Pin", {

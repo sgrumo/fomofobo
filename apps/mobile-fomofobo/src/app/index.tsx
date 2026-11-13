@@ -417,9 +417,6 @@ const MapScreen = () => {
                         ]}
                     />
                 )}
-                {results?.truncated === true && (
-                    <Notice tone="warning" lines={[t("Map.Truncated")]} />
-                )}
             </View>
             {/* A preview, a detail or the saved list covers the bottom of the map, so the controls give way */}
             {!previewOpen && !savedOpen && (

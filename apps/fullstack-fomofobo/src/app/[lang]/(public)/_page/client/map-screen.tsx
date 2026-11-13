@@ -544,9 +544,6 @@ export const MapScreen = (props: MapScreenProps) => {
                 text={online ? t("Map.Error") : t("Map.NeedsConnection")}
             />
         ) : undefined,
-        results?.truncated === true ? (
-            <Alert key="truncated" type="warning" text={t("Map.Truncated")} />
-        ) : undefined,
     ]
 
     return (
