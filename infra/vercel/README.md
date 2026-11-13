@@ -2,10 +2,12 @@
 
 The app runs on Vercel, the database on Turso, the event photos on Cloudflare R2, and the place search on Geoapify. Every service runs on its free plan.
 
-| Environment | Branch | Vercel project  | Turso database  | R2 bucket              |
-| ----------- | ------ | --------------- | --------------- | ---------------------- |
-| `prod`      | `main` | `fomofobo-prod` | `fomofobo-prod` | `fomofobo-prod-photos` |
-| `dev`       | `dev`  | `fomofobo-dev`  | `fomofobo-dev`  | `fomofobo-dev`         |
+| Environment | Branch | Domain           | Vercel project  | Turso database  | R2 bucket              |
+| ----------- | ------ | ---------------- | --------------- | --------------- | ---------------------- |
+| `prod`      | `main` | `www.zonzo.live` | `fomofobo-prod` | `fomofobo-prod` | `fomofobo-prod-photos` |
+| `dev`       | `dev`  | `dev.zonzo.live` | `fomofobo-dev`  | `fomofobo-dev`  | `fomofobo-dev`         |
+
+Each domain is the production domain of its Vercel project and the `APP_BASE_URL` of its `env/<env>.env`. A domain serves one project only: to move it, remove it from the old project first.
 
 `dev` runs the `preview` shape of `APP_ENV`, and `prod` runs `vercel`. `preview` serves the `/dev/*` pages, the API documentation and detailed errors to anyone who opens its URL. `apps/fullstack-fomofobo/src/server/config/app-config.ts` lists what each shape serves.
 
