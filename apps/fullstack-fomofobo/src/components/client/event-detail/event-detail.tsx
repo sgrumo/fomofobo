@@ -19,17 +19,14 @@ import {
     PixelIconDirections,
     PixelIconFacebook,
     PixelIconInstagram,
-    PixelIconShare,
 } from "ui-components/pixel-icons"
 import { StatGrid } from "ui-components/stat-grid"
 import { Timeline } from "ui-components/timeline"
-import { useToast } from "ui-components/toast"
 
 import { DirectionsLink } from "@/components/client/directions-link/directions-link"
 import { PhotoGallery } from "@/components/client/photo-gallery/photo-gallery"
 import { SaveToggle } from "@/components/client/save-toggle/save-toggle"
 import { ShareRow } from "@/components/client/share-row/share-row"
-import { useCopyLink } from "@/lib/hooks/use-copy-link"
 import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 
 const actionClassName =
@@ -46,8 +43,6 @@ interface EventDetailProps {
 export const EventDetail = (props: EventDetailProps) => {
     const { t } = useTranslation("shared")
     const language = useLanguage()
-    const toast = useToast()
-    const copyLink = useCopyLink()
     const priceSummary = usePriceSummary()
     const { occurrence } = props
     const span = {
@@ -56,20 +51,6 @@ export const EventDetail = (props: EventDetailProps) => {
     }
     const status = occurrenceStatus(span, props.now)
     const elapsedFraction = occurrenceProgress(span, props.now)
-
-    const share = () => {
-        const data = { title: occurrence.title, url: props.shareUrl }
-        // Both calls run first in the click: Safari drops the user gesture after an await.
-        if ("canShare" in navigator && navigator.canShare(data)) {
-            navigator.share(data).catch((error: unknown) => {
-                if (!(error instanceof DOMException && error.name === "AbortError")) {
-                    toast.add({ type: "error", error: { type: "generic" } })
-                }
-            })
-            return
-        }
-        void copyLink(data.url)
-    }
 
     const facts = occurrenceFactsOf(occurrence, language).map(fact =>
         match(fact)
@@ -112,14 +93,7 @@ export const EventDetail = (props: EventDetailProps) => {
                             icon={<PixelIconClose />}
                             onClick={props.onClose}
                         />
-                        <div className="flex gap-2">
-                            <SaveToggle occurrence={occurrence} />
-                            <IconButton
-                                aria-label={t("Detail.Share")}
-                                icon={<PixelIconShare />}
-                                onClick={share}
-                            />
-                        </div>
+                        <SaveToggle occurrence={occurrence} />
                     </>
                 }
             />

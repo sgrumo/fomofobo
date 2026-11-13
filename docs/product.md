@@ -82,7 +82,7 @@ The event and venue details open over the map, with no page of their own. On a w
 
 The event detail offers directions to the venue, the external link of the event and a save action. It shows the price summary, the capacity and the count of interested visitors, and lists every price, the membership card, the minimum age and the notes when the scheme holds more than one price line. Directions open Apple Maps on iOS and iPadOS, and Google Maps elsewhere.
 
-Share opens the share sheet of the device, or copies the link where none exists. A row of links shares the detail on WhatsApp, Telegram, Facebook and X with its title, date, time and venue, and a button copies the link. A shared link shows a card with the title, the cover, and the description of the event or else its date, time and venue.
+A row of links at the bottom of the detail shares it on WhatsApp, Telegram, Facebook and X with its title, date, time and venue, and a button copies the link. A shared link shows a card with the title, the cover, and the description of the event or else its date, time and venue.
 
 ### Venue detail
 

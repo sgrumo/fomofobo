@@ -1426,7 +1426,7 @@ test.describe("detail over the map", () => {
         )
     })
 
-    test("links each share target to the map with the detail open, and copies the link where the browser has no share sheet", async ({
+    test("links each share target to the map with the detail open, and copies the link", async ({
         page,
         context,
         baseURL,
@@ -1437,10 +1437,6 @@ test.describe("detail over the map", () => {
         )
         const shareUrl = `${String(baseURL)}/it?event=${event.id}&occurrence=2026-10-24&detail=true`
         await context.grantPermissions(["clipboard-read", "clipboard-write"])
-        await page.addInitScript(() => {
-            Reflect.deleteProperty(Navigator.prototype, "share")
-            Reflect.deleteProperty(Navigator.prototype, "canShare")
-        })
 
         await gotoPage(page, eventDetailPath(event.id, "2026-10-24"))
         const detail = page.getByRole("dialog", { name: event.title, exact: true })
@@ -1460,18 +1456,13 @@ test.describe("detail over the map", () => {
             )
         }
 
-        for (const control of [
-            t("shared", "Detail.ShareOn.Copy"),
-            t("shared", "Detail.Share"),
-        ]) {
-            await page.evaluate("navigator.clipboard.writeText('')")
-            await clickIconButton(detail, control)
+        await page.evaluate("navigator.clipboard.writeText('')")
+        await clickIconButton(detail, t("shared", "Detail.ShareOn.Copy"))
 
-            // A string expression: the suite compiles without the DOM types of the browser.
-            await expect
-                .poll(async () => await page.evaluate("navigator.clipboard.readText()"))
-                .toBe(shareUrl)
-        }
+        // A string expression: the suite compiles without the DOM types of the browser.
+        await expect
+            .poll(async () => await page.evaluate("navigator.clipboard.readText()"))
+            .toBe(shareUrl)
     })
 
     test("opens the venue detail from the venue of an event, closes it, and names a blocked venue alone", async ({
