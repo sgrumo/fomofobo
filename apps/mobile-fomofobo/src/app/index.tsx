@@ -310,7 +310,8 @@ const MapScreen = () => {
                 style={{ top: insets.top + 8 }}
                 pointerEvents="box-none"
             >
-                <View className="flex-row items-start gap-2">
+                {/* Above the chips, so the place suggestions cover them */}
+                <View className="z-10 flex-row items-start gap-2">
                     <View className="min-w-0 flex-1">
                         <PlaceSearch
                             // A new place, or a recenter that clears it, resets the typed text

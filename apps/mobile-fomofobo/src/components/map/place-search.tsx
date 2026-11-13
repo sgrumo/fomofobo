@@ -136,7 +136,7 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
     }
 
     return (
-        <View className="gap-2">
+        <View>
             <SearchField
                 label={t("Search.Label")}
                 placeholder={t("Search.Placeholder")}
@@ -165,8 +165,9 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                     props.onPlaceSelect(place)
                 }}
             />
+            {/* Drawn over the filters below the field, as the web dropdown */}
             {showsSuggestions && (
-                <PixelPanel shadow="md">
+                <PixelPanel shadow="md" className="absolute inset-x-0 top-full mt-2">
                     <ScrollView
                         keyboardShouldPersistTaps="handled"
                         className="max-h-80"
