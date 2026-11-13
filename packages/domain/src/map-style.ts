@@ -146,5 +146,25 @@ export const mapStyle = {
                 "text-color": "#defcf0",
             },
         },
+        {
+            id: "city-labels",
+            type: "symbol",
+            source: "openmaptiles",
+            "source-layer": "place",
+            filter: ["in", ["get", "class"], ["literal", ["city", "town", "village"]]],
+            layout: {
+                "text-field": ["upcase", ["get", "name"]],
+                "text-font": ["Noto Sans Bold"],
+                "text-size": ["match", ["get", "class"], "city", 16, "town", 13, 11],
+                "text-letter-spacing": 0.12,
+                // The larger places win a label collision
+                "symbol-sort-key": ["get", "rank"],
+            },
+            paint: {
+                "text-color": "#defcf0",
+                "text-halo-color": "#237a60",
+                "text-halo-width": 1.5,
+            },
+        },
     ],
 } satisfies StyleSpecification
