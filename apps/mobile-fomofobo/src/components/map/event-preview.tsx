@@ -17,6 +17,7 @@ import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { Notice } from "@/components/ui/notice/notice"
 import { PixelCircle } from "@/components/ui/pixel-circle/pixel-circle"
 import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
+import { PixelPanel } from "@/components/ui/pixel-panel/pixel-panel"
 import { Text } from "@/components/ui/text/text"
 import { TickProgress } from "@/components/ui/tick-progress/tick-progress"
 import { TonedPhoto } from "@/components/ui/toned-photo/toned-photo"
@@ -45,12 +46,16 @@ interface PagingTabProps {
     paging: PreviewPaging
 }
 
-// A tab with no bottom edge, so the top line of the sheet frame runs under it
+// A tab that peeks out behind the top of the preview. The padding adds the 2 pt ring of the
+// panel to the padding of the web tab.
 const PagingTab = (props: PagingTabProps) => {
     const { t } = useTranslation("shared")
 
     return (
-        <View className="flex-row items-center justify-center gap-2 border-2 border-b-0 border-line bg-surface px-2 pt-0.5">
+        <PixelPanel
+            shadow="lg"
+            className="flex-row items-center justify-center gap-2 px-2.5 pb-3.5 pt-1.5"
+        >
             <IconButton
                 icon="back"
                 size="sm"
@@ -76,7 +81,7 @@ const PagingTab = (props: PagingTabProps) => {
                     props.paging.onNext()
                 }}
             />
-        </View>
+        </PixelPanel>
     )
 }
 

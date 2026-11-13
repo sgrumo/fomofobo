@@ -24,6 +24,7 @@ import {
     bottomSheetTabbedBackgroundStyle,
     bottomSheetTabRowStyle,
     bottomSheetTabRowStyles,
+    bottomSheetTabTuckStyle,
     DRAG_DOWN_OFFSETS,
     SWIPE_UP_ACTIVE_OFFSETS,
     SWIPE_UP_DISTANCE,
@@ -40,7 +41,7 @@ const TabbedHandle = (props: BottomSheetHandleProps) => {
     return (
         <View>
             <View className={bottomSheetTabRowStyles} style={bottomSheetTabRowStyle}>
-                {tab}
+                <View style={bottomSheetTabTuckStyle}>{tab}</View>
             </View>
             <BottomSheetHandle {...props} indicatorStyle={bottomSheetHandleIndicator} />
         </View>
