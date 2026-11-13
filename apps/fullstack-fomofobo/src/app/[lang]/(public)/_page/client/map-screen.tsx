@@ -58,6 +58,7 @@ import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import { useMediaQuery } from "@/lib/hooks/use-media-query"
 import { useNow } from "@/lib/hooks/use-now"
 import { useOnline } from "@/lib/hooks/use-online"
+import { playSound } from "@/lib/sounds/play-sound"
 
 import { CategoryChips } from "./category-chips"
 import { DateChips } from "./date-chips"
@@ -287,6 +288,7 @@ export const MapScreen = (props: MapScreenProps) => {
         )
     }
     const openDetail = () => {
+        playSound("expand")
         setDetailPushed(true)
         setQuery({ detail: true }, { history: "push" })
     }

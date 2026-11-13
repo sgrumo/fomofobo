@@ -478,7 +478,6 @@ export const EventMap = (props: EventMapProps) => {
                             permanentCount={feature.properties.permanentCount}
                             emphasis={emphasis}
                             onExpand={() => {
-                                playSound("cluster")
                                 const zoom = clusters.getClusterExpansionZoom(clusterId)
                                 // Past the last cluster zoom the points share one spot, so no zoom splits them.
                                 const first =
@@ -488,6 +487,7 @@ export const EventMap = (props: EventMapProps) => {
                                           )
                                         : undefined
                                 if (first !== undefined) {
+                                    playSound("event")
                                     centerOnMarker()
                                     selectIndex(first)
                                     return

@@ -40,6 +40,7 @@ import { api } from "@/lib/api/client"
 import { useDeviceStorage } from "@/lib/hooks/use-device-storage"
 import { useNow } from "@/lib/hooks/use-now"
 import { useOnline } from "@/lib/hooks/use-online"
+import { playSound } from "@/lib/sounds/play-sound"
 
 const TOAST_DURATION_MS = 5000
 
@@ -474,6 +475,7 @@ const MapScreen = () => {
                         : undefined
                 }
                 onOpenDetail={() => {
+                    playSound("expand")
                     setQuery({ detail: true })
                 }}
                 onOpenVenue={venueId => {

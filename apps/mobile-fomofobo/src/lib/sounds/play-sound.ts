@@ -4,16 +4,16 @@ import type { AudioSource } from "expo-audio"
 
 import { deviceStorage } from "@/lib/storage/device-storage"
 
-import clusterV1 from "../../../assets/sounds/cluster-v1.flac"
-import clusterV2 from "../../../assets/sounds/cluster-v2.flac"
 import eventV1 from "../../../assets/sounds/event-v1.flac"
 import eventV2 from "../../../assets/sounds/event-v2.flac"
+import expandV1 from "../../../assets/sounds/expand-v1.flac"
+import expandV2 from "../../../assets/sounds/expand-v2.flac"
 import saveOff from "../../../assets/sounds/save-off.flac"
 import saveOn from "../../../assets/sounds/save-on.flac"
 
 const SOUND_SOURCES = {
     event: [eventV1, eventV2],
-    cluster: [clusterV1, clusterV2],
+    expand: [expandV1, expandV2],
     "save-on": [saveOn],
     "save-off": [saveOff],
 }
