@@ -46,7 +46,7 @@ const TOAST_DURATION_MS = 5000
 
 const CLOCK_TICK_MS = 60_000
 
-const CONTROLS_BOTTOM_OFFSET = 32
+const CONTROLS_BOTTOM_OFFSET = 8
 
 const CLEARED_SELECTION = {
     event: undefined,
@@ -352,7 +352,8 @@ const MapScreen = () => {
                             tone={filtersOpen ? "inverse" : "surface"}
                             expanded={filtersOpen}
                             onPress={() => {
-                                setFiltersOpen(open => !open)
+                                playSound(filtersOpen ? "save-off" : "save-on")
+                                setFiltersOpen(!filtersOpen)
                             }}
                         />
                         {filtersActive && (
