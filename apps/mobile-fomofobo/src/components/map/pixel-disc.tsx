@@ -1,4 +1,5 @@
 import type { MapPointKind } from "domain/event-clusters"
+import { PIXEL_ICON_GRID } from "domain/pixel-icons"
 import { EVENT_DISC, MARKER_CELL_PX, SELECTED_EVENT_DISC } from "domain/pixel-markers"
 import type { CategoryIcon } from "models"
 import { useId } from "react"
@@ -6,13 +7,15 @@ import type { ReactNode } from "react"
 import { View } from "react-native"
 import Svg, { ClipPath, Defs, Path } from "react-native-svg"
 
-import { PixelGlyph } from "@/components/ui/pixel-glyph/pixel-glyph"
-import { PIXEL_GLYPH_SIZE } from "@/components/ui/pixel-glyph/pixel-glyph.styles"
+import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
 import { dashWedgesPath } from "@/lib/pixel/pixel-shapes"
 import { THEME_COLORS } from "@/lib/theme/theme-tokens"
 
 // Shadow cells of a selected disc, right and down
 const SHADOW_CELLS = 2
+
+// One icon cell is one disc cell, so the icon keeps the pixel grid of the disc
+const ICON_SIZE = PIXEL_ICON_GRID * MARKER_CELL_PX
 
 interface PixelDiscProps {
     kind: MapPointKind
@@ -60,11 +63,16 @@ export const PixelDisc = (props: PixelDiscProps) => {
                 pointerEvents="none"
                 className="absolute"
                 style={{
-                    left: (size - PIXEL_GLYPH_SIZE) / 2,
-                    top: (size - PIXEL_GLYPH_SIZE) / 2,
+                    left: (size - ICON_SIZE) / 2,
+                    top: (size - ICON_SIZE) / 2,
                 }}
             >
-                <PixelGlyph icon={props.icon} color="line" />
+                <PixelIcon
+                    name={props.icon}
+                    size={ICON_SIZE}
+                    color="line"
+                    centered={true}
+                />
             </View>
         </View>
     )

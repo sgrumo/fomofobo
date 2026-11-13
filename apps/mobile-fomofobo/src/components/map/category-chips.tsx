@@ -21,7 +21,7 @@ export const CategoryChips = (props: CategoryChipsProps) => {
                 <Chip
                     key={category.id}
                     label={category.name}
-                    glyph={category.icon}
+                    icon={category.icon}
                     pressed={props.selected?.includes(category.id) === true}
                     onPressedChange={pressed => {
                         props.onChange(
