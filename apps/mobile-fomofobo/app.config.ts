@@ -103,8 +103,8 @@ const config: ExpoConfig = {
         [
             "expo-splash-screen",
             {
-                // The Zonzo wordmark on the green of the brand, which the map ground carries on
-                image: "./assets/splash-icon.png",
+                // The first frame of the radar GIF at its size in `SplashRadar`, so the sweep starts where the launch screen stops
+                image: "./assets/splash/radar-start.png",
                 imageWidth: 240,
                 resizeMode: "contain",
                 backgroundColor: THEME_COLORS["map-ground"],

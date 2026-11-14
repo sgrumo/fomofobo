@@ -65,8 +65,8 @@ const deviceStorageReady = lazyAsync(() =>
     hydrateDeviceStorage().then(startDeviceSaveSync),
 )
 
-// On success the splash radar hides the native splash once it covers the screen, so no frame
-// of the screen behind shows between them. A failed init hides it for the error screen.
+// On success the splash radar hides the native splash once the GIF paints its first frame, so no
+// frame of the screen behind shows between them. A failed init hides it for the error screen.
 const appReady = lazyAsync(() =>
     Promise.all([nativeI18n.init(), deviceStorageReady()])
         .catch((error: unknown) => {
