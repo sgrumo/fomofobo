@@ -182,12 +182,12 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
             )}
             <View className="flex-row items-center gap-2 border-t-2 border-line pt-3">
                 <View className="min-w-0 flex-1">
-                    {localDateOf(span.startsAt, PLATFORM_TIME_ZONE) !==
-                        localDateOf(props.now, PLATFORM_TIME_ZONE) && (
-                        <Text variant="pixel-sm">
-                            {dayMonthOf(span.startsAt, PLATFORM_TIME_ZONE)}
-                        </Text>
-                    )}
+                    <Text variant="pixel-sm">
+                        {localDateOf(span.startsAt, PLATFORM_TIME_ZONE) ===
+                        localDateOf(props.now, PLATFORM_TIME_ZONE)
+                            ? t("Preview.Today")
+                            : dayMonthOf(span.startsAt, PLATFORM_TIME_ZONE)}
+                    </Text>
                     <Text
                         variant="pixel-xl"
                         numberOfLines={1}

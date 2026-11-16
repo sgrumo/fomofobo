@@ -92,7 +92,8 @@
         "Programme": "Programmazione",
         "Previous": "Precedente qui",
         "Next": "Successivo qui",
-        "Position": "{{index}}/{{total}}"
+        "Position": "{{index}}/{{total}}",
+        "Today": "Oggi"
     },
     "Detail": {
         "Loading": "Caricamento evento",

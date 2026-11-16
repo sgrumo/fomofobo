@@ -179,11 +179,11 @@ const PreviewBody = (props: PreviewBodyProps) => {
             ) : undefined}
             <div className="border-line flex items-center justify-between gap-2 border-t-2 pt-3">
                 <span className="flex flex-col">
-                    {startsToday ? undefined : (
-                        <span className="tp-pixel-sm">
-                            {dayMonthOf(span.startsAt, PLATFORM_TIME_ZONE)}
-                        </span>
-                    )}
+                    <span className="tp-pixel-sm">
+                        {startsToday
+                            ? t("Preview.Today")
+                            : dayMonthOf(span.startsAt, PLATFORM_TIME_ZONE)}
+                    </span>
                     <span className="tp-pixel-xl">
                         {/* Thin spaces part the arrow from the times */}
                         {`${localTimeOf(span.startsAt, PLATFORM_TIME_ZONE)}\u2009→\u2009${localTimeOf(span.endsAt, PLATFORM_TIME_ZONE)}`}
