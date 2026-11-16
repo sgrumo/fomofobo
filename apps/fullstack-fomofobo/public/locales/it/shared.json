@@ -171,12 +171,17 @@
         "Instagram": "Instagram",
         "Facebook": "Facebook",
         "ShareOn": {
-            "Label": "Condividi su",
             "whatsapp": "Condividi su WhatsApp",
             "telegram": "Condividi su Telegram",
             "facebook": "Condividi su Facebook",
-            "x": "Condividi su X",
-            "Copy": "Copia il link"
+            "Copy": "Copia il link",
+            "Open": "Condividi",
+            "Names": {
+                "whatsapp": "WhatsApp",
+                "telegram": "Telegram",
+                "facebook": "Facebook",
+                "link": "Link"
+            }
         }
     },
     "Price": {

@@ -82,11 +82,11 @@ The event and venue details open over the map, with no page of their own. On a w
 
 The event detail offers directions to the venue, the external link of the event and a save action. It shows the price summary, the capacity and the count of interested visitors, and lists every price, the membership card, the minimum age and the notes when the scheme holds more than one price line. Directions open Apple Maps on iOS and iPadOS, and Google Maps elsewhere.
 
-A row of links at the bottom of the detail shares it on WhatsApp, Telegram, Facebook and X with its title, date, time and venue, and a button copies the link. A shared link shows a card with the title, the cover, and the description of the event or else its date, time and venue.
+A share action on the detail shares it on WhatsApp, Telegram and Facebook with its title, date, time and venue, or copies the link. A shared link shows a card with the title, the cover, and the description of the event or else its date, time and venue.
 
 ### Venue detail
 
-The event detail and the map preview link to the venue detail. It shows the profile of the venue, directions to it and its links, with the share row of the event detail. The detail of a permanent venue also shows its kind and its closing days, with the link to its programme and the directions in a bar at its bottom, as in the event detail. It shows no past events and no website link, because the programme link leads to the website.
+The event detail and the map preview link to the venue detail. It shows the profile of the venue, directions to it and its links, with the share action of the event detail. The detail of a permanent venue also shows its kind and its closing days, with the link to its programme and the directions in a bar at its bottom, as in the event detail. It shows no past events and no website link, because the programme link leads to the website.
 
 The detail lists the upcoming events of the venue, one row for each event at its next occurrence, live events first. A row opens the event detail. A button below opens the past events of the venue as a second page in the same panel or sheet, with a back button to the profile. They list their title and their first and last date, with no photo, newest first, and a button loads more.
 

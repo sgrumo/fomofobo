@@ -1506,7 +1506,7 @@ test.describe("detail over the map", () => {
         )
     })
 
-    test("links each share target to the map with the detail open, and copies the link", async ({
+    test("opens the share menu of the detail, links each share target to the map with the detail open, and copies the link", async ({
         page,
         context,
         baseURL,
@@ -1520,14 +1520,19 @@ test.describe("detail over the map", () => {
 
         await gotoPage(page, eventDetailPath(event.id, "2026-10-24"))
         const detail = page.getByRole("dialog", { name: event.title, exact: true })
+        await clickIconButton(detail, t("shared", "Detail.ShareOn.Open"))
+        // The menu opens in a portal, outside the detail
+        const shareMenu = page.getByRole("dialog").filter({
+            has: page.getByRole("link", { name: t("shared", "Detail.ShareOn.whatsapp") }),
+        })
 
+        await expect(shareMenu.getByRole("link")).toHaveCount(3)
         for (const [target, host] of [
             ["whatsapp", "https://wa.me/"],
             ["telegram", "https://t.me/share/url"],
             ["facebook", "https://www.facebook.com/sharer/sharer.php"],
-            ["x", "https://x.com/intent/tweet"],
         ] as const) {
-            const link = detail.getByRole("link", {
+            const link = shareMenu.getByRole("link", {
                 name: t("shared", `Detail.ShareOn.${target}`),
             })
             await expect(link).toHaveAttribute("href", new RegExp(`^${host}`, "u"))
@@ -1537,7 +1542,9 @@ test.describe("detail over the map", () => {
         }
 
         await page.evaluate("navigator.clipboard.writeText('')")
-        await clickIconButton(detail, t("shared", "Detail.ShareOn.Copy"))
+        await clickIconButton(shareMenu, t("shared", "Detail.ShareOn.Copy"))
+
+        await expect(shareMenu).toBeHidden()
 
         // A string expression: the suite compiles without the DOM types of the browser.
         await expect

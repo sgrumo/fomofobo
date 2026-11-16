@@ -14,7 +14,7 @@ import { match } from "ts-pattern"
 import { PhotoGallery } from "@/components/event/photo-gallery"
 import { PriceDetails } from "@/components/event/price-details"
 import { DirectionsButton } from "@/components/links/directions-button"
-import { ShareRow } from "@/components/links/share-row"
+import { ShareMenu } from "@/components/links/share-menu"
 import { SaveToggle } from "@/components/saves/save-toggle"
 import { Badge } from "@/components/ui/badge/badge"
 import { Button } from "@/components/ui/button/button"
@@ -92,7 +92,10 @@ export const EventDetail = (props: EventDetailProps) => {
                             label={t("Preview.Close")}
                             onPress={props.onClose}
                         />
-                        <SaveToggle occurrence={occurrence} />
+                        <View className="flex-row gap-2">
+                            <SaveToggle occurrence={occurrence} />
+                            <ShareMenu url={shareUrl} text={shareText} />
+                        </View>
                     </>
                 }
             />
@@ -154,7 +157,6 @@ export const EventDetail = (props: EventDetailProps) => {
                     {occurrence.venue.address}
                 </Text>
             </View>
-            <ShareRow url={shareUrl} text={shareText} />
         </>
     )
 }

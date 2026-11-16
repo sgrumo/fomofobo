@@ -33,7 +33,7 @@ import { Spinner } from "ui-components/spinner"
 import { DetailActionBar } from "@/components/client/detail-action-bar/detail-action-bar"
 import { detailActionClassName } from "@/components/client/detail-action-bar/detail-action-bar.styles"
 import { DirectionsLink } from "@/components/client/directions-link/directions-link"
-import { ShareRow } from "@/components/client/share-row/share-row"
+import { ShareMenu } from "@/components/client/share-menu/share-menu"
 import { TonedImage } from "@/components/client/toned-image/toned-image"
 import { api } from "@/lib/api/client-api"
 import { useClosingText } from "@/lib/hooks/use-closing-text"
@@ -111,7 +111,10 @@ export const VenueDetail = (props: VenueDetailProps) => {
 
     return (
         <article ref={articleRef} className="flex flex-col gap-5">
-            <header className="flex items-center gap-3">{closeButton}</header>
+            <header className="flex items-center justify-between gap-3">
+                {closeButton}
+                <ShareMenu url={props.shareUrl} text={venueShareTextOf(venue)} />
+            </header>
             {venue.coverPhotoUrl === null ? undefined : (
                 <TonedImage
                     src={venue.coverPhotoUrl}
@@ -194,7 +197,6 @@ export const VenueDetail = (props: VenueDetailProps) => {
                     {t("Venue.ShowHistory")}
                 </Button>
             )}
-            <ShareRow url={props.shareUrl} text={venueShareTextOf(venue)} />
             {permanent ? (
                 <DetailActionBar label={t("Detail.Actions")}>
                     {venue.programmeUrl === null ? undefined : (

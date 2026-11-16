@@ -20,7 +20,6 @@ describe("shareUrlOf", () => {
             target: "facebook",
             expected: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
         },
-        { target: "x", expected: `https://x.com/intent/tweet?url=${url}&text=${text}` },
     ] as const)("encodes the link and the text for $target", ({ target, expected }) => {
         expect(shareUrlOf(target, shared)).toBe(expected)
     })

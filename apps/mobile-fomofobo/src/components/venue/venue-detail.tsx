@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next"
 import { Linking, View } from "react-native"
 
 import { DirectionsButton } from "@/components/links/directions-button"
-import { ShareRow } from "@/components/links/share-row"
+import { ShareMenu } from "@/components/links/share-menu"
 import { Badge } from "@/components/ui/badge/badge"
 import { Button } from "@/components/ui/button/button"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
@@ -81,11 +81,15 @@ export const VenueDetail = (props: VenueDetailProps) => {
 
     return (
         <>
-            <View className="flex-row">
+            <View className="z-10 flex-row justify-between">
                 <IconButton
                     icon="close"
                     label={t("Preview.Close")}
                     onPress={props.onClose}
+                />
+                <ShareMenu
+                    url={venueDetailUrlOf(env.apiUrl, language, venue.id)}
+                    text={venueShareTextOf(venue)}
                 />
             </View>
             {venue.coverPhotoUrl !== null && (
@@ -137,10 +141,6 @@ export const VenueDetail = (props: VenueDetailProps) => {
             )}
             <VenueUpcoming upcoming={venue.upcoming} onOpenEvent={props.onOpenEvent} />
             {!permanent && <VenueHistory venueId={venue.id} />}
-            <ShareRow
-                url={venueDetailUrlOf(env.apiUrl, language, venue.id)}
-                text={venueShareTextOf(venue)}
-            />
         </>
     )
 }

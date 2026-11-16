@@ -1,6 +1,6 @@
 import { match } from "ts-pattern"
 
-export type ShareTarget = "whatsapp" | "telegram" | "facebook" | "x"
+export type ShareTarget = "whatsapp" | "telegram" | "facebook"
 
 /**
  * @description Builds the URL that opens the share flow of the target with the link and the
@@ -19,6 +19,5 @@ export const shareUrlOf = (
         .with("whatsapp", () => `https://wa.me/?text=${text}%20${url}`)
         .with("telegram", () => `https://t.me/share/url?url=${url}&text=${text}`)
         .with("facebook", () => `https://www.facebook.com/sharer/sharer.php?u=${url}`)
-        .with("x", () => `https://x.com/intent/tweet?url=${url}&text=${text}`)
         .exhaustive()
 }

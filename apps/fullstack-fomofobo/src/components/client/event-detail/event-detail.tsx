@@ -28,7 +28,7 @@ import { detailActionClassName } from "@/components/client/detail-action-bar/det
 import { DirectionsLink } from "@/components/client/directions-link/directions-link"
 import { PhotoGallery } from "@/components/client/photo-gallery/photo-gallery"
 import { SaveToggle } from "@/components/client/save-toggle/save-toggle"
-import { ShareRow } from "@/components/client/share-row/share-row"
+import { ShareMenu } from "@/components/client/share-menu/share-menu"
 import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 
 interface EventDetailProps {
@@ -92,7 +92,13 @@ export const EventDetail = (props: EventDetailProps) => {
                             icon={<PixelIconClose />}
                             onClick={props.onClose}
                         />
-                        <SaveToggle occurrence={occurrence} />
+                        <span className="flex gap-2">
+                            <SaveToggle occurrence={occurrence} />
+                            <ShareMenu
+                                url={props.shareUrl}
+                                text={occurrenceShareTextOf(occurrence, language)}
+                            />
+                        </span>
                     </>
                 }
             />
@@ -139,10 +145,6 @@ export const EventDetail = (props: EventDetailProps) => {
                 )}
                 <p className="tp-body-md text-fg-muted">{occurrence.venue.address}</p>
             </section>
-            <ShareRow
-                url={props.shareUrl}
-                text={occurrenceShareTextOf(occurrence, language)}
-            />
             <DetailActionBar label={t("Detail.Actions")}>
                 <DirectionsLink
                     coordinates={occurrence.venue.coordinates}
