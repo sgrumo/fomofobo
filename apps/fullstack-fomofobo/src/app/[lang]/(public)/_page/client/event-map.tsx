@@ -30,6 +30,7 @@ import {
 import type { MarkerMove, MarkerTransitions, ShownMarker } from "domain/marker-motion"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { pinStartOf } from "domain/pin-tag"
+import { PIN_DISC_RADIUS_PX } from "domain/pixel-markers"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { Map as MapLibreMap, setWorkerUrl } from "maplibre-gl"
 import type {
@@ -58,6 +59,9 @@ import { VenuePin } from "./venue-pin"
 setWorkerUrl(
     new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).toString(),
 )
+
+// Puts the center of the disc of a pin on its point, as the kit anchors it
+const PIN_OFFSET: [number, number] = [0, PIN_DISC_RADIUS_PX]
 
 const DOT_DITHER_IMAGE = "dot-dither"
 
@@ -130,7 +134,7 @@ interface PreviewCard {
     content: ReactNode
 }
 
-// Box of a pin and its tag, above the anchor at its bottom center, in px
+// Box of a pin and its tag, above the bottom of its disc, in px
 const PIN_BOX = { width: 96, height: 80 }
 
 /**
@@ -325,7 +329,7 @@ export const EventMap = (props: EventMapProps) => {
         const [x, y] = fitPanOf(
             new DOMRect(
                 bounds.left + anchor.x - PIN_BOX.width / 2,
-                bounds.top + anchor.y - PIN_BOX.height,
+                bounds.top + anchor.y + PIN_DISC_RADIUS_PX - PIN_BOX.height,
                 PIN_BOX.width,
                 PIN_BOX.height,
             ),
@@ -527,6 +531,7 @@ export const EventMap = (props: EventMapProps) => {
                     map={shownOn}
                     coordinates={coordinates}
                     anchor="bottom"
+                    offset={PIN_OFFSET}
                     layer={layer}
                 >
                     <MarkerMotion route={props.route} move={move}>
@@ -558,6 +563,7 @@ export const EventMap = (props: EventMapProps) => {
                 map={shownOn}
                 coordinates={coordinates}
                 anchor="bottom"
+                offset={PIN_OFFSET}
                 layer={layer}
             >
                 <MarkerMotion route={props.route} move={move}>

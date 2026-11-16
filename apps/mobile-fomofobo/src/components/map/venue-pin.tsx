@@ -26,7 +26,7 @@ export const VenuePin = (props: VenuePinProps) => {
 
     return (
         <View
-            className={cn("items-center gap-0.5", {
+            className={cn("items-center gap-2", {
                 "opacity-35": props.emphasis === "dimmed",
             })}
             pointerEvents="box-none"

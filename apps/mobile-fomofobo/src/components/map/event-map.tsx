@@ -30,6 +30,7 @@ import {
 import type { MarkerMove, MarkerTransitions, ShownMarker } from "domain/marker-motion"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { pinStartOf } from "domain/pin-tag"
+import { PIN_DISC_RADIUS_PX } from "domain/pixel-markers"
 import { MAP_BOUNDS, MAP_MIN_ZOOM, PLATFORM_TIME_ZONE } from "domain/platform"
 import type {
     CategoryIcon,
@@ -50,6 +51,9 @@ import { EventPin } from "./event-pin"
 import { MarkerMotion } from "./marker-motion"
 import { PositionMarker } from "./position-marker"
 import { VenuePin } from "./venue-pin"
+
+// Puts the center of the disc of a pin on its point, as the kit anchors it
+const PIN_OFFSET: [number, number] = [0, PIN_DISC_RADIUS_PX]
 
 const INITIAL_ZOOM = 13
 const MAP_IMAGES = { "dot-dither": dotDitherPattern }
@@ -369,7 +373,13 @@ export const EventMap = (props: EventMapProps) => {
                 spot.index - source.occurrences.length,
             )
             return venue === undefined ? undefined : (
-                <Marker key={key} lngLat={lngLat} anchor="bottom" style={layerStyle}>
+                <Marker
+                    key={key}
+                    lngLat={lngLat}
+                    anchor="bottom"
+                    offset={PIN_OFFSET}
+                    style={layerStyle}
+                >
                     <MarkerMotion move={move}>
                         <VenuePin
                             name={venue.name}
@@ -388,7 +398,13 @@ export const EventMap = (props: EventMapProps) => {
 
         const occurrence = source.occurrences.at(spot.index)
         return occurrence === undefined ? undefined : (
-            <Marker key={key} lngLat={lngLat} anchor="bottom" style={layerStyle}>
+            <Marker
+                key={key}
+                lngLat={lngLat}
+                anchor="bottom"
+                offset={PIN_OFFSET}
+                style={layerStyle}
+            >
                 <MarkerMotion move={move}>
                     <EventPin
                         title={occurrence.title}

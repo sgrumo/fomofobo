@@ -2,6 +2,8 @@
 // on a square grid around a center, a cell in when the distance from its middle to the center
 // passes a test. Paths run in cell units, and each client scales one cell to `MARKER_CELL_PX`.
 
+import type { CategoryIcon } from "models"
+
 import { LIVE_WAVE_RUNS, POSITION_WAVE_RUNS } from "./pixel-waves"
 
 export const MARKER_CELL_PX = 2
@@ -50,23 +52,123 @@ const cellsPathOf = (reach: number, test: CellTest, shiftX = 0, shiftY = 0): str
  * @description Builds an event disc: a fill, a ring one cell wide, and the solid shadow of a selected disc
  * @param radius Radius of the disc, in cells
  */
-const discOf = (radius: number) => {
-    const reach = radius + 1
-    return {
-        cells: 2 * padOf(reach),
-        fillPath: cellsPathOf(reach, distance => distance <= radius - 1),
-        ringPath: cellsPathOf(
-            reach,
-            distance => distance > radius - 1 && distance <= radius,
-        ),
-        // Two cells right and down, under the disc
-        shadowPath: cellsPathOf(reach, distance => distance <= radius, 2, 2),
-    }
+// The discs of the zonzo-locator kit of the designer. The selected disc draws its shadow two
+// cells right and down, past its cells.
+export const EVENT_DISC = {
+    cells: 22,
+    fillPath:
+        "M8 1h6v1h-6zM5 2h12v1h-12zM4 3h14v1h-14zM3 4h16v1h-16zM2 5h18v1h-18zM2 6h18v1h-18zM2 7h18v1h-18zM1 8h20v1h-20zM1 9h20v1h-20zM1 10h20v1h-20zM1 11h20v1h-20zM1 12h20v1h-20zM1 13h20v1h-20zM2 14h18v1h-18zM2 15h18v1h-18zM2 16h18v1h-18zM3 17h16v1h-16zM4 18h14v1h-14zM5 19h12v1h-12zM8 20h6v1h-6z",
+    ringPath:
+        "M8 0h6v1h-6zM5 1h3v1h-3zM14 1h3v1h-3zM4 2h1v1h-1zM17 2h1v1h-1zM3 3h1v1h-1zM18 3h1v1h-1zM2 4h1v1h-1zM19 4h1v1h-1zM1 5h1v1h-1zM20 5h1v1h-1zM1 6h1v1h-1zM20 6h1v1h-1zM1 7h1v1h-1zM20 7h1v1h-1zM0 8h1v1h-1zM21 8h1v1h-1zM0 9h1v1h-1zM21 9h1v1h-1zM0 10h1v1h-1zM21 10h1v1h-1zM0 11h1v1h-1zM21 11h1v1h-1zM0 12h1v1h-1zM21 12h1v1h-1zM0 13h1v1h-1zM21 13h1v1h-1zM1 14h1v1h-1zM20 14h1v1h-1zM1 15h1v1h-1zM20 15h1v1h-1zM1 16h1v1h-1zM20 16h1v1h-1zM2 17h1v1h-1zM19 17h1v1h-1zM3 18h1v1h-1zM18 18h1v1h-1zM4 19h1v1h-1zM17 19h1v1h-1zM5 20h3v1h-3zM14 20h3v1h-3zM8 21h6v1h-6z",
+    shadowPath: "",
 }
 
-export const EVENT_DISC = discOf(9)
+export const SELECTED_EVENT_DISC = {
+    cells: 26,
+    fillPath:
+        "M9 1h8v1h-8zM7 2h12v1h-12zM5 3h16v1h-16zM4 4h18v1h-18zM3 5h20v1h-20zM3 6h20v1h-20zM2 7h22v1h-22zM2 8h22v1h-22zM1 9h24v1h-24zM1 10h24v1h-24zM1 11h24v1h-24zM1 12h24v1h-24zM1 13h24v1h-24zM1 14h24v1h-24zM1 15h24v1h-24zM1 16h24v1h-24zM2 17h22v1h-22zM2 18h22v1h-22zM3 19h20v1h-20zM3 20h20v1h-20zM4 21h18v1h-18zM5 22h16v1h-16zM7 23h12v1h-12zM9 24h8v1h-8z",
+    ringPath:
+        "M9 0h8v1h-8zM7 1h2v1h-2zM17 1h2v1h-2zM5 2h2v1h-2zM19 2h2v1h-2zM4 3h1v1h-1zM21 3h1v1h-1zM3 4h1v1h-1zM22 4h1v1h-1zM2 5h1v1h-1zM23 5h1v1h-1zM2 6h1v1h-1zM23 6h2v1h-2zM1 7h1v1h-1zM24 7h1v1h-1zM1 8h1v1h-1zM24 8h2v1h-2zM0 9h1v1h-1zM25 9h1v1h-1zM0 10h1v1h-1zM25 10h1v1h-1zM0 11h1v1h-1zM25 11h1v1h-1zM0 12h1v1h-1zM25 12h1v1h-1zM0 13h1v1h-1zM25 13h1v1h-1zM0 14h1v1h-1zM25 14h1v1h-1zM0 15h1v1h-1zM25 15h1v1h-1zM0 16h1v1h-1zM25 16h1v1h-1zM1 17h1v1h-1zM24 17h2v1h-2zM1 18h1v1h-1zM24 18h1v1h-1zM2 19h1v1h-1zM23 19h2v1h-2zM2 20h1v1h-1zM23 20h1v1h-1zM3 21h1v1h-1zM22 21h2v1h-2zM4 22h1v1h-1zM21 22h2v1h-2zM5 23h2v1h-2zM19 23h3v1h-3zM6 24h3v1h-3zM17 24h3v1h-3zM8 25h10v1h-10z",
+    shadowPath:
+        "M25 7h1v1h-1zM26 9h1v1h-1zM26 10h1v1h-1zM26 11h2v1h-2zM26 12h2v1h-2zM26 13h2v1h-2zM26 14h2v1h-2zM26 15h2v1h-2zM26 16h2v1h-2zM26 17h2v1h-2zM25 18h3v1h-3zM25 19h2v1h-2zM24 20h3v1h-3zM24 21h2v1h-2zM23 22h3v1h-3zM22 23h3v1h-3zM20 24h4v1h-4zM7 25h1v1h-1zM18 25h5v1h-5zM9 26h12v1h-12zM11 27h8v1h-8z",
+}
 
-export const SELECTED_EVENT_DISC = discOf(11)
+// Shift down from the bottom of a pin to the center of its disc, where the kit anchors the pin.
+// A selected disc keeps this center.
+export const PIN_DISC_RADIUS_PX = (EVENT_DISC.cells * MARKER_CELL_PX) / 2
+
+interface PinIcon {
+    // Side of the icon grid, in icon cells
+    cells: number
+    // Side of one icon cell in px, which the kit sets by hand for each icon
+    cellPx: number
+    // Place of the icon grid in px from the corner of `EVENT_DISC`, optical correction included
+    left: number
+    top: number
+    path: string
+}
+
+// The category icons of the kit and their place in the disc. A selected disc moves them by
+// half the growth of the disc.
+export const PIN_ICONS: Record<CategoryIcon, PinIcon> = {
+    art: {
+        cells: 12,
+        cellPx: 1.8333,
+        left: 10.925,
+        top: 11.467,
+        path: "M0 1h12v1h-12zM0 2h1v1h-1zM11 2h1v1h-1zM0 3h1v1h-1zM7 3h2v1h-2zM11 3h1v1h-1zM0 4h1v1h-1zM7 4h2v1h-2zM11 4h1v1h-1zM0 5h1v1h-1zM11 5h1v1h-1zM0 6h1v1h-1zM4 6h1v1h-1zM11 6h1v1h-1zM0 7h1v1h-1zM3 7h3v1h-3zM8 7h1v1h-1zM11 7h1v1h-1zM0 8h1v1h-1zM2 8h8v1h-8zM11 8h1v1h-1zM0 9h12v1h-12z",
+    },
+    food: {
+        cells: 12,
+        cellPx: 1.8333,
+        left: 10.777,
+        top: 12.951,
+        path: "M1 0h1v1h-1zM3 0h1v1h-1zM5 0h1v1h-1zM10 0h1v1h-1zM1 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM9 1h2v1h-2zM1 2h1v1h-1zM3 2h1v1h-1zM5 2h1v1h-1zM9 2h2v1h-2zM1 3h5v1h-5zM9 3h2v1h-2zM2 4h3v1h-3zM9 4h2v1h-2zM3 5h1v1h-1zM9 5h2v1h-2zM3 6h1v1h-1zM10 6h1v1h-1zM3 7h1v1h-1zM10 7h1v1h-1zM3 8h1v1h-1zM10 8h1v1h-1zM3 9h1v1h-1zM10 9h1v1h-1zM3 10h1v1h-1zM10 10h1v1h-1z",
+    },
+    cinema: {
+        cells: 12,
+        cellPx: 1.8333,
+        left: 11.536,
+        top: 10.728,
+        path: "M1 1h3v1h-3zM6 1h3v1h-3zM0 2h1v1h-1zM4 2h2v1h-2zM9 2h1v1h-1zM0 3h1v1h-1zM2 3h1v1h-1zM4 3h2v1h-2zM7 3h1v1h-1zM9 3h1v1h-1zM0 4h1v1h-1zM4 4h2v1h-2zM9 4h1v1h-1zM1 5h3v1h-3zM6 5h3v1h-3zM0 6h9v1h-9zM0 7h1v1h-1zM8 7h1v1h-1zM10 7h2v1h-2zM0 8h1v1h-1zM2 8h2v1h-2zM8 8h4v1h-4zM0 9h1v1h-1zM8 9h1v1h-1zM10 9h2v1h-2zM0 10h9v1h-9z",
+    },
+    comedy: {
+        cells: 12,
+        cellPx: 2,
+        left: 10,
+        top: 10.8,
+        path: "M3 0h6v1h-6zM2 1h1v1h-1zM9 1h1v1h-1zM1 2h1v1h-1zM10 2h1v1h-1zM0 3h1v1h-1zM3 3h2v1h-2zM7 3h2v1h-2zM11 3h1v1h-1zM0 4h1v1h-1zM11 4h1v1h-1zM0 5h1v1h-1zM2 5h8v1h-8zM11 5h1v1h-1zM0 6h1v1h-1zM2 6h1v1h-1zM9 6h1v1h-1zM11 6h1v1h-1zM0 7h1v1h-1zM3 7h1v1h-1zM8 7h1v1h-1zM11 7h1v1h-1zM1 8h1v1h-1zM4 8h4v1h-4zM10 8h1v1h-1zM2 9h1v1h-1zM9 9h1v1h-1zM3 10h6v1h-6z",
+    },
+    party: {
+        cells: 12,
+        cellPx: 2,
+        left: 10.889,
+        top: 11.421,
+        path: "M3 0h5v1h-5zM2 1h7v1h-7zM1 2h2v1h-2zM5 2h5v1h-5zM1 3h1v1h-1zM3 3h7v1h-7zM1 4h9v1h-9zM1 5h9v1h-9zM2 6h7v1h-7zM3 7h5v1h-5zM4 8h3v1h-3zM5 9h1v1h-1zM6 10h1v1h-1zM5 11h1v1h-1z",
+    },
+    talk: {
+        cells: 12,
+        cellPx: 1.8333,
+        left: 11.189,
+        top: 11.566,
+        path: "M1 1h10v1h-10zM0 2h1v1h-1zM11 2h1v1h-1zM0 3h1v1h-1zM11 3h1v1h-1zM0 4h1v1h-1zM11 4h1v1h-1zM0 5h1v1h-1zM11 5h1v1h-1zM0 6h1v1h-1zM11 6h1v1h-1zM0 7h1v1h-1zM11 7h1v1h-1zM1 8h2v1h-2zM5 8h6v1h-6zM2 9h1v1h-1zM4 9h1v1h-1zM2 10h2v1h-2z",
+    },
+    market: {
+        cells: 12,
+        cellPx: 2.1667,
+        left: 9,
+        top: 8.364,
+        path: "M4 2h4v1h-4zM3 3h1v1h-1zM8 3h1v1h-1zM2 4h1v1h-1zM9 4h1v1h-1zM0 5h12v1h-12zM1 6h1v1h-1zM4 6h1v1h-1zM7 6h1v1h-1zM10 6h1v1h-1zM1 7h10v1h-10zM1 8h1v1h-1zM4 8h1v1h-1zM7 8h1v1h-1zM10 8h1v1h-1zM2 9h8v1h-8z",
+    },
+    music: {
+        cells: 7,
+        cellPx: 3,
+        left: 11.75,
+        top: 11.333,
+        path: "M3 0h2v1h-2zM3 1h3v1h-3zM3 2h1v1h-1zM5 2h2v1h-2zM3 3h1v1h-1zM1 4h3v1h-3zM0 5h4v1h-4zM1 6h2v1h-2z",
+    },
+    sport: {
+        cells: 12,
+        cellPx: 1.8333,
+        left: 10.992,
+        top: 10.666,
+        path: "M4 0h4v1h-4zM2 1h1v1h-1zM9 1h1v1h-1zM1 2h2v1h-2zM10 2h1v1h-1zM1 3h1v1h-1zM4 3h4v1h-4zM10 3h1v1h-1zM0 4h1v1h-1zM4 4h4v1h-4zM10 4h2v1h-2zM0 5h1v1h-1zM4 5h4v1h-4zM10 5h2v1h-2zM0 6h1v1h-1zM5 6h2v1h-2zM11 6h1v1h-1zM0 7h3v1h-3zM11 7h1v1h-1zM1 8h3v1h-3zM8 8h3v1h-3zM1 9h3v1h-3zM7 9h4v1h-4zM2 10h2v1h-2zM7 10h3v1h-3zM4 11h4v1h-4z",
+    },
+    theatre: {
+        cells: 12,
+        cellPx: 1.8333,
+        left: 11,
+        top: 11.708,
+        path: "M0 1h12v1h-12zM0 2h12v1h-12zM0 3h2v1h-2zM4 3h4v1h-4zM10 3h2v1h-2zM0 4h12v1h-12zM0 5h12v1h-12zM1 6h2v1h-2zM4 6h4v1h-4zM9 6h2v1h-2zM1 7h3v1h-3zM8 7h3v1h-3zM2 8h8v1h-8zM3 9h6v1h-6zM4 10h4v1h-4z",
+    },
+    other: {
+        cells: 12,
+        cellPx: 1.6667,
+        left: 12,
+        top: 12,
+        path: "M0 5h2v1h-2zM5 5h2v1h-2zM10 5h2v1h-2zM0 6h2v1h-2zM5 6h2v1h-2zM10 6h2v1h-2z",
+    },
+}
 
 /**
  * @description Builds the SVG path data of runs of cells, one rectangle per run

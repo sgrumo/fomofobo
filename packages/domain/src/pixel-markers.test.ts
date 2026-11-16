@@ -5,6 +5,7 @@ import {
     EVENT_DISC,
     LIVE_WAVE,
     MARKER_CELL_PX,
+    PIN_ICONS,
     POSITION_CORE,
     POSITION_WAVE,
     SELECTED_EVENT_DISC,
@@ -58,6 +59,30 @@ describe("pixel markers", () => {
 
         expect([...fill].filter(key => ring.has(key))).toStrictEqual([])
         expect(fill.size).toBeGreaterThan(ring.size)
+    })
+
+    it("places every pin icon inside the fill of the disc", () => {
+        const fill = cellsOf(EVENT_DISC.fillPath)
+        const outside = Object.entries(PIN_ICONS).flatMap(([name, icon]) =>
+            [...cellsOf(icon.path)].flatMap(key => {
+                const [x = 0, y = 0] = key.split(" ").map(Number)
+                // The first and the last px of the icon cell, as disc cells
+                const discCellOf = (start: number, offset: number) =>
+                    Math.floor((start + offset) / MARKER_CELL_PX)
+                const xs = [0, icon.cellPx - 0.01].map(offset =>
+                    discCellOf(icon.left + x * icon.cellPx, offset),
+                )
+                const ys = [0, icon.cellPx - 0.01].map(offset =>
+                    discCellOf(icon.top + y * icon.cellPx, offset),
+                )
+                return xs
+                    .flatMap(cx => ys.map(cy => `${String(cx)} ${String(cy)}`))
+                    .filter(cell => !fill.has(cell))
+                    .map(() => name)
+            }),
+        )
+
+        expect(new Set(outside)).toStrictEqual(new Set())
     })
 
     it("fills every cell of the cluster inside its outer ring once", () => {

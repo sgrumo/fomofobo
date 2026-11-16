@@ -23,7 +23,7 @@ export const VenuePin = (props: VenuePinProps) => {
 
     return (
         <div
-            className={cn("flex flex-col items-center gap-0.5 transition-opacity", {
+            className={cn("flex flex-col items-center gap-2 transition-opacity", {
                 "opacity-35": props.emphasis === "dimmed",
             })}
         >

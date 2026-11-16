@@ -1,17 +1,25 @@
 "use client"
 
 import type { MapPointKind } from "domain/event-clusters"
-import { EVENT_DISC, MARKER_CELL_PX, SELECTED_EVENT_DISC } from "domain/pixel-markers"
+import {
+    EVENT_DISC,
+    MARKER_CELL_PX,
+    PIN_ICONS,
+    SELECTED_EVENT_DISC,
+} from "domain/pixel-markers"
 import { cn } from "frontend-shared/styles"
 import type { CategoryIcon } from "models"
 import type { ReactNode } from "react"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
-import { CategoryGlyph } from "./category-glyph"
-
 // Shadow cells of a selected disc, right and down
 const SHADOW_CELLS = 2
+
+// Half the growth of a selected disc. The kit icons sit in `EVENT_DISC`, so a selected disc moves
+// them by it, and hangs it below the pin so that its center stays on the point of the pin.
+const SELECTED_HALF_GROWTH =
+    ((SELECTED_EVENT_DISC.cells - EVENT_DISC.cells) * MARKER_CELL_PX) / 2
 
 interface PixelDiscProps extends RouteClientComponentProps<"root"> {
     kind: MapPointKind
@@ -25,9 +33,14 @@ export const PixelDisc = (props: PixelDiscProps) => {
     const disc = props.selected ? SELECTED_EVENT_DISC : EVENT_DISC
     const size = disc.cells * MARKER_CELL_PX
     const drawn = props.selected ? disc.cells + SHADOW_CELLS : disc.cells
+    const icon = PIN_ICONS[props.icon]
+    const iconShift = props.selected ? SELECTED_HALF_GROWTH : 0
 
     return (
-        <span className="relative block shrink-0" style={{ width: size, height: size }}>
+        <span
+            className="relative block shrink-0"
+            style={{ width: size, height: size, marginBottom: -iconShift }}
+        >
             {props.behind}
             <svg
                 aria-hidden={true}
@@ -42,9 +55,7 @@ export const PixelDisc = (props: PixelDiscProps) => {
                     "text-permanent": props.kind === "permanent",
                 })}
             >
-                {props.selected ? (
-                    <path d={disc.shadowPath} className="fill-line" />
-                ) : undefined}
+                <path d={disc.shadowPath} className="fill-line" />
                 <path d={disc.fillPath} fill="currentColor" />
                 <path
                     d={disc.ringPath}
@@ -54,12 +65,17 @@ export const PixelDisc = (props: PixelDiscProps) => {
                     })}
                 />
             </svg>
-            <CategoryGlyph
-                route={props.route}
-                icon={props.icon}
-                cellPx={MARKER_CELL_PX}
-                className="fill-line absolute top-1/2 left-1/2 -translate-1/2"
-            />
+            <svg
+                aria-hidden={true}
+                width={icon.cells * icon.cellPx}
+                height={icon.cells * icon.cellPx}
+                viewBox={`0 0 ${String(icon.cells)} ${String(icon.cells)}`}
+                shapeRendering="crispEdges"
+                className="fill-line absolute"
+                style={{ left: icon.left + iconShift, top: icon.top + iconShift }}
+            >
+                <path d={icon.path} />
+            </svg>
         </span>
     )
 }
