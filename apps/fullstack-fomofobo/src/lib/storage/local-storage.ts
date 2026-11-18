@@ -21,6 +21,7 @@ export const localStorageSchema = {
     "device-id": z.uuid().nullable(),
     "event-form-mode": z.enum(["wizard", "form"]),
     "sounds-muted": z.boolean(),
+    "app-download-dismissed": z.boolean(),
 }
 export type LocalStorageKey = keyof typeof localStorageSchema
 export type LocalStorageItem<K extends LocalStorageKey> = z.output<
@@ -37,6 +38,7 @@ export const localStorageDefaults: {
     "device-id": null,
     "event-form-mode": "wizard",
     "sounds-muted": false,
+    "app-download-dismissed": false,
 }
 
 export const localStorage = createWebStorage(

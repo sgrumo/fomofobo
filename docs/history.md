@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-18 · Phone browsers suggest the native app
+
+### Changed
+
+The map on a phone browser asks once to download the native app from the App Store or Google Play. The prompt shows only when the server knows the store listing of that platform.
+
+### Why
+
+A client request. The native app is the main way to use the product on a phone, and the web app now leads phone visitors to it.
+
+### Check next time
+
+Agree early whether the web app pushes phone visitors to the native app, since it changes the role of the installable web app.
+
 ## 2026-11-18 · A cluster press closes the open preview
 
 ### Changed

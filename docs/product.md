@@ -110,7 +110,7 @@ The saved list works offline for every saved event that the device showed online
 
 A native app for iOS and Android offers the features of the public web app: the map with its preview, search and filters, event and venue details, saved events and offline reads. It has no sign-in and no backoffice, and it speaks Italian alone.
 
-The stores install and update the app, in place of the install button and the update prompt of the web app. A version gate asks for a store update when the server marks the installed version as too old, and shows a maintenance notice when the server says so.
+The stores install and update the app, in place of the install button and the update prompt of the web app. A phone browser on the map asks once to download the app from its store, when that store lists the app. A version gate asks for a store update when the server marks the installed version as too old, and shows a maintenance notice when the server says so.
 
 ### Privacy and support
 

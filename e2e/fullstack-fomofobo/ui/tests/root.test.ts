@@ -23,7 +23,8 @@ import {
 import { blockVenue, updateVenue } from "../../api/backoffice-venues/api"
 import { saveOccurrence } from "../../api/public/api"
 import { SATURDAY_NOON } from "../../api/public/utils"
-import { gotoPage, gotoPath, t } from "../app"
+import { VERSION_GATE_ENV } from "../../server"
+import { gotoPage, gotoPath, reloadPage, t } from "../app"
 import {
     blockPublicEvent,
     buildArea,
@@ -1924,5 +1925,56 @@ test.describe("detail over the map", () => {
                     .getByRole("heading", { level: 1, name }),
             ).toBeVisible()
         }
+    })
+})
+
+test.describe("download prompt", () => {
+    test.use({
+        userAgent:
+            "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1",
+    })
+
+    test.beforeEach(async ({ page }) => {
+        await preparePublicPage(page)
+    })
+
+    test("asks a phone once to download the app from its store, and stays away once dismissed", async ({
+        page,
+    }) => {
+        const prompt = page.getByRole("dialog", {
+            name: t("shared", "DownloadApp.Title"),
+        })
+
+        await gotoPage(page, mapPath(buildArea()))
+
+        await expect(prompt).toContainText(
+            t("shared", "DownloadApp.Description", {
+                store: t("shared", "DownloadApp.Store.ios"),
+            }),
+        )
+
+        await clickButton(prompt, t("shared", "DownloadApp.Stay"))
+
+        await expect(prompt).toBeHidden()
+
+        await reloadPage(page)
+
+        await expect(page.getByLabel(t("shared", "Search.Label"))).toBeVisible()
+        await expect(prompt).toBeHidden()
+    })
+
+    test("opens the store listing of the app", async ({ page }) => {
+        const prompt = page.getByRole("dialog", {
+            name: t("shared", "DownloadApp.Title"),
+        })
+        // The store stays out of the test: the listing answers an empty page
+        await page.route(VERSION_GATE_ENV.IOS_STORE_URL, route =>
+            route.fulfill({ contentType: "text/html", body: "" }),
+        )
+
+        await gotoPage(page, mapPath(buildArea()))
+        await clickButton(prompt, t("shared", "DownloadApp.Open"))
+
+        await expect(page).toHaveURL(VERSION_GATE_ENV.IOS_STORE_URL)
     })
 })

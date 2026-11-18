@@ -37,6 +37,7 @@ import {
     DetailSheet,
     DetailSidePanel,
 } from "@/components/client/detail-dialog/detail-dialog"
+import { DownloadAppDialog } from "@/components/client/download-app-dialog/download-app-dialog"
 import { EventDetail } from "@/components/client/event-detail/event-detail"
 import {
     EventPreview,
@@ -53,6 +54,7 @@ import { useDynamicRoute } from "@/framework/routes/route-hooks/use-dynamic-rout
 import { routes } from "@/framework/routes/routes"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
+import type { StorePlatform } from "@/lib/app-stores/store-platform"
 import { useGeolocation } from "@/lib/hooks/use-geolocation"
 import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import { useMediaQuery } from "@/lib/hooks/use-media-query"
@@ -115,6 +117,7 @@ const targetOf = (entry: PreviewEntry): PreviewTarget =>
 
 interface MapScreenProps extends RouteClientComponentProps<"root"> {
     baseUrl: string
+    storeUrls: Record<StorePlatform, string | undefined>
 }
 
 export const MapScreen = (props: MapScreenProps) => {
@@ -768,6 +771,7 @@ export const MapScreen = (props: MapScreenProps) => {
                 }}
                 onClose={closePreview}
             />
+            <DownloadAppDialog storeUrls={props.storeUrls} />
         </section>
     )
 }

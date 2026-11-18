@@ -637,6 +637,16 @@
         "BackHome": "Torna alla mappa",
         "OpenSaved": "Apri gli eventi salvati"
     },
+    "DownloadApp": {
+        "Title": "Zonzo è anche un'app",
+        "Description": "Scarica Zonzo da {{store}} per avere la mappa degli eventi sempre a portata di mano.",
+        "Store": {
+            "ios": "App Store",
+            "android": "Google Play"
+        },
+        "Open": "Scarica l'app",
+        "Stay": "Continua sul web"
+    },
     "Install": {
         "Title": "Installa l'app",
         "Button": "Aggiungi alla schermata Home",
