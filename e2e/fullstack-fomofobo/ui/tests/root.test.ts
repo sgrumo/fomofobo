@@ -1545,6 +1545,12 @@ test.describe("detail over the map", () => {
         await clickIconButton(shareMenu, t("shared", "Detail.ShareOn.Copy"))
 
         await expect(shareMenu).toBeHidden()
+        await expectToast(page, { type: "success" }, t("shared", "Detail.ShareOn.Copied"))
+        await dismissToast(
+            page,
+            { type: "success" },
+            t("shared", "Detail.ShareOn.Copied"),
+        )
 
         // A string expression: the suite compiles without the DOM types of the browser.
         await expect
