@@ -175,6 +175,8 @@ interface EventMapProps extends RouteClientComponentProps<"root"> {
     onSelectedClick: () => void
     // A drag of the map by the visitor
     onDragStart: () => void
+    // A press on a cluster that the map zooms into
+    onClusterZoom: () => void
     // A pan or a zoom of the map by the visitor
     onUserMoveStart: () => void
     // West, south, east and north edges of the map once it loads and after each move
@@ -509,6 +511,7 @@ export const EventMap = (props: EventMapProps) => {
                                     selectIndex(first)
                                     return
                                 }
+                                props.onClusterZoom()
                                 shownOn.easeTo({
                                     center: [coordinates.longitude, coordinates.latitude],
                                     zoom,

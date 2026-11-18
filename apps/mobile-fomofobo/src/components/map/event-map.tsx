@@ -126,6 +126,8 @@ interface EventMapProps {
     onPress: () => void
     // A pan or a zoom of the map by the visitor
     onUserMoveStart: () => void
+    // A press on a cluster that the map zooms into
+    onClusterZoom: () => void
 }
 
 export const EventMap = (props: EventMapProps) => {
@@ -358,6 +360,7 @@ export const EventMap = (props: EventMapProps) => {
                                     selectIndex(first)
                                     return
                                 }
+                                props.onClusterZoom()
                                 cameraRef.current?.easeTo({ center: lngLat, zoom })
                             }}
                         />

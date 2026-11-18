@@ -304,6 +304,7 @@ const MapScreen = () => {
                     setCreditOpen(false)
                     closePreview()
                 }}
+                onClusterZoom={closePreview}
             />
             <View
                 className="absolute inset-x-4 gap-2"

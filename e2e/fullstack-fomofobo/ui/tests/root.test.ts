@@ -246,6 +246,55 @@ test.describe("map", () => {
         await expect(cluster).toBeVisible()
     })
 
+    test("closes the preview of a pin and opens a cluster on a press of the cluster", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const category = await seedCategory()
+        // The cluster lies west of the pin, clear of the preview card above the pin
+        const [courtyard, loggia, garden] = await Promise.all([
+            seedVenue(offsetPoint(center, { latitude: 0, longitude: -0.0075 })),
+            seedVenue(offsetPoint(center, { latitude: 0.0005, longitude: -0.0075 })),
+            seedVenue(offsetPoint(center, { latitude: 0, longitude: 0.0075 })),
+        ])
+        await Promise.all([
+            seedPublicEvent(
+                { venue: courtyard, category },
+                { startsAt: "2026-10-24T11:00", endsAt: "2026-10-24T13:00" },
+            ),
+            seedPublicEvent(
+                { venue: loggia, category },
+                { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+            ),
+        ])
+        const picnic = await seedPublicEvent(
+            { venue: garden, category },
+            { startsAt: "2026-10-24T18:00", endsAt: "2026-10-24T20:00" },
+        )
+        const cluster = page.getByRole("button", {
+            name: t("shared", "Map.Cluster", {
+                count: 2,
+                live: 1,
+                upcoming: 1,
+                ended: 0,
+                permanent: 0,
+            }),
+        })
+        const preview = page.getByRole("dialog", { name: picnic.title, exact: true })
+
+        await gotoPage(
+            page,
+            `${mapPath(center)}&event=${picnic.id}&occurrence=2026-10-24`,
+        )
+
+        await expect(preview).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+
+        await cluster.click()
+
+        await expect(preview).toBeHidden()
+        await expect(cluster).toBeHidden()
+    })
+
     test("opens the cluster that holds the event of a preview into its pins, and groups it again once the preview closes", async ({
         page,
     }) => {

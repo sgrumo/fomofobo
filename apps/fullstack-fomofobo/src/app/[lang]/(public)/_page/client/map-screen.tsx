@@ -285,6 +285,12 @@ export const MapScreen = (props: MapScreenProps) => {
             { history: "replace" },
         )
     }
+    // A drag of the map or a zoom into a cluster closes the preview, not the detail over it
+    const closeBarePreview = () => {
+        if (previewOpen && !detailOpen) {
+            closePreview()
+        }
+    }
     const openDetail = () => {
         playSound("expand")
         setDetailPushed(true)
@@ -574,11 +580,8 @@ export const MapScreen = (props: MapScreenProps) => {
                 onUserMoveStart={() => {
                     setCreditOpen(false)
                 }}
-                onDragStart={() => {
-                    if (previewOpen && !detailOpen) {
-                        closePreview()
-                    }
-                }}
+                onDragStart={closeBarePreview}
+                onClusterZoom={closeBarePreview}
                 onViewportChange={bbox => {
                     setSearchArea(area =>
                         nextSearchArea(bbox, center, area, results?.truncated === true),

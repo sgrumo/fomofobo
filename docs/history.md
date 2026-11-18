@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-18 · A cluster press closes the open preview
+
+### Changed
+
+A press on a cluster while a preview is open closes the preview and zooms into the cluster, on the web and in the native app. Before, the clusters stayed frozen and the press changed nothing.
+
+### Why
+
+A client request. The visitor expects a press on a cluster to open it, whatever is open.
+
+### Check next time
+
+Agree how each map control behaves while a preview is open before the map interactions are built.
+
 ## 2026-11-13 · Night events count for the day before
 
 ### Changed
