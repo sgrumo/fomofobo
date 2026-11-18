@@ -56,8 +56,8 @@
         "Kind": {
             "live": "Live",
             "upcoming": "In arrivo",
-            "permanent": "Continuo",
-            "ended": "Finito"
+            "permanent": "Fissi",
+            "ended": "Finiti"
         },
         "Categories": "Categorie",
         "Dates": "Date",
