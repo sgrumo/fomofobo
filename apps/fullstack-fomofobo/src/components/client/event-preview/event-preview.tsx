@@ -435,15 +435,15 @@ export const EventPreviewCard = (props: NonModalPreviewProps) => {
             aria-modal={false}
             aria-labelledby={titleId}
             tabIndex={-1}
-            className="drop-shadow-hard-lg flex w-[23.75rem] cursor-auto flex-col items-center outline-none"
+            className="drop-shadow-hard-lg pointer-events-none flex w-[23.75rem] cursor-auto flex-col items-center outline-none"
         >
-            {/* In flow, so the map pans the tab clear of the controls too */}
+            {/* In flow, so the map pans the tab clear of the controls too. The card takes the press on its tab and its panel alone, so a press beside the tab reaches the map */}
             {props.paging === undefined ? undefined : (
-                <div className="-mb-2">
+                <div className="pointer-events-auto -mb-2">
                     <PagingTab paging={props.paging} />
                 </div>
             )}
-            <div className="pixel-corners relative w-full p-4">
+            <div className="pixel-corners pointer-events-auto relative w-full p-4">
                 <PreviewPanel
                     entry={props.entry}
                     loadFailed={false}

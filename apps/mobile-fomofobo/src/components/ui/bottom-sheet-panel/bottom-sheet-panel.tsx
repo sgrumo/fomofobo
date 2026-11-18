@@ -1,15 +1,9 @@
-import GorhomBottomSheet, {
-    BottomSheetHandle,
-    BottomSheetView,
-} from "@gorhom/bottom-sheet"
-import type {
-    BottomSheetBackgroundProps,
-    BottomSheetHandleProps,
-} from "@gorhom/bottom-sheet"
-import { createContext, use, useEffect, useRef } from "react"
+import GorhomBottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet"
+import { useEffect, useRef } from "react"
 import type { ReactNode } from "react"
 import { View } from "react-native"
 import { GestureDetector, usePanGesture } from "react-native-gesture-handler"
+import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { BottomSheetBackground } from "@/components/ui/bottom-sheet/bottom-sheet"
@@ -19,9 +13,10 @@ import {
 } from "@/components/ui/bottom-sheet/bottom-sheet.styles"
 
 import {
+    BOTTOM_SHEET_TAB_ROW_HEIGHT,
     bottomSheetPanelContentStyles,
     bottomSheetPanelStyle,
-    bottomSheetTabbedBackgroundStyle,
+    bottomSheetTabLayerStyle,
     bottomSheetTabRowStyle,
     bottomSheetTabRowStyles,
     bottomSheetTabTuckStyle,
@@ -29,31 +24,6 @@ import {
     SWIPE_UP_ACTIVE_OFFSETS,
     SWIPE_UP_DISTANCE,
 } from "./bottom-sheet-panel.styles"
-
-// gorhom takes the handle as a component: the tab goes through context, so the handle keeps
-// its identity across renders
-const TabContext = createContext<ReactNode>(undefined)
-
-// The tab sits in the handle, above the frame, so the frame line runs under it
-const TabbedHandle = (props: BottomSheetHandleProps) => {
-    const tab = use(TabContext)
-
-    return (
-        <View>
-            <View className={bottomSheetTabRowStyles} style={bottomSheetTabRowStyle}>
-                <View style={bottomSheetTabTuckStyle}>{tab}</View>
-            </View>
-            <BottomSheetHandle {...props} indicatorStyle={bottomSheetHandleIndicator} />
-        </View>
-    )
-}
-
-const TabbedBackground = (props: BottomSheetBackgroundProps) => (
-    <BottomSheetBackground
-        {...props}
-        style={[props.style, bottomSheetTabbedBackgroundStyle]}
-    />
-)
 
 interface BottomSheetPanelProps {
     open: boolean
@@ -69,6 +39,11 @@ interface BottomSheetPanelProps {
 const BottomSheetPanel = (props: BottomSheetPanelProps) => {
     const ref = useRef<GorhomBottomSheet>(null)
     const insets = useSafeAreaInsets()
+    // Top of the sheet frame in the parent, which the tab follows
+    const sheetTop = useSharedValue(0)
+    const tabRowStyle = useAnimatedStyle(() => ({
+        transform: [{ translateY: sheetTop.value - BOTTOM_SHEET_TAB_ROW_HEIGHT }],
+    }))
     const onSwipeUp = props.onSwipeUp
     const swipeUp = usePanGesture({
         enabled: onSwipeUp !== undefined,
@@ -92,10 +67,26 @@ const BottomSheetPanel = (props: BottomSheetPanelProps) => {
     }, [props.open])
 
     return (
-        <TabContext value={props.tab}>
+        <>
+            {/* Outside the sheet and under it, so a press beside the tab reaches the screen behind */}
+            {props.tab !== undefined && (
+                <Animated.View
+                    pointerEvents="box-none"
+                    style={[bottomSheetTabLayerStyle, tabRowStyle]}
+                >
+                    <View
+                        pointerEvents="box-none"
+                        className={bottomSheetTabRowStyles}
+                        style={bottomSheetTabRowStyle}
+                    >
+                        <View style={bottomSheetTabTuckStyle}>{props.tab}</View>
+                    </View>
+                </Animated.View>
+            )}
             <GorhomBottomSheet
                 ref={ref}
                 index={-1}
+                animatedPosition={sheetTop}
                 enableDynamicSizing={true}
                 // The sheet pans on a drag down alone, so a drag up reaches the swipe of the content
                 activeOffsetY={onSwipeUp === undefined ? undefined : DRAG_DOWN_OFFSETS}
@@ -103,10 +94,7 @@ const BottomSheetPanel = (props: BottomSheetPanelProps) => {
                 detached={true}
                 bottomInset={insets.bottom + BOTTOM_SHEET_INSET}
                 style={bottomSheetPanelStyle}
-                backgroundComponent={
-                    props.tab === undefined ? BottomSheetBackground : TabbedBackground
-                }
-                handleComponent={props.tab === undefined ? undefined : TabbedHandle}
+                backgroundComponent={BottomSheetBackground}
                 handleIndicatorStyle={bottomSheetHandleIndicator}
                 onClose={() => {
                     // A close that `open` asked for is no close of the user
@@ -123,7 +111,7 @@ const BottomSheetPanel = (props: BottomSheetPanelProps) => {
                     </GestureDetector>
                 </BottomSheetView>
             </GorhomBottomSheet>
-        </TabContext>
+        </>
     )
 }
 
