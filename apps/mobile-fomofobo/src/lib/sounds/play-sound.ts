@@ -6,14 +6,13 @@ import { deviceStorage } from "@/lib/storage/device-storage"
 
 import eventV1 from "../../../assets/sounds/event-v1.flac"
 import eventV2 from "../../../assets/sounds/event-v2.flac"
-import expandV1 from "../../../assets/sounds/expand-v1.flac"
-import expandV2 from "../../../assets/sounds/expand-v2.flac"
+import expand from "../../../assets/sounds/expand.flac"
 import saveOff from "../../../assets/sounds/save-off.flac"
 import saveOn from "../../../assets/sounds/save-on.flac"
 
 const SOUND_SOURCES = {
     event: [eventV1, eventV2],
-    expand: [expandV1, expandV2],
+    expand: [expand],
     "save-on": [saveOn],
     "save-off": [saveOff],
 }

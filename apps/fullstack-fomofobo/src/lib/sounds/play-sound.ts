@@ -5,7 +5,7 @@ import { localStorage } from "@/lib/storage/local-storage"
 // Versions of each sound, served from `public/sounds`
 const SOUND_URLS = {
     event: ["/sounds/event-v1.flac", "/sounds/event-v2.flac"],
-    expand: ["/sounds/expand-v1.flac", "/sounds/expand-v2.flac"],
+    expand: ["/sounds/expand.flac"],
     "save-on": ["/sounds/save-on.flac"],
     "save-off": ["/sounds/save-off.flac"],
 }
