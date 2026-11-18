@@ -8,7 +8,7 @@ import { Chip, ChipRow } from "ui-components/chip"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
-interface KindChipsProps extends RouteClientComponentProps<"root"> {
+interface KindChipsProps extends RouteClientComponentProps<"map"> {
     shown: ReadonlySet<MapPointKind>
     onChange: (change: MapQuery) => void
     className?: string

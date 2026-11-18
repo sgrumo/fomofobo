@@ -74,7 +74,7 @@ test.describe("saved events", () => {
         const detail = page.getByRole("dialog", { name: event.title, exact: true })
         await expect(link).toHaveAttribute(
             "href",
-            `/it?event=${event.id}&occurrence=2026-10-25&detail=true`,
+            `/it/map?event=${event.id}&occurrence=2026-10-25&detail=true`,
         )
         await link.click()
 

@@ -21,7 +21,7 @@ const SHADOW_CELLS = 2
 const SELECTED_HALF_GROWTH =
     ((SELECTED_EVENT_DISC.cells - EVENT_DISC.cells) * MARKER_CELL_PX) / 2
 
-interface PixelDiscProps extends RouteClientComponentProps<"root"> {
+interface PixelDiscProps extends RouteClientComponentProps<"map"> {
     kind: MapPointKind
     icon: CategoryIcon
     selected: boolean

@@ -17,6 +17,6 @@ export const useBackToMap = () => {
             router.back()
             return
         }
-        router.push(routes.root.path({ parameters: { lang: language }, query: {} }))
+        router.push(routes.map.path({ parameters: { lang: language }, query: {} }))
     }
 }

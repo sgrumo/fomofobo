@@ -11,7 +11,7 @@ import type { MapQuery } from "./map-query"
  * @param query Keys of the map query
  */
 const mapUrlOf = (baseUrl: string, language: string, query: MapQuery): string => {
-    const url = new URL(`/${language}`, baseUrl)
+    const url = new URL(`/${language}/map`, baseUrl)
     url.search = new URLSearchParams(z.encode(mapQuerySchema, query)).toString()
     return url.href
 }

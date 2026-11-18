@@ -1,0 +1,578 @@
+/* Landing of the public app. Desktop copies the design values; a phone fits one screen, with no scroll */
+
+.landing {
+    --landing-face-height: 184px;
+    --landing-menu-height: 184px;
+    --landing-shadow: 8px;
+
+    box-sizing: border-box;
+    display: flex;
+    min-height: 100%;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 20px 20px;
+    color: var(--palette-paper);
+    background-color: var(--palette-map-ground);
+    background-image:
+        linear-gradient(
+            28deg,
+            transparent 49.6%,
+            rgb(143 227 192 / 0.16) 49.6%,
+            rgb(143 227 192 / 0.16) 50.4%,
+            transparent 50.4%
+        ),
+        linear-gradient(
+            -62deg,
+            transparent 49.7%,
+            rgb(143 227 192 / 0.12) 49.7%,
+            rgb(143 227 192 / 0.12) 50.3%,
+            transparent 50.3%
+        ),
+        linear-gradient(90deg, rgb(24 89 69 / 0.5) 1px, transparent 1px),
+        linear-gradient(0deg, rgb(24 89 69 / 0.5) 1px, transparent 1px);
+    background-size:
+        420px 300px,
+        360px 260px,
+        48px 48px,
+        48px 48px;
+    animation: landing-drift 160s linear infinite;
+}
+
+.landing a {
+    color: var(--palette-paper);
+}
+
+.landing a:hover {
+    color: var(--palette-map-water);
+}
+
+.landing-mono {
+    font-family: var(--font-count);
+    font-weight: 400;
+    text-transform: uppercase;
+    -webkit-font-smoothing: none;
+}
+
+.landing-main {
+    display: flex;
+    width: 100%;
+    max-width: 1080px;
+    flex-direction: column;
+    align-items: center;
+}
+
+.landing-logo {
+    width: 260px;
+    max-width: 80vw;
+    height: 260px;
+    max-height: 80vw;
+    flex: none;
+    background-image: url("/landing/radar-sprite.png");
+    background-repeat: no-repeat;
+    background-size: 2400% 100%;
+    image-rendering: pixelated;
+    animation: landing-radar 1.6s steps(24, jump-none) infinite;
+}
+
+.landing-wordmark {
+    margin: -24px 0 0;
+    font-size: 110px;
+    line-height: 110px;
+    letter-spacing: 0.06em;
+}
+
+.landing-tagline {
+    max-width: 540px;
+    margin: 16px 0 0;
+    font:
+        400 19px/1.55 "Geist Variable",
+        var(--font-sans);
+    text-align: center;
+}
+
+.landing-explore {
+    display: flex;
+    width: 100%;
+    margin-top: 36px;
+    justify-content: center;
+}
+
+.landing-card-slot {
+    position: relative;
+    box-sizing: border-box;
+    width: min(524px, 100%);
+    padding-right: var(--landing-shadow);
+}
+
+/* Pixel corners on a 2 px grid, three steps deep */
+.landing-step {
+    clip-path: polygon(
+        6px 0,
+        calc(100% - 6px) 0,
+        calc(100% - 6px) 2px,
+        calc(100% - 4px) 2px,
+        calc(100% - 4px) 4px,
+        calc(100% - 2px) 4px,
+        calc(100% - 2px) 6px,
+        100% 6px,
+        100% calc(100% - 6px),
+        calc(100% - 2px) calc(100% - 6px),
+        calc(100% - 2px) calc(100% - 4px),
+        calc(100% - 4px) calc(100% - 4px),
+        calc(100% - 4px) calc(100% - 2px),
+        calc(100% - 6px) calc(100% - 2px),
+        calc(100% - 6px) 100%,
+        6px 100%,
+        6px calc(100% - 2px),
+        4px calc(100% - 2px),
+        4px calc(100% - 4px),
+        2px calc(100% - 4px),
+        2px calc(100% - 6px),
+        0 calc(100% - 6px),
+        0 6px,
+        2px 6px,
+        2px 4px,
+        4px 4px,
+        4px 2px,
+        6px 2px
+    );
+}
+
+.landing-card {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    color: var(--palette-ink);
+    text-align: left;
+    background: none;
+    cursor: pointer;
+    filter: drop-shadow(var(--landing-shadow) var(--landing-shadow) 0 var(--palette-ink));
+    transition:
+        transform 60ms linear,
+        filter 60ms linear;
+}
+
+.landing-card:hover {
+    transform: translate(
+        calc(var(--landing-shadow) / 2),
+        calc(var(--landing-shadow) / 2)
+    );
+    filter: drop-shadow(
+        calc(var(--landing-shadow) / 2) calc(var(--landing-shadow) / 2) 0
+            var(--palette-ink)
+    );
+}
+
+.landing-card:active {
+    transform: translate(var(--landing-shadow), var(--landing-shadow));
+    filter: drop-shadow(0 0 0 var(--palette-ink));
+}
+
+.landing-card:focus-visible {
+    outline: 3px dashed var(--palette-paper);
+    outline-offset: 6px;
+}
+
+.landing-card-face {
+    display: flex;
+    box-sizing: border-box;
+    min-height: var(--landing-face-height);
+    align-items: flex-end;
+    padding: 28px;
+    font-size: 33px;
+    line-height: 33px;
+    white-space: nowrap;
+    background: var(--palette-red);
+}
+
+.landing-turn {
+    transform-origin: 50% 50%;
+    animation: landing-turn 420ms cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+
+.landing-veil {
+    position: fixed;
+    z-index: 5;
+    inset: 0;
+}
+
+.landing-back {
+    position: relative;
+    z-index: 6;
+    transform: translate(
+        calc(var(--landing-shadow) / 2),
+        calc(var(--landing-shadow) / 2)
+    );
+    filter: drop-shadow(
+        calc(var(--landing-shadow) / 2) calc(var(--landing-shadow) / 2) 0
+            var(--palette-ink)
+    );
+    animation: landing-turn-back 420ms cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+
+.landing-back-face {
+    display: flex;
+    height: var(--landing-menu-height);
+    flex-direction: column;
+    background: var(--palette-paper);
+}
+
+.landing-back-bar {
+    width: 100%;
+    height: 40px;
+    flex: none;
+    padding: 0 20px;
+    border: 0;
+    border-bottom: 2px solid var(--palette-ink);
+    color: var(--palette-ink);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-align: left;
+    background: var(--palette-red);
+    cursor: pointer;
+}
+
+.landing-back-bar:focus-visible {
+    outline: 3px dashed var(--palette-ink);
+    outline-offset: -5px;
+}
+
+.landing-back-rows {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.landing .landing-row {
+    display: flex;
+    min-height: 0;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 0 20px;
+    color: var(--palette-ink);
+    text-decoration: none;
+}
+
+.landing .landing-row:not(:last-child) {
+    border-bottom: 2px solid var(--palette-ink);
+}
+
+.landing .landing-row:hover,
+.landing .landing-row:focus-visible {
+    color: var(--palette-paper);
+    background: var(--palette-ink);
+    outline: none;
+}
+
+.landing-row-label {
+    font-size: 22px;
+}
+
+.landing-row-hint {
+    color: var(--palette-ink-muted);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+}
+
+.landing-row:hover .landing-row-hint,
+.landing-row:focus-visible .landing-row-hint {
+    color: var(--palette-map-water);
+}
+
+.landing-points-frame {
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 48px;
+    padding-right: 8px;
+}
+
+.landing-points {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    gap: 2px;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    list-style: none;
+    background: var(--palette-ink);
+}
+
+.landing-points li {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px 20px 26px;
+    background: var(--palette-map-block);
+}
+
+.landing-point-tag {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--palette-map-water);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+}
+
+.landing-dot {
+    width: 12px;
+    height: 12px;
+    flex: none;
+}
+
+.landing-blink {
+    animation: landing-blink 1s steps(1) infinite;
+}
+
+.landing-point-title {
+    font-size: 22px;
+    line-height: 24px;
+    white-space: nowrap;
+}
+
+.landing-point-body {
+    font:
+        400 15px/1.45 "Geist Variable",
+        var(--font-sans);
+}
+
+.landing-footer {
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1080px;
+    margin-top: auto;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 32px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+}
+
+@media (max-height: 860px) {
+    .landing {
+        --landing-face-height: 164px;
+        --landing-menu-height: 164px;
+    }
+
+    .landing-logo {
+        width: 208px;
+        height: 208px;
+    }
+
+    .landing-wordmark {
+        margin-top: -18px;
+    }
+
+    .landing-explore {
+        margin-top: 28px;
+    }
+
+    .landing-points-frame {
+        margin-top: 36px;
+    }
+
+    .landing-footer {
+        padding-top: 24px;
+    }
+}
+
+/* Phone: one screen, the parts spread over the height, the card a short bar that opens over the points */
+@media (max-width: 820px) {
+    .landing {
+        --landing-face-height: 0px;
+        --landing-menu-height: 196px;
+        --landing-shadow: 6px;
+
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+        padding: max(12px, env(safe-area-inset-top)) 16px
+            max(12px, env(safe-area-inset-bottom));
+    }
+
+    .landing-main {
+        min-height: 0;
+        flex: 1;
+        justify-content: space-evenly;
+    }
+
+    .landing-logo {
+        width: min(46vw, 19dvh);
+        height: min(46vw, 19dvh);
+    }
+
+    .landing-wordmark {
+        margin-top: calc(min(46vw, 19dvh) * -0.09);
+        font-size: clamp(44px, 8.5dvh, 66px);
+        line-height: 1;
+    }
+
+    .landing-tagline {
+        max-width: 360px;
+        margin-top: 8px;
+        font-size: 15px;
+        line-height: 1.45;
+        text-wrap: balance;
+    }
+
+    .landing-tagline-break {
+        display: none;
+    }
+
+    .landing-explore,
+    .landing-points-frame {
+        margin-top: 0;
+    }
+
+    .landing-card-slot {
+        width: min(400px, 100%);
+    }
+
+    .landing-card-face {
+        height: 60px;
+        align-items: center;
+        padding: 0 20px;
+        font-size: 20px;
+        line-height: 20px;
+    }
+
+    .landing-back {
+        position: absolute;
+        top: 0;
+        right: var(--landing-shadow);
+        left: 0;
+    }
+
+    .landing-back-bar {
+        height: 36px;
+        padding: 0 16px;
+    }
+
+    .landing .landing-row {
+        padding: 0 16px;
+    }
+
+    .landing-row-label {
+        font-size: 18px;
+    }
+
+    .landing-row-hint {
+        display: none;
+    }
+
+    .landing-points-frame {
+        padding-right: 0;
+    }
+
+    .landing-points {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .landing-points li {
+        gap: 6px;
+        padding: 12px 12px 14px;
+    }
+
+    .landing-point-tag {
+        gap: 8px;
+        font-size: 10px;
+    }
+
+    .landing-dot {
+        width: 10px;
+        height: 10px;
+    }
+
+    .landing-point-title {
+        font-size: 16px;
+        line-height: 18px;
+        white-space: normal;
+    }
+
+    .landing-point-body {
+        font-size: 12.5px;
+        line-height: 1.35;
+    }
+
+    .landing-footer {
+        justify-content: space-between;
+        padding-top: 8px;
+        font-size: 10px;
+    }
+}
+
+/* A short phone screen keeps the titles of the points and drops their text */
+@media (max-width: 820px) and (max-height: 740px) {
+    .landing-point-body {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .landing,
+    .landing-blink,
+    .landing-turn,
+    .landing-back {
+        animation: none;
+    }
+
+    .landing-logo {
+        background-image: url("/landing/radar.png");
+        background-size: 100% 100%;
+        animation: none;
+    }
+}
+
+@keyframes landing-drift {
+    to {
+        background-position:
+            -840px 0,
+            -360px 0,
+            -96px 0,
+            -96px 0;
+    }
+}
+
+@keyframes landing-radar {
+    to {
+        background-position: 100% 0;
+    }
+}
+
+@keyframes landing-blink {
+    50% {
+        background: var(--palette-map-block);
+    }
+}
+
+@keyframes landing-turn {
+    from {
+        transform: perspective(900px) rotateY(-90deg);
+    }
+
+    to {
+        transform: perspective(900px) rotateY(0);
+    }
+}
+
+@keyframes landing-turn-back {
+    from {
+        transform: translate(
+                calc(var(--landing-shadow) / 2),
+                calc(var(--landing-shadow) / 2)
+            )
+            perspective(900px) rotateY(-90deg);
+    }
+
+    to {
+        transform: translate(
+                calc(var(--landing-shadow) / 2),
+                calc(var(--landing-shadow) / 2)
+            )
+            perspective(900px) rotateY(0);
+    }
+}

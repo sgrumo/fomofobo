@@ -13,7 +13,7 @@ const SOURCES = [
 
 const CREDIT_ID = "map-credit"
 
-interface MapCreditProps extends RouteClientComponentProps<"root"> {
+interface MapCreditProps extends RouteClientComponentProps<"map"> {
     open: boolean
     onOpenChange: (open: boolean) => void
 }

@@ -152,7 +152,7 @@ const fitPanOf = (box: DOMRect, frame: DOMRect): [number, number] => {
     ]
 }
 
-interface EventMapProps extends RouteClientComponentProps<"root"> {
+interface EventMapProps extends RouteClientComponentProps<"map"> {
     center: GeoPoint
     locateRequest: LocateRequest | undefined
     position: GeoPoint | undefined

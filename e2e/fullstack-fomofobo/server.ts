@@ -33,7 +33,8 @@ export const VERSION_GATE_ENV = {
 export const buildApp = () => {
     // `next start` keeps `unstable_cache` reads here across runs, each run on a fresh database file.
     rmSync(DATA_CACHE_DIR, { recursive: true, force: true })
-    exec("pnpm build", "Next build", APP_DIR)
+    // The landing is prerendered, so its store links come from the build.
+    exec("pnpm build", "Next build", APP_DIR, VERSION_GATE_ENV)
 }
 
 /**

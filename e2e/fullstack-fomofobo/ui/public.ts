@@ -146,7 +146,7 @@ export const mapPath = (
     center: GeoPoint,
     shown: ReadonlyArray<"permanent" | "ended"> = [],
 ): string =>
-    `/?lat=${String(center.latitude)}&lng=${String(center.longitude)}${shown
+    `/map?lat=${String(center.latitude)}&lng=${String(center.longitude)}${shown
         .map(kind => `&show-${kind}=true`)
         .join("")}`
 
@@ -156,11 +156,11 @@ export const mapPath = (
  * @param date Date of the occurrence
  */
 export const eventDetailPath = (eventId: string, date: string): string =>
-    `/?event=${eventId}&occurrence=${date}&detail=true`
+    `/map?event=${eventId}&occurrence=${date}&detail=true`
 
 /**
  * @description Returns the map path with the detail of the venue open
  * @param venueId Venue opened
  */
 export const venueDetailPath = (venueId: string): string =>
-    `/?venue=${venueId}&detail=true`
+    `/map?venue=${venueId}&detail=true`

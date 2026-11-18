@@ -9,7 +9,7 @@ import { PixelSprite } from "./pixel-sprite"
 
 const CORE_PX = POSITION_CORE.cells * MARKER_CELL_PX
 
-export const PositionMarker = (props: RouteClientComponentProps<"root">) => {
+export const PositionMarker = (props: RouteClientComponentProps<"map">) => {
     const { t } = useTranslation("shared")
 
     return (

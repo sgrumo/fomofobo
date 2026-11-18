@@ -6,7 +6,7 @@ summary: Mobile-first web app and native app that show events around a place on 
 
 ## Overview
 
-Zonzo is a responsive, mobile-first web app, with a native app for iOS and Android, for finding events around a place. Visitors open it with no account, see the events of the coming days as pins on a map, and narrow them by name, place, category and date. Each event opens a detail over the map that a visitor can open directly from a link or share. Organizers publish their events through a backoffice in the same app, and publishing needs no approval. Admins supervise the organizers, block organizers or events, and manage the shared catalogue of categories. The web app installs on the home screen, and both apps keep the events already loaded viewable offline.
+Zonzo is a responsive, mobile-first web app, with a native app for iOS and Android, for finding events around a place. A landing page leads to the map in the browser or to the native app. Visitors open the map with no account, see the events of the coming days as pins, and narrow them by name, place, category and date. A visitor opens or shares each event detail from a link. Organizers publish their events through a backoffice in the same app. Admins supervise the organizers, block organizers or events, and manage the catalogue of categories. The web app installs on the home screen, and both apps keep loaded events viewable offline.
 
 ## Perimeter
 
@@ -58,6 +58,10 @@ Once every occurrence of an event ended more than the retention days ago, a dail
 
 The search center is the position of the device when the visitor grants location, else a default city until the visitor picks a place. The first search covers a fixed radius around the search center. Then the results are the occurrences at venues inside the area that the map shows, so a pan or a zoom out reaches the events of another city. The app shows no distance to an event.
 
+### Landing page
+
+The root of the web app is a landing page that presents the product. It opens the map in the browser, and it links each store that lists the native app. On a phone the landing page fits one screen with no scroll.
+
 ### Map
 
 Each venue with results is one pin. The pin shows the result of the venue with the highest status, in the order live, upcoming, permanent, ended. It takes the icon of that category and the look of that status. A tag above the pin reads live for a live result, the start time for an upcoming result of today, and the date for an upcoming result of another day. When the venue holds more live or upcoming events, the tag adds their count as "+N". Ended events and the permanent venue do not count. The tag takes no press, so a press on it reaches the pin below.
@@ -78,7 +82,7 @@ Four kind chips under the search field are the legend of the pins, and each one 
 
 ### Event detail
 
-The event and venue details open over the map, with no page of their own. On a wide screen the detail is a panel beside the map, and on a phone a tall sheet that leaves the top of the map in view. The map URL names the detail, so each occurrence of an event and each venue has its own link. The old event and venue page URLs open the map with the detail open.
+The event and venue details open over the map, with no page of their own. On a wide screen the detail is a panel beside the map, and on a phone a tall sheet that leaves the top of the map in view. The map URL names the detail, so each occurrence of an event and each venue has its own link. The old event and venue page URLs, and the map links of the language root shared before the landing page, open the map with the detail open.
 
 The event detail offers directions to the venue, the external link of the event and a save action. It shows the price summary, the capacity and the count of interested visitors, and lists every price, the membership card, the minimum age and the notes when the scheme holds more than one price line. Directions open Apple Maps on iOS and iPadOS, and Google Maps elsewhere.
 
@@ -150,7 +154,7 @@ The event detail and the map preview show the count of saves of an occurrence on
 
 ## Architecture and integrations
 
-- One Next.js application serves the public app, the event pages and the backoffice, because the analysis keeps them in one program. The app speaks Italian alone. The public app keeps the language segment `/it/` in its URLs, so a second language needs no route move, and the backoffice lives under `/backoffice`.
+- One Next.js application serves the public app, the event pages and the backoffice, because the analysis keeps them in one program. The app speaks Italian alone. The public app keeps the language segment `/it/` in its URLs, so a second language needs no route move. The landing page is the language root and the map lives under `/map`. The backoffice lives under `/backoffice`.
 - Server Components and route handlers serve the public reads, and Server Actions carry the backoffice writes.
 - An Expo app for iOS and Android calls the same API under `/api/*`, with no backend layer of its own, because the API already serves every public read and the save counts.
 - Turso, a hosted libSQL database (SQLite), holds categories, venues, events, occurrences and accounts. Occurrences are stored as rows, because the map search filters them by time window and by area.

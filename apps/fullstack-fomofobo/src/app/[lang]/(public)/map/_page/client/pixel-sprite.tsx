@@ -6,7 +6,7 @@ import { cn } from "frontend-shared/styles"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
-interface PixelSpriteProps extends RouteClientComponentProps<"root"> {
+interface PixelSpriteProps extends RouteClientComponentProps<"map"> {
     sprite: MarkerSprite
     // Color of the cells, a `text-*` class
     className: string

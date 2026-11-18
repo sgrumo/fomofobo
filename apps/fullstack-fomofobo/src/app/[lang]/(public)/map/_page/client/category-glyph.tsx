@@ -5,7 +5,7 @@ import type { CategoryIcon } from "models"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
-interface CategoryGlyphProps extends RouteClientComponentProps<"root"> {
+interface CategoryGlyphProps extends RouteClientComponentProps<"map"> {
     icon: CategoryIcon
     className?: string
 }

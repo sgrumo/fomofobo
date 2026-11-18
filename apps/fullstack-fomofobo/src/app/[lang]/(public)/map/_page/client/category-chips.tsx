@@ -10,7 +10,7 @@ import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
 import { CategoryGlyph } from "./category-glyph"
 
-interface CategoryChipsProps extends RouteClientComponentProps<"root"> {
+interface CategoryChipsProps extends RouteClientComponentProps<"map"> {
     categories: Category[]
     selected: readonly string[] | undefined
     free: boolean

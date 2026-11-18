@@ -16,7 +16,7 @@ const manifest = (): MetadataRoute.Manifest => {
         short_name: "Zonzo",
         description: t("App.Description"),
         lang: defaultLanguage,
-        start_url: routes.root.path({ parameters: { lang: defaultLanguage }, query: {} }),
+        start_url: routes.map.path({ parameters: { lang: defaultLanguage }, query: {} }),
         scope: "/",
         display: "standalone",
         orientation: "portrait",

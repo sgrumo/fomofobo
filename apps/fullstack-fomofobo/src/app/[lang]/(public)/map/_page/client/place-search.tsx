@@ -22,7 +22,7 @@ import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { api } from "@/lib/api/client-api"
 import { useOnline } from "@/lib/hooks/use-online"
 
-interface PlaceSearchProps extends RouteClientComponentProps<"root"> {
+interface PlaceSearchProps extends RouteClientComponentProps<"map"> {
     center: GeoPoint
     initialText: string
     onPlaceSelect: (place: PlaceSuggestion) => void

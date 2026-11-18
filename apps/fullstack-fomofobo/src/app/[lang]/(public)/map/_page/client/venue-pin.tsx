@@ -10,7 +10,7 @@ import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
 import { PixelDisc } from "./pixel-disc"
 
-interface VenuePinProps extends RouteClientComponentProps<"root"> {
+interface VenuePinProps extends RouteClientComponentProps<"map"> {
     name: string
     kind: PermanentVenueKind
     icon: CategoryIcon

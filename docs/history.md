@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-18 · A landing page in front of the map
+
+### Changed
+
+The root of the web app is now a landing page that presents the product and leads to the map in the browser or to the native app stores. The map moved from the language root to `/map`. The map links shared before the move open the map with the detail open.
+
+### Why
+
+A client request. A visitor first meets a page that presents the product and offers the browser or the native app.
+
+### Check next time
+
+Agree early whether the product needs a landing page in front of the app, since the move of the app URL needs redirects for every link already shared.
+
 ## 2026-11-18 · Phone browsers suggest the native app
 
 ### Changed

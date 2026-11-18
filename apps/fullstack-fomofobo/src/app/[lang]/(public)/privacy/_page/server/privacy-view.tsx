@@ -50,7 +50,7 @@ export const PrivacyView = (props: PrivacyViewProps) => {
                 {t("Legal.WriteTo", { email: CONTACT_EMAIL })}
             </a>
             <RouteLink
-                route={routes.root}
+                route={routes.map}
                 parameters={{ lang: props.language }}
                 query={{}}
                 className="tp-pixel-md text-fg underline"

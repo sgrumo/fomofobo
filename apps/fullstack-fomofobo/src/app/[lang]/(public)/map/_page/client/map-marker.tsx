@@ -9,7 +9,7 @@ import { createPortal } from "react-dom"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
-interface MapMarkerProps extends RouteClientComponentProps<"root"> {
+interface MapMarkerProps extends RouteClientComponentProps<"map"> {
     map: MapLibreMap
     coordinates: GeoPoint
     anchor: PositionAnchor

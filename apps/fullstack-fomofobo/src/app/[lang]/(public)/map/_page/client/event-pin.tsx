@@ -16,7 +16,7 @@ import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { PixelDisc } from "./pixel-disc"
 import { PixelSprite } from "./pixel-sprite"
 
-interface EventPinProps extends RouteClientComponentProps<"root"> {
+interface EventPinProps extends RouteClientComponentProps<"map"> {
     title: string
     status: OccurrenceStatus
     start: PinStart

@@ -1,28 +1,44 @@
+import { IncomingMessage } from "node:http"
+import { Socket } from "node:net"
+
 import { getPathMatch } from "next/dist/shared/lib/router/utils/path-match"
-import { prepareDestination } from "next/dist/shared/lib/router/utils/prepare-destination"
+import {
+    matchHas,
+    prepareDestination,
+} from "next/dist/shared/lib/router/utils/prepare-destination"
 import { describe, expect, it } from "vitest"
 
 import { detailRedirects } from "./detail-redirects"
 
 /**
  * @description Returns the URL the first matching redirect builds, `undefined` with none
- * @param pathname Pathname requested
- * @remarks Runs the matcher and the destination builder of Next itself
+ * @param url Path and query requested
+ * @remarks Runs the matchers and the destination builder of Next itself
  */
-const redirectOf = (pathname: string): string | undefined => {
+const redirectOf = (url: string): string | undefined => {
+    const { pathname, searchParams } = new URL(url, "http://localhost")
+    const query = Object.fromEntries(searchParams)
+    const request = new IncomingMessage(new Socket())
     for (const redirect of detailRedirects) {
-        const params = getPathMatch(redirect.source, {
+        const pathParams = getPathMatch(redirect.source, {
             strict: true,
             removeUnnamedParams: true,
         })(pathname)
-        if (params !== false) {
+        const hasParams =
+            pathParams === false ? false : matchHas(request, query, redirect.has)
+        if (pathParams !== false && hasParams !== false) {
             const { newUrl, parsedDestination } = prepareDestination({
                 appendParamsToQuery: false,
                 destination: redirect.destination,
-                params,
-                query: {},
+                params: { ...pathParams, ...hasParams },
+                query,
             })
-            return `${newUrl}${parsedDestination.search}`
+            const search = new URLSearchParams(
+                Object.entries(parsedDestination.query).flatMap(([key, value]) =>
+                    typeof value === "string" ? [[key, value]] : [],
+                ),
+            ).toString()
+            return search === "" ? newUrl : `${newUrl}?${search}`
         }
     }
     return undefined
@@ -31,16 +47,27 @@ const redirectOf = (pathname: string): string | undefined => {
 describe("detailRedirects", () => {
     it("should open the map with the event detail in place of the event page", () => {
         expect(redirectOf("/it/events/e1/2026-10-24")).toBe(
-            "/it?event=e1&occurrence=2026-10-24&detail=true",
+            "/it/map?event=e1&occurrence=2026-10-24&detail=true",
         )
     })
 
     it("should open the map with the venue detail in place of the venue page", () => {
-        expect(redirectOf("/it/venues/v1")).toBe("/it?venue=v1&detail=true")
+        expect(redirectOf("/it/venues/v1")).toBe("/it/map?venue=v1&detail=true")
     })
 
-    it("should leave the map and the other pages alone", () => {
+    it("should open the map with the query of a shared link to the language root", () => {
+        expect(redirectOf("/it?event=e1&occurrence=2026-10-24&detail=true")).toBe(
+            "/it/map?event=e1&occurrence=2026-10-24&detail=true",
+        )
+        expect(redirectOf("/it?venue=v1&detail=true")).toBe(
+            "/it/map?venue=v1&detail=true",
+        )
+    })
+
+    it("should leave the landing, the map and the other pages alone", () => {
         expect(redirectOf("/it")).toBeUndefined()
+        expect(redirectOf("/it?lat=44&lng=11")).toBeUndefined()
+        expect(redirectOf("/it/map?event=e1")).toBeUndefined()
         expect(redirectOf("/it/saved")).toBeUndefined()
         expect(redirectOf("/it/events/e1")).toBeUndefined()
     })

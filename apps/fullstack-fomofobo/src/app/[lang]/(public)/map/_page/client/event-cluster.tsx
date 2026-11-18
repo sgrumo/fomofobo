@@ -15,7 +15,7 @@ const BAND_MASK = `url("data:image/svg+xml,${encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${String(CLUSTER_SHAPE.cells)} ${String(CLUSTER_SHAPE.cells)}" shape-rendering="crispEdges"><path d="${CLUSTER_SHAPE.bandPath}"/></svg>`,
 )}")`
 
-interface EventClusterProps extends RouteClientComponentProps<"root"> {
+interface EventClusterProps extends RouteClientComponentProps<"map"> {
     count: number
     liveCount: number
     upcomingCount: number

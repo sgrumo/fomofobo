@@ -22,9 +22,15 @@ const backofficeListQuery = {
 const blockedFilterSchema = z.enum(["blocked", "active"])
 
 export const routes = {
-    root: createDynamicRoute({
+    root: createStaticRoute({
         segments: ["[lang]"],
         title: ({ t }) => t("PageTitle.Home"),
+        parametersSchema: z.object({ lang: languageKeySchema }),
+        generateStaticParams: () => languageKeys.map(lang => ({ lang })),
+    }),
+    map: createDynamicRoute({
+        segments: ["[lang]", "map"],
+        title: ({ t }) => t("PageTitle.Map"),
         parametersSchema: z.object({ lang: languageKeySchema }),
         querySchema: mapQuerySchema,
         queryOptions: { event: { push: true }, venue: { push: true } },

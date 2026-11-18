@@ -11,7 +11,7 @@ import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
 import { RESULT_MARKER_ATTRIBUTE } from "./result-marker"
 
-interface MarkerMotionProps extends RouteClientComponentProps<"root"> {
+interface MarkerMotionProps extends RouteClientComponentProps<"map"> {
     move: MarkerMove | undefined
     children: ReactNode
 }

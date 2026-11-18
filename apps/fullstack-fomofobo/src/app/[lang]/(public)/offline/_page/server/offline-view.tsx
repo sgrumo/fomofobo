@@ -25,7 +25,7 @@ export const OfflineView = (props: OfflineViewProps) => {
                 {t("Offline.OpenSaved")}
             </RouteLink>
             <RouteLink
-                route={routes.root}
+                route={routes.map}
                 parameters={{ lang: props.language }}
                 query={{}}
                 className="tp-pixel-md text-fg underline"

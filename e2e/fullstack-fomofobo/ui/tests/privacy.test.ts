@@ -31,6 +31,6 @@ test.describe("privacy policy", () => {
         ).toHaveAttribute("href", `mailto:${CONTACT_EMAIL}`)
         await expect(
             page.getByRole("link", { name: t("shared", "Legal.BackHome") }),
-        ).toHaveAttribute("href", "/it")
+        ).toHaveAttribute("href", "/it/map")
     })
 })

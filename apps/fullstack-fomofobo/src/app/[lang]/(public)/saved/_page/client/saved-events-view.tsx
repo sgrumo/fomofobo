@@ -98,7 +98,7 @@ export const SavedEventsView = (props: RouteClientComponentProps<"saved">) => {
                 onClose={closeDetail}
                 onOpenVenue={venueId => {
                     router.push(
-                        routes.root.path({
+                        routes.map.path({
                             parameters: { lang: language },
                             query: { venue: venueId, detail: true },
                         }),

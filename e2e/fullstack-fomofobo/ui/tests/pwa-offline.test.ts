@@ -33,7 +33,7 @@ test.describe("installed app offline", () => {
         expect(manifest).toMatchObject({
             name: "Zonzo",
             display: "standalone",
-            start_url: expect.stringMatching(/^\/[a-z]{2}$/u),
+            start_url: expect.stringMatching(/^\/[a-z]{2}\/map$/u),
             icons: expect.arrayContaining([
                 expect.objectContaining({ sizes: "192x192" }),
                 expect.objectContaining({ sizes: "512x512", purpose: "maskable" }),

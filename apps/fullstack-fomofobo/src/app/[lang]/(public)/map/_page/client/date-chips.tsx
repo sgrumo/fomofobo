@@ -28,7 +28,7 @@ import {
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
-interface DateChipsProps extends RouteClientComponentProps<"root"> {
+interface DateChipsProps extends RouteClientComponentProps<"map"> {
     query: Pick<MapQuery, "date" | "from" | "to">
     now: Date
     onChange: (change: MapQuery) => void

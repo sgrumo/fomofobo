@@ -34,6 +34,7 @@ describe("languageRedirects", () => {
 
     it("should prefix a path with no language", () => {
         expect(redirectOf("/saved")).toBe("/it/saved")
+        expect(redirectOf("/map")).toBe("/it/map")
         expect(redirectOf("/events/a/2026-10-24")).toBe("/it/events/a/2026-10-24")
         expect(redirectOf("/dev/showcase")).toBe("/it/dev/showcase")
     })

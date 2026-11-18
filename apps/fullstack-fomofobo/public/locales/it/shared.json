@@ -10,7 +10,8 @@
         "Dev": "Dev"
     },
     "PageTitle": {
-        "Home": "Mappa",
+        "Home": "Gli eventi intorno a te, in tempo reale",
+        "Map": "Mappa",
         "Saved": "Eventi salvati",
         "Offline": "Offline",
         "DevShowcase": "Showcase",
@@ -647,6 +648,42 @@
         },
         "Open": "Scarica l'app",
         "Stay": "Continua sul web"
+    },
+    "Landing": {
+        "Wordmark": "Zonzo",
+        "Tagline": "Gli eventi intorno a te, in tempo reale, su una mappa.",
+        "TaglineMore": "Così sai cosa succede adesso, stasera, nei prossimi giorni.",
+        "Explore": "Esplora la mappa",
+        "Back": "Torna indietro",
+        "OpenBrowser": "Apri su browser",
+        "OpenBrowserHint": "zonzo.live",
+        "DownloadIos": "Scarica per iPhone",
+        "DownloadAndroid": "Scarica per Android",
+        "PointsLabel": "Perché Zonzo",
+        "Points": {
+            "Live": {
+                "Tag": "Adesso",
+                "Title": "In tempo reale",
+                "Body": "Vedi quali eventi sono in corso ora e quali in arrivo, o guarda cosa c'è al cinema e a teatro."
+            },
+            "NoFeed": {
+                "Tag": "Niente feed",
+                "Title": "Fuori dai social",
+                "Body": "Nessun algoritmo, niente scroll o mille pagine da consultare. Solo una mappa, poi esci di casa."
+            },
+            "NoLogin": {
+                "Tag": "Apri e guardi",
+                "Title": "Nessun login",
+                "Body": "Non devi creare un account né ricordarti una password."
+            },
+            "Privacy": {
+                "Tag": "Privacy",
+                "Title": "Zero dati",
+                "Body": "Non raccogliamo i tuoi dati. Mentre stai esplorando non sappiamo chi sei, e va bene così."
+            }
+        },
+        "Copyright": "© {{year}} Zonzo · zonzo.live",
+        "Contact": "Contatti"
     },
     "Install": {
         "Title": "Installa l'app",

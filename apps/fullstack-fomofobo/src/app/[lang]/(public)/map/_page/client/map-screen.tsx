@@ -115,7 +115,7 @@ const targetOf = (entry: PreviewEntry): PreviewTarget =>
           }
         : { type: "venue", venueId: entry.venue.id }
 
-interface MapScreenProps extends RouteClientComponentProps<"root"> {
+interface MapScreenProps extends RouteClientComponentProps<"map"> {
     baseUrl: string
     storeUrls: Record<StorePlatform, string | undefined>
 }

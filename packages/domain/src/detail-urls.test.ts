@@ -12,7 +12,7 @@ describe("eventDetailUrlOf", () => {
                 date: "2026-10-24",
             }),
         ).toBe(
-            `https://fomofobo-dev.vercel.app/it?event=${eventId}&occurrence=2026-10-24&detail=true`,
+            `https://fomofobo-dev.vercel.app/it/map?event=${eventId}&occurrence=2026-10-24&detail=true`,
         )
     })
 })
@@ -22,7 +22,7 @@ describe("venueDetailUrlOf", () => {
         const venueId = crypto.randomUUID()
 
         expect(venueDetailUrlOf("https://fomofobo-dev.vercel.app", "it", venueId)).toBe(
-            `https://fomofobo-dev.vercel.app/it?venue=${venueId}&detail=true`,
+            `https://fomofobo-dev.vercel.app/it/map?venue=${venueId}&detail=true`,
         )
     })
 })

@@ -89,7 +89,7 @@ export const SavedEventsList = (props: SavedEventsListProps) => {
                             className="bg-surface border-line shadow-hard-md flex items-start gap-3 rounded-md border-2 p-3"
                         >
                             <RouteLink
-                                route={routes.root}
+                                route={routes.map}
                                 parameters={{ lang: language }}
                                 query={{
                                     event: occurrence.eventId,
