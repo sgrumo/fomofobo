@@ -1,11 +1,12 @@
 import type { PhotoTone } from "domain/photo-tone"
 import type { EventPhoto } from "models"
 import type { ReactNode } from "react"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ScrollView, View } from "react-native"
 
 import { Badge } from "@/components/ui/badge/badge"
+import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { TonedPhoto } from "@/components/ui/toned-photo/toned-photo"
 
 interface PhotoGalleryProps {
@@ -21,10 +22,17 @@ export const PhotoGallery = (props: PhotoGalleryProps) => {
     const { t } = useTranslation("shared")
     const [index, setIndex] = useState(0)
     const [pageWidth, setPageWidth] = useState(0)
+    const scrollRef = useRef<ScrollView>(null)
+    // Sets the index at once: Android ends a programmatic scroll with no momentum event
+    const showPhoto = (target: number) => {
+        setIndex(target)
+        scrollRef.current?.scrollTo({ x: target * pageWidth, animated: true })
+    }
 
     return (
         <View className="overflow-hidden rounded-lg border-2 border-line bg-surface-inverse">
             <ScrollView
+                ref={scrollRef}
                 horizontal={true}
                 pagingEnabled={true}
                 showsHorizontalScrollIndicator={false}
@@ -66,6 +74,32 @@ export const PhotoGallery = (props: PhotoGalleryProps) => {
             <View className="absolute inset-x-3 top-3 flex-row justify-between">
                 {props.controls}
             </View>
+            {props.photos.length > 1 && (
+                <View
+                    pointerEvents="box-none"
+                    className="absolute inset-x-3 inset-y-0 flex-row items-center justify-between"
+                >
+                    <IconButton
+                        icon="back"
+                        label={t("Detail.PreviousPhoto")}
+                        size="sm"
+                        disabled={index === 0}
+                        onPress={() => {
+                            showPhoto(index - 1)
+                        }}
+                    />
+                    <IconButton
+                        icon="back"
+                        mirrored={true}
+                        label={t("Detail.NextPhoto")}
+                        size="sm"
+                        disabled={index === props.photos.length - 1}
+                        onPress={() => {
+                            showPhoto(index + 1)
+                        }}
+                    />
+                </View>
+            )}
             {props.photos.length > 0 && (
                 <Badge className="absolute bottom-3 left-3">
                     {t("Detail.PhotoCounter", {

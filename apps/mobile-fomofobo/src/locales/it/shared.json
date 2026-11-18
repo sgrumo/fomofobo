@@ -103,6 +103,8 @@
         "Gallery": "Foto di {{title}}",
         "Photo": "Foto {{index}} di {{total}}",
         "PhotoCounter": "Foto {{index}}/{{total}}",
+        "PreviousPhoto": "Foto precedente",
+        "NextPhoto": "Foto successiva",
         "Cover": "Immagine di {{title}}",
         "Date": "Data",
         "Time": "Orario",

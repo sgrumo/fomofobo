@@ -4,9 +4,11 @@ import type { PhotoTone } from "domain/photo-tone"
 import { cn } from "frontend-shared/styles"
 import type { EventPhoto } from "models"
 import type { ReactNode } from "react"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Badge } from "ui-components/badge"
+import { IconButton } from "ui-components/icon-button"
+import { PixelIconBack } from "ui-components/pixel-icons"
 
 import { TonedImage } from "@/components/client/toned-image/toned-image"
 
@@ -22,10 +24,16 @@ interface PhotoGalleryProps {
 export const PhotoGallery = (props: PhotoGalleryProps) => {
     const { t } = useTranslation("shared")
     const [index, setIndex] = useState(0)
+    const stripRef = useRef<HTMLDivElement>(null)
+    const showPhoto = (target: number) => {
+        const strip = stripRef.current
+        strip?.scrollTo({ left: target * strip.clientWidth, behavior: "smooth" })
+    }
 
     return (
         <div className="border-line bg-surface-inverse relative overflow-hidden rounded-lg border-2">
             <div
+                ref={stripRef}
                 role="group"
                 aria-label={t("Detail.Gallery", { title: props.title })}
                 className="flex aspect-[4/3] snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto"
@@ -70,6 +78,28 @@ export const PhotoGallery = (props: PhotoGalleryProps) => {
             <div className="absolute inset-x-3 top-3 flex justify-between">
                 {props.controls}
             </div>
+            {props.photos.length > 1 ? (
+                <div className="pointer-events-none absolute inset-x-3 top-1/2 flex -translate-y-1/2 justify-between [&>*]:pointer-events-auto">
+                    <IconButton
+                        aria-label={t("Detail.PreviousPhoto")}
+                        icon={<PixelIconBack />}
+                        size="sm"
+                        disabled={index === 0}
+                        onClick={() => {
+                            showPhoto(index - 1)
+                        }}
+                    />
+                    <IconButton
+                        aria-label={t("Detail.NextPhoto")}
+                        icon={<PixelIconBack className="rotate-180" />}
+                        size="sm"
+                        disabled={index === props.photos.length - 1}
+                        onClick={() => {
+                            showPhoto(index + 1)
+                        }}
+                    />
+                </div>
+            ) : undefined}
             {props.photos.length === 0 ? undefined : (
                 <Badge tone="neutral" className="absolute bottom-3 left-3">
                     {t("Detail.PhotoCounter", {
