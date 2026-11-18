@@ -48,21 +48,18 @@ const cellsPathOf = (reach: number, test: CellTest, shiftX = 0, shiftY = 0): str
         .join("")
 }
 
-/**
- * @description Builds an event disc: a fill, a ring one cell wide, and the solid shadow of a selected disc
- * @param radius Radius of the disc, in cells
- */
-// The discs of the zonzo-locator kit of the designer. The selected disc draws its shadow two
-// cells right and down, past its cells.
+// A disc of radius 9 in a grid of 22 cells, with one free cell around its ring
+const EVENT_DISC_REACH = 10
+
 export const EVENT_DISC = {
-    cells: 22,
-    fillPath:
-        "M8 1h6v1h-6zM5 2h12v1h-12zM4 3h14v1h-14zM3 4h16v1h-16zM2 5h18v1h-18zM2 6h18v1h-18zM2 7h18v1h-18zM1 8h20v1h-20zM1 9h20v1h-20zM1 10h20v1h-20zM1 11h20v1h-20zM1 12h20v1h-20zM1 13h20v1h-20zM2 14h18v1h-18zM2 15h18v1h-18zM2 16h18v1h-18zM3 17h16v1h-16zM4 18h14v1h-14zM5 19h12v1h-12zM8 20h6v1h-6z",
-    ringPath:
-        "M8 0h6v1h-6zM5 1h3v1h-3zM14 1h3v1h-3zM4 2h1v1h-1zM17 2h1v1h-1zM3 3h1v1h-1zM18 3h1v1h-1zM2 4h1v1h-1zM19 4h1v1h-1zM1 5h1v1h-1zM20 5h1v1h-1zM1 6h1v1h-1zM20 6h1v1h-1zM1 7h1v1h-1zM20 7h1v1h-1zM0 8h1v1h-1zM21 8h1v1h-1zM0 9h1v1h-1zM21 9h1v1h-1zM0 10h1v1h-1zM21 10h1v1h-1zM0 11h1v1h-1zM21 11h1v1h-1zM0 12h1v1h-1zM21 12h1v1h-1zM0 13h1v1h-1zM21 13h1v1h-1zM1 14h1v1h-1zM20 14h1v1h-1zM1 15h1v1h-1zM20 15h1v1h-1zM1 16h1v1h-1zM20 16h1v1h-1zM2 17h1v1h-1zM19 17h1v1h-1zM3 18h1v1h-1zM18 18h1v1h-1zM4 19h1v1h-1zM17 19h1v1h-1zM5 20h3v1h-3zM14 20h3v1h-3zM8 21h6v1h-6z",
+    cells: 2 * padOf(EVENT_DISC_REACH),
+    fillPath: cellsPathOf(EVENT_DISC_REACH, distance => distance <= 8),
+    ringPath: cellsPathOf(EVENT_DISC_REACH, distance => distance > 8 && distance <= 9),
     shadowPath: "",
 }
 
+// The selected disc of the zonzo-locator kit of the designer. It draws its shadow two cells right
+// and down, past its cells.
 export const SELECTED_EVENT_DISC = {
     cells: 26,
     fillPath:
