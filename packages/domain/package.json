@@ -28,6 +28,7 @@
         "./pixel-shapes": "./src/pixel-shapes.ts",
         "./platform": "./src/platform.ts",
         "./price-details": "./src/price-details.ts",
+        "./radar-loader": "./src/radar-loader.ts",
         "./price-summary": "./src/price-summary.ts",
         "./round-center": "./src/round-center.ts",
         "./save-queue": "./src/save-queue.ts",

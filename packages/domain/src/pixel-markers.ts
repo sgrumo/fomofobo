@@ -172,7 +172,7 @@ export const PIN_ICONS: Record<CategoryIcon, PinIcon> = {
  * @param runs Runs as `x y length`, comma-separated
  * @param shiftX Cells the path moves right
  */
-const runsPathOf = (runs: string, shiftX = 0): string =>
+export const runsPathOf = (runs: string, shiftX = 0): string =>
     runs === ""
         ? ""
         : runs

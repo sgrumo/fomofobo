@@ -29,7 +29,6 @@ import {
     PixelIconSound,
 } from "ui-components/pixel-icons"
 import { Separator } from "ui-components/separator"
-import { Spinner } from "ui-components/spinner"
 import { useToast } from "ui-components/toast"
 
 import {
@@ -48,6 +47,7 @@ import type {
     PreviewVenue,
 } from "@/components/client/event-preview/event-preview"
 import { LegalLinks } from "@/components/client/legal-links/legal-links"
+import { RadarLoader } from "@/components/client/radar-loader/radar-loader"
 import { SavedEventsList } from "@/components/client/saved-events-list/saved-events-list"
 import { VenueDetail } from "@/components/client/venue-detail/venue-detail"
 import { useDynamicRoute } from "@/framework/routes/route-hooks/use-dynamic-route"
@@ -687,7 +687,7 @@ export const MapScreen = (props: MapScreenProps) => {
                 />
                 <div className="flex items-center gap-2">
                     {search.isFetching ? (
-                        <Spinner title={t("Map.Loading")} size="xs" />
+                        <RadarLoader title={t("Map.Loading")} cellPx={1} />
                     ) : undefined}
                     <button
                         type="button"

@@ -33,6 +33,7 @@
     "Map": {
         "Label": "Mappa degli eventi",
         "Loading": "Caricamento eventi",
+        "Opening": "Apertura della mappa",
         "Error": "Non è stato possibile caricare gli eventi. Mostro gli ultimi risultati.",
         "Unsupported": "Questo browser non riesce a disegnare la mappa.",
         "Credits": "Fonti della mappa",

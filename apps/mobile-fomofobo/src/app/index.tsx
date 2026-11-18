@@ -31,7 +31,7 @@ import { DetailSheet } from "@/components/ui/detail-sheet/detail-sheet"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { Notice } from "@/components/ui/notice/notice"
 import { PixelPanel } from "@/components/ui/pixel-panel/pixel-panel"
-import { Spinner } from "@/components/ui/spinner/spinner"
+import { RadarLoader } from "@/components/ui/radar-loader/radar-loader"
 import { Text } from "@/components/ui/text/text"
 import { showToast } from "@/components/ui/toast/toast-store"
 import { ApiResponseError } from "@/lib/api/api-response-error"
@@ -430,7 +430,9 @@ const MapScreen = () => {
                 >
                     <MapAttribution open={creditOpen} onOpenChange={setCreditOpen} />
                     <View className="flex-row items-center gap-2">
-                        {searchFetching && <Spinner label={t("Map.Loading")} size="sm" />}
+                        {searchFetching && (
+                            <RadarLoader label={t("Map.Loading")} cellSize={1} />
+                        )}
                         <IconButton
                             icon="saved"
                             label={t("Saved.Open")}

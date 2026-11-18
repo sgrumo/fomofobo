@@ -45,6 +45,7 @@ import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Alert } from "ui-components/alert"
 
+import { RadarLoader } from "@/components/client/radar-loader/radar-loader"
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { FIXED_MAP_OPTIONS, fixMapGestures } from "@/lib/map/fixed-map"
 import { playSound } from "@/lib/sounds/play-sound"
@@ -611,6 +612,12 @@ export const EventMap = (props: EventMapProps) => {
             <div className="absolute inset-0 isolate">
                 <div ref={containerRef} className="size-full" />
             </div>
+            {/* The ground of the map holds the loader until the map draws */}
+            {map === undefined ? (
+                <div className="bg-map-ground absolute inset-0 flex items-center justify-center">
+                    <RadarLoader title={t("Map.Opening")} cellPx={4} />
+                </div>
+            ) : undefined}
             {map === undefined || viewport === undefined
                 ? undefined
                 : [
