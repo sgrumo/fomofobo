@@ -28,12 +28,11 @@ export const CategoryChips = (props: CategoryChipsProps) => {
                     key={category.id}
                     label={category.name}
                     icon={
-                        // A span keeps the glyph out of the icon size of the chip, so each cell stays 2px
+                        // A span keeps the glyph out of the icon size of the chip, so each cell stays whole px
                         <span className="flex">
                             <CategoryGlyph
                                 route={props.route}
                                 icon={category.icon}
-                                cellPx={2}
                                 className="fill-current"
                             />
                         </span>

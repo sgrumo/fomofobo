@@ -1,27 +1,30 @@
 "use client"
 
-import { PIXEL_GLYPH_GRID, PIXEL_GLYPHS } from "domain/pixel-glyphs"
-import { pixelIconPath } from "domain/pixel-icons"
+import { MARKER_CELL_PX, PIN_ICONS } from "domain/pixel-markers"
 import type { CategoryIcon } from "models"
 
 import type { RouteClientComponentProps } from "@/framework/routes/routes"
 
 interface CategoryGlyphProps extends RouteClientComponentProps<"root"> {
     icon: CategoryIcon
-    // Side of one glyph cell in px
-    cellPx: number
     className?: string
 }
 
-export const CategoryGlyph = (props: CategoryGlyphProps) => (
-    <svg
-        aria-hidden={true}
-        width={PIXEL_GLYPH_GRID * props.cellPx}
-        height={PIXEL_GLYPH_GRID * props.cellPx}
-        viewBox={`0 0 ${String(PIXEL_GLYPH_GRID)} ${String(PIXEL_GLYPH_GRID)}`}
-        shapeRendering="crispEdges"
-        className={props.className}
-    >
-        <path d={pixelIconPath(PIXEL_GLYPHS[props.icon])} />
-    </svg>
-)
+// The icon of the map pin at half its size, in whole px cells
+export const CategoryGlyph = (props: CategoryGlyphProps) => {
+    const pinIcon = PIN_ICONS[props.icon]
+    const side = pinIcon.cells * Math.round(pinIcon.cellPx / MARKER_CELL_PX)
+
+    return (
+        <svg
+            aria-hidden={true}
+            width={side}
+            height={side}
+            viewBox={`0 0 ${String(pinIcon.cells)} ${String(pinIcon.cells)}`}
+            shapeRendering="crispEdges"
+            className={props.className}
+        >
+            <path d={pinIcon.path} />
+        </svg>
+    )
+}
