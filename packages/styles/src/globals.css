@@ -36,6 +36,11 @@
     --palette-map-dot: #3e9c7c;
     --palette-map-water: #8fe3c0;
     --palette-map-road: #defcf0;
+    /* A status color at 40% over the map ground */
+    --palette-red-on-map: #7b6746;
+    --palette-yellow-on-map: #7b9d53;
+    --palette-gray-light-on-map: #669a89;
+    --palette-sky-on-map: #57a1a0;
 }
 
 /* Theme */
@@ -73,6 +78,10 @@
     --color-upcoming: var(--palette-yellow);
     --color-ended: var(--palette-gray-light);
     --color-permanent: var(--palette-sky);
+    --color-live-on-map: var(--palette-red-on-map);
+    --color-upcoming-on-map: var(--palette-yellow-on-map);
+    --color-ended-on-map: var(--palette-gray-light-on-map);
+    --color-permanent-on-map: var(--palette-sky-on-map);
     --color-social: var(--palette-lilac);
     --color-position: var(--palette-lilac);
 

@@ -29,6 +29,11 @@ const PALETTE = {
     mapDot: "#3e9c7c",
     mapWater: "#8fe3c0",
     mapRoad: "#defcf0",
+    // A status color at 40% over the map ground
+    redOnMap: "#7b6746",
+    yellowOnMap: "#7b9d53",
+    grayLightOnMap: "#669a89",
+    skyOnMap: "#57a1a0",
 } as const
 
 const SEMANTIC_COLORS = {
@@ -55,6 +60,10 @@ const SEMANTIC_COLORS = {
     upcoming: PALETTE.yellow,
     ended: PALETTE.grayLight,
     permanent: PALETTE.sky,
+    "live-on-map": PALETTE.redOnMap,
+    "upcoming-on-map": PALETTE.yellowOnMap,
+    "ended-on-map": PALETTE.grayLightOnMap,
+    "permanent-on-map": PALETTE.skyOnMap,
     social: PALETTE.lilac,
     position: PALETTE.lilac,
 

@@ -1,9 +1,11 @@
 import type { PixelIconName } from "domain/pixel-icons"
-import { createContext, useContext } from "react"
+import { PIXEL_CORNER_PROFILE } from "domain/pixel-shapes"
+import { createContext, useContext, useState } from "react"
 import type { ReactNode } from "react"
 import { ScrollView, View } from "react-native"
 
 import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
+import { PixelShape } from "@/components/ui/pixel-shape/pixel-shape"
 import { PressBounce } from "@/components/ui/press-bounce/press-bounce"
 import { Text } from "@/components/ui/text/text"
 import { COMPACT_MAX_FONT_SCALE } from "@/lib/theme/font-scale"
@@ -89,10 +91,17 @@ interface ChipProps {
     disabled?: boolean
 }
 
+interface ChipBox {
+    width: number
+    height: number
+}
+
 const Chip = (props: ChipProps) => {
     const inBar = useContext(ChipBarContext)
     const tone = props.tone ?? "inverse"
     const inverse = props.pressed && tone === "inverse"
+    const pixelTone = inBar || tone === "inverse" ? undefined : tone
+    const [box, setBox] = useState<ChipBox>()
 
     return (
         <PressBounce
@@ -111,14 +120,40 @@ const Chip = (props: ChipProps) => {
             onPress={() => {
                 props.onPressedChange(!props.pressed)
             }}
+            onLayout={
+                pixelTone === undefined
+                    ? undefined
+                    : event => {
+                          setBox({
+                              width: Math.round(event.nativeEvent.layout.width),
+                              height: Math.round(event.nativeEvent.layout.height),
+                          })
+                      }
+            }
             className={cn(
-                chipVariants({ pressed: props.pressed, tone, inBar }),
+                chipVariants({
+                    pressed: props.pressed,
+                    inverseTone: tone === "inverse",
+                    shape: inBar ? "bar" : pixelTone === undefined ? "rounded" : "pixel",
+                }),
                 props.grow === true && "grow justify-center",
                 props.disabled === true && "opacity-50",
             )}
             bounce={CHIP_BOUNCE}
-            styleOf={() => (inBar ? undefined : hardShadow("sm"))}
+            styleOf={() =>
+                inBar || pixelTone !== undefined ? undefined : hardShadow("sm")
+            }
         >
+            {pixelTone !== undefined && box !== undefined && (
+                <PixelShape
+                    width={box.width}
+                    height={box.height}
+                    profile={PIXEL_CORNER_PROFILE}
+                    fill={props.pressed ? pixelTone : `${pixelTone}-on-map`}
+                    ink="line"
+                    shadow="sm"
+                />
+            )}
             {props.icon !== undefined && (
                 <PixelIcon
                     name={props.icon}
