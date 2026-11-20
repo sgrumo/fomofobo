@@ -2,6 +2,7 @@
 // on a square grid around a center, a cell in when the distance from its middle to the center
 // passes a test. Paths run in cell units, and each client scales one cell to `MARKER_CELL_PX`.
 
+import { mapValues } from "es-toolkit"
 import type { CategoryIcon } from "models"
 
 import { LIVE_WAVE_RUNS, POSITION_WAVE_RUNS } from "./pixel-waves"
@@ -50,10 +51,14 @@ const cellsPathOf = (reach: number, test: CellTest, shiftX = 0, shiftY = 0): str
 
 // A disc of radius 9 in a grid of 22 cells, with one free cell around its ring
 const EVENT_DISC_REACH = 10
+const EVENT_DISC_FILL_RADIUS = 8
 
 export const EVENT_DISC = {
     cells: 2 * padOf(EVENT_DISC_REACH),
-    fillPath: cellsPathOf(EVENT_DISC_REACH, distance => distance <= 8),
+    fillPath: cellsPathOf(
+        EVENT_DISC_REACH,
+        distance => distance <= EVENT_DISC_FILL_RADIUS,
+    ),
     ringPath: cellsPathOf(EVENT_DISC_REACH, distance => distance > 8 && distance <= 9),
     shadowPath: "",
 }
@@ -166,6 +171,34 @@ export const PIN_ICONS: Record<CategoryIcon, PinIcon> = {
         path: "M0 5h2v1h-2zM5 5h2v1h-2zM10 5h2v1h-2zM0 6h2v1h-2zM5 6h2v1h-2zM10 6h2v1h-2z",
     },
 }
+
+// Width of the fill of the disc the kit draws its icons in, in cells
+const KIT_DISC_FILL_CELLS = 20
+
+// The fill of `EVENT_DISC` is narrower than the one of the kit, so an icon shrinks by the same ratio
+const PIN_ICON_SCALE = (2 * EVENT_DISC_FILL_RADIUS) / KIT_DISC_FILL_CELLS
+
+interface PinIconBox {
+    // Side of the icon in px
+    side: number
+    // Place of the icon in px from the corner of `EVENT_DISC`
+    left: number
+    top: number
+}
+
+// The box each disc draws its icon in: the place of the kit, the icon shrunk around its center
+export const PIN_ICON_BOXES: Record<CategoryIcon, PinIconBox> = mapValues(
+    PIN_ICONS,
+    icon => {
+        const kitSide = icon.cells * icon.cellPx
+        const side = kitSide * PIN_ICON_SCALE
+        return {
+            side,
+            left: icon.left + (kitSide - side) / 2,
+            top: icon.top + (kitSide - side) / 2,
+        }
+    },
+)
 
 /**
  * @description Builds the SVG path data of runs of cells, one rectangle per run

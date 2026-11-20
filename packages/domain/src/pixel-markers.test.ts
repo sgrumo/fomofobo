@@ -1,3 +1,4 @@
+import { categoryIconValues } from "models"
 import { describe, expect, it } from "vitest"
 
 import {
@@ -5,6 +6,7 @@ import {
     EVENT_DISC,
     LIVE_WAVE,
     MARKER_CELL_PX,
+    PIN_ICON_BOXES,
     PIN_ICONS,
     POSITION_CORE,
     POSITION_WAVE,
@@ -63,24 +65,27 @@ describe("pixel markers", () => {
 
     it("places every pin icon inside the fill of the disc", () => {
         const fill = cellsOf(EVENT_DISC.fillPath)
-        const outside = Object.entries(PIN_ICONS).flatMap(([name, icon]) =>
-            [...cellsOf(icon.path)].flatMap(key => {
+        const outside = categoryIconValues.flatMap(name => {
+            const icon = PIN_ICONS[name]
+            const box = PIN_ICON_BOXES[name]
+            return [...cellsOf(icon.path)].flatMap(key => {
                 const [x = 0, y = 0] = key.split(" ").map(Number)
+                const cellPx = box.side / icon.cells
                 // The first and the last px of the icon cell, as disc cells
                 const discCellOf = (start: number, offset: number) =>
                     Math.floor((start + offset) / MARKER_CELL_PX)
-                const xs = [0, icon.cellPx - 0.01].map(offset =>
-                    discCellOf(icon.left + x * icon.cellPx, offset),
+                const xs = [0, cellPx - 0.01].map(offset =>
+                    discCellOf(box.left + x * cellPx, offset),
                 )
-                const ys = [0, icon.cellPx - 0.01].map(offset =>
-                    discCellOf(icon.top + y * icon.cellPx, offset),
+                const ys = [0, cellPx - 0.01].map(offset =>
+                    discCellOf(box.top + y * cellPx, offset),
                 )
                 return xs
                     .flatMap(cx => ys.map(cy => `${String(cx)} ${String(cy)}`))
                     .filter(cell => !fill.has(cell))
                     .map(() => name)
-            }),
-        )
+            })
+        })
 
         expect(new Set(outside)).toStrictEqual(new Set())
     })

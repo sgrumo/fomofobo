@@ -2,6 +2,7 @@ import type { MapPointKind } from "domain/event-clusters"
 import {
     EVENT_DISC,
     MARKER_CELL_PX,
+    PIN_ICON_BOXES,
     PIN_ICONS,
     SELECTED_EVENT_DISC,
 } from "domain/pixel-markers"
@@ -37,6 +38,7 @@ export const PixelDisc = (props: PixelDiscProps) => {
     const drawn = props.selected ? disc.cells + SHADOW_CELLS : disc.cells
     const dashed = props.kind === "ended"
     const icon = PIN_ICONS[props.icon]
+    const iconBox = PIN_ICON_BOXES[props.icon]
     const iconShift = props.selected ? SELECTED_HALF_GROWTH : 0
 
     return (
@@ -67,11 +69,11 @@ export const PixelDisc = (props: PixelDiscProps) => {
             <View
                 pointerEvents="none"
                 className="absolute"
-                style={{ left: icon.left + iconShift, top: icon.top + iconShift }}
+                style={{ left: iconBox.left + iconShift, top: iconBox.top + iconShift }}
             >
                 <Svg
-                    width={icon.cells * icon.cellPx}
-                    height={icon.cells * icon.cellPx}
+                    width={iconBox.side}
+                    height={iconBox.side}
                     viewBox={`0 0 ${String(icon.cells)} ${String(icon.cells)}`}
                 >
                     <Path d={icon.path} fill={THEME_COLORS.line} />

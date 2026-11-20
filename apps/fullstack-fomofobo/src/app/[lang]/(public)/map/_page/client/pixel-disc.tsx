@@ -4,6 +4,7 @@ import type { MapPointKind } from "domain/event-clusters"
 import {
     EVENT_DISC,
     MARKER_CELL_PX,
+    PIN_ICON_BOXES,
     PIN_ICONS,
     SELECTED_EVENT_DISC,
 } from "domain/pixel-markers"
@@ -34,6 +35,7 @@ export const PixelDisc = (props: PixelDiscProps) => {
     const size = disc.cells * MARKER_CELL_PX
     const drawn = props.selected ? disc.cells + SHADOW_CELLS : disc.cells
     const icon = PIN_ICONS[props.icon]
+    const iconBox = PIN_ICON_BOXES[props.icon]
     const iconShift = props.selected ? SELECTED_HALF_GROWTH : 0
 
     return (
@@ -67,12 +69,12 @@ export const PixelDisc = (props: PixelDiscProps) => {
             </svg>
             <svg
                 aria-hidden={true}
-                width={icon.cells * icon.cellPx}
-                height={icon.cells * icon.cellPx}
+                width={iconBox.side}
+                height={iconBox.side}
                 viewBox={`0 0 ${String(icon.cells)} ${String(icon.cells)}`}
                 shapeRendering="crispEdges"
                 className="fill-line absolute"
-                style={{ left: icon.left + iconShift, top: icon.top + iconShift }}
+                style={{ left: iconBox.left + iconShift, top: iconBox.top + iconShift }}
             >
                 <path d={icon.path} />
             </svg>
