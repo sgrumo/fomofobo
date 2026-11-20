@@ -16,6 +16,7 @@ import {
     CHIP_BOUNCE,
     CHIP_HIT_SLOP,
     CHIP_ICON_SIZE,
+    CHIP_OFF_OPACITY,
     chipBarStyles,
     chipBarTrackStyles,
     chipCountVariants,
@@ -149,7 +150,8 @@ const Chip = (props: ChipProps) => {
                     width={box.width}
                     height={box.height}
                     profile={PIXEL_CORNER_PROFILE}
-                    fill={props.pressed ? pixelTone : `${pixelTone}-on-map`}
+                    fill={pixelTone}
+                    fillOpacity={props.pressed ? undefined : CHIP_OFF_OPACITY}
                     ink="line"
                     shadow="sm"
                 />

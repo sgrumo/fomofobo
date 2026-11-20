@@ -60,6 +60,9 @@ export const chipCountVariants = cva("tp-pixel-sm", {
 
 export const CHIP_ICON_SIZE = 12
 
+// A colored chip lets the map show through its fill until pressed
+export const CHIP_OFF_OPACITY = 0.4
+
 export const CHIP_BOUNCE = { scale: 0.95, shift: false }
 
 // Brings the 28 pt chip to the 44 pt target

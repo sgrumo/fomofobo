@@ -36,11 +36,6 @@
     --palette-map-dot: #3e9c7c;
     --palette-map-water: #8fe3c0;
     --palette-map-road: #defcf0;
-    /* A status color at 40% over the map ground */
-    --palette-red-on-map: #7b6746;
-    --palette-yellow-on-map: #7b9d53;
-    --palette-gray-light-on-map: #669a89;
-    --palette-sky-on-map: #57a1a0;
 }
 
 /* Theme */
@@ -78,10 +73,6 @@
     --color-upcoming: var(--palette-yellow);
     --color-ended: var(--palette-gray-light);
     --color-permanent: var(--palette-sky);
-    --color-live-on-map: var(--palette-red-on-map);
-    --color-upcoming-on-map: var(--palette-yellow-on-map);
-    --color-ended-on-map: var(--palette-gray-light-on-map);
-    --color-permanent-on-map: var(--palette-sky-on-map);
     --color-social: var(--palette-lilac);
     --color-position: var(--palette-lilac);
 
@@ -621,6 +612,16 @@
         clip-path: var(--pixel-corners-inner);
         background-color: var(--pixel-fill, var(--color-surface));
     }
+}
+
+/* The stepped outline of `pixel-corners` and its `hard-sm` shadow around the background of the box, which can be see-through: a 9-slice image of `--palette-ink` cells, whose shadow falls outside the box. The image holds the ink as a literal, so the outline takes no `--pixel-ink` */
+@utility pixel-frame {
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-image-source: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 8 8' shape-rendering='crispEdges'><path fill='%230f1f1a' d='M2 0h3v1h-3zM1 1h1v1h-1zM5 1h1v1h-1zM0 2h1v1h-1zM6 2h1v1h-1zM0 3h1v1h-1zM6 3h2v1h-2zM0 4h1v1h-1zM6 4h2v1h-2zM1 5h1v1h-1zM5 5h3v1h-3zM2 6h5v1h-5zM3 7h3v1h-3z'/></svg>");
+    border-image-slice: 6 8 8 6;
+    border-image-width: 6px 8px 8px 6px;
+    border-image-outset: 0 2px 2px 0;
 }
 
 /* Stepped circle of a `--pixel-circle-outer-*` size: `::before` draws the 2 px ink ring, `::after` the fill. Pair it with a `drop-shadow-hard-*` and the matching `size-*` */

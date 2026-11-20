@@ -16,16 +16,12 @@ export const chipStyles = styles((tone: ChipTone) => [
     {
         "bg-surface border-line shadow-hard-sm not-data-[pressed]:enabled:hover:bg-surface-muted data-[pressed]:bg-surface-inverse data-[pressed]:text-fg-inverse rounded-md border-2":
             tone === "inverse",
-        // A colored chip draws stepped corners, as the search field, in its tint over the map until pressed
-        "pixel-corners drop-shadow-hard-sm relative": tone !== "inverse",
-        "[--pixel-fill:var(--color-live-on-map)] data-[pressed]:[--pixel-fill:var(--color-live)]":
-            tone === "live",
-        "[--pixel-fill:var(--color-upcoming-on-map)] data-[pressed]:[--pixel-fill:var(--color-upcoming)]":
-            tone === "upcoming",
-        "[--pixel-fill:var(--color-ended-on-map)] data-[pressed]:[--pixel-fill:var(--color-ended)]":
-            tone === "ended",
-        "[--pixel-fill:var(--color-permanent-on-map)] data-[pressed]:[--pixel-fill:var(--color-permanent)]":
-            tone === "permanent",
+        // A colored chip draws the stepped corners of the search field, see-through until pressed
+        "pixel-frame": tone !== "inverse",
+        "bg-live/40 data-[pressed]:bg-live": tone === "live",
+        "bg-upcoming/40 data-[pressed]:bg-upcoming": tone === "upcoming",
+        "bg-ended/40 data-[pressed]:bg-ended": tone === "ended",
+        "bg-permanent/40 data-[pressed]:bg-permanent": tone === "permanent",
     },
 ])
 
