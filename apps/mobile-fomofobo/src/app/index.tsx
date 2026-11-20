@@ -1,5 +1,10 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { centerQueryOf, nextLocateRequest, searchCenterOf } from "domain/map-center"
+import {
+    centerQueryOf,
+    isInsideMap,
+    nextLocateRequest,
+    searchCenterOf,
+} from "domain/map-center"
 import type { LocateRequest } from "domain/map-center"
 import { hasActiveFilters, shownKindsOf, shownResultsOf } from "domain/map-filters"
 import { placeQueryOf, textQueryOf } from "domain/map-search"
@@ -85,14 +90,10 @@ const MapScreen = () => {
     const [locateRequest, setLocateRequest] = useState<LocateRequest>()
     const [searchArea, setSearchArea] = useState<SearchArea>()
     const filtersActive = hasActiveFilters(query)
-    const { center, hasQueryCenter, locationOff, searchReady } = searchCenterOf(
-        query,
-        location.state.status,
-    )
-    const position =
-        location.state.status === "granted" ? location.state.position : undefined
+    const { center, hasQueryCenter, locationOff, outsideMap, position, searchReady } =
+        searchCenterOf(query, location.state)
 
-    // The first fix becomes the center, unless the params already name one.
+    // The first fix inside the map becomes the center, unless the params already name one.
     const fixLatitude = position?.latitude
     const fixLongitude = position?.longitude
     useEffect(() => {
@@ -239,6 +240,17 @@ const MapScreen = () => {
         const result = await location.locate()
         match(result)
             .with({ status: "granted" }, granted => {
+                if (!isInsideMap(granted.position)) {
+                    showToast(
+                        {
+                            tone: "info",
+                            title: t("Map.OutsideMap.Title"),
+                            message: t("Map.OutsideMap.Description"),
+                        },
+                        TOAST_DURATION_MS,
+                    )
+                    return
+                }
                 setQuery({ ...centerQueryOf(granted.position), place: undefined })
                 setLocateRequest(previous =>
                     nextLocateRequest(granted.position, previous),
@@ -408,6 +420,9 @@ const MapScreen = () => {
                             <Text>{t("Map.AllowLocation")}</Text>
                         </Button>
                     </View>
+                )}
+                {!hasQueryCenter && outsideMap && (
+                    <Notice tone="info" lines={[t("Map.OutsideMap.Description")]} />
                 )}
                 {!online && <Notice tone="info" lines={[t("Map.Offline")]} />}
                 {online && searchError !== null && (

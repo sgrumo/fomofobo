@@ -1,4 +1,4 @@
-import type { LocationStatus } from "domain/map-center"
+import type { DeviceLocation } from "domain/map-center"
 import {
     Accuracy,
     getCurrentPositionAsync,
@@ -9,14 +9,8 @@ import {
     watchPositionAsync,
 } from "expo-location"
 import type { LocationObject, LocationSubscription } from "expo-location"
-import type { GeoPoint } from "models"
 import { useEffect, useState } from "react"
 import { AppState, Linking } from "react-native"
-import type { StrictExclude } from "shared/types"
-
-type DeviceLocation =
-    | { status: StrictExclude<LocationStatus, "granted"> }
-    | { status: "granted"; position: GeoPoint }
 
 const POSITION_OPTIONS = { accuracy: Accuracy.Balanced, distanceInterval: 25 }
 

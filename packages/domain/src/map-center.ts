@@ -1,41 +1,66 @@
 import type { GeoPoint } from "models"
+import type { StrictExclude } from "shared/types"
 
 import type { MapQuery } from "./map-query"
-import { DEFAULT_CITY } from "./platform"
+import { DEFAULT_CITY, MAP_BOUNDS } from "./platform"
 import { roundCenter } from "./round-center"
 
 // `unknown` until the device answers: the permission prompt may stay open
 export type LocationStatus = "unknown" | "granted" | "denied" | "unavailable"
 
+export type DeviceLocation =
+    | { status: StrictExclude<LocationStatus, "granted"> }
+    | { status: "granted"; position: GeoPoint }
+
 export interface SearchCenter {
     center: GeoPoint
     hasQueryCenter: boolean
     locationOff: boolean
+    outsideMap: boolean
+    // Fix of the device inside the map, else undefined
+    position: GeoPoint | undefined
     searchReady: boolean
 }
+
+const [MAP_WEST, MAP_SOUTH, MAP_EAST, MAP_NORTH] = MAP_BOUNDS
+
+/**
+ * @description True when the point lies inside the edges of the map
+ * @param point Point checked
+ */
+export const isInsideMap = (point: GeoPoint): boolean =>
+    point.longitude >= MAP_WEST &&
+    point.longitude <= MAP_EAST &&
+    point.latitude >= MAP_SOUTH &&
+    point.latitude <= MAP_NORTH
 
 /**
  * @description Returns the center of the map search: the center of the map query, else the
  * default city, and whether the search may start
  * @param query Map query
- * @param location Status of the device location
+ * @param location Location of the device
  * @remarks Holds the search with no query center until the device answers, so the default city
  * never flashes by before the first fix moves the center
  */
 export const searchCenterOf = (
     query: Pick<MapQuery, "lat" | "lng">,
-    location: LocationStatus,
+    location: DeviceLocation,
 ): SearchCenter => {
     const queryCenter =
         query.lat === undefined || query.lng === undefined
             ? undefined
             : { latitude: query.lat, longitude: query.lng }
-    const locationOff = location === "denied" || location === "unavailable"
+    const fix = location.status === "granted" ? location.position : undefined
+    const position = fix !== undefined && isInsideMap(fix) ? fix : undefined
+    const outsideMap = fix !== undefined && position === undefined
+    const locationOff = location.status === "denied" || location.status === "unavailable"
     return {
         center: queryCenter ?? DEFAULT_CITY.center,
         hasQueryCenter: queryCenter !== undefined,
         locationOff,
-        searchReady: queryCenter !== undefined || locationOff,
+        outsideMap,
+        position,
+        searchReady: queryCenter !== undefined || locationOff || outsideMap,
     }
 }
 

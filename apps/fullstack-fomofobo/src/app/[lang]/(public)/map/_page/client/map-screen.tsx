@@ -2,7 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { eventDetailUrlOf, venueDetailUrlOf } from "domain/detail-urls"
-import { centerQueryOf, nextLocateRequest, searchCenterOf } from "domain/map-center"
+import {
+    centerQueryOf,
+    isInsideMap,
+    nextLocateRequest,
+    searchCenterOf,
+} from "domain/map-center"
 import type { LocateRequest } from "domain/map-center"
 import { hasActiveFilters, shownKindsOf, shownResultsOf } from "domain/map-filters"
 import type { MapQuery } from "domain/map-query"
@@ -147,12 +152,12 @@ export const MapScreen = (props: MapScreenProps) => {
         center,
         hasQueryCenter: hasUrlCenter,
         locationOff,
+        outsideMap,
+        position,
         searchReady,
-    } = searchCenterOf(query, geolocation.state.status)
-    const position =
-        geolocation.state.status === "granted" ? geolocation.state.position : undefined
+    } = searchCenterOf(query, geolocation.state)
 
-    // The first position becomes the center, unless the URL already names one.
+    // The first position inside the map becomes the center, unless the URL already names one.
     useEffect(() => {
         if (position !== undefined && !hasUrlCenter) {
             setQuery(centerQueryOf(position))
@@ -504,6 +509,14 @@ export const MapScreen = (props: MapScreenProps) => {
         const result = await geolocation.locate()
         match(result)
             .with({ status: "granted" }, granted => {
+                if (!isInsideMap(granted.position)) {
+                    toast.add({
+                        type: "info",
+                        title: t("Map.OutsideMap.Title"),
+                        messages: [t("Map.OutsideMap.Description")],
+                    })
+                    return
+                }
                 setQuery({ ...centerQueryOf(granted.position), place: undefined })
                 setLocateRequest(previous =>
                     nextLocateRequest(granted.position, previous),
@@ -542,6 +555,9 @@ export const MapScreen = (props: MapScreenProps) => {
                     {t("Map.AllowLocation")}
                 </Button>
             </Alert>
+        ) : undefined,
+        !hasUrlCenter && outsideMap ? (
+            <Alert key="outside-map" type="info" text={t("Map.OutsideMap.Description")} />
         ) : undefined,
         online ? undefined : (
             <Alert key="offline" type="warning" text={t("Map.Offline")} />

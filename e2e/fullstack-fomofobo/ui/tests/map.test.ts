@@ -1077,6 +1077,34 @@ test.describe("map", () => {
         ).toBeVisible()
     })
 
+    test("keeps the default city when the device lies outside Italy, and says why", async ({
+        page,
+        context,
+    }) => {
+        const cupertino = { latitude: 37.323, longitude: -122.032 }
+        await context.grantPermissions(["geolocation"])
+        await context.setGeolocation(cupertino)
+
+        await gotoPage(page, "/map")
+
+        await expectAlert(page, {
+            type: "info",
+            text: t("shared", "Map.OutsideMap.Description"),
+        })
+        await expect(page).not.toHaveURL(/lat=/u)
+        await expect(
+            page.getByRole("img", { name: t("shared", "Map.Position") }),
+        ).not.toBeAttached()
+
+        await clickIconButton(page, t("shared", "Map.Locate"))
+
+        const outside = { title: t("shared", "Map.OutsideMap.Title") }
+        const why = t("shared", "Map.OutsideMap.Description")
+        await expectToast(page, outside, why)
+        await dismissToast(page, outside, why)
+        await expect(page).not.toHaveURL(/lat=/u)
+    })
+
     test("keeps the center of a shared link, and the locate button moves it to the device", async ({
         page,
         context,

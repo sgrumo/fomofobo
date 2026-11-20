@@ -56,7 +56,7 @@ Once every occurrence of an event ended more than the retention days ago, a dail
 
 ### Search area
 
-The search center is the position of the device when the visitor grants location, else a default city until the visitor picks a place. The first search covers a fixed radius around the search center. Then the results are the occurrences at venues inside the area that the map shows, so a pan or a zoom out reaches the events of another city. The app shows no distance to an event.
+The search center is the position of the device when the visitor grants location, else a default city until the visitor picks a place. A position outside the map, which covers Italy, keeps the default city, and the app tells the visitor to search a place. The first search covers a fixed radius around the search center. Then the results are the occurrences at venues inside the area that the map shows, so a pan or a zoom out reaches the events of another city. The app shows no distance to an event.
 
 ### Landing page
 
