@@ -41,7 +41,7 @@ import type {
 } from "models"
 import { useEffect, useEffectEvent, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { View } from "react-native"
+import { Platform, View } from "react-native"
 
 import { playSound } from "@/lib/sounds/play-sound"
 
@@ -331,11 +331,36 @@ export const EventMap = (props: EventMapProps) => {
         // A leaving marker keeps its key, so it stays on its native annotation: a new annotation
         // reaches the screen a few frames late, and the move would play before it shows
         const key = marker.key
+        // Android hands a press on a marker to the marker alone, never to the pressable inside it
+        const pressesNatively = Platform.OS === "android" && move?.type !== "leave"
 
         if ("cluster" in feature.properties) {
             const clusterId = feature.properties.cluster_id
+            const expand = () => {
+                markerPressedAtRef.current = Date.now()
+                const zoom = clusters.getClusterExpansionZoom(clusterId)
+                // Past the last cluster zoom the points share one spot, so no zoom splits them.
+                const first =
+                    zoom > CLUSTER_MAX_ZOOM
+                        ? firstLeafIndex(clusters.getLeaves(clusterId, Infinity))
+                        : undefined
+                if (first !== undefined) {
+                    playSound("event")
+                    centerOnMarker()
+                    selectIndex(first)
+                    return
+                }
+                props.onClusterZoom()
+                cameraRef.current?.easeTo({ center: lngLat, zoom })
+            }
             return (
-                <Marker key={key} lngLat={lngLat} anchor="center" style={layerStyle}>
+                <Marker
+                    key={key}
+                    lngLat={lngLat}
+                    anchor="center"
+                    style={layerStyle}
+                    onPress={pressesNatively ? expand : undefined}
+                >
                     <MarkerMotion move={move}>
                         <EventCluster
                             count={feature.properties.point_count}
@@ -344,25 +369,7 @@ export const EventMap = (props: EventMapProps) => {
                             endedCount={feature.properties.endedCount}
                             permanentCount={feature.properties.permanentCount}
                             emphasis={emphasis}
-                            onExpand={() => {
-                                markerPressedAtRef.current = Date.now()
-                                const zoom = clusters.getClusterExpansionZoom(clusterId)
-                                // Past the last cluster zoom the points share one spot, so no zoom splits them.
-                                const first =
-                                    zoom > CLUSTER_MAX_ZOOM
-                                        ? firstLeafIndex(
-                                              clusters.getLeaves(clusterId, Infinity),
-                                          )
-                                        : undefined
-                                if (first !== undefined) {
-                                    playSound("event")
-                                    centerOnMarker()
-                                    selectIndex(first)
-                                    return
-                                }
-                                props.onClusterZoom()
-                                cameraRef.current?.easeTo({ center: lngLat, zoom })
-                            }}
+                            onExpand={expand}
                         />
                     </MarkerMotion>
                 </Marker>
@@ -375,13 +382,21 @@ export const EventMap = (props: EventMapProps) => {
             const venue = source.permanentVenues.at(
                 spot.index - source.occurrences.length,
             )
-            return venue === undefined ? undefined : (
+            if (venue === undefined) {
+                return undefined
+            }
+            const selectVenue = () => {
+                centerOnMarker()
+                props.onSelectVenue(venue.id)
+            }
+            return (
                 <Marker
                     key={key}
                     lngLat={lngLat}
                     anchor="bottom"
                     offset={PIN_OFFSET}
                     style={layerStyle}
+                    onPress={pressesNatively ? selectVenue : undefined}
                 >
                     <MarkerMotion move={move}>
                         <VenuePin
@@ -389,10 +404,7 @@ export const EventMap = (props: EventMapProps) => {
                             kind={venue.kind}
                             icon={props.iconOf(venue.categoryId)}
                             emphasis={emphasis}
-                            onSelect={() => {
-                                centerOnMarker()
-                                props.onSelectVenue(venue.id)
-                            }}
+                            onSelect={selectVenue}
                         />
                     </MarkerMotion>
                 </Marker>
@@ -400,13 +412,22 @@ export const EventMap = (props: EventMapProps) => {
         }
 
         const occurrence = source.occurrences.at(spot.index)
-        return occurrence === undefined ? undefined : (
+        if (occurrence === undefined) {
+            return undefined
+        }
+        const selectOccurrence = () => {
+            playSound("event")
+            centerOnMarker()
+            props.onSelect({ eventId: occurrence.eventId, date: occurrence.date })
+        }
+        return (
             <Marker
                 key={key}
                 lngLat={lngLat}
                 anchor="bottom"
                 offset={PIN_OFFSET}
                 style={layerStyle}
+                onPress={pressesNatively ? selectOccurrence : undefined}
             >
                 <MarkerMotion move={move}>
                     <EventPin
@@ -420,14 +441,7 @@ export const EventMap = (props: EventMapProps) => {
                         icon={props.iconOf(occurrence.primaryCategoryId)}
                         moreCount={spot.moreCount}
                         emphasis={emphasis}
-                        onSelect={() => {
-                            playSound("event")
-                            centerOnMarker()
-                            props.onSelect({
-                                eventId: occurrence.eventId,
-                                date: occurrence.date,
-                            })
-                        }}
+                        onSelect={selectOccurrence}
                     />
                 </MarkerMotion>
             </Marker>
