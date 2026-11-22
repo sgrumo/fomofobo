@@ -6,7 +6,8 @@ import { languageKeys } from "i18n/i18n"
 
 // The Expo config loader resolves a relative import only with its extension.
 import { parseEnv } from "./config/env.ts"
-import { resolveTarget } from "./config/target.ts"
+import { withShellProfileable } from "./config/shell-profileable.ts"
+import { measuresPerformance, resolveTarget } from "./config/target.ts"
 import { withUncompressedSounds } from "./config/uncompressed-sounds.ts"
 import { FONT_FAMILIES, THEME_COLORS } from "./src/lib/theme/theme-tokens.ts"
 
@@ -158,4 +159,6 @@ const config: ExpoConfig = {
     ],
 }
 
-export default withUncompressedSounds(config)
+export default withUncompressedSounds(
+    measuresPerformance(env.APP_ENV) ? withShellProfileable(config) : config,
+)

@@ -26,6 +26,8 @@ import {
 interface DetailSheetProps {
     open: boolean
     onClose: () => void
+    // The sheet comes to rest open
+    onOpened?: () => void
     footer?: ReactNode
     children?: ReactNode
 }
@@ -67,6 +69,11 @@ const DetailSheet = (props: DetailSheetProps) => {
                           </BottomSheetFooter>
                       )
             }
+            onChange={index => {
+                if (index === 0) {
+                    props.onOpened?.()
+                }
+            }}
             onClose={() => {
                 // A close that `open` asked for is no close of the user
                 if (props.open) {

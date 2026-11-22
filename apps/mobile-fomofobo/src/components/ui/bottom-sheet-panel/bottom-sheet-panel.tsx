@@ -28,6 +28,8 @@ import {
 interface BottomSheetPanelProps {
     open: boolean
     onClose: () => void
+    // The sheet comes to rest open
+    onOpened?: () => void
     // A tab that peeks out above the sheet
     tab?: ReactNode
     onSwipeUp?: () => void
@@ -96,6 +98,11 @@ const BottomSheetPanel = (props: BottomSheetPanelProps) => {
                 style={bottomSheetPanelStyle}
                 backgroundComponent={BottomSheetBackground}
                 handleIndicatorStyle={bottomSheetHandleIndicator}
+                onChange={index => {
+                    if (index === 0) {
+                        props.onOpened?.()
+                    }
+                }}
                 onClose={() => {
                     // A close that `open` asked for is no close of the user
                     if (props.open) {

@@ -57,6 +57,7 @@ interface EntityDetailSheetProps {
     open: boolean
     selection: DetailSelection | undefined
     onClose: () => void
+    onOpened: () => void
     onOpenVenue: (venueId: string) => void
     onOpenEvent: (ref: OccurrenceRef) => void
 }
@@ -138,6 +139,7 @@ export const EntityDetailSheet = (props: EntityDetailSheetProps) => {
         <DetailSheet
             open={props.open}
             onClose={props.onClose}
+            onOpened={props.onOpened}
             footer={isVenue ? venueActions : eventActions}
         >
             {isVenue && venue !== undefined ? (

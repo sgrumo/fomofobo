@@ -45,6 +45,7 @@ import { api } from "@/lib/api/client"
 import { useDeviceStorage } from "@/lib/hooks/use-device-storage"
 import { useNow } from "@/lib/hooks/use-now"
 import { useOnline } from "@/lib/hooks/use-online"
+import { endMark, startMark } from "@/lib/perf/perf-store"
 import { playSound } from "@/lib/sounds/play-sound"
 
 const TOAST_DURATION_MS = 5000
@@ -134,6 +135,19 @@ const MapScreen = () => {
     if (search !== undefined && search !== results) {
         setResults(search)
     }
+    // The first results end on the frame after they reach the map, pins or none
+    const resultsReady = results !== undefined
+    useEffect(() => {
+        if (!resultsReady) {
+            return undefined
+        }
+        const frame = requestAnimationFrame(() => {
+            endMark("first-results")
+        })
+        return () => {
+            cancelAnimationFrame(frame)
+        }
+    }, [resultsReady])
     const { showLive, showUpcoming, showPermanent, showEnded } = query
     const shownKinds = useMemo(
         () => shownKindsOf({ showLive, showUpcoming, showPermanent, showEnded }),
@@ -287,6 +301,7 @@ const MapScreen = () => {
                     )
                 }}
                 onSelect={ref => {
+                    startMark("pin-preview")
                     setFiltersOpen(false)
                     setQuery({
                         event: ref.eventId,
@@ -296,6 +311,7 @@ const MapScreen = () => {
                     })
                 }}
                 onSelectVenue={venueId => {
+                    startMark("pin-preview")
                     setFiltersOpen(false)
                     setQuery({
                         event: undefined,
@@ -378,7 +394,13 @@ const MapScreen = () => {
                         )}
                     </View>
                 </View>
-                <KindChips shown={shownKinds} onChange={setQuery} />
+                <KindChips
+                    shown={shownKinds}
+                    onChange={change => {
+                        startMark("chip-markers")
+                        setQuery(change)
+                    }}
+                />
                 {filtersOpen && (
                     <PixelPanel shadow="md">
                         <View className="gap-2 p-2">
@@ -495,6 +517,7 @@ const MapScreen = () => {
                         : undefined
                 }
                 onOpenDetail={() => {
+                    startMark("detail")
                     playSound("expand")
                     setQuery({ detail: true })
                 }}
@@ -508,6 +531,9 @@ const MapScreen = () => {
                 }}
                 onClose={() => {
                     setQuery(CLEARED_SELECTION)
+                }}
+                onOpened={() => {
+                    endMark("pin-preview")
                 }}
             />
             <DetailSheet
@@ -542,6 +568,9 @@ const MapScreen = () => {
                 }
                 onClose={() => {
                     setQuery(CLEARED_SELECTION)
+                }}
+                onOpened={() => {
+                    endMark("detail")
                 }}
                 onOpenVenue={venueId => {
                     setQuery({

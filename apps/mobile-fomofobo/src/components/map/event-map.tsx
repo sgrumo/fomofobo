@@ -43,6 +43,7 @@ import { useEffect, useEffectEvent, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Platform, View } from "react-native"
 
+import { endMark, startMark } from "@/lib/perf/perf-store"
 import { playSound } from "@/lib/sounds/play-sound"
 
 import dotDitherPattern from "../../../assets/map/dot-dither.png"
@@ -256,6 +257,20 @@ export const EventMap = (props: EventMapProps) => {
             clearTimeout(timer)
         }
     }, [generation, hasLeaving])
+
+    // Marks end on the frame after the commit of a new scene, when the markers reach the screen
+    useEffect(() => {
+        if (generation === undefined) {
+            return undefined
+        }
+        const frame = requestAnimationFrame(() => {
+            endMark("chip-markers")
+            endMark("pan-markers")
+        })
+        return () => {
+            cancelAnimationFrame(frame)
+        }
+    }, [generation])
 
     const exactZoom = viewport?.exactZoom ?? 0
     const entryOf = (
@@ -472,6 +487,9 @@ export const EventMap = (props: EventMapProps) => {
                     }
                 }}
                 onRegionDidChange={event => {
+                    if (event.nativeEvent.userInteraction) {
+                        startMark("pan-markers")
+                    }
                     showViewport(viewportOf(event.nativeEvent))
                 }}
             >

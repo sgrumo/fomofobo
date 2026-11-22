@@ -37,3 +37,14 @@ export const resolveTarget = (appEnv: AppEnv): Target =>
             firebaseDir: "firebase/prod",
         }))
         .exhaustive()
+
+/**
+ * @description True when a build of the environment measures its performance: the perf overlay and the profiler
+ * @param appEnv Environment of the build
+ * @remarks Keeps `prod` alone unmeasured, so the store build carries no overlay and stays closed to the profiler
+ */
+export const measuresPerformance = (appEnv: AppEnv): boolean =>
+    match(appEnv)
+        .with("local", "dev", () => true)
+        .with("prod", () => false)
+        .exhaustive()

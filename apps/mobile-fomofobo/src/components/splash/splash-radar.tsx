@@ -4,6 +4,8 @@ import { useEffect, useState } from "react"
 import { View } from "react-native"
 import Animated, { FadeOut, useReducedMotion } from "react-native-reanimated"
 
+import { endMark } from "@/lib/perf/perf-store"
+
 import radar from "../../../assets/splash/radar.gif"
 
 // One sweep of the radar, the length of the GIF, which plays once
@@ -20,6 +22,7 @@ export const SplashRadar = () => {
     useEffect(() => {
         if (reducedMotion) {
             void hideAsync()
+            endMark("first-view")
         }
     }, [reducedMotion])
 
@@ -43,11 +46,13 @@ export const SplashRadar = () => {
                         void hideAsync()
                         setTimeout(() => {
                             setShown(false)
+                            endMark("first-view")
                         }, SPLASH_RADAR_MS)
                     }}
                     onError={() => {
                         void hideAsync()
                         setShown(false)
+                        endMark("first-view")
                     }}
                 />
             </View>

@@ -270,6 +270,7 @@ interface EventPreviewProps {
     onOpenDetail: () => void
     onOpenVenue: (venueId: string) => void
     onClose: () => void
+    onOpened: () => void
 }
 
 export const EventPreview = (props: EventPreviewProps) => {
@@ -288,6 +289,7 @@ export const EventPreview = (props: EventPreviewProps) => {
         <BottomSheetPanel
             open={props.open}
             onClose={props.onClose}
+            onOpened={props.onOpened}
             onSwipeUp={props.entry === undefined ? undefined : props.onOpenDetail}
             tab={
                 props.paging === undefined ? undefined : (

@@ -74,6 +74,7 @@
         "react-native-css-interop": "~0.2.2",
         "react-native-gesture-handler": "~3.1.0",
         "react-native-reanimated": "~4.5.0",
+        "react-native-release-profiler": "^0.4.5",
         "react-native-safe-area-context": "~5.7.0",
         "react-native-screens": "~4.26.0",
         "react-native-svg": "15.15.4",
@@ -86,6 +87,7 @@
     },
     "devDependencies": {
         "@babel/plugin-transform-react-jsx": "^7.29.7",
+        "@react-native-community/cli-tools": "^21.0.0",
         "@types/node": "catalog:",
         "@types/react": "catalog:",
         "babel-preset-expo": "~57.0.3",

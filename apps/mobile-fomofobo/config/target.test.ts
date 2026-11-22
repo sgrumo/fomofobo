@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { appEnvValues, resolveTarget } from "./target"
+import { appEnvValues, measuresPerformance, resolveTarget } from "./target"
 
 describe("resolveTarget", () => {
     it("keeps the store identity for prod alone", () => {
@@ -18,6 +18,14 @@ describe("resolveTarget", () => {
     it("gives prod its own Firebase config", () => {
         expect(resolveTarget("prod").firebaseDir).not.toBe(
             resolveTarget("dev").firebaseDir,
+        )
+    })
+})
+
+describe("measuresPerformance", () => {
+    it("measures every build but the store build", () => {
+        expect(appEnvValues.filter(appEnv => !measuresPerformance(appEnv))).toStrictEqual(
+            ["prod"],
         )
     })
 })

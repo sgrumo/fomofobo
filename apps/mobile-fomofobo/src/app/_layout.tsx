@@ -25,6 +25,7 @@ import { View } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { lazyAsync } from "shared/function"
 
+import { PerfOverlay } from "@/components/perf/perf-overlay"
 import { SplashRadar } from "@/components/splash/splash-radar"
 import { Button } from "@/components/ui/button/button"
 import { Text } from "@/components/ui/text/text"
@@ -32,6 +33,7 @@ import { ToastHost } from "@/components/ui/toast/toast-host"
 import { VersionGate } from "@/components/version-gate/version-gate"
 import { isPersistedQuery, PERSISTED_CACHE_MAX_AGE_MS } from "@/lib/api/persisted-queries"
 import { nativeI18n } from "@/lib/i18n/native-i18n"
+import { perfMeasured, startPerf } from "@/lib/perf/perf-env"
 import { startDeviceSaveSync } from "@/lib/saves/device-save-sync"
 import { loadSounds } from "@/lib/sounds/play-sound"
 import { hydrateDeviceStorage } from "@/lib/storage/device-storage"
@@ -39,6 +41,7 @@ import { QUERY_CACHE_STORAGE_KEY } from "@/lib/storage/storage-keys"
 import { FONT_FAMILIES, THEME_COLORS } from "@/lib/theme/theme-tokens"
 
 void preventAutoHideAsync()
+startPerf()
 
 // A query leaves the cache, and the persisted copy with it, once it ages past the persisted window.
 const queryClient = new QueryClient({
@@ -157,6 +160,7 @@ const RootLayout = () => (
                         </BottomSheetModalProvider>
                     </VersionGate>
                     <ToastHost />
+                    {perfMeasured && <PerfOverlay />}
                     <SplashRadar />
                 </PersistQueryClientProvider>
             </AppReadyGate>
