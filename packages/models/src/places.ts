@@ -6,6 +6,7 @@ import { venueSchema } from "./venues"
 
 export const placeSuggestionSchema = z.object({
     label: z.string(),
+    address: z.string(),
     coordinates: geoPointSchema,
 })
 export type PlaceSuggestion = z.infer<typeof placeSuggestionSchema>

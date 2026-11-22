@@ -40,9 +40,14 @@ describe("GET /api/public/places", () => {
         }
         expect(res.data).toStrictEqual({
             places: [
-                { label: "jazz, Imola, Italy", coordinates: cacheCenter },
                 {
-                    label: "jazz, Bologna, Italy",
+                    label: "jazz, Imola (BO), Emilia-Romagna",
+                    address: "jazz, Imola (BO)",
+                    coordinates: cacheCenter,
+                },
+                {
+                    label: "jazz, Bologna (BO), Emilia-Romagna",
+                    address: "jazz, Bologna (BO)",
                     coordinates: { ...cacheCenter, latitude: cacheCenter.latitude + 0.1 },
                 },
             ],

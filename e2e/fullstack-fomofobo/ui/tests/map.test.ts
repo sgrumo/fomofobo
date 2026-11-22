@@ -911,7 +911,9 @@ test.describe("map", () => {
         await expect(farPin).toBeHidden()
 
         await fillSearchField(page, t("shared", "Search.Label"), text)
-        await page.getByRole("button", { name: `${text}, Bologna, Italy` }).click()
+        await page
+            .getByRole("button", { name: `${text}, Bologna (BO), Emilia-Romagna` })
+            .click()
 
         await expect(page).toHaveURL(/place=/u)
         await expect(farPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
@@ -969,13 +971,15 @@ test.describe("map", () => {
         await gotoPage(page, mapPath(buildArea()))
         await fillSearchField(page, t("shared", "Search.Label"), text)
         await expect(
-            page.getByRole("button", { name: `${text}, Imola, Italy` }),
+            page.getByRole("button", { name: `${text}, Imola (BO), Emilia-Romagna` }),
         ).toBeVisible()
         await searchField.press("Enter")
 
         await expect(page).toHaveURL(/place=/u)
         // The search service lowercases the text that the geocoding mock echoes
-        await expect(searchField).toHaveValue(`${text.toLowerCase()}, Imola, Italy`)
+        await expect(searchField).toHaveValue(
+            `${text.toLowerCase()}, Imola (BO), Emilia-Romagna`,
+        )
     })
 
     test("opens the detail of a venue of the area that the search names, in the group of its kind", async ({

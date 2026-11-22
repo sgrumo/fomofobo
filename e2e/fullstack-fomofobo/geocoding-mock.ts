@@ -6,6 +6,7 @@ import { GEOCODING_FAILURE_TEXT } from "./geocoding-mock-contract.ts"
 const AUTOCOMPLETE_PATH = "/v1/geocode/autocomplete"
 // The app searches places of Italy alone, with no radius around the center
 const EXPECTED_PLACES_FILTER = "countrycode:it"
+const EXPECTED_PLACES_LANGUAGE = "it"
 
 /**
  * @description Builds the two results the mock answers for a text: one at the bias point, one north of it
@@ -14,16 +15,24 @@ const EXPECTED_PLACES_FILTER = "countrycode:it"
  */
 const resultsOf = (text: string, bias: { lon: number; lat: number }) => [
     {
-        formatted: `${text}, Imola, Italy`,
+        address_line1: text,
+        city: "Imola",
+        county: "Bologna",
+        county_code: "BO",
+        state: "Emilia-Romagna",
         lat: bias.lat,
         lon: bias.lon,
         result_type: "street",
     },
     {
-        formatted: `${text}, Bologna, Italy`,
+        address_line1: text,
+        city: "Bologna",
+        county: "Bologna",
+        county_code: "BO",
+        state: "Emilia-Romagna",
         lat: bias.lat + 0.1,
         lon: bias.lon,
-        result_type: "city",
+        result_type: "street",
     },
 ]
 
@@ -51,6 +60,8 @@ createServer((request, response) => {
         answer(401, { message: "Invalid apiKey" })
     } else if (url.searchParams.get("filter") !== EXPECTED_PLACES_FILTER) {
         answer(400, { message: "Unexpected filter" })
+    } else if (url.searchParams.get("lang") !== EXPECTED_PLACES_LANGUAGE) {
+        answer(400, { message: "Unexpected language" })
     } else if (text === GEOCODING_FAILURE_TEXT) {
         answer(500, { message: "Internal error" })
     } else {

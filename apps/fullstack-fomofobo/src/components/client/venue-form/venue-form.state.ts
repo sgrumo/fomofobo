@@ -95,7 +95,7 @@ const longitudeAction =
 const placeAction =
     (state: VenueFormState) => (action: Action<VenueFormAction, "place">) => ({
         ...state,
-        address: action.value.label,
+        address: action.value.address,
         latitude: action.value.coordinates.latitude.toString(),
         longitude: action.value.coordinates.longitude.toString(),
     })

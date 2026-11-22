@@ -19,10 +19,16 @@ describe("placeQueryOf", () => {
     it("centers on the rounded place, names it and clears the text", () => {
         expect(
             placeQueryOf({
-                label: "Imola, BO",
+                label: "Imola, Bologna, Emilia-Romagna",
+                address: "Imola, Bologna",
                 coordinates: { latitude: 44.3532, longitude: 11.7148 },
             }),
-        ).toStrictEqual({ lat: 44.353, lng: 11.715, place: "Imola, BO", q: undefined })
+        ).toStrictEqual({
+            lat: 44.353,
+            lng: 11.715,
+            place: "Imola, Bologna, Emilia-Romagna",
+            q: undefined,
+        })
     })
 })
 
@@ -38,11 +44,13 @@ describe("textQueryOf", () => {
 
 describe("submittedPlaceOf", () => {
     const imola = {
-        label: "Imola, BO",
+        label: "Imola, Bologna, Emilia-Romagna",
+        address: "Imola, Bologna",
         coordinates: { latitude: 44.3532, longitude: 11.7148 },
     }
     const bologna = {
-        label: "Bologna, BO",
+        label: "Bologna, Emilia-Romagna",
+        address: "Bologna",
         coordinates: { latitude: 44.4949, longitude: 11.3426 },
     }
 

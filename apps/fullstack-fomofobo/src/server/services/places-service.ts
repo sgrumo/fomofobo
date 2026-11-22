@@ -14,6 +14,7 @@ const PLACES_CALLS_PER_WINDOW = 30
 const PLACES_WINDOW_MS = 60_000
 // A bias, not a circle: a far city still shows up, after the nearby matches
 const PLACES_COUNTRY_CODE = "it"
+const PLACES_LANGUAGE = "it"
 const PLACES_CACHE_SECONDS = 86_400
 const EVENTS_PER_SUGGESTION = 5
 const VENUES_PER_SUGGESTION = 5
@@ -71,10 +72,12 @@ export class PlacesService {
                     await this.provider.suggest(text, {
                         center: cacheCenter,
                         countryCode: PLACES_COUNTRY_CODE,
+                        language: PLACES_LANGUAGE,
                     }),
                 [
-                    "places",
+                    "places-v2",
                     PLACES_COUNTRY_CODE,
+                    PLACES_LANGUAGE,
                     text,
                     String(cacheCenter.latitude),
                     String(cacheCenter.longitude),

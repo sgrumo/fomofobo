@@ -22,7 +22,7 @@ test.describe("backoffice venues", () => {
         const name = `Venue ${crypto.randomUUID()}`
         // The place search answers the text it received in lower case
         const street = `via ${crypto.randomUUID().slice(0, 8)}`
-        const address = `${street}, Imola, Italy`
+        const address = `${street}, Imola (BO)`
         const { account } = await signInBrowser(page, "organizer")
 
         await gotoBackofficePage(page, "/backoffice/venues")
@@ -33,7 +33,7 @@ test.describe("backoffice venues", () => {
             dialog,
             t("shared", "Backoffice.VenueForm.Search"),
             street,
-            ["exact", address],
+            ["exact", `${address}, Emilia-Romagna`],
         )
         await expectInputValue(
             dialog,

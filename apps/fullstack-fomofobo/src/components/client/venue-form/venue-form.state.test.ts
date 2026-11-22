@@ -14,18 +14,19 @@ import {
 const i18n = createI18nInstance("it", { shared, ui })
 
 describe("venueFormReducer", () => {
-    it("fills the address and the coordinates from a picked place", () => {
+    it("fills the postal address and the coordinates from a picked place", () => {
         const state = venueFormReducer(initialVenueFormState(), {
             type: "place",
             value: {
-                label: "Via Emilia 1, Imola, Italy",
+                label: "Via Emilia, 1, 40026 Imola (BO), Emilia-Romagna",
+                address: "Via Emilia, 1, 40026 Imola (BO)",
                 coordinates: { latitude: 44.3533, longitude: 11.7147 },
             },
         })
 
         expect(state).toStrictEqual({
             ...initialVenueFormState(),
-            address: "Via Emilia 1, Imola, Italy",
+            address: "Via Emilia, 1, 40026 Imola (BO)",
             latitude: "44.3533",
             longitude: "11.7147",
         })
