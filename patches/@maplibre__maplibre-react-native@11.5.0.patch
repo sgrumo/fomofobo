@@ -1,8 +1,38 @@
+diff --git a/ios/components/annotations/point-annotation/MLRNPointAnnotation.h b/ios/components/annotations/point-annotation/MLRNPointAnnotation.h
+index 3f613ddc8be8ff0a0f462a9ac5ba63a4a7c40cec..e724460847d6e6696d346cf6f26ffe67a8a3cb1a 100644
+--- a/ios/components/annotations/point-annotation/MLRNPointAnnotation.h
++++ b/ios/components/annotations/point-annotation/MLRNPointAnnotation.h
+@@ -26,6 +26,7 @@
+ @property (nonatomic, copy) void (^reactOnDragStart)(NSDictionary *event);
+ @property (nonatomic, copy) void (^reactOnDrag)(NSDictionary *event);
+ @property (nonatomic, copy) void (^reactOnDragEnd)(NSDictionary *event);
++@property (nonatomic, copy) void (^reactOnShow)(NSDictionary *event);
+ 
+ @property (nonatomic, assign) BOOL reactSelected;
+ @property (nonatomic, assign) BOOL reactDraggable;
 diff --git a/ios/components/annotations/point-annotation/MLRNPointAnnotation.m b/ios/components/annotations/point-annotation/MLRNPointAnnotation.m
-index 71ee64d14f2892373cfb4556dfd35ee3c005f4ce..1bdfd3ce4f20a6275e0628aa0bf7fdbedb67cecd 100644
+index 71ee64d14f2892373cfb4556dfd35ee3c005f4ce..a8602348caa5fe82b6a0e88ae227bf6ee5aac800 100644
 --- a/ios/components/annotations/point-annotation/MLRNPointAnnotation.m
 +++ b/ios/components/annotations/point-annotation/MLRNPointAnnotation.m
-@@ -199,6 +199,14 @@ - (CGFloat)_getZPosition {
+@@ -12,6 +12,9 @@ @implementation MLRNPointAnnotation {
+   // Finger-to-anchor offset to preserve the touch position relative to the annotation's anchor
+   CGPoint _dragFingerOffset;
+   BOOL _dragFingerOffsetCaptured;
++  // The React coordinate reaches the annotation one main queue turn after its props
++  BOOL _coordinateApplied;
++  BOOL _shownReported;
+ }
+ 
+ - (id)init {
+@@ -68,6 +71,7 @@ - (void)setCenter:(CGPoint)center {
+   if (self.dragState == MLNAnnotationViewDragStateNone) {
+     _dragFingerOffsetCaptured = NO;
+     [super setCenter:center];
++    [self _reportShown];
+     return;
+   }
+ 
+@@ -199,6 +203,14 @@ - (CGFloat)_getZPosition {
    return latitudeMax - self.coordinate.latitude;
  }
  
@@ -17,6 +47,55 @@ index 71ee64d14f2892373cfb4556dfd35ee3c005f4ce..1bdfd3ce4f20a6275e0628aa0bf7fdbe
  - (void)_handleTap:(UITapGestureRecognizer *)recognizer {
    if ([_map isKindOfClass:[MLRNMapView class]]) {
      ((MLRNMapView *)_map).annotationSelected = YES;
+@@ -258,9 +270,20 @@ - (void)_updateCoordinate {
+ 
+   dispatch_async(dispatch_get_main_queue(), ^{
+     self.coordinate = CLLocationCoordinate2DMake(lat, lng);
++    self->_coordinateApplied = YES;
+   });
+ }
+ 
++// MapLibre places a new annotation view a few frames after it mounts, once the annotation
++// tile holds it: the first center it sets in a window at the React coordinate puts it on screen.
++- (void)_reportShown {
++  if (_shownReported || !_coordinateApplied || self.window == nil || self.reactOnShow == nil) {
++    return;
++  }
++  _shownReported = YES;
++  self.reactOnShow([self makeEventPayload]);
++}
++
+ - (void)_addAnnotation {
+   if ([_map.annotations containsObject:self]) {
+     return;
+diff --git a/ios/components/annotations/point-annotation/MLRNPointAnnotationComponentView.mm b/ios/components/annotations/point-annotation/MLRNPointAnnotationComponentView.mm
+index 9ebd2ba1b24f4b5594382cc9f5e52a3062c10b63..e394be86f63338ab42cc516ae072edef92e04cca 100644
+--- a/ios/components/annotations/point-annotation/MLRNPointAnnotationComponentView.mm
++++ b/ios/components/annotations/point-annotation/MLRNPointAnnotationComponentView.mm
+@@ -159,6 +159,23 @@ - (void)prepareView {
+           ->onDragEnd(eventStruct);
+     }
+   }];
++  [_view setReactOnShow:^(NSDictionary *event) {
++    __typeof__(self) strongSelf = weakSelf;
++
++    if (strongSelf != nullptr && strongSelf->_eventEmitter != nullptr) {
++      NSString *idValue = event[@"id"];
++      facebook::react::MLRNPointAnnotationEventEmitter::OnShow eventStruct{
++          std::string([idValue UTF8String] ?: ""),
++          folly::dynamic::array([event[@"lngLat"][0] doubleValue],
++                                [event[@"lngLat"][1] doubleValue]),
++          folly::dynamic::array([event[@"point"][0] doubleValue],
++                                [event[@"point"][1] doubleValue])};
++
++      std::dynamic_pointer_cast<const facebook::react::MLRNPointAnnotationEventEmitter>(
++          strongSelf->_eventEmitter)
++          ->onShow(eventStruct);
++    }
++  }];
+ 
+   // Add _view as a subview (not contentView) so the MapView can discover it
+   // via its addToMap: method which iterates through subviews looking for
 diff --git a/ios/components/images/MLRNImages.m b/ios/components/images/MLRNImages.m
 index 8ab57eb85c0f55bfc1a75e3916e94dbc47f3ad90..9aa3f1ee4bffafdce2d6db7a7ebc8930fe280f58 100644
 --- a/ios/components/images/MLRNImages.m
@@ -53,3 +132,149 @@ index 22212748b1f1ca2eb73b5a1688ddb848b5c8ab0c..5db676c335d6e98ee9726a616d5ad770
  
    [reactMapView _applyLight];
    [reactMapView _applyScaleBar];
+diff --git a/lib/commonjs/components/annotations/view-annotation/PointAnnotationNativeComponent.ts b/lib/commonjs/components/annotations/view-annotation/PointAnnotationNativeComponent.ts
+index 042fc5f75a547228c40f559e9820f5003d6f1abb..94dfe526a9117fae4b868bef63effae3c69843e1 100644
+--- a/lib/commonjs/components/annotations/view-annotation/PointAnnotationNativeComponent.ts
++++ b/lib/commonjs/components/annotations/view-annotation/PointAnnotationNativeComponent.ts
+@@ -44,6 +44,8 @@ export interface NativeProps extends ViewProps {
+   onDragStart?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+   onDrag?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+   onDragEnd?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
++  // iOS: fired once, when MapLibre first places the view on screen at its coordinate
++  onShow?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+ }
+ 
+ interface NativeCommands {
+diff --git a/lib/module/components/annotations/view-annotation/PointAnnotationNativeComponent.ts b/lib/module/components/annotations/view-annotation/PointAnnotationNativeComponent.ts
+index 042fc5f75a547228c40f559e9820f5003d6f1abb..94dfe526a9117fae4b868bef63effae3c69843e1 100644
+--- a/lib/module/components/annotations/view-annotation/PointAnnotationNativeComponent.ts
++++ b/lib/module/components/annotations/view-annotation/PointAnnotationNativeComponent.ts
+@@ -44,6 +44,8 @@ export interface NativeProps extends ViewProps {
+   onDragStart?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+   onDrag?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+   onDragEnd?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
++  // iOS: fired once, when MapLibre first places the view on screen at its coordinate
++  onShow?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+ }
+ 
+ interface NativeCommands {
+diff --git a/lib/typescript/commonjs/components/annotations/marker/Marker.d.ts b/lib/typescript/commonjs/components/annotations/marker/Marker.d.ts
+index 02888a9a2b3d41c3142990069e672afb045fd0b4..bf9b37cf85b89b1ac726af87ed0fecce95f09a52 100644
+--- a/lib/typescript/commonjs/components/annotations/marker/Marker.d.ts
++++ b/lib/typescript/commonjs/components/annotations/marker/Marker.d.ts
+@@ -55,6 +55,7 @@ export interface MarkerProps extends ViewProps {
+      * This callback is fired when the marker is pressed.
+      */
+     onPress?: (event: NativeSyntheticEvent<MarkerEvent>) => void;
++    onShow?: (event: NativeSyntheticEvent<MarkerEvent>) => void;
+     /**
+      * Expects one child - can be a View with multiple elements.
+      */
+diff --git a/lib/typescript/commonjs/components/annotations/view-annotation/PointAnnotationNativeComponent.d.ts b/lib/typescript/commonjs/components/annotations/view-annotation/PointAnnotationNativeComponent.d.ts
+index 23e89176059308e51cfcc15fc89a75fc221a3bce..c729affd4727cd7d4cb0b15348db3d109c9dff0b 100644
+--- a/lib/typescript/commonjs/components/annotations/view-annotation/PointAnnotationNativeComponent.d.ts
++++ b/lib/typescript/commonjs/components/annotations/view-annotation/PointAnnotationNativeComponent.d.ts
+@@ -34,6 +34,7 @@ export interface NativeProps extends ViewProps {
+     onDragStart?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+     onDrag?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+     onDragEnd?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
++    onShow?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+ }
+ interface NativeCommands {
+     refresh: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
+diff --git a/lib/typescript/commonjs/components/annotations/view-annotation/ViewAnnotation.d.ts b/lib/typescript/commonjs/components/annotations/view-annotation/ViewAnnotation.d.ts
+index 76ac153e4ee21d470386b108426ed59ee500aaa0..5a9a8cf7e135fb8367c2d70e2a591cfc8d0a5fc8 100644
+--- a/lib/typescript/commonjs/components/annotations/view-annotation/ViewAnnotation.d.ts
++++ b/lib/typescript/commonjs/components/annotations/view-annotation/ViewAnnotation.d.ts
+@@ -83,6 +83,7 @@ export interface ViewAnnotationProps {
+      * This callback is fired while this annotation is being dragged.
+      */
+     onDrag?: (event: NativeSyntheticEvent<ViewAnnotationEvent>) => void;
++    onShow?: (event: NativeSyntheticEvent<ViewAnnotationEvent>) => void;
+     style?: ViewProps["style"];
+     /**
+      * Expects one child, and an optional callout can be added as well
+diff --git a/lib/typescript/module/components/annotations/marker/Marker.d.ts b/lib/typescript/module/components/annotations/marker/Marker.d.ts
+index 02888a9a2b3d41c3142990069e672afb045fd0b4..bf9b37cf85b89b1ac726af87ed0fecce95f09a52 100644
+--- a/lib/typescript/module/components/annotations/marker/Marker.d.ts
++++ b/lib/typescript/module/components/annotations/marker/Marker.d.ts
+@@ -55,6 +55,7 @@ export interface MarkerProps extends ViewProps {
+      * This callback is fired when the marker is pressed.
+      */
+     onPress?: (event: NativeSyntheticEvent<MarkerEvent>) => void;
++    onShow?: (event: NativeSyntheticEvent<MarkerEvent>) => void;
+     /**
+      * Expects one child - can be a View with multiple elements.
+      */
+diff --git a/lib/typescript/module/components/annotations/view-annotation/PointAnnotationNativeComponent.d.ts b/lib/typescript/module/components/annotations/view-annotation/PointAnnotationNativeComponent.d.ts
+index 23e89176059308e51cfcc15fc89a75fc221a3bce..c729affd4727cd7d4cb0b15348db3d109c9dff0b 100644
+--- a/lib/typescript/module/components/annotations/view-annotation/PointAnnotationNativeComponent.d.ts
++++ b/lib/typescript/module/components/annotations/view-annotation/PointAnnotationNativeComponent.d.ts
+@@ -34,6 +34,7 @@ export interface NativeProps extends ViewProps {
+     onDragStart?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+     onDrag?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+     onDragEnd?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
++    onShow?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+ }
+ interface NativeCommands {
+     refresh: (viewRef: React.ElementRef<HostComponent<NativeProps>>) => void;
+diff --git a/lib/typescript/module/components/annotations/view-annotation/ViewAnnotation.d.ts b/lib/typescript/module/components/annotations/view-annotation/ViewAnnotation.d.ts
+index 76ac153e4ee21d470386b108426ed59ee500aaa0..5a9a8cf7e135fb8367c2d70e2a591cfc8d0a5fc8 100644
+--- a/lib/typescript/module/components/annotations/view-annotation/ViewAnnotation.d.ts
++++ b/lib/typescript/module/components/annotations/view-annotation/ViewAnnotation.d.ts
+@@ -83,6 +83,7 @@ export interface ViewAnnotationProps {
+      * This callback is fired while this annotation is being dragged.
+      */
+     onDrag?: (event: NativeSyntheticEvent<ViewAnnotationEvent>) => void;
++    onShow?: (event: NativeSyntheticEvent<ViewAnnotationEvent>) => void;
+     style?: ViewProps["style"];
+     /**
+      * Expects one child, and an optional callout can be added as well
+diff --git a/src/components/annotations/marker/Marker.tsx b/src/components/annotations/marker/Marker.tsx
+index 2527b4352cb0ea165082fe0521bf0e996926ca78..45431937d46e0057b91f71dddaf2b14e7a477318 100644
+--- a/src/components/annotations/marker/Marker.tsx
++++ b/src/components/annotations/marker/Marker.tsx
+@@ -87,6 +87,13 @@ export interface MarkerProps extends ViewProps {
+    */
+   onPress?: (event: NativeSyntheticEvent<MarkerEvent>) => void;
+ 
++  /**
++   * iOS only: this callback is fired once, when the marker first shows on screen
++   * at its coordinate. A new marker shows a few frames after it mounts. Android
++   * shows a marker as it mounts and never fires it.
++   */
++  onShow?: (event: NativeSyntheticEvent<MarkerEvent>) => void;
++
+   /**
+    * Expects one child - can be a View with multiple elements.
+    */
+diff --git a/src/components/annotations/view-annotation/PointAnnotationNativeComponent.ts b/src/components/annotations/view-annotation/PointAnnotationNativeComponent.ts
+index 042fc5f75a547228c40f559e9820f5003d6f1abb..94dfe526a9117fae4b868bef63effae3c69843e1 100644
+--- a/src/components/annotations/view-annotation/PointAnnotationNativeComponent.ts
++++ b/src/components/annotations/view-annotation/PointAnnotationNativeComponent.ts
+@@ -44,6 +44,8 @@ export interface NativeProps extends ViewProps {
+   onDragStart?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+   onDrag?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+   onDragEnd?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
++  // iOS: fired once, when MapLibre first places the view on screen at its coordinate
++  onShow?: CodegenTypes.DirectEventHandler<NativeAnnotationEvent>;
+ }
+ 
+ interface NativeCommands {
+diff --git a/src/components/annotations/view-annotation/ViewAnnotation.tsx b/src/components/annotations/view-annotation/ViewAnnotation.tsx
+index 45c378c76e8a7bbee87a2e5b9a535023cd5798cd..be82d6430f5ae24ed9c15b1731d586cb79806d23 100644
+--- a/src/components/annotations/view-annotation/ViewAnnotation.tsx
++++ b/src/components/annotations/view-annotation/ViewAnnotation.tsx
+@@ -132,6 +132,12 @@ export interface ViewAnnotationProps {
+    */
+   onDrag?: (event: NativeSyntheticEvent<ViewAnnotationEvent>) => void;
+ 
++  /**
++   * iOS only: this callback is fired once, when the annotation first shows on
++   * screen at its coordinate. A new annotation shows a few frames after it mounts.
++   */
++  onShow?: (event: NativeSyntheticEvent<ViewAnnotationEvent>) => void;
++
+   style?: ViewProps["style"];
+ 
+   /**

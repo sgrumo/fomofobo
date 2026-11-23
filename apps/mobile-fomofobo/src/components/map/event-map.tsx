@@ -49,7 +49,7 @@ import { playSound } from "@/lib/sounds/play-sound"
 import dotDitherPattern from "../../../assets/map/dot-dither.png"
 import { EventCluster } from "./event-cluster"
 import { EventPin } from "./event-pin"
-import { MarkerMotion } from "./marker-motion"
+import { MapMarker } from "./map-marker"
 import { PositionMarker } from "./position-marker"
 import { VenuePin } from "./venue-pin"
 
@@ -337,7 +337,6 @@ export const EventMap = (props: EventMapProps) => {
         const { marker, move, emphasis, layer, source } = entry
         const { feature, coordinates } = marker
         const lngLat: [number, number] = [coordinates.longitude, coordinates.latitude]
-        const layerStyle = { zIndex: layer }
         // A press on a pin centers the map on it, and its time drops the map press that echoes it
         const centerOnMarker = () => {
             markerPressedAtRef.current = Date.now()
@@ -369,25 +368,24 @@ export const EventMap = (props: EventMapProps) => {
                 cameraRef.current?.easeTo({ center: lngLat, zoom })
             }
             return (
-                <Marker
+                <MapMarker
                     key={key}
                     lngLat={lngLat}
                     anchor="center"
-                    style={layerStyle}
+                    layer={layer}
+                    move={move}
                     onPress={pressesNatively ? expand : undefined}
                 >
-                    <MarkerMotion move={move}>
-                        <EventCluster
-                            count={feature.properties.point_count}
-                            liveCount={feature.properties.liveCount}
-                            upcomingCount={feature.properties.upcomingCount}
-                            endedCount={feature.properties.endedCount}
-                            permanentCount={feature.properties.permanentCount}
-                            emphasis={emphasis}
-                            onExpand={expand}
-                        />
-                    </MarkerMotion>
-                </Marker>
+                    <EventCluster
+                        count={feature.properties.point_count}
+                        liveCount={feature.properties.liveCount}
+                        upcomingCount={feature.properties.upcomingCount}
+                        endedCount={feature.properties.endedCount}
+                        permanentCount={feature.properties.permanentCount}
+                        emphasis={emphasis}
+                        onExpand={expand}
+                    />
+                </MapMarker>
             )
         }
 
@@ -406,24 +404,23 @@ export const EventMap = (props: EventMapProps) => {
                 props.onSelectVenue(venue.id)
             }
             return (
-                <Marker
+                <MapMarker
                     key={key}
                     lngLat={lngLat}
                     anchor="bottom"
                     offset={PIN_OFFSET}
-                    style={layerStyle}
+                    layer={layer}
+                    move={move}
                     onPress={pressesNatively ? selectVenue : undefined}
                 >
-                    <MarkerMotion move={move}>
-                        <VenuePin
-                            name={venue.name}
-                            kind={venue.kind}
-                            icon={props.iconOf(venue.categoryId)}
-                            emphasis={emphasis}
-                            onSelect={selectVenue}
-                        />
-                    </MarkerMotion>
-                </Marker>
+                    <VenuePin
+                        name={venue.name}
+                        kind={venue.kind}
+                        icon={props.iconOf(venue.categoryId)}
+                        emphasis={emphasis}
+                        onSelect={selectVenue}
+                    />
+                </MapMarker>
             )
         }
 
@@ -437,30 +434,29 @@ export const EventMap = (props: EventMapProps) => {
             props.onSelect({ eventId: occurrence.eventId, date: occurrence.date })
         }
         return (
-            <Marker
+            <MapMarker
                 key={key}
                 lngLat={lngLat}
                 anchor="bottom"
                 offset={PIN_OFFSET}
-                style={layerStyle}
+                layer={layer}
+                move={move}
                 onPress={pressesNatively ? selectOccurrence : undefined}
             >
-                <MarkerMotion move={move}>
-                    <EventPin
-                        title={occurrence.title}
-                        status={spot.kind}
-                        start={pinStartOf(
-                            new Date(occurrence.startsAt),
-                            props.now,
-                            PLATFORM_TIME_ZONE,
-                        )}
-                        icon={props.iconOf(occurrence.primaryCategoryId)}
-                        moreCount={spot.moreCount}
-                        emphasis={emphasis}
-                        onSelect={selectOccurrence}
-                    />
-                </MarkerMotion>
-            </Marker>
+                <EventPin
+                    title={occurrence.title}
+                    status={spot.kind}
+                    start={pinStartOf(
+                        new Date(occurrence.startsAt),
+                        props.now,
+                        PLATFORM_TIME_ZONE,
+                    )}
+                    icon={props.iconOf(occurrence.primaryCategoryId)}
+                    moreCount={spot.moreCount}
+                    emphasis={emphasis}
+                    onSelect={selectOccurrence}
+                />
+            </MapMarker>
         )
     }
 
