@@ -66,7 +66,7 @@ const createdVenueSchema =
 const write = { readOnlyHint: false, destructiveHint: true, openWorldHint: false }
 
 const CONFIRMATION_RULE =
-    "Before you call it, show the user every field you will send and wait for a clear yes. Never invent a value that the source does not give: ask."
+    "Before you call it, show the user every field you will send, in plain words with names in place of ids, and wait for a clear yes. Never invent a value that the source does not give: ask."
 
 /**
  * @description Registers the tools that write events and venues on the server

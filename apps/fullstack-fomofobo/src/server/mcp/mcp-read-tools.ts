@@ -73,7 +73,7 @@ export const registerReadTools = (
         {
             title: "List categories",
             description:
-                "Lists every event category with its id. An event takes one or more categories; the first one sets the icon of its pin on the map.",
+                "Lists every event category with its id. An event takes one or more categories; the primary one sets the icon of its pin on the map.",
             annotations: readOnly,
         },
         () =>

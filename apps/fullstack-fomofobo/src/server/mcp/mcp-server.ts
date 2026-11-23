@@ -3,6 +3,7 @@ import { McpServer } from "@modelcontextprotocol/server"
 import type { Account } from "models"
 
 import type { Container } from "../container"
+import { MCP_INSTRUCTIONS } from "./mcp-instructions"
 import { registerReadTools } from "./mcp-read-tools"
 import { registerWriteTools } from "./mcp-write-tools"
 
@@ -24,7 +25,10 @@ export interface McpCall {
  * @param call Account, client address, instant and origin of the request
  */
 export const buildMcpServer = (services: McpServices, call: McpCall): McpServer => {
-    const server = new McpServer({ name: "zonzo-backoffice", version: "1.0.0" })
+    const server = new McpServer(
+        { name: "zonzo-backoffice", version: "1.0.0" },
+        { instructions: MCP_INSTRUCTIONS },
+    )
     registerReadTools(server, services, call)
     registerWriteTools(server, services, call)
     return server

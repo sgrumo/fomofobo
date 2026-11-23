@@ -9,6 +9,8 @@ user-invocable: true
 
 $ARGUMENTS
 
+This skill serves Claude Code in this repo. On claude.ai an Admin adds events through the Zonzo connector at `/api/mcp`, whose server instructions hold the conversation rules.
+
 The `backoffice-cli` helper sends each call to the backoffice API as the account of its env file. The server applies the backoffice rules: the session, the role and every field check. A call creates real data in the environment that it targets.
 
 Run every command from the repo root. `pnpm -s backoffice` with no arguments prints the usage.
