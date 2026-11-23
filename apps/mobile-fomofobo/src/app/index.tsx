@@ -474,6 +474,7 @@ const MapScreen = () => {
                             icon="saved"
                             label={t("Saved.Open")}
                             onPress={() => {
+                                playSound("expand")
                                 setQuery({ saved: true })
                             }}
                         />

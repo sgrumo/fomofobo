@@ -429,6 +429,7 @@ export const MapScreen = (props: MapScreenProps) => {
     // True while the open saved list owns the history entry that a close pops
     const savedPushedRef = useRef(false)
     const openSaved = () => {
+        playSound("expand")
         savedPushedRef.current = true
         setQuery({ saved: true }, { history: "push" })
     }
