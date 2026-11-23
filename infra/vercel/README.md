@@ -43,7 +43,7 @@ The upload leaves the git metadata out, so Vercel runs no check on the commit au
 At repository level, set the variable `VERCEL_ORG_ID` and the secret `VERCEL_TOKEN` one time. `VERCEL_ORG_ID` is the id of the Vercel account that owns both projects.
 
 1. Create the database with `turso db create fomofobo-<env> --location aws-eu-west-1`. Write its URL, from `turso db show fomofobo-<env> --url`, into `DATABASE_URL` of `env/<env>.env`.
-2. Create the photos bucket with `pnpm dlx wrangler r2 bucket create fomofobo-<env>-photos`. R2 makes a whole bucket public, never a prefix, so the bucket holds photos alone. In the Cloudflare dashboard, connect a custom domain to it and disable its `r2.dev` URL. The domain must be a zone of the same Cloudflare account. Until `dev` has a domain (TQ-23), keep its `r2.dev` URL enabled and use it as the public URL. Cloudflare rate-limits that URL. Write the public URL into `PHOTOS_PUBLIC_BASE_URL` of `env/<env>.env`.
+2. Create the photos bucket with `pnpm dlx wrangler r2 bucket create fomofobo-<env>-photos`. R2 makes a whole bucket public, never a prefix, so the bucket holds photos alone. In the Cloudflare dashboard, connect a custom domain to it and disable its `r2.dev` URL. The domain must be a zone of the same Cloudflare account. Until a bucket has a domain (TQ-23), keep its `r2.dev` URL enabled and use it as the public URL. Cloudflare rate-limits that URL. Write the public URL into `PHOTOS_PUBLIC_BASE_URL` of `env/<env>.env`.
 3. Set the CORS rule of the bucket with `pnpm dlx wrangler r2 bucket cors set fomofobo-<env>-photos --file cors.json`. The browser uploads with a presigned `PUT`, so the rule allows the app origin, the `PUT` method and the `Content-Type` header:
 
     ```json
