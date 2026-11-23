@@ -32,6 +32,7 @@ export const buildMcpEndpoint = (
                 account: await resolveMcpAccount(dependencies.authAccounts, claims.sub),
                 forwardedFor: request.headers.get("x-forwarded-for") ?? undefined,
                 now: new Date(),
+                appUrl: new URL(dependencies.resource).origin,
             }
             const handler = createMcpHandler(
                 () => buildMcpServer(dependencies.services, call),

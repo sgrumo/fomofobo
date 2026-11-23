@@ -72,3 +72,15 @@ export const callTool = async (
         ? { isError: true, text }
         : { isError: false, value: parseJson(text) }
 }
+
+/**
+ * @description Returns the value of a tool answer
+ * @param result Answer of `callTool`
+ * @throws When the tool answered an error, with its text
+ */
+export const toolValueOf = (result: Awaited<ReturnType<typeof callTool>>): unknown => {
+    if (result.isError) {
+        throw new TypeError(`Tool error: ${result.text}`)
+    }
+    return result.value
+}

@@ -17,21 +17,31 @@ const toolListSchema = z.object({
 })
 
 describe("MCP tools/list", () => {
-    it("lists the read tools of the backoffice, each marked read-only", async () => {
+    it("lists the tools of the backoffice, the writes marked destructive", async () => {
         const { tokens } = await authorizeAdmin()
 
         const res = await callMcp(tokens.access_token, "tools/list")
         expectStatus(res, 200)
 
         const tools = toolListSchema.parse(rpcMessageOf(res.data)).result.tools
-        expect(tools.map(tool => tool.name).toSorted()).toStrictEqual([
-            "get_event",
-            "list_categories",
-            "list_events",
-            "search_organizers",
-            "search_places",
-            "search_venues",
+        expect(
+            tools
+                .map(tool => ({
+                    name: tool.name,
+                    readOnly: tool.annotations.readOnlyHint,
+                    destructive: tool.annotations.destructiveHint,
+                }))
+                .toSorted((left, right) => left.name.localeCompare(right.name)),
+        ).toStrictEqual([
+            { name: "create_event", readOnly: false, destructive: true },
+            { name: "create_venue", readOnly: false, destructive: true },
+            { name: "get_event", readOnly: true, destructive: undefined },
+            { name: "list_categories", readOnly: true, destructive: undefined },
+            { name: "list_events", readOnly: true, destructive: undefined },
+            { name: "search_organizers", readOnly: true, destructive: undefined },
+            { name: "search_places", readOnly: true, destructive: undefined },
+            { name: "search_venues", readOnly: true, destructive: undefined },
+            { name: "update_event", readOnly: false, destructive: true },
         ])
-        expect(tools.every(tool => tool.annotations.readOnlyHint === true)).toBe(true)
     })
 })
