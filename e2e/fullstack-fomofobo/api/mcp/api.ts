@@ -40,3 +40,35 @@ export const rpcMessageOf = (data: unknown): unknown =>
             .find(line => line.startsWith("data: "))
             ?.slice("data: ".length) ?? "null",
     )
+
+const toolResultMessageSchema = z.object({
+    result: z.object({
+        isError: z.boolean().optional(),
+        content: z.array(z.object({ type: z.literal("text"), text: z.string() })),
+    }),
+})
+
+/**
+ * @description Returns the JSON value of a text
+ * @param text JSON text
+ */
+const parseJson = (text: string): unknown => JSON.parse(text)
+
+/**
+ * @description Calls one MCP tool and returns its answer: the JSON value, or the error text
+ * @param token Access token of an Admin
+ * @param name Name of the tool
+ * @param args Arguments of the call
+ */
+export const callTool = async (
+    token: string,
+    name: string,
+    args: Record<string, unknown> = {},
+): Promise<{ isError: false; value: unknown } | { isError: true; text: string }> => {
+    const res = await callMcp(token, "tools/call", { name, arguments: args })
+    const { result } = toolResultMessageSchema.parse(rpcMessageOf(res.data))
+    const text = result.content.map(part => part.text).join("\n")
+    return result.isError === true
+        ? { isError: true, text }
+        : { isError: false, value: parseJson(text) }
+}

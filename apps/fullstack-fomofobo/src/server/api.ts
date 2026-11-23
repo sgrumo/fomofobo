@@ -155,7 +155,12 @@ const buildApi = (): OpenAPIHono => {
 
     app.route("/", buildClientCompatibilityRouter(clientCompatibility))
 
-    const mcpEndpoint = buildMcpEndpoint({ auth, authAccounts, resource: mcpResource })
+    const mcpEndpoint = buildMcpEndpoint({
+        auth,
+        authAccounts,
+        services: { categories, events, organizers, places, venues },
+        resource: mcpResource,
+    })
     app.all(MCP_PATH, c => mcpEndpoint(c.req.raw))
 
     app.use(`${apiBasePath}/backoffice/*`, backofficeSession(authAccounts))
