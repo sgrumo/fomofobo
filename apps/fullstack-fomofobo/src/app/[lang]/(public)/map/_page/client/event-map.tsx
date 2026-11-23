@@ -550,6 +550,7 @@ export const EventMap = (props: EventMapProps) => {
                                     props.onSelectedClick()
                                     return
                                 }
+                                playSound("event")
                                 centerOnMarker()
                                 props.onSelectVenue(venue.id)
                             }}

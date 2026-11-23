@@ -401,6 +401,7 @@ export const EventMap = (props: EventMapProps) => {
                 return undefined
             }
             const selectVenue = () => {
+                playSound("event")
                 centerOnMarker()
                 props.onSelectVenue(venue.id)
             }
