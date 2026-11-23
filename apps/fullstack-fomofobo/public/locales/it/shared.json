@@ -26,7 +26,9 @@
             "Categories": "Categorie",
             "Organizers": "Organizzatori",
             "Settings": "Impostazioni",
-            "Venue": "Luogo"
+            "Venue": "Luogo",
+            "OauthLogin": "Collega un assistente",
+            "OauthConsent": "Autorizza un assistente"
         },
         "Privacy": "Privacy",
         "Support": "Assistenza"
@@ -253,6 +255,19 @@
             "InvalidCredentials": "Email o password errate.",
             "Failed": "Accesso non riuscito. Riprova tra poco.",
             "Blocked": "Il tuo account è bloccato. Contatta un Admin."
+        },
+        "OauthLogin": {
+            "Title": "Collega un assistente",
+            "Hint": "Un assistente come Claude chiede di usare il tuo account del backoffice. Accedi per continuare."
+        },
+        "OauthConsent": {
+            "Title": "Autorizza l'accesso",
+            "Request": "{{client}} chiede di leggere e scrivere eventi e luoghi con il tuo account.",
+            "Site": "Sito dell'app: {{site}}",
+            "UnknownClient": "Un'app senza nome",
+            "Approve": "Autorizza",
+            "Deny": "Rifiuta",
+            "Failed": "Operazione non riuscita. Ricomincia il collegamento dall'assistente."
         },
         "List": {
             "Loading": "Caricamento",

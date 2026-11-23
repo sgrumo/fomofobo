@@ -25,6 +25,14 @@ describe("resolveAppConfig", () => {
         })
     })
 
+    it("should open the OAuth client registration in the test shape alone", () => {
+        expect(
+            appEnvValues.filter(
+                appEnv => resolveAppConfig(appEnv).oauthClientRegistrationEnabled,
+            ),
+        ).toStrictEqual(["test"])
+    })
+
     it("should hide the error detail and the API documentation in the vercel shape", () => {
         const config = resolveAppConfig("vercel")
 

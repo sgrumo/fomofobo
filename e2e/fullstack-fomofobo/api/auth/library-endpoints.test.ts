@@ -14,10 +14,18 @@ const unexposedEndpoints = [
     "/api/auth/admin/create-user",
     "/api/auth/admin/set-role",
     "/api/auth/admin/impersonate-user",
+    "/api/auth/token",
+    "/api/auth/oauth2/create-client",
+    "/api/auth/admin/oauth2/create-client",
+    "/api/auth/oauth2/update-client",
+    "/api/auth/oauth2/continue",
+    "/api/auth/oauth2/introspect",
+    "/api/auth/oauth2/update-consent",
+    "/api/auth/oauth2/end-session",
 ]
 
 describe("auth library endpoints", () => {
-    it("answer 404 to every endpoint but the sign-in", async () => {
+    it("answer 404 to every endpoint that the app does not mount by name", async () => {
         for (const path of unexposedEndpoints) {
             const res = await axios.post(
                 `${publishedAppUrl()}${path}`,

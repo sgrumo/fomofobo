@@ -86,6 +86,20 @@ export const routes = {
             reason: z.enum(["blocked"]).optional().catch(undefined),
         }),
     }),
+    // The OAuth pages read the signed authorization query raw: its snake_case keys and its
+    // signature cannot pass through a query schema
+    backofficeOauthLogin: createDynamicRoute({
+        segments: ["backoffice", "oauth-login"],
+        title: ({ t }) => t("PageTitle.Backoffice.OauthLogin"),
+        parametersSchema: z.object({}),
+        querySchema: z.object({}),
+    }),
+    backofficeOauthConsent: createDynamicRoute({
+        segments: ["backoffice", "oauth-consent"],
+        title: ({ t }) => t("PageTitle.Backoffice.OauthConsent"),
+        parametersSchema: z.object({}),
+        querySchema: z.object({}),
+    }),
     backofficeEvents: createDynamicRoute({
         segments: ["backoffice", "events"],
         title: ({ t }) => t("PageTitle.Backoffice.Events"),
@@ -171,6 +185,12 @@ export const routes = {
 export const routeHandlers = {
     api: createRouteHandler({ segments: ["api", "[[...route]]"] }),
     authLogout: createRouteHandler({ segments: ["auth", "logout"] }),
+    oauthAuthorizationServerMetadata: createRouteHandler({
+        segments: [".well-known", "oauth-authorization-server", "[[...issuer]]"],
+    }),
+    oauthProtectedResourceMetadata: createRouteHandler({
+        segments: [".well-known", "oauth-protected-resource", "[[...resource]]"],
+    }),
     serviceWorker: createRouteHandler({ segments: ["serwist", "[path]"] }),
 } as const
 

@@ -75,6 +75,8 @@ catalogs:
 
 overrides:
   "@types/node": "catalog:"
+  # Same version as better-auth of the catalog: @better-auth/mcp asks for a caret range, which resolves past the core
+  "@better-auth/oauth-provider": "1.7.7"
 
 minimumReleaseAge: 4320
 minimumReleaseAgeExcludePrune: true

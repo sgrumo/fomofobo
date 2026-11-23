@@ -1,25 +1,50 @@
 import "server-only"
+import { cimd } from "@better-auth/cimd"
+import { fetchClientMetadataResource } from "@better-auth/cimd/node"
+import { mcp } from "@better-auth/mcp"
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { APIError } from "better-auth/api"
 import { nextCookies } from "better-auth/next-js"
+import { jwt } from "better-auth/plugins"
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from "models"
 import type { DbInstanceFromSchema } from "storage"
 import {
     AccountsStorage,
     accounts,
     authCredentials,
+    authJwks,
+    authOauthAccessTokens,
+    authOauthClientAssertions,
+    authOauthClientResources,
+    authOauthClients,
+    authOauthConsents,
+    authOauthRefreshTokens,
+    authOauthResources,
     authRateLimits,
     authSessions,
     authVerifications,
 } from "storage"
+
+import { routes } from "@/framework/routes/routes"
+
+import { mcpResourceUrl } from "./mcp-resource"
 
 export interface AuthSettings {
     baseUrl: string
     secret: string
     secureCookies: boolean
     rateLimitEnabled: boolean
+    clientRegistrationEnabled: boolean
 }
+
+const OAUTH_LOGIN_PATH = routes.backofficeOauthLogin.path({ parameters: {}, query: {} })
+const OAUTH_CONSENT_PATH = routes.backofficeOauthConsent.path({
+    parameters: {},
+    query: {},
+})
+
+const accountIdField = { userId: "accountId" }
 
 /**
  * @description Builds the wrong-password error of the library, which a blocked account
@@ -54,8 +79,18 @@ export const buildAuth = (db: DbInstanceFromSchema, settings: AuthSettings) => {
                 authCredentials,
                 authVerifications,
                 authRateLimits,
+                authJwks,
+                authOauthClients,
+                authOauthResources,
+                authOauthClientResources,
+                authOauthRefreshTokens,
+                authOauthAccessTokens,
+                authOauthConsents,
+                authOauthClientAssertions,
             },
         }),
+        // The JWT plugin turns a session into a JWT there, which the MCP endpoint would take as an access token
+        disabledPaths: ["/token"],
         user: {
             modelName: "accounts",
             additionalFields: {
@@ -103,8 +138,44 @@ export const buildAuth = (db: DbInstanceFromSchema, settings: AuthSettings) => {
                 },
             },
         },
-        // Last plugin: it writes the cookies the other plugins set
-        plugins: [nextCookies()],
+        plugins: [
+            jwt({
+                disableSettingJwtHeader: true,
+                schema: { jwks: { modelName: "authJwks" } },
+            }),
+            mcp({
+                resource: mcpResourceUrl(settings.baseUrl),
+                loginPage: OAUTH_LOGIN_PATH,
+                consentPage: OAUTH_CONSENT_PATH,
+                allowDynamicClientRegistration: settings.clientRegistrationEnabled,
+                allowUnauthenticatedClientRegistration:
+                    settings.clientRegistrationEnabled,
+                schema: {
+                    oauthClient: {
+                        modelName: "authOauthClients",
+                        fields: accountIdField,
+                    },
+                    oauthResource: { modelName: "authOauthResources" },
+                    oauthClientResource: { modelName: "authOauthClientResources" },
+                    oauthRefreshToken: {
+                        modelName: "authOauthRefreshTokens",
+                        fields: accountIdField,
+                    },
+                    oauthAccessToken: {
+                        modelName: "authOauthAccessTokens",
+                        fields: accountIdField,
+                    },
+                    oauthConsent: {
+                        modelName: "authOauthConsents",
+                        fields: accountIdField,
+                    },
+                    oauthClientAssertion: { modelName: "authOauthClientAssertions" },
+                },
+            }),
+            cimd({ fetchClientMetadataResource, metadataProfile: "mcp-2026-07-28" }),
+            // Last plugin: it writes the cookies the other plugins set
+            nextCookies(),
+        ],
     })
 }
 

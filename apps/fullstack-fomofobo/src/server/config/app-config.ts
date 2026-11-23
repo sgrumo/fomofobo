@@ -41,6 +41,11 @@ export interface AppConfig {
     authRateLimitEnabled: boolean
     /** Serve the `/api/test/*` routes of the E2E suite: the row reset and the account seed. */
     testRoutesEnabled: boolean
+    /**
+     * Let any caller register an OAuth client. Elsewhere a client identifies itself with a
+     * Client ID Metadata Document, whose HTTPS URL a local suite cannot serve.
+     */
+    oauthClientRegistrationEnabled: boolean
 }
 
 /**
@@ -52,6 +57,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
         .returnType<AppConfig>()
         .with("test", () => ({
             testRoutesEnabled: true,
+            oauthClientRegistrationEnabled: true,
             authRateLimitEnabled: false,
             secureCookies: false,
             devPagesEnabled: true,
@@ -60,6 +66,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
         }))
         .with("local", () => ({
             testRoutesEnabled: false,
+            oauthClientRegistrationEnabled: false,
             authRateLimitEnabled: false,
             secureCookies: false,
             devPagesEnabled: true,
@@ -68,6 +75,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
         }))
         .with("preview", () => ({
             testRoutesEnabled: false,
+            oauthClientRegistrationEnabled: false,
             authRateLimitEnabled: true,
             secureCookies: true,
             devPagesEnabled: true,
@@ -76,6 +84,7 @@ export const resolveAppConfig = (appEnv: AppEnv): AppConfig =>
         }))
         .with("vercel", () => ({
             testRoutesEnabled: false,
+            oauthClientRegistrationEnabled: false,
             authRateLimitEnabled: true,
             secureCookies: true,
             devPagesEnabled: false,

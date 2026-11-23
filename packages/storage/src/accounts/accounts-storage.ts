@@ -1,8 +1,15 @@
 import { and, count, eq, or } from "drizzle-orm"
+import type { BatchItem } from "drizzle-orm/batch"
 import type { Account, AccountRole, OrganizerListQuery } from "models"
 
 import type { DbInstanceFromSchema } from "../db-config"
-import { accounts, authCredentials, authSessions } from "../db-schema"
+import {
+    accounts,
+    authCredentials,
+    authOauthAccessTokens,
+    authOauthRefreshTokens,
+    authSessions,
+} from "../db-schema"
 import { likeContains } from "../utils/like"
 import { toLimitOffset } from "../utils/pagination"
 
@@ -143,7 +150,7 @@ export class AccountsStorage {
 
     /**
      * @description Persists the new password credential of one account and deletes its
-     * sessions
+     * sessions and OAuth tokens
      * @param accountId Account changed
      * @param credential Credential inserted in place of the old one
      * @param changedAt Instant of the change
@@ -166,13 +173,13 @@ export class AccountsStorage {
             this.db
                 .insert(authCredentials)
                 .values(toPasswordCredentialRow(accountId, credential, changedAt)),
-            this.db.delete(authSessions).where(eq(authSessions.accountId, accountId)),
+            ...this.sessionDeletes(accountId),
         ])
     }
 
     /**
-     * @description Persists the block of one account and deletes its sessions, or returns
-     * `null` when no row matches
+     * @description Persists the block of one account and deletes its sessions and OAuth
+     * tokens, or returns `null` when no row matches
      * @param id Account blocked
      * @param blockedAt Instant of the block
      */
@@ -186,7 +193,7 @@ export class AccountsStorage {
                 .set({ isBlocked: true, blockedAt, updatedAt: blockedAt })
                 .where(eq(accounts.id, id))
                 .returning(),
-            this.db.delete(authSessions).where(eq(authSessions.accountId, id)),
+            ...this.sessionDeletes(id),
         ])
         return row ? toAccount(row) : null
     }
@@ -206,10 +213,28 @@ export class AccountsStorage {
     }
 
     /**
-     * @description Deletes every session of one account
+     * @description Deletes every session and OAuth token of one account
      * @param accountId Account signed out
      */
     public async deleteSessions(accountId: string): Promise<void> {
-        await this.db.delete(authSessions).where(eq(authSessions.accountId, accountId))
+        await this.db.batch(this.sessionDeletes(accountId))
+    }
+
+    /**
+     * @description Builds the deletes of every session and OAuth token of one account
+     * @param accountId Account signed out
+     */
+    private sessionDeletes(
+        accountId: string,
+    ): [BatchItem<"sqlite">, ...Array<BatchItem<"sqlite">>] {
+        return [
+            this.db
+                .delete(authOauthAccessTokens)
+                .where(eq(authOauthAccessTokens.accountId, accountId)),
+            this.db
+                .delete(authOauthRefreshTokens)
+                .where(eq(authOauthRefreshTokens.accountId, accountId)),
+            this.db.delete(authSessions).where(eq(authSessions.accountId, accountId)),
+        ]
     }
 }

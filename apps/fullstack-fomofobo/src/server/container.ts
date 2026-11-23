@@ -68,6 +68,7 @@ const buildContainer = (): Container => {
         secret: env.BETTER_AUTH_SECRET,
         secureCookies: appConfig.secureCookies,
         rateLimitEnabled: appConfig.authRateLimitEnabled,
+        clientRegistrationEnabled: appConfig.oauthClientRegistrationEnabled,
     })
 
     const accountsStorage = new AccountsStorage(db)

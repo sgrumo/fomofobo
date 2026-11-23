@@ -5,12 +5,13 @@ import type { ApplicationError } from "backend-shared/http"
 import { handleErrors, loggerMiddleware } from "backend-shared/http"
 import { memoize } from "es-toolkit"
 import { accountRoleSchema, HttpStatus, organizerCreationSchema } from "models"
-import { deleteAllRows } from "storage"
+import { authJwks, authOauthResources, deleteAllRows } from "storage"
 import { match } from "ts-pattern"
 
+import { OAUTH_PATHS } from "@/lib/auth/oauth"
 import { SIGN_IN_PATH } from "@/lib/auth/sign-in"
 
-import { backofficeSession } from "./auth/backoffice-session"
+import { backofficeSession, requireRole } from "./auth/backoffice-session"
 import { CATEGORIES_TAG, expireTags, PLACES_TAG, PUBLIC_TAG, SETTINGS_TAG } from "./cache"
 import { requestClock } from "./clock"
 import { getContainer } from "./container"
@@ -81,9 +82,9 @@ export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus 
  * @throws When the environment misses a variable of its `APP_ENV` variant
  * @remarks Serves the OpenAPI document and its Swagger UI outside production only, so a
  * deployed build exposes neither
- * @remarks Exposes one endpoint of the auth library, the sign-in. Its other endpoints,
- * the sign-up and the account changes included, answer `404`: the services call the
- * library on the server
+ * @remarks Exposes the sign-in and the OAuth endpoints of the auth library by name, the
+ * consent to an Admin session alone. Its other endpoints, the sign-up and the account
+ * changes included, answer `404`: the services call the library on the server
  * @remarks Checks the session of every `/api/backoffice/*` call, a route not mounted
  * included, so an unknown backoffice path answers `401` to a visitor without one
  */
@@ -122,6 +123,22 @@ const buildApi = (): OpenAPIHono => {
 
     app.post(SIGN_IN_PATH, c => auth.handler(c.req.raw))
 
+    app.get(OAUTH_PATHS.authorize, c => auth.handler(c.req.raw))
+    app.post(OAUTH_PATHS.token, c => auth.handler(c.req.raw))
+    app.post(OAUTH_PATHS.revoke, c => auth.handler(c.req.raw))
+    app.get(OAUTH_PATHS.jwks, c => auth.handler(c.req.raw))
+    app.use(OAUTH_PATHS.consent, backofficeSession(authAccounts), requireRole("admin"))
+    app.post(OAUTH_PATHS.consent, c => auth.handler(c.req.raw))
+    app.use(
+        OAUTH_PATHS.publicClient,
+        backofficeSession(authAccounts),
+        requireRole("admin"),
+    )
+    app.get(OAUTH_PATHS.publicClient, c => auth.handler(c.req.raw))
+    if (appConfig.oauthClientRegistrationEnabled) {
+        app.post(OAUTH_PATHS.register, c => auth.handler(c.req.raw))
+    }
+
     app.route(
         "/",
         buildPublicRouter({
@@ -145,7 +162,8 @@ const buildApi = (): OpenAPIHono => {
 
     if (appConfig.testRoutesEnabled) {
         app.post(`${apiBasePath}/test/reset-database`, async c => {
-            await deleteAllRows(db)
+            // The auth library seeds these rows once per process, never again after a reset
+            await deleteAllRows(db, [authOauthResources, authJwks])
             expireTags(PUBLIC_TAG, CATEGORIES_TAG, PLACES_TAG, SETTINGS_TAG)
             return c.body(null, HttpStatus.NoContent)
         })

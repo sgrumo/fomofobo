@@ -33,9 +33,13 @@ export const seedAccount = async (seed: AccountSeed): Promise<Account> => {
 
 /**
  * @description Sends the email and password to the sign-in endpoint and returns the response
- * @param credentials Email and password sent
+ * @param credentials Email and password sent, with the signed query of an OAuth login page
  */
-export const signIn = async (credentials: { email: string; password: string }) =>
+export const signIn = async (credentials: {
+    email: string
+    password: string
+    oauth_query?: string
+}) =>
     await axios.post(`${publishedAppUrl()}/api/auth/sign-in/email`, credentials, {
         validateStatus: () => true,
     })
