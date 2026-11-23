@@ -160,7 +160,23 @@ def require_prod_env
     )
   end
   app_config
-  UI.important("APP_ENV=prod - building against PRODUCTION (store release)")
+  UI.important("APP_ENV=prod - building the store id against #{ENV["API_URL"]}")
+end
+
+# TestFlight builds the store id against the dev API: its testers try a build on the backend
+# it was made for, before that backend reaches prod, and never write test data into
+# production. app.config.ts reads API_URL from the process, so the value set here reaches
+# `prebuild` and the config that the Xcode build embeds. Set in the lane rather than by the
+# `--env` of the pnpm script, so a bare `fastlane ios beta --env prod` builds against dev too.
+def use_dev_api_url
+  dev_url = env_file_values("dev")["API_URL"].to_s
+  if dev_url.empty?
+    UI.user_error!(
+      "TestFlight builds against the dev API, but .env.dev holds no API_URL. " \
+      "Set API_URL=https://dev.zonzo.live in .env.dev, then run this lane again."
+    )
+  end
+  ENV["API_URL"] = dev_url
 end
 
 # --clean regenerates the native project from app.config.ts, so the application id, the
@@ -373,12 +389,13 @@ platform :ios do
   end
 
   # Named `beta` because fastlane refuses a lane named after an action, and `testflight` is
-  # the alias of `upload_to_testflight`. Same store id and signing as `release`, so a build
-  # that passed TestFlight is the kind App Review gets, but nothing is submitted: the build
-  # reaches the internal testers of App Store Connect alone. No external group, since an
-  # external tester waits on a Beta App Review of its own.
-  desc "Build and upload to TestFlight for the internal testers (store id) - no App Review"
+  # the alias of `upload_to_testflight`. Same store id and signing as `release`, but the dev
+  # API, so App Review never gets a TestFlight build: `release` builds its own against prod.
+  # Nothing is submitted: the build reaches the internal testers of App Store Connect alone.
+  # No external group, since an external tester waits on a Beta App Review of its own.
+  desc "Build and upload to TestFlight for the internal testers (store id, dev API) - no App Review"
   lane :beta do
+    use_dev_api_url
     require_prod_env
     require_app_version
     bundle_id = ios_bundle_id

@@ -45,7 +45,7 @@ Build an ad-hoc ipa and hand it to internal testers via Firebase App Distributio
 [bundle exec] fastlane ios beta
 ```
 
-Build and upload to TestFlight for the internal testers (store id) - no App Review
+Build and upload to TestFlight for the internal testers (store id, dev API) - no App Review
 
 ### ios release
 

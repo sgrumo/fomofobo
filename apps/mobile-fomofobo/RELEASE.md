@@ -158,7 +158,7 @@ The build is out when the testers of the `internal` group get the App Distributi
 
 ## Ship a TestFlight build
 
-The TestFlight build carries the store id and the `API_URL` of `.env.prod`. It reaches the internal testers of App Store Connect, with no App Review.
+The TestFlight build carries the store id and the `API_URL` of `.env.dev`, so its testers use dev.zonzo.live. App Review never gets this build: `pnpm release:ios:store` builds its own against `.env.prod`. It reaches the internal testers of App Store Connect, with no App Review.
 
 1. In App Store Connect, under TestFlight, create an internal group once, with automatic distribution on. An internal tester must be a user of the App Store Connect team.
 2. Check out the commit to ship, with a clean working tree.

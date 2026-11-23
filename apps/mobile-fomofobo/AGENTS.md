@@ -76,6 +76,8 @@ lane, never the app on first launch.
 | Firebase native config | `firebase/dev/`              | `firebase/dev/`                        | `firebase/prod/`                 |
 | Lanes                  | none                         | `ios distribute`, `android distribute` | `ios release`, `android release` |
 
+`ios beta` builds `prod` with the `API_URL` of `.env.dev`: TestFlight testers get the store id on the dev backend.
+
 - An unrecognized `APP_ENV` fails. One variable has one name in every environment: no `_DEV`
   suffix.
 - `.env` holds the local values. To point a local build at another backend, put the values in
