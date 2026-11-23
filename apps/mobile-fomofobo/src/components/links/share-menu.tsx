@@ -35,7 +35,7 @@ const ShareOption = (props: ShareOptionProps) => (
         <IconButton
             icon={props.icon}
             label={props.label}
-            size="lg"
+            size="xl"
             onPress={props.onPress}
         />
         {/* The button carries the label */}

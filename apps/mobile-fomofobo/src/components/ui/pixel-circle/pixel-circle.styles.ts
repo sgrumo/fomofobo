@@ -7,4 +7,5 @@ export const pixelCircleSizeStyles: Record<PixelCircleSize, string> = {
     36: "h-9 w-9",
     40: "h-10 w-10",
     48: "h-12 w-12",
+    52: "h-[52px] w-[52px]",
 }

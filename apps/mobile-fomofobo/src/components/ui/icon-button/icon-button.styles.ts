@@ -6,6 +6,7 @@ export const iconButtonSizes = {
     sm: { circle: 32, icon: 14 },
     md: { circle: 40, icon: 16 },
     lg: { circle: 48, icon: 20 },
+    xl: { circle: 52, icon: 20 },
 } as const satisfies Record<string, { circle: PixelCircleSize; icon: number }>
 
 export const iconButtonTones = {

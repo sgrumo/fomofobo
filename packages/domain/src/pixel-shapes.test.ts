@@ -14,6 +14,12 @@ describe("pixelCircleProfile", () => {
         ])
     })
 
+    it("steps a 52 px circle as the selected disc of a map pin", () => {
+        expect(pixelCircleProfile(52)).toStrictEqual([
+            18, 18, 14, 14, 10, 10, 8, 8, 6, 6, 4, 4, 4, 4, 2, 2, 2, 2,
+        ])
+    })
+
     it.each(PIXEL_CIRCLE_SIZES)("keeps the circle %i inside its upper half", size => {
         const profile = pixelCircleProfile(size)
 

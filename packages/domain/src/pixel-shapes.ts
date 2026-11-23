@@ -4,7 +4,7 @@
 
 export const PIXEL_CELL = 2
 
-export const PIXEL_CIRCLE_SIZES = [32, 36, 40, 48] as const
+export const PIXEL_CIRCLE_SIZES = [32, 36, 40, 48, 52] as const
 
 export type PixelCircleSize = (typeof PIXEL_CIRCLE_SIZES)[number]
 
@@ -35,4 +35,5 @@ export const PIXEL_CIRCLE_PROFILES: Record<PixelCircleSize, number[]> = {
     36: pixelCircleProfile(36),
     40: pixelCircleProfile(40),
     48: pixelCircleProfile(48),
+    52: pixelCircleProfile(52),
 }
