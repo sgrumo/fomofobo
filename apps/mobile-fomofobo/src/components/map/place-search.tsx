@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import {
     isEmptySuggestions,
     MIN_SUGGESTION_TEXT,
-    submittedPlaceOf,
+    submittedSuggestionOf,
     SUGGESTION_DELAY_MS,
     venueSuggestionGroupsOf,
 } from "domain/map-search"
@@ -14,6 +14,7 @@ import type { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import { Keyboard, Linking, Pressable, ScrollView, View } from "react-native"
 import { useDebounced } from "react-shared"
+import { match } from "ts-pattern"
 
 import { Notice } from "@/components/ui/notice/notice"
 import { PixelPanel } from "@/components/ui/pixel-panel/pixel-panel"
@@ -156,13 +157,26 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                 }}
                 onSubmitEditing={() => {
                     setOpen(false)
-                    const place = submittedPlaceOf(text, debouncedText, suggestions)
-                    if (place === undefined) {
+                    const picked = submittedSuggestionOf(text, debouncedText, suggestions)
+                    if (picked === undefined) {
                         props.onTextSubmit(text)
                         return
                     }
-                    setText(place.label)
-                    props.onPlaceSelect(place)
+                    match(picked)
+                        .with({ type: "place" }, ({ place }) => {
+                            setText(place.label)
+                            props.onPlaceSelect(place)
+                        })
+                        .with({ type: "event" }, ({ event }) => {
+                            props.onEventSelect({
+                                eventId: event.eventId,
+                                date: event.date,
+                            })
+                        })
+                        .with({ type: "venue" }, ({ venue }) => {
+                            props.onVenueSelect(venue.venueId)
+                        })
+                        .exhaustive()
                 }}
             />
             {/* Drawn over the filters below the field, as the web dropdown */}

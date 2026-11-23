@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import {
     isEmptySuggestions,
     MIN_SUGGESTION_TEXT,
-    submittedPlaceOf,
+    submittedSuggestionOf,
     SUGGESTION_DELAY_MS,
     venueSuggestionGroupsOf,
 } from "domain/map-search"
@@ -14,6 +14,7 @@ import { useRef, useState } from "react"
 import type { FocusEvent, MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 import { useDebounced } from "react-shared"
+import { match } from "ts-pattern"
 import { Alert } from "ui-components/alert"
 import { SearchField } from "ui-components/search-field"
 import { Spinner } from "ui-components/spinner"
@@ -75,16 +76,30 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
             ref={formRef}
             role="search"
             className="relative"
-            onSubmit={event => {
-                event.preventDefault()
+            onSubmit={submit => {
+                submit.preventDefault()
                 setOpen(false)
-                const place = submittedPlaceOf(text, debouncedText, suggestions.data)
-                if (place === undefined) {
+                const picked = submittedSuggestionOf(
+                    text,
+                    debouncedText,
+                    suggestions.data,
+                )
+                if (picked === undefined) {
                     props.onTextSubmit(text)
                     return
                 }
-                setText(place.label)
-                props.onPlaceSelect(place)
+                match(picked)
+                    .with({ type: "place" }, ({ place }) => {
+                        setText(place.label)
+                        props.onPlaceSelect(place)
+                    })
+                    .with({ type: "event" }, ({ event }) => {
+                        props.onEventSelect({ eventId: event.eventId, date: event.date })
+                    })
+                    .with({ type: "venue" }, ({ venue }) => {
+                        props.onVenueSelect(venue.venueId)
+                    })
+                    .exhaustive()
             }}
         >
             <SearchField

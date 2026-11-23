@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-23 · Enter picks the first search suggestion
+
+### Changed
+
+A text submitted with Enter or the search key of the keyboard picks the first suggestion of the list, a place, an event or a venue. Before, it moved to the first place only when no event or venue matched, and else it filtered the events by text.
+
+### Why
+
+A client request. The visitor expects the submit to act as a tap on the first row, with no second tap in the list.
+
+### Check next time
+
+Agree early on what the submit of a search field does when the list mixes places and results.
+
 ## 2026-11-18 · A landing page in front of the map
 
 ### Changed

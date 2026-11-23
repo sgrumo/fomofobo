@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import {
     isEmptySuggestions,
     placeQueryOf,
-    submittedPlaceOf,
+    submittedSuggestionOf,
     textQueryOf,
     venueSuggestionGroupsOf,
 } from "./map-search"
@@ -42,7 +42,7 @@ describe("textQueryOf", () => {
     })
 })
 
-describe("submittedPlaceOf", () => {
+describe("submittedSuggestionOf", () => {
     const imola = {
         label: "Imola, Bologna, Emilia-Romagna",
         address: "Imola, Bologna",
@@ -53,32 +53,64 @@ describe("submittedPlaceOf", () => {
         address: "Bologna",
         coordinates: { latitude: 44.4949, longitude: 11.3426 },
     }
+    const jazzNight = {
+        eventId: crypto.randomUUID(),
+        date: "2026-11-28",
+        title: "Imola Jazz Night",
+    }
 
-    it("picks the first place when no event or venue matches the text", () => {
+    it("picks the first place, the first row of the list, even when an event or a venue matches", () => {
         expect(
-            submittedPlaceOf(" Imola ", "Imola", {
+            submittedSuggestionOf(" Imola ", "Imola", {
                 places: [imola, bologna],
-                events: [],
-                venues: [],
+                events: [jazzNight],
+                venues: [venue("Imola Jazz Club", "regular")],
             }),
-        ).toStrictEqual(imola)
+        ).toStrictEqual({ type: "place", place: imola })
     })
 
-    it("keeps a text search when an event or a venue matches the text", () => {
+    it("picks the first event when no place matches", () => {
         expect(
-            submittedPlaceOf("Imola", "Imola", {
-                places: [imola],
-                events: [],
+            submittedSuggestionOf("Imola", "Imola", {
+                places: [],
+                events: [jazzNight],
                 venues: [venue("Imola Jazz Club", "regular")],
+            }),
+        ).toStrictEqual({ type: "event", event: jazzNight })
+    })
+
+    it("picks the first regular venue before a permanent venue, in the order of the groups", () => {
+        const rocca = venue("Rocca di Imola", "museum")
+        const club = venue("Imola Jazz Club", "regular")
+
+        expect(
+            submittedSuggestionOf("Imola", "Imola", {
+                places: [],
+                events: [],
+                venues: [rocca, club],
+            }),
+        ).toStrictEqual({ type: "venue", venue: club })
+    })
+
+    it("keeps a text search with no suggestion", () => {
+        expect(
+            submittedSuggestionOf("Imola", "Imola", {
+                places: [],
+                events: [],
+                venues: [],
             }),
         ).toBeUndefined()
     })
 
     it("keeps a text search while the suggestions belong to another text", () => {
         expect(
-            submittedPlaceOf("Imola", "Imo", { places: [imola], events: [], venues: [] }),
+            submittedSuggestionOf("Imola", "Imo", {
+                places: [imola],
+                events: [],
+                venues: [],
+            }),
         ).toBeUndefined()
-        expect(submittedPlaceOf("Imola", "Imola", undefined)).toBeUndefined()
+        expect(submittedSuggestionOf("Imola", "Imola", undefined)).toBeUndefined()
     })
 })
 

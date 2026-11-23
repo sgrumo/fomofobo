@@ -1,5 +1,6 @@
 import { partition } from "es-toolkit"
 import type { PlaceSuggestion, SearchSuggestions } from "models"
+import { isDefined } from "shared/values"
 
 import { centerQueryOf } from "./map-center"
 import type { MapQuery } from "./map-query"
@@ -14,6 +15,11 @@ interface VenueSuggestionGroups {
     regular: VenueSuggestion[]
     permanent: VenueSuggestion[]
 }
+
+export type SubmittedSuggestion =
+    | { type: "place"; place: PlaceSuggestion }
+    | { type: "event"; event: SearchSuggestions["events"][number] }
+    | { type: "venue"; venue: VenueSuggestion }
 
 /**
  * @description Returns the map query change that centers the search on a place suggestion and
@@ -37,23 +43,31 @@ export const textQueryOf = (text: string): MapQuery => {
 }
 
 /**
- * @description Returns the place that a submitted text picks: the first place suggestion of the
- * text when no event or venue matches it, else undefined for a text search
+ * @description Returns the suggestion that a submitted text picks: the first one of the list, in
+ * the order the list shows them, else undefined for a text search
  * @param text Submitted text
  * @param suggestedText Text of the suggestions
  * @param suggestions Suggestions of the suggested text, undefined until they load
  */
-export const submittedPlaceOf = (
+export const submittedSuggestionOf = (
     text: string,
     suggestedText: string,
     suggestions: SearchSuggestions | undefined,
-): PlaceSuggestion | undefined =>
-    suggestions === undefined ||
-    text.trim() !== suggestedText ||
-    suggestions.events.length > 0 ||
-    suggestions.venues.length > 0
-        ? undefined
-        : suggestions.places.at(0)
+): SubmittedSuggestion | undefined => {
+    if (suggestions === undefined || text.trim() !== suggestedText) {
+        return undefined
+    }
+    const venues = venueSuggestionGroupsOf(suggestions.venues)
+    const place = suggestions.places.at(0)
+    const event = suggestions.events.at(0)
+    const venue = venues.regular.at(0) ?? venues.permanent.at(0)
+    const picks: Array<SubmittedSuggestion | undefined> = [
+        place === undefined ? undefined : { type: "place", place },
+        event === undefined ? undefined : { type: "event", event },
+        venue === undefined ? undefined : { type: "venue", venue },
+    ]
+    return picks.find(isDefined)
+}
 
 /**
  * @description Returns the venue suggestions split into regular venues and permanent venues

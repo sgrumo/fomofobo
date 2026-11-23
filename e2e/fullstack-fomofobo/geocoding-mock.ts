@@ -1,7 +1,10 @@
 import { createServer } from "node:http"
 import { parseArgs } from "node:util"
 
-import { GEOCODING_FAILURE_TEXT } from "./geocoding-mock-contract.ts"
+import {
+    GEOCODING_FAILURE_TEXT,
+    GEOCODING_NO_PLACE_PREFIX,
+} from "./geocoding-mock-contract.ts"
 
 const AUTOCOMPLETE_PATH = "/v1/geocode/autocomplete"
 // The app searches places of Italy alone, with no radius around the center
@@ -64,6 +67,8 @@ createServer((request, response) => {
         answer(400, { message: "Unexpected language" })
     } else if (text === GEOCODING_FAILURE_TEXT) {
         answer(500, { message: "Internal error" })
+    } else if (text.startsWith(GEOCODING_NO_PLACE_PREFIX)) {
+        answer(200, { results: [] })
     } else {
         answer(200, { results: resultsOf(text, { lon: lon ?? 0, lat: lat ?? 0 }) })
     }

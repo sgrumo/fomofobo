@@ -23,6 +23,7 @@ import {
 import { blockVenue, updateVenue } from "../../api/backoffice-venues/api"
 import { saveOccurrence } from "../../api/public/api"
 import { SATURDAY_NOON } from "../../api/public/utils"
+import { GEOCODING_NO_PLACE_PREFIX } from "../../geocoding-mock-contract"
 import { VERSION_GATE_ENV } from "../../server"
 import { gotoPage, gotoPath, reloadPage, t } from "../app"
 import {
@@ -962,7 +963,7 @@ test.describe("map", () => {
         await expect(page).not.toHaveURL(/place=/u)
     })
 
-    test("moves to the first suggested place on Enter when no event or venue matches the text", async ({
+    test("moves to the first suggestion on Enter, a place when one matches the text", async ({
         page,
     }) => {
         const text = `Piazza ${crypto.randomUUID().slice(0, 8)}`
@@ -980,6 +981,33 @@ test.describe("map", () => {
         await expect(searchField).toHaveValue(
             `${text.toLowerCase()}, Imola (BO), Emilia-Romagna`,
         )
+    })
+
+    test("opens the first suggested event on Enter when no place matches the text", async ({
+        page,
+    }) => {
+        const center = buildArea()
+        const event = await seedPublicEvent(
+            { venue: await seedVenue(center), category: await seedCategory() },
+            {
+                title: `${GEOCODING_NO_PLACE_PREFIX} ${crypto.randomUUID().slice(0, 8)}`,
+                startsAt: "2026-10-24T18:00",
+                endsAt: "2026-10-24T20:00",
+            },
+        )
+        const searchField = page.getByLabel(t("shared", "Search.Label"))
+
+        await gotoPage(page, mapPath(center))
+        await fillSearchField(page, t("shared", "Search.Label"), event.title)
+        await expect(
+            page
+                .getByRole("region", { name: t("shared", "Search.Events") })
+                .getByRole("button", { name: event.title, exact: true }),
+        ).toBeVisible()
+        await searchField.press("Enter")
+
+        await expect(getBottomSheet(page, event.title)).toBeVisible()
+        await expect(page).toHaveURL(new RegExp(`event=${event.id}`, "u"))
     })
 
     test("opens the detail of a venue of the area that the search names, in the group of its kind", async ({
