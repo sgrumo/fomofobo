@@ -572,6 +572,39 @@ export const MapScreen = (props: MapScreenProps) => {
         ) : undefined,
     ]
 
+    // A wide screen drops the panel under the filter button at the width of a phone, over the map.
+    // A phone lays it under the kind chips, each row at the width of its chips, so the map stays
+    // clickable beside them.
+    const filtersPanel = (
+        <div
+            id={filtersId}
+            className={cn(
+                "pixel-corners drop-shadow-hard-md relative flex flex-col gap-2 p-2",
+                {
+                    "absolute top-full right-0 z-10 mt-2 w-86": wide,
+                    hidden: !filtersOpen,
+                },
+            )}
+        >
+            <CategoryChips
+                route={props.route}
+                categories={categories.data ?? []}
+                selected={query.categories}
+                free={query.free === true}
+                onChange={applyFilter}
+                className="flex-wrap justify-center"
+            />
+            <Separator className="pointer-events-none" />
+            <DateChips
+                route={props.route}
+                query={query}
+                now={now}
+                onChange={applyFilter}
+                className="flex-wrap justify-center"
+            />
+        </div>
+    )
+
     return (
         <section aria-label={t("Map.Label")} className="bg-map-ground absolute inset-0">
             <EventMap
@@ -654,6 +687,7 @@ export const MapScreen = (props: MapScreenProps) => {
                                 className="bg-live border-line pointer-events-none absolute -top-0.5 -right-0.5 size-3 border-2"
                             />
                         ) : undefined}
+                        {wide ? filtersPanel : undefined}
                     </div>
                 </div>
                 {/* A phone spreads the kind chips over the width of the search row */}
@@ -663,31 +697,7 @@ export const MapScreen = (props: MapScreenProps) => {
                     onChange={applyFilter}
                     className="max-w-full md:self-center"
                 />
-                {/* The filters sit in a panel that the filter button opens. On a phone each row takes the width of its chips, so the map stays clickable beside them. */}
-                <div
-                    id={filtersId}
-                    className={cn(
-                        "pixel-corners drop-shadow-hard-md relative flex flex-col gap-2 p-2 md:w-fit md:max-w-2xl md:self-end",
-                        { hidden: !filtersOpen },
-                    )}
-                >
-                    <CategoryChips
-                        route={props.route}
-                        categories={categories.data ?? []}
-                        selected={query.categories}
-                        free={query.free === true}
-                        onChange={applyFilter}
-                        className="flex-wrap justify-center"
-                    />
-                    <Separator className="pointer-events-none" />
-                    <DateChips
-                        route={props.route}
-                        query={query}
-                        now={now}
-                        onChange={applyFilter}
-                        className="flex-wrap justify-center"
-                    />
-                </div>
+                {wide ? undefined : filtersPanel}
                 {notices}
             </div>
             {/* A preview or a detail hides it, as it covers the bottom of the map */}
