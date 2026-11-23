@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-23 · Admins add events from a claude.ai chat
+
+### Changed
+
+An Admin adds and changes events, and creates venues, from a chat on claude.ai, through a custom connector. The app serves an OAuth authorization server and an MCP endpoint for it, and the chat sends no photo.
+
+### Why
+
+A decision. An Admin with no technical skills needs a way to add events with no command line and no backoffice form.
+
+### Check next time
+
+Agree early which roles reach a chat channel and whether photos travel through it, since each answer changes the OAuth and the upload work.
+
 ## 2026-11-23 · Enter picks the first search suggestion
 
 ### Changed

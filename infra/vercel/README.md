@@ -23,6 +23,12 @@ The upload leaves the git metadata out, so Vercel runs no check on the commit au
 
 `.github/workflows/purge-photos.yaml` runs `apps/photo-purge` every day for each environment. It reads `env/<env>.env` and the secrets `DATABASE_AUTH_TOKEN`, `S3_ACCESS_KEY` and `S3_SECRET_KEY` of the GitHub environment. It deletes the photos of each event whose occurrences all ended more than three days ago: first the rows, then the objects. If an object delete fails, the run fails and its log lists the key, and the object stays in the bucket with no row.
 
+## claude.ai connector
+
+`docs/claude-connector.md` shows how an Owner adds the connector on claude.ai. It needs no runtime value of its own. The auth library creates the signing key of the access tokens in `auth_jwks` on first use, encrypted with `BETTER_AUTH_SECRET`.
+
+claude.ai identifies itself with a Client ID Metadata Document, which the app fetches from claude.ai. So the app needs no client registration, which it serves under `APP_ENV=test` alone.
+
 ## Mobile version gate
 
 `GET /api/client-compatibility` tells each build of the mobile app to go on, to update, or to wait for maintenance. Before a breaking change of the API, follow `mobile-version-gate.md`.
@@ -79,13 +85,13 @@ The backoffice has no sign-up. Create the first Admin with the `admin-accounts` 
 
 `env/<env>.env` holds the configuration of each environment. The GitHub environment holds the credentials:
 
-| Secret                | Value                                                                                                |
-| --------------------- | ---------------------------------------------------------------------------------------------------- |
-| `DATABASE_AUTH_TOKEN` | `turso db tokens create fomofobo-<env>`                                                              |
-| `S3_ACCESS_KEY`       | Access key id of the R2 token of the environment                                                     |
-| `S3_SECRET_KEY`       | Secret access key of the R2 token of the environment                                                 |
-| `BETTER_AUTH_SECRET`  | At least 32 random characters, for example `openssl rand -base64 32`. A new value ends every session |
-| `GEOAPIFY_API_KEY`    | API key of the Geoapify project of the environment                                                   |
+| Secret                | Value                                                                                                                                                                                                                          |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DATABASE_AUTH_TOKEN` | `turso db tokens create fomofobo-<env>`                                                                                                                                                                                        |
+| `S3_ACCESS_KEY`       | Access key id of the R2 token of the environment                                                                                                                                                                               |
+| `S3_SECRET_KEY`       | Secret access key of the R2 token of the environment                                                                                                                                                                           |
+| `BETTER_AUTH_SECRET`  | At least 32 random characters, for example `openssl rand -base64 32`. A new value ends every session. After the deploy of a new value, delete the rows of `auth_jwks`. Until then the OAuth server cannot read its signing key |
+| `GEOAPIFY_API_KEY`    | API key of the Geoapify project of the environment                                                                                                                                                                             |
 
 The deploy writes a credential as Sensitive. A value set in the Vercel dashboard alone lasts until the next deploy overwrites it, or never reaches the next project.
 

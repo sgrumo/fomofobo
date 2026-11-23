@@ -136,7 +136,9 @@ Organizers see, create, edit and delete only their own events, and the event of 
 
 A deleted event leaves the app and the backoffice, and its photos leave the public bucket.
 
-An account can also write events and venues from Claude Code, with a flyer, a photo or a text as the source. Claude calls the backoffice API as that account, so the roles and the rules of the backoffice apply unchanged. Claude shows a summary before each write.
+An Admin, and no Organizer, can also add and change events and create venues from a claude.ai chat, from a flyer, a photo or a text. The chat sends no photo, so the Admin adds the photos in the backoffice, from the link that Claude gives after each write. Claude shows a summary before each write, and claude.ai asks the Admin to approve each write until the Admin picks Always allow.
+
+Any account can also write events and venues from Claude Code, photos included. In both channels Claude acts as that account, so the roles and the rules of the backoffice apply unchanged.
 
 The backoffice page of an event lists each occurrence that has not ended with its count of saves, under the participant threshold too. The organizer of the event and every Admin see it.
 
@@ -166,5 +168,6 @@ The event detail and the map preview show the count of saves of an occurrence on
 - OpenFreeMap: the tiles of the event map. The device keeps at most 500 viewed tiles, because the provider caps an offline download at 3,000 tiles.
 - A service worker of the public app keeps what a visitor loaded and serves it offline. It sends the backoffice, the sign-in and every write straight to the network, because a worker at the root of the site controls the backoffice pages too.
 - The Next data cache holds the shared public reads: the categories, the event pages and the place suggestions. Every backoffice write expires its entries at once, because a block must hide an event on the next request. The save counts stay out of it, because each save would expire the event page.
-- Authentication runs inside the app with database sessions, because Admins create accounts and a block must end every open session at once. Every backoffice API call reads the session from the database, so a block applies on the next call.
+- Authentication runs inside the app with database sessions, because Admins create accounts and a block must end every open session at once. Every backoffice API call reads the session from the database, so a block applies on the next call. The app also serves an OAuth authorization server on the same accounts, for the claude.ai connector. Its access tokens stay valid until they expire, so the MCP endpoint reads the account on every call too.
+- claude.ai: a custom connector of the claude.ai organization of the customer reaches the MCP endpoint, which gives Claude the backoffice tools for events and venues. The endpoint sends the conversation rules as its server instructions, so no Owner uploads a skill to claude.ai.
 - Deploy: the app runs on Vercel, in the region of its Turso database. Every service runs on its free plan. The Vercel Hobby plan admits non-commercial use only. A person builds the native app with Fastlane on a Mac, with no CI workflow: testers get it from Firebase App Distribution, TestFlight or the internal testing track of Google Play, and users from the App Store and Google Play.
