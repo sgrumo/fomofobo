@@ -67,6 +67,14 @@ Build and submit to App Review (production) - no TestFlight distribution
 
 Build and release to the Play Store production track (production)
 
+### android beta
+
+```sh
+[bundle exec] fastlane android beta
+```
+
+Build and upload to the Play internal testing track (store id, dev API) - no review
+
 ### android distribute
 
 ```sh

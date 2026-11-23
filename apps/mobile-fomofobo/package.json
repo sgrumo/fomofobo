@@ -24,7 +24,8 @@
         "release:android:distribute": "APP_ENV=dev bundle exec fastlane android distribute --env dev",
         "release:ios:store": "APP_ENV=prod bundle exec fastlane ios release --env prod",
         "release:ios:testflight": "APP_ENV=prod bundle exec fastlane ios beta --env prod",
-        "release:android:store": "APP_ENV=prod bundle exec fastlane android release --env prod"
+        "release:android:store": "APP_ENV=prod bundle exec fastlane android release --env prod",
+        "release:android:internal": "APP_ENV=prod bundle exec fastlane android beta --env prod"
     },
     "dependencies": {
         "@expo-google-fonts/funnel-sans": "^0.4.2",

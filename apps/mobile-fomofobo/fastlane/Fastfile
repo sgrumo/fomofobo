@@ -156,23 +156,25 @@ def require_prod_env
   unless ENV["APP_ENV"] == "prod"
     UI.user_error!(
       "Store lanes require APP_ENV=prod (got #{ENV["APP_ENV"].inspect}). " \
-      "Run `pnpm release:ios:store`, `pnpm release:ios:testflight` or `pnpm release:android:store`."
+      "Run `pnpm release:ios:store`, `pnpm release:ios:testflight`, " \
+      "`pnpm release:android:store` or `pnpm release:android:internal`."
     )
   end
   app_config
   UI.important("APP_ENV=prod - building the store id against #{ENV["API_URL"]}")
 end
 
-# TestFlight builds the store id against the dev API: its testers try a build on the backend
-# it was made for, before that backend reaches prod, and never write test data into
-# production. app.config.ts reads API_URL from the process, so the value set here reaches
-# `prebuild` and the config that the Xcode build embeds. Set in the lane rather than by the
-# `--env` of the pnpm script, so a bare `fastlane ios beta --env prod` builds against dev too.
+# The `beta` lanes, TestFlight and the Play internal track, build the store id against the dev
+# API: their testers try a build on the backend it was made for, before that backend reaches
+# prod, and never write test data into production. app.config.ts reads API_URL from the
+# process, so the value set here reaches `prebuild` and the config that the native build
+# embeds. Set in the lane rather than by the `--env` of the pnpm script, so a bare
+# `fastlane <platform> beta --env prod` builds against dev too.
 def use_dev_api_url
   dev_url = env_file_values("dev")["API_URL"].to_s
   if dev_url.empty?
     UI.user_error!(
-      "TestFlight builds against the dev API, but .env.dev holds no API_URL. " \
+      "The beta lanes build against the dev API, but .env.dev holds no API_URL. " \
       "Set API_URL=https://dev.zonzo.live in .env.dev, then run this lane again."
     )
   end
@@ -508,6 +510,27 @@ platform :android do
       aab: AAB_PATH,
       **PLAY_UPLOAD_OPTIONS
     )
+  end
+
+  # The Android twin of `ios beta`: the store id against the dev API, for the testers of the
+  # internal track, with no review. Never promote this release to production in the Play
+  # Console: it talks to dev. `release` builds its own bundle against prod. The version code
+  # comes from every track, so the next production release clears this one.
+  desc "Build and upload to the Play internal testing track (store id, dev API) - no review"
+  lane :beta do
+    use_dev_api_url
+    require_prod_env
+    require_app_version
+    build_aab(next_play_version_code)
+    upload_to_play_store(
+      track: "internal",
+      release_status: "completed",
+      package_name: android_package,
+      json_key: ENV["GOOGLE_PLAY_JSON_KEY_PATH"],
+      aab: AAB_PATH,
+      **PLAY_UPLOAD_OPTIONS
+    )
+    UI.success("#{ENV["APP_VERSION"]} uploaded to the Play internal testing track")
   end
 
   desc "Build a signed release APK and hand it to internal testers via Firebase App Distribution (dev environment)"

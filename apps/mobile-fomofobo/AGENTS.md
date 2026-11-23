@@ -69,14 +69,14 @@ schema per environment, and `config/target.ts` maps the environment to an identi
 `app.config.ts` calls both, so an invalid value fails `expo start`, `prebuild` and every
 lane, never the app on first launch.
 
-|                        | unset or `local`             | `dev`                                  | `prod`                           |
-| ---------------------- | ---------------------------- | -------------------------------------- | -------------------------------- |
-| `API_URL`              | defaults to `localhost:3000` | required, `https`                      | required, `https`                |
-| Application id, scheme | `.dev` id, `zonzodev`        | `.dev` id, `zonzodev`                  | store id, `zonzo`                |
-| Firebase native config | `firebase/dev/`              | `firebase/dev/`                        | `firebase/prod/`                 |
-| Lanes                  | none                         | `ios distribute`, `android distribute` | `ios release`, `android release` |
+|                        | unset or `local`             | `dev`                                  | `prod`                                                       |
+| ---------------------- | ---------------------------- | -------------------------------------- | ------------------------------------------------------------ |
+| `API_URL`              | defaults to `localhost:3000` | required, `https`                      | required, `https`                                            |
+| Application id, scheme | `.dev` id, `zonzodev`        | `.dev` id, `zonzodev`                  | store id, `zonzo`                                            |
+| Firebase native config | `firebase/dev/`              | `firebase/dev/`                        | `firebase/prod/`                                             |
+| Lanes                  | none                         | `ios distribute`, `android distribute` | `ios release`, `ios beta`, `android release`, `android beta` |
 
-`ios beta` builds `prod` with the `API_URL` of `.env.dev`: TestFlight testers get the store id on the dev backend.
+`ios beta` and `android beta` build `prod` with the `API_URL` of `.env.dev`: the testers of TestFlight and of the Play internal track get the store id on the dev backend.
 
 - An unrecognized `APP_ENV` fails. One variable has one name in every environment: no `_DEV`
   suffix.

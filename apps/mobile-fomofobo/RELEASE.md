@@ -168,6 +168,16 @@ The build is out when the testers of the group get the TestFlight email. App Sto
 
 An external tester gets a build only after a Beta App Review. Add an external group to the build by hand in App Store Connect.
 
+## Ship a Play internal test build
+
+The internal test build is the Android twin of the TestFlight build: the store id and the `API_URL` of `.env.dev`. Never promote it to production in the Play Console. `pnpm release:android:store` builds its own bundle against `.env.prod`. Play reviews no build on the internal track.
+
+1. In the Play Console, under Testing > Internal testing, add an email list of testers once. A tester opts in from the link on that page.
+2. Check out the commit to ship, with a clean working tree.
+3. Run `APP_VERSION=x.y.z pnpm release:android:internal`.
+
+The build is out when the Play Store offers the update to the testers, some minutes after the lane ends. The lane needs a first release on Play, as "Android" above says.
+
 ## Ship a store release
 
 1. Test the App Distribution build of the same commit. That build talks to dev.
