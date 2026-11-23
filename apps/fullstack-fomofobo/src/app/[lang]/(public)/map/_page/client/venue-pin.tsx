@@ -23,7 +23,8 @@ export const VenuePin = (props: VenuePinProps) => {
 
     return (
         <div
-            className={cn("flex flex-col items-center gap-2 transition-opacity", {
+            // Sets the tag 8 px above the ring of the disc, past the two free cell rows of its grid
+            className={cn("flex flex-col items-center gap-1 transition-opacity", {
                 "opacity-35": props.emphasis === "dimmed",
             })}
         >

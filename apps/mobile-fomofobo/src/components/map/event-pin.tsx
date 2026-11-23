@@ -59,8 +59,8 @@ export const EventPin = (props: EventPinProps) => {
 
     return (
         <View
-            // The kit sets the tag 8 pt above the disc, and 20 pt above a live disc to clear its wave
-            className={cn("items-center", props.status === "live" ? "gap-5" : "gap-2", {
+            // Sets the tag 8 pt above the ring of the disc, past the two free cell rows of its grid
+            className={cn("items-center gap-1", {
                 "opacity-35": props.emphasis === "dimmed",
             })}
             pointerEvents="box-none"

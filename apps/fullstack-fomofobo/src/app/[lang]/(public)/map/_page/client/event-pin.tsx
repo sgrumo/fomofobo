@@ -50,14 +50,10 @@ export const EventPin = (props: EventPinProps) => {
 
     return (
         <div
-            // The kit sets the tag 8 px above the disc, and 20 px above a live disc to clear its wave
-            className={cn(
-                "flex flex-col items-center transition-opacity",
-                props.status === "live" ? "gap-5" : "gap-2",
-                {
-                    "opacity-35": props.emphasis === "dimmed",
-                },
-            )}
+            // Sets the tag 8 px above the ring of the disc, past the two free cell rows of its grid
+            className={cn("flex flex-col items-center gap-1 transition-opacity", {
+                "opacity-35": props.emphasis === "dimmed",
+            })}
         >
             {/* Draws above the live wave of the disc */}
             <span className="relative z-10 flex items-center">

@@ -26,7 +26,8 @@ export const VenuePin = (props: VenuePinProps) => {
 
     return (
         <View
-            className={cn("items-center gap-2", {
+            // Sets the tag 8 pt above the ring of the disc, past the two free cell rows of its grid
+            className={cn("items-center gap-1", {
                 "opacity-35": props.emphasis === "dimmed",
             })}
             pointerEvents="box-none"
