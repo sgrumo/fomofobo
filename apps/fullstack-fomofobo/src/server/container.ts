@@ -20,6 +20,7 @@ import type { AppConfig } from "./config/app-config"
 import { resolveAppConfig } from "./config/app-config"
 import { parseEnv } from "./config/env"
 import { GeoapifyProvider } from "./geocoding/geoapify-provider"
+import { mcpResourceUrl } from "./mcp/mcp-resource"
 import { AuthAccountsService } from "./services/auth-accounts-service"
 import { CategoriesService } from "./services/categories-service"
 import { ClientCompatibilityService } from "./services/client-compatibility-service"
@@ -49,6 +50,7 @@ export interface Container {
     publicVenues: PublicVenuesService
     saves: PublicSavesService
     settings: SettingsService
+    mcpResource: string
 }
 
 /**
@@ -99,6 +101,7 @@ const buildContainer = (): Container => {
         db,
         auth,
         authAccounts,
+        mcpResource: mcpResourceUrl(env.APP_BASE_URL),
         organizers: new OrganizersService(authAccounts, accountsStorage),
         categories: new CategoriesService(
             categoriesStorage,

@@ -17,6 +17,8 @@ import { requestClock } from "./clock"
 import { getContainer } from "./container"
 import type { AppErrorCode } from "./errors"
 import { handleRouteNotFound } from "./errors"
+import { buildMcpEndpoint } from "./mcp/mcp-endpoint"
+import { MCP_PATH } from "./mcp/mcp-resource"
 import { buildBackofficeCategoriesRouter } from "./routers/backoffice-categories-router"
 import { buildBackofficeEventsRouter } from "./routers/backoffice-events-router"
 import { buildBackofficeOrganizersRouter } from "./routers/backoffice-organizers-router"
@@ -97,6 +99,7 @@ const buildApi = (): OpenAPIHono => {
         clientCompatibility,
         db,
         events,
+        mcpResource,
         occurrences,
         organizers,
         photos,
@@ -151,6 +154,9 @@ const buildApi = (): OpenAPIHono => {
     )
 
     app.route("/", buildClientCompatibilityRouter(clientCompatibility))
+
+    const mcpEndpoint = buildMcpEndpoint({ auth, authAccounts, resource: mcpResource })
+    app.all(MCP_PATH, c => mcpEndpoint(c.req.raw))
 
     app.use(`${apiBasePath}/backoffice/*`, backofficeSession(authAccounts))
     app.route("/", buildBackofficeSessionRouter())

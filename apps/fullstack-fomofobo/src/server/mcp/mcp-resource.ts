@@ -1,6 +1,6 @@
 import "server-only"
 
-const MCP_PATH = "/api/mcp"
+export const MCP_PATH = "/api/mcp"
 
 /**
  * @description Returns the URL of the MCP endpoint, which the OAuth tokens name as their audience

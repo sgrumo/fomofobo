@@ -20,12 +20,14 @@ Fullstack app: one Next.js process serves the API and the pages. The API mounts 
 │   │   ├── (public)/                # Open pages
 │   │   └── [...rest]/               # Catch-all -> `notFound()`
 │   ├── backoffice/                  # Root layout of the backoffice, `BACKOFFICE_LANGUAGE`
-│   │   ├── login/                   # The one backoffice page outside the guard
+│   │   ├── login/                   # Backoffice login, outside the guard
+│   │   ├── oauth-login/             # OAuth login, outside the guard: carries the signed authorization query
+│   │   ├── oauth-consent/           # OAuth consent, `requireAdminSession`, outside the shell
 │   │   ├── (protected)/             # Pages behind `requireSession`, inside the role-aware shell
 │   │   └── [...rest]/               # Catch-all -> `notFound()`
 │   ├── auth/logout/route.ts         # Sign-out, same-origin `POST` alone
 │   └── api/[[...route]]/route.ts    # Hono mount, one export per HTTP verb
-├── src/server/                      # The API: api.ts (DI), container.ts, auth/, config/, errors.ts, routers/, services/
+├── src/server/                      # The API: api.ts (DI), container.ts, auth/, config/, errors.ts, mcp/, routers/, services/
 ├── src/actions/                     # "use server" boundary: `apiAction` alone
 ├── src/framework/routes/            # Route ledger, server pair, keyed hooks, RouteLink
 ├── src/lib/api/                     # Transports and the two api bindings
@@ -121,13 +123,19 @@ backoffice/(protected)/layout -> getSession()         -> shell: navigation by ro
 backoffice/login              -> signInWithEmail      -> POST /api/auth/sign-in/email -> session cookie
 /api/backoffice/*             -> backofficeSession    -> c.var.account, or 401 Unauthenticated / AccountBlocked
 /auth/logout                  -> POST, same origin    -> 303 to the login page
+/api/auth/oauth2/authorize    -> no session           -> backoffice/oauth-login -> sign-in with oauth_query
+backoffice/oauth-consent      -> requireAdminSession  -> POST /api/auth/oauth2/consent -> code to the client
+/api/mcp                      -> requireMcpAuth       -> resolveMcpAccount -> one stateless MCP exchange
 ```
 
 - **Every `(protected)` page calls `requireSession` with its own path** - never the layout (no pathname there), never `proxy.ts`. An Admin page calls `requireAdminSession`, which answers not found to an Organizer
 - The shell hides what the role cannot do. The API refuses it on its own
 - The guard gates pages. The security boundary is `backofficeSession` on `/api/backoffice/*`, which reads the session row on **every** call. An Admin-only route adds `requireRole("admin")` -> `403 ForbiddenAction`
 - `AuthAccountsService` is the one wrapper of the library: session reads, account creation, password, block. A write that ends sessions runs in one storage batch with them
-- Hono mounts one library endpoint, the sign-in. **NEVER** mount the whole library handler - it serves sign-up, account changes and admin endpoints over HTTP
+- Hono mounts each library endpoint by name: the sign-in and the OAuth endpoints of `OAUTH_PATHS`. **NEVER** mount the whole library handler - it serves sign-up, account changes and admin endpoints over HTTP
+- The OAuth consent and the public client read sit behind `backofficeSession` + `requireRole("admin")`: Admins alone connect a client. The registration answers under `APP_ENV=test` alone; elsewhere a client identifies itself with a Client ID Metadata Document
+- An MCP access token is a JWT that stays valid until it expires. `resolveMcpAccount` reads the account on **every** MCP call, so a block applies on the next call. Every write that ends sessions deletes the OAuth tokens in the same batch
+- The OAuth metadata documents live at the origin root under `src/app/.well-known/`. TypeScript globs skip dot folders, so `tsconfig.json` includes that folder by name
 - A blocked account signs in like a wrong password, and any backoffice call answers `401 AccountBlocked` and deletes its sessions. The `401` sends the browser to the login page, with `reason=blocked` for `AccountBlocked`: only an open session learns of its block
 - `session.cookieCache` stays off, so a block or a revoked session applies on the next request
 - The `nextCookies` plugin writes a refreshed session cookie in a route handler and a Server Action. A page reads with `refresh: false`: a Server Component cannot write a cookie. Keep `nextCookies` the last plugin
@@ -138,7 +146,7 @@ backoffice/login              -> signInWithEmail      -> POST /api/auth/sign-in/
 ## API
 
 - Route definitions in `packages/api-routes` already carry `/api`. Hono declares **no** base path
-- Only `/api/health`, `/api/doc`, `/api/swagger`, `/api/auth/sign-in/email` and the `/api/test/*` routes repeat the prefix by hand. Doc and Swagger answer outside production alone. `/api/test/reset-database` and `/api/test/accounts` (an account with a password, for a sign-in) answer under `APP_ENV=test` alone, for the E2E suite
+- Only `/api/health`, `/api/doc`, `/api/swagger`, `/api/auth/sign-in/email`, the OAuth endpoints, `/api/mcp` and the `/api/test/*` routes repeat the prefix by hand. Doc and Swagger answer outside production alone. `/api/test/reset-database` and `/api/test/accounts` (an account with a password, for a sign-in) answer under `APP_ENV=test` alone, for the E2E suite
 - The route handler builds the application on the first request, never at module evaluation
 
 ## Environment

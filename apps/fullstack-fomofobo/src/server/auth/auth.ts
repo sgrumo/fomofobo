@@ -28,7 +28,7 @@ import {
 
 import { routes } from "@/framework/routes/routes"
 
-import { mcpResourceUrl } from "./mcp-resource"
+import { mcpResourceUrl } from "../mcp/mcp-resource"
 
 export interface AuthSettings {
     baseUrl: string
