@@ -100,6 +100,7 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
     const online = useOnline()
     const [text, setText] = useState(props.initialText)
     const [open, setOpen] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
     const queryClient = useQueryClient()
     const [debouncedText] = useDebounced(text.trim(), identity, SUGGESTION_DELAY_MS)
 
@@ -125,12 +126,14 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
     // suggestions of its own text, from the cache or from a new call, as a map search does
     const submit = async (submittedText: string) => {
         const submitted = submittedText.trim()
+        setSubmitting(true)
         const submittedSuggestions =
             online && submitted.length >= MIN_SUGGESTION_TEXT
                 ? await queryClient
                       .query({ ...suggestionsOptionsOf(submitted), retry: false })
                       .catch(() => undefined)
                 : undefined
+        setSubmitting(false)
         const picked =
             submittedSuggestions === undefined
                 ? undefined
@@ -153,6 +156,14 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
             .exhaustive()
     }
 
+    // The wait of the debounce counts as a search, so the loader shows while the text changes
+    const searching =
+        submitting ||
+        (open &&
+            online &&
+            text.trim().length >= MIN_SUGGESTION_TEXT &&
+            (text.trim() !== debouncedText || suggestionsFetching))
+
     const places = suggestions?.places ?? []
     const events = suggestions?.events ?? []
     const venueGroups = venueSuggestionGroupsOf(suggestions?.venues ?? [])
@@ -174,6 +185,7 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                 label={t("Search.Label")}
                 placeholder={t("Search.Placeholder")}
                 value={text}
+                loading={searching}
                 onFocus={() => {
                     setOpen(true)
                     props.onFocus()

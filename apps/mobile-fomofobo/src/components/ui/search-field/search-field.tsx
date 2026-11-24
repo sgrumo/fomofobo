@@ -5,6 +5,7 @@ import Animated from "react-native-reanimated"
 
 import { PixelIcon } from "@/components/ui/pixel-icon/pixel-icon"
 import { PixelPanel } from "@/components/ui/pixel-panel/pixel-panel"
+import { Spinner } from "@/components/ui/spinner/spinner"
 import { Text } from "@/components/ui/text/text"
 import { COMPACT_MAX_FONT_SCALE } from "@/lib/theme/font-scale"
 import { THEME_COLORS } from "@/lib/theme/theme-tokens"
@@ -27,6 +28,7 @@ interface SearchFieldProps {
     value: string
     onValueChange: (value: string) => void
     placeholder?: string
+    loading?: boolean
     // Receives the text of the field: the change of the last letters can reach the parent after it
     onSubmitEditing?: (text: string) => void
     onFocus?: () => void
@@ -46,7 +48,11 @@ const SearchField = (props: SearchFieldProps) => {
             className={props.className}
         >
             <View className={searchFieldStyles}>
-                <PixelIcon name="search" size={SEARCH_FIELD_ICON_SIZE} />
+                {props.loading === true ? (
+                    <Spinner label={t("SearchField.Loading")} size="xs" />
+                ) : (
+                    <PixelIcon name="search" size={SEARCH_FIELD_ICON_SIZE} />
+                )}
                 <View className={searchFieldInputContainerStyles}>
                     <TextInput
                         ref={inputRef}

@@ -7,7 +7,8 @@
         "NextMonth": "Mese successivo"
     },
     "SearchField": {
-        "Clear": "Cancella la ricerca"
+        "Clear": "Cancella la ricerca",
+        "Loading": "Ricerca in corso"
     },
     "Select": {
         "Title": "Seleziona",

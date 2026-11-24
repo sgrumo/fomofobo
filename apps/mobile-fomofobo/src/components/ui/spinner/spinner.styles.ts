@@ -2,6 +2,7 @@ import { steps } from "react-native-reanimated"
 import type { CSSAnimationProperties } from "react-native-reanimated"
 
 export const spinnerSizes = {
+    xs: 16,
     sm: 20,
     md: 32,
     lg: 48,
