@@ -28,6 +28,7 @@ const autocompleteResultSchema = z.object({
     state: z.string().optional(),
     lat: z.number(),
     lon: z.number(),
+    result_type: z.string().optional(),
 })
 type AutocompleteResult = z.infer<typeof autocompleteResultSchema>
 
@@ -62,6 +63,31 @@ export const placeSuggestionOf = (result: AutocompleteResult): PlaceSuggestion =
         coordinates: { latitude: result.lat, longitude: result.lon },
     }
 }
+
+// A province or a region shares its name with its capital, and its center falls outside the town
+const AREA_RESULT_TYPES = new Set(["county", "state", "country"])
+
+/**
+ * @description Maps the results of the Geoapify autocomplete to suggestions with distinct labels, in the order of the results: of the results that share a label, the place wins over the area
+ * @param results Results of the Geoapify autocomplete
+ */
+export const distinctPlacesOf = (
+    results: readonly AutocompleteResult[],
+): PlaceSuggestion[] =>
+    [
+        ...Map.groupBy(
+            results.map(result => ({ result, suggestion: placeSuggestionOf(result) })),
+            entry => entry.suggestion.label,
+        ).values(),
+    ]
+        .map(
+            group =>
+                group.find(
+                    entry => !AREA_RESULT_TYPES.has(entry.result.result_type ?? ""),
+                ) ?? group.at(0),
+        )
+        .filter(isDefined)
+        .map(entry => entry.suggestion)
 
 export class GeoapifyProvider implements GeocodingProvider {
     private readonly baseUrl: string
@@ -104,7 +130,7 @@ export class GeoapifyProvider implements GeocodingProvider {
                 throw new Error(`Geoapify answered ${String(response.status)}`)
             }
             const { results } = autocompleteResponseSchema.parse(await response.json())
-            return results.map(placeSuggestionOf)
+            return distinctPlacesOf(results)
         } catch (error) {
             logger.warn("Geoapify autocomplete failed", { error })
             throw appError(
