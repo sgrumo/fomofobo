@@ -16,4 +16,10 @@ describe("directionsUrl", () => {
             "https://www.google.com/maps/dir/?api=1&destination=44.3533,11.7147",
         )
     })
+
+    it("builds the Waze URL", () => {
+        expect(directionsUrl(venue, "waze")).toBe(
+            "https://www.waze.com/ul?ll=44.3533,11.7147&navigate=yes",
+        )
+    })
 })

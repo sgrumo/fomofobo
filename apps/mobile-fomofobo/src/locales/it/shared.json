@@ -149,6 +149,14 @@
         "Offline": "Sei offline e questo evento non è ancora stato caricato.",
         "Actions": "Azioni dell'evento"
     },
+    "Directions": {
+        "Title": "Indicazioni con",
+        "App": {
+            "apple": "Mappe",
+            "google": "Google Maps",
+            "waze": "Waze"
+        }
+    },
     "Price": {
         "Free": "Gratis",
         "From": "da {{price}}",

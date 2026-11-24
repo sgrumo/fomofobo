@@ -77,6 +77,8 @@ const config: ExpoConfig = {
             CFBundleAllowMixedLocalizations: true,
             // HTTPS alone, so App Store Connect asks no export compliance question per build
             ITSAppUsesNonExemptEncryption: false,
+            // Maps apps that `installedMapsProvidersOf` probes for the directions picker
+            LSApplicationQueriesSchemes: ["comgooglemaps", "waze"],
         },
     },
     android: {

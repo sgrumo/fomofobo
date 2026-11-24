@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-24 · The native app asks which maps app to use
+
+### Changed
+
+The directions of the native app open a choice of the maps apps of the phone in place of the default maps app of the platform. On iOS the choice holds only the apps that the phone has.
+
+### Why
+
+A client request. Many visitors use Google Maps or Waze on an iPhone.
+
+### Check next time
+
+Agree early which maps apps the directions offer, since iOS must declare each app that the native app looks for.
+
 ## 2026-11-23 · Admins add events from a claude.ai chat
 
 ### Changed

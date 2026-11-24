@@ -1,20 +1,42 @@
-import { directionsUrl } from "domain/directions-url"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 
-import { mapsProviderOf } from "./maps-provider"
+import { installedMapsProvidersOf } from "./maps-provider"
 
-const venue = { latitude: 44.3546, longitude: 11.7139 }
-
-describe("mapsProviderOf", () => {
-    it("opens Apple Maps on iOS", () => {
-        expect(directionsUrl(venue, mapsProviderOf("ios"))).toBe(
-            "https://maps.apple.com/directions?destination=44.3546,11.7139",
+describe("installedMapsProvidersOf", () => {
+    it("offers Apple Maps alone on an iPhone with no other maps app", async () => {
+        const providers = await installedMapsProvidersOf("ios", () =>
+            Promise.resolve(false),
         )
+
+        expect(providers).toStrictEqual(["apple"])
     })
 
-    it("opens Google Maps on Android", () => {
-        expect(directionsUrl(venue, mapsProviderOf("android"))).toBe(
-            "https://www.google.com/maps/dir/?api=1&destination=44.3546,11.7139",
+    it("offers Google Maps and Waze on an iPhone that has them", async () => {
+        const providers = await installedMapsProvidersOf("ios", () =>
+            Promise.resolve(true),
         )
+
+        expect(providers).toStrictEqual(["apple", "google", "waze"])
+    })
+
+    it("skips an app whose probe fails", async () => {
+        const canOpenUrl = vi
+            .fn<(url: string) => Promise<boolean>>()
+            .mockResolvedValueOnce(true)
+            .mockRejectedValueOnce(new Error("not allowed"))
+
+        const providers = await installedMapsProvidersOf("ios", canOpenUrl)
+
+        expect(canOpenUrl.mock.calls).toStrictEqual([["comgooglemaps://"], ["waze://"]])
+        expect(providers).toStrictEqual(["apple", "google"])
+    })
+
+    it("offers Google Maps and Waze on Android with no probe", async () => {
+        const canOpenUrl = vi.fn<(url: string) => Promise<boolean>>()
+
+        const providers = await installedMapsProvidersOf("android", canOpenUrl)
+
+        expect(canOpenUrl).not.toHaveBeenCalled()
+        expect(providers).toStrictEqual(["google", "waze"])
     })
 })
