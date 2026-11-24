@@ -37,6 +37,7 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
     const online = useOnline()
     const [text, setText] = useState(props.initialText)
     const [open, setOpen] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
     const formRef = useRef<HTMLFormElement>(null)
     const queryClient = useQueryClient()
     const [debouncedText] = useDebounced(text.trim(), identity, SUGGESTION_DELAY_MS)
@@ -56,12 +57,14 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
     // suggestions of its own text, from the cache or from a new call, as a map search does
     const submit = async () => {
         const submitted = text.trim()
+        setSubmitting(true)
         const submittedSuggestions =
             online && submitted.length >= MIN_SUGGESTION_TEXT
                 ? await queryClient
                       .query(suggestionsOptionsOf(submitted))
                       .catch(() => undefined)
                 : undefined
+        setSubmitting(false)
         const picked =
             submittedSuggestions === undefined
                 ? undefined
@@ -83,6 +86,14 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
             })
             .exhaustive()
     }
+
+    // The wait of the debounce counts as a search, so the loader shows while the text changes
+    const searching =
+        submitting ||
+        (open &&
+            online &&
+            text.trim().length >= MIN_SUGGESTION_TEXT &&
+            (text.trim() !== debouncedText || suggestions.isFetching))
 
     const places = suggestions.data?.places ?? []
     const events = suggestions.data?.events ?? []
@@ -117,6 +128,7 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                 label={t("Search.Label")}
                 placeholder={t("Search.Placeholder")}
                 value={text}
+                loading={searching}
                 onFocus={() => {
                     setOpen(true)
                 }}

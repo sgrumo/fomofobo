@@ -1,4 +1,5 @@
 import { userEvent } from "@testing-library/user-event"
+import { noop } from "es-toolkit"
 import { useState } from "react"
 import { describe, expect, it } from "vitest"
 
@@ -25,6 +26,27 @@ describe("SearchField", () => {
             "placeholder",
             "Event, place, date",
         )
+    })
+
+    it("shows the loading spinner only while loading", () => {
+        const { rerender } = render(
+            <SearchField label="Search events" value="jazz" onValueChange={noop} />,
+        )
+        expect(
+            screen.queryByLabelText(t("SearchField.Loading", undefined)),
+        ).not.toBeInTheDocument()
+
+        rerender(
+            <SearchField
+                label="Search events"
+                value="jazz"
+                loading={true}
+                onValueChange={noop}
+            />,
+        )
+        expect(
+            screen.getByLabelText(t("SearchField.Loading", undefined)),
+        ).toBeInTheDocument()
     })
 
     it("shows the clear button only with a value, and clears on click", async () => {

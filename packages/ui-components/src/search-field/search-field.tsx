@@ -5,6 +5,7 @@ import type { StrictOmit } from "shared/types"
 
 import { useUiContext } from "../i18n/ui-context"
 import { PixelIconClose, PixelIconSearch } from "../pixel-icons/pixel-icons"
+import { Spinner } from "../spinner/spinner"
 import {
     searchFieldClearStyles,
     searchFieldCursorStyles,
@@ -23,12 +24,14 @@ interface SearchFieldProps extends StrictOmit<
     label: string
     value: string
     onValueChange: (value: string) => void
+    loading?: boolean
     className?: string
 }
 export const SearchField = ({
     label,
     value,
     onValueChange,
+    loading = false,
     placeholder,
     className,
     ...props
@@ -39,7 +42,14 @@ export const SearchField = ({
     return (
         <div className={cn(searchFieldRootStyles(), className)}>
             <span className={searchFieldIconStyles()}>
-                <PixelIconSearch />
+                {loading ? (
+                    <Spinner
+                        title={i18n.t("SearchField.Loading", undefined)}
+                        size="custom"
+                    />
+                ) : (
+                    <PixelIconSearch />
+                )}
             </span>
             <div className={searchFieldInputContainerStyles()}>
                 <input
