@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { distinctPlacesOf, placeSuggestionOf } from "./geoapify-provider"
+import { distinctPlacesOf, placeSuggestionOf, rankedPlacesOf } from "./geoapify-provider"
 
 const coordinates = { lat: 44.35, lon: 11.71 }
 
@@ -139,5 +139,78 @@ describe("distinctPlacesOf", () => {
                 coordinates: { latitude: 44.35, longitude: 11.71 },
             },
         ])
+    })
+})
+
+describe("rankedPlacesOf", () => {
+    const town = (name: string, lat: number) => ({
+        address_line1: name,
+        city: name,
+        county: "Bologna",
+        county_code: "BO",
+        state: "Emilia-Romagna",
+        lat,
+        lon: 11.71,
+        result_type: "city",
+    })
+    const quarter = (name: string, lat: number) => ({
+        address_line1: name,
+        city: "Milano",
+        county: "Milano",
+        county_code: "MI",
+        state: "Lombardia",
+        lat,
+        lon: 9.19,
+        result_type: "suburb",
+    })
+
+    it("puts the town of the typed name before the near places of a close name", () => {
+        expect(
+            rankedPlacesOf(
+                "imola",
+                [town("Imola", 44.35), town("Isola", 44.1)],
+                [quarter("Isola", 45.49), quarter("Via Imola", 45.47)],
+            ).map(place => place.label),
+        ).toStrictEqual([
+            "Imola, Bologna, Emilia-Romagna",
+            "Isola, Milano (MI), Lombardia",
+            "Via Imola, Milano (MI), Lombardia",
+        ])
+    })
+
+    it("matches the name with no case, accents or extra spaces, and a town whose name opens with the text after it", () => {
+        expect(
+            rankedPlacesOf(
+                "  san lazzaro ",
+                [town("San Lazzaro di Savena", 44.47), town("San Làzzaro", 44.2)],
+                [quarter("San Lazzaro", 45.48)],
+            ).map(place => place.address),
+        ).toStrictEqual([
+            "San Làzzaro, Bologna",
+            "San Lazzaro di Savena, Bologna",
+            "San Lazzaro, Milano (MI)",
+        ])
+    })
+
+    it("keeps the order of the near places when no town has the typed name", () => {
+        expect(
+            rankedPlacesOf(
+                "bolognina",
+                [town("Bologna", 44.49)],
+                [quarter("Bolognina", 45.5), town("Bolognina", 44.7)],
+            ).map(place => place.coordinates.latitude),
+        ).toStrictEqual([44.7, 45.5])
+    })
+
+    it("keeps five suggestions at most", () => {
+        expect(
+            rankedPlacesOf(
+                "via roma",
+                [],
+                [45.1, 45.2, 45.3, 45.4, 45.5, 45.6].map(lat =>
+                    quarter(`Via Roma ${String(lat)}`, lat),
+                ),
+            ),
+        ).toHaveLength(5)
     })
 })

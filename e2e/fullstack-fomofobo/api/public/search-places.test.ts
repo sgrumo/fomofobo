@@ -1,7 +1,10 @@
 import { expectApiError, expectStatus } from "e2e-kit/assertions"
 import { describe, expect, it } from "vitest"
 
-import { GEOCODING_FAILURE_TEXT } from "../../geocoding-mock-contract"
+import {
+    GEOCODING_FAILURE_TEXT,
+    GEOCODING_TOWN_PREFIX,
+} from "../../geocoding-mock-contract"
 import { signInAs } from "../auth/utils"
 import {
     buildWeeklyRecurrence,
@@ -56,6 +59,26 @@ describe("GET /api/public/places", () => {
             ],
             venues: [],
         })
+    })
+
+    it("puts the town of the typed name before the places near the center", async () => {
+        const center = { latitude: 45.464, longitude: 9.19 }
+        const text = `${GEOCODING_TOWN_PREFIX} ${crypto.randomUUID().slice(0, 8)}`
+
+        const res = await searchPlaces({
+            headers: {
+                "x-test-now": SATURDAY_NOON,
+                "x-forwarded-for": crypto.randomUUID(),
+            },
+            queryParams: { q: text, lat: center.latitude, lng: center.longitude },
+        })
+
+        expectStatus(res, 200)
+        expect(res.data.places.map(place => place.label)).toStrictEqual([
+            `${text}, Bologna, Emilia-Romagna`,
+            `${text}, Imola (BO), Emilia-Romagna`,
+            `${text}, Bologna (BO), Emilia-Romagna`,
+        ])
     })
 
     it("suggests the venues of the area whose name matches with their kind, and no blocked one", async () => {

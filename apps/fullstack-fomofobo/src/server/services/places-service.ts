@@ -75,7 +75,7 @@ export class PlacesService {
                         language: PLACES_LANGUAGE,
                     }),
                 [
-                    "places-v3",
+                    "places-v4",
                     PLACES_COUNTRY_CODE,
                     PLACES_LANGUAGE,
                     text,

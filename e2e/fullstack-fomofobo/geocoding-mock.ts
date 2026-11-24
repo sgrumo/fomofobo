@@ -4,6 +4,7 @@ import { parseArgs } from "node:util"
 import {
     GEOCODING_FAILURE_TEXT,
     GEOCODING_NO_PLACE_PREFIX,
+    GEOCODING_TOWN_PREFIX,
 } from "./geocoding-mock-contract.ts"
 
 const AUTOCOMPLETE_PATH = "/v1/geocode/autocomplete"
@@ -39,6 +40,27 @@ const resultsOf = (text: string, bias: { lon: number; lat: number }) => [
     },
 ]
 
+/**
+ * @description Builds the results the mock answers to the request restricted to towns: for a text with the town prefix, a town of that name half a degree north of the bias point
+ * @param text Text searched
+ * @param bias Longitude and latitude of the `proximity` bias
+ */
+const townsOf = (text: string, bias: { lon: number; lat: number }) =>
+    text.startsWith(GEOCODING_TOWN_PREFIX)
+        ? [
+              {
+                  address_line1: text,
+                  city: text,
+                  county: "Bologna",
+                  county_code: "BO",
+                  state: "Emilia-Romagna",
+                  lat: bias.lat + 0.5,
+                  lon: bias.lon,
+                  result_type: "city",
+              },
+          ]
+        : []
+
 const { values } = parseArgs({ options: { port: { type: "string" } } })
 
 // Fake of the Geoapify autocomplete endpoint, started by the lifecycle of the suite
@@ -70,6 +92,12 @@ createServer((request, response) => {
     } else if (text.startsWith(GEOCODING_NO_PLACE_PREFIX)) {
         answer(200, { results: [] })
     } else {
-        answer(200, { results: resultsOf(text, { lon: lon ?? 0, lat: lat ?? 0 }) })
+        const bias = { lon: lon ?? 0, lat: lat ?? 0 }
+        answer(200, {
+            results:
+                url.searchParams.get("type") === "city"
+                    ? townsOf(text, bias)
+                    : resultsOf(text, bias),
+        })
     }
 }).listen(Number(values.port), "127.0.0.1")

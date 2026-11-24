@@ -89,6 +89,53 @@ export const distinctPlacesOf = (
         .filter(isDefined)
         .map(entry => entry.suggestion)
 
+// Geoapify writes a municipality, and a hamlet with a name of its own, as a `city`
+const TOWN_RESULT_TYPE = "city"
+
+/**
+ * @description Returns a name in lower case, with no accents and single spaces, so a typed text and a place name compare
+ * @param name Name compared
+ */
+const nameKeyOf = (name: string): string =>
+    name
+        .normalize("NFD")
+        .replaceAll(/\p{Diacritic}/gu, "")
+        .toLowerCase()
+        .trim()
+        .replaceAll(/\s+/gu, " ")
+
+/**
+ * @description Returns the rank of a result for a typed text, lower first: a town of that name, then a town whose name opens with the text, then any other result
+ * @param result Result of the Geoapify autocomplete
+ * @param textKey Name key of the typed text
+ */
+const townRankOf = (result: AutocompleteResult, textKey: string): number => {
+    if (result.result_type !== TOWN_RESULT_TYPE) {
+        return 2
+    }
+    const nameKey = nameKeyOf(result.address_line1)
+    return nameKey === textKey ? 0 : nameKey.startsWith(`${textKey} `) ? 1 : 2
+}
+
+/**
+ * @description Maps the results of the two Geoapify requests to the suggestions of a text: the towns of that name first, then the places near the center
+ * @param text Text typed by the Visitor
+ * @param towns Results of the request restricted to towns
+ * @param places Results of the request near the center
+ */
+export const rankedPlacesOf = (
+    text: string,
+    towns: readonly AutocompleteResult[],
+    places: readonly AutocompleteResult[],
+): PlaceSuggestion[] => {
+    const textKey = nameKeyOf(text)
+    return distinctPlacesOf(
+        [...towns.filter(town => townRankOf(town, textKey) < 2), ...places].toSorted(
+            (first, second) => townRankOf(first, textKey) - townRankOf(second, textKey),
+        ),
+    ).slice(0, PLACES_PER_SUGGESTION)
+}
+
 export class GeoapifyProvider implements GeocodingProvider {
     private readonly baseUrl: string
     private readonly apiKey: string | undefined
@@ -98,7 +145,7 @@ export class GeoapifyProvider implements GeocodingProvider {
     }
 
     /**
-     * @description Fetches the places of the Geoapify autocomplete in the country, the nearest to the center first
+     * @description Fetches the places of the Geoapify autocomplete in the country: the towns named as the text first, then the places nearest to the center
      * @param text Text typed by the Visitor
      * @param area Center the results rank around, the ISO 3166-1 alpha-2 code of the country, and the language of the names
      * @throws When the key is unset, or when Geoapify fails, times out or answers an unknown shape
@@ -107,30 +154,35 @@ export class GeoapifyProvider implements GeocodingProvider {
         text: string,
         area: { center: GeoPoint; countryCode: string; language: string },
     ): Promise<PlaceSuggestion[]> {
-        if (this.apiKey === undefined) {
+        const apiKey = this.apiKey
+        if (apiKey === undefined) {
             throw appError("GeocodingUnavailable", "GEOAPIFY_API_KEY is unset")
         }
         const { latitude, longitude } = area.center
-        const url = new URL("/v1/geocode/autocomplete", this.baseUrl)
-        url.search = new URLSearchParams({
+        const params = {
             text,
             filter: `countrycode:${area.countryCode}`,
             bias: `proximity:${longitude},${latitude}`,
             limit: String(PLACES_PER_SUGGESTION),
             lang: area.language,
             format: "json",
-            apiKey: this.apiKey,
-        }).toString()
+            apiKey,
+        }
 
         try {
-            const response = await fetch(url, {
-                signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-            })
-            if (!response.ok) {
-                throw new Error(`Geoapify answered ${String(response.status)}`)
-            }
-            const { results } = autocompleteResponseSchema.parse(await response.json())
-            return distinctPlacesOf(results)
+            // The bias toward the center buries a far town under the near places of a close
+            // name, such as Isola for Imola from Milan, so the towns come from a request of their own
+            // A failed town request leaves the near places alone
+            const [towns, places] = await Promise.all([
+                this.autocomplete({ ...params, type: TOWN_RESULT_TYPE }).catch(
+                    (error: unknown) => {
+                        logger.warn("Geoapify town autocomplete failed", { error })
+                        return []
+                    },
+                ),
+                this.autocomplete(params),
+            ])
+            return rankedPlacesOf(text, towns, places)
         } catch (error) {
             logger.warn("Geoapify autocomplete failed", { error })
             throw appError(
@@ -138,5 +190,24 @@ export class GeoapifyProvider implements GeocodingProvider {
                 "The geocoding provider is unavailable",
             )
         }
+    }
+
+    /**
+     * @description Fetches the results of one request to the Geoapify autocomplete
+     * @param params Query parameters of the request
+     * @throws When Geoapify answers an error status or an unknown shape
+     */
+    private async autocomplete(
+        params: Record<string, string>,
+    ): Promise<AutocompleteResult[]> {
+        const url = new URL("/v1/geocode/autocomplete", this.baseUrl)
+        url.search = new URLSearchParams(params).toString()
+        const response = await fetch(url, {
+            signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        })
+        if (!response.ok) {
+            throw new Error(`Geoapify answered ${String(response.status)}`)
+        }
+        return autocompleteResponseSchema.parse(await response.json()).results
     }
 }
