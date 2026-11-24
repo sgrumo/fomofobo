@@ -484,7 +484,12 @@ PLAY_UPLOAD_OPTIONS = {
   skip_upload_screenshots: true,
 }
 
+# Exported before `prebuild`, which evaluates app.config.ts and writes APP_BUILD_NUMBER into
+# the versionCode of build.gradle. `bundleRelease` ignores the `android.injected.version.code`
+# property, so a Gradle property cannot set the code of a bundle.
 def build_aab(version_code)
+  ENV["APP_BUILD_NUMBER"] = version_code.to_s
+  UI.important("APP_BUILD_NUMBER=#{ENV["APP_BUILD_NUMBER"]}")
   prebuild("android")
   gradle(
     task: "clean bundleRelease",
@@ -492,7 +497,7 @@ def build_aab(version_code)
     # The Expo template leaves org.gradle.caching unset, so without this the task-output
     # cache is never written and every task re-executes against a warm GRADLE_USER_HOME.
     flags: "--build-cache",
-    properties: android_signing_properties.merge("android.injected.version.code" => version_code)
+    properties: android_signing_properties
   )
 end
 
