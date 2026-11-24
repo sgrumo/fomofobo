@@ -13,11 +13,5 @@ export const detailSheetContentStyle = {
     paddingBottom: 16,
 }
 
-// Keeps the end of the content clear of the footer
-export const detailSheetContentWithFooterStyle = {
-    ...detailSheetContentStyle,
-    paddingBottom: 96,
-}
-
 export const detailSheetFooterStyles =
     "flex-row gap-3 border-t-2 border-line bg-surface px-4 py-3"

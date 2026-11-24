@@ -170,10 +170,13 @@ export const EventDetailActions = (props: EventDetailActionsProps) => {
     const { instagramUrl, facebookUrl } = props.occurrence.externalLinks
 
     return (
-        <View accessibilityLabel={t("Detail.Actions")} className="flex-1 flex-row gap-3">
+        <View
+            accessibilityLabel={t("Detail.Actions")}
+            className="flex-1 flex-row flex-wrap gap-3"
+        >
             <DirectionsButton
                 coordinates={props.occurrence.venue.coordinates}
-                className="flex-1"
+                className="grow"
             />
             {instagramUrl !== null && (
                 <Button
@@ -182,7 +185,7 @@ export const EventDetailActions = (props: EventDetailActionsProps) => {
                     icon="instagram"
                     accessibilityRole="link"
                     accessibilityLabel={t("Detail.Instagram")}
-                    className="flex-1"
+                    className="grow"
                     onPress={() => {
                         void Linking.openURL(instagramUrl)
                     }}
@@ -197,7 +200,7 @@ export const EventDetailActions = (props: EventDetailActionsProps) => {
                     icon="facebook"
                     accessibilityRole="link"
                     accessibilityLabel={t("Detail.Facebook")}
-                    className="flex-1"
+                    className="grow"
                     onPress={() => {
                         void Linking.openURL(facebookUrl)
                     }}

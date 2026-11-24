@@ -154,14 +154,17 @@ export const VenueDetailActions = (props: VenueDetailActionsProps) => {
     const programmeUrl = props.venue.programmeUrl
 
     return (
-        <View accessibilityLabel={t("Detail.Actions")} className="flex-1 flex-row gap-3">
+        <View
+            accessibilityLabel={t("Detail.Actions")}
+            className="flex-1 flex-row flex-wrap gap-3"
+        >
             {programmeUrl !== null && (
                 <Button
                     variant="secondary"
                     size="sm"
                     accessibilityRole="link"
                     accessibilityLabel={t("Preview.Programme")}
-                    className="flex-1 bg-permanent"
+                    className="grow bg-permanent"
                     onPress={() => {
                         void Linking.openURL(programmeUrl)
                     }}
@@ -169,7 +172,7 @@ export const VenueDetailActions = (props: VenueDetailActionsProps) => {
                     <Text>{t("Preview.Programme")}</Text>
                 </Button>
             )}
-            <DirectionsButton coordinates={props.venue.coordinates} className="flex-1" />
+            <DirectionsButton coordinates={props.venue.coordinates} className="grow" />
         </View>
     )
 }

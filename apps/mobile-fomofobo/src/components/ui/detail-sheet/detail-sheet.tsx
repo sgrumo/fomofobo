@@ -3,7 +3,7 @@ import GorhomBottomSheet, {
     BottomSheetScrollView,
 } from "@gorhom/bottom-sheet"
 import type { BottomSheetFooterProps } from "@gorhom/bottom-sheet"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { ReactNode } from "react"
 import { View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -18,7 +18,6 @@ import {
     DETAIL_SHEET_SNAP_POINTS,
     DETAIL_SHEET_TOP_GAP,
     detailSheetContentStyle,
-    detailSheetContentWithFooterStyle,
     detailSheetFooterStyles,
     detailSheetStyle,
 } from "./detail-sheet.styles"
@@ -38,6 +37,8 @@ const DetailSheet = (props: DetailSheetProps) => {
     const ref = useRef<GorhomBottomSheet>(null)
     const insets = useSafeAreaInsets()
     const footer = props.footer
+    // The actions of the footer can wrap to a second row, so the end of the content clears its height
+    const [footerHeight, setFooterHeight] = useState(0)
 
     useEffect(() => {
         if (props.open) {
@@ -65,7 +66,14 @@ const DetailSheet = (props: DetailSheetProps) => {
                     ? undefined
                     : (footerProps: BottomSheetFooterProps) => (
                           <BottomSheetFooter {...footerProps}>
-                              <View className={detailSheetFooterStyles}>{footer}</View>
+                              <View
+                                  className={detailSheetFooterStyles}
+                                  onLayout={event => {
+                                      setFooterHeight(event.nativeEvent.layout.height)
+                                  }}
+                              >
+                                  {footer}
+                              </View>
                           </BottomSheetFooter>
                       )
             }
@@ -85,7 +93,11 @@ const DetailSheet = (props: DetailSheetProps) => {
                 contentContainerStyle={
                     footer === undefined
                         ? detailSheetContentStyle
-                        : detailSheetContentWithFooterStyle
+                        : {
+                              ...detailSheetContentStyle,
+                              paddingBottom:
+                                  footerHeight + detailSheetContentStyle.paddingBottom,
+                          }
                 }
             >
                 {props.children}
