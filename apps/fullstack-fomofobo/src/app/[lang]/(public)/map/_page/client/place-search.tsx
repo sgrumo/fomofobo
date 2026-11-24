@@ -1,6 +1,6 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import {
     isEmptySuggestions,
     MIN_SUGGESTION_TEXT,
@@ -38,20 +38,51 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
     const [text, setText] = useState(props.initialText)
     const [open, setOpen] = useState(false)
     const formRef = useRef<HTMLFormElement>(null)
+    const queryClient = useQueryClient()
     const [debouncedText] = useDebounced(text.trim(), identity, SUGGESTION_DELAY_MS)
 
+    const suggestionsOptionsOf = (q: string) =>
+        api.searchPlacesQuery({
+            params: {},
+            query: { q, lat: props.center.latitude, lng: props.center.longitude },
+        })
     const showsSuggestions = open && debouncedText.length >= MIN_SUGGESTION_TEXT
     const suggestions = useQuery({
-        ...api.searchPlacesQuery({
-            params: {},
-            query: {
-                q: debouncedText,
-                lat: props.center.latitude,
-                lng: props.center.longitude,
-            },
-        }),
+        ...suggestionsOptionsOf(debouncedText),
         enabled: showsSuggestions,
     })
+
+    // Enter often comes before the suggestions of the last letters, so the submit reads the
+    // suggestions of its own text, from the cache or from a new call, as a map search does
+    const submit = async () => {
+        const submitted = text.trim()
+        const submittedSuggestions =
+            online && submitted.length >= MIN_SUGGESTION_TEXT
+                ? await queryClient
+                      .query(suggestionsOptionsOf(submitted))
+                      .catch(() => undefined)
+                : undefined
+        const picked =
+            submittedSuggestions === undefined
+                ? undefined
+                : submittedSuggestionOf(submittedSuggestions)
+        if (picked === undefined) {
+            props.onTextSubmit(text)
+            return
+        }
+        match(picked)
+            .with({ type: "place" }, ({ place }) => {
+                setText(place.label)
+                props.onPlaceSelect(place)
+            })
+            .with({ type: "event" }, ({ event }) => {
+                props.onEventSelect({ eventId: event.eventId, date: event.date })
+            })
+            .with({ type: "venue" }, ({ venue }) => {
+                props.onVenueSelect(venue.venueId)
+            })
+            .exhaustive()
+    }
 
     const places = suggestions.data?.places ?? []
     const events = suggestions.data?.events ?? []
@@ -76,30 +107,10 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
             ref={formRef}
             role="search"
             className="relative"
-            onSubmit={submit => {
-                submit.preventDefault()
+            onSubmit={event => {
+                event.preventDefault()
                 setOpen(false)
-                const picked = submittedSuggestionOf(
-                    text,
-                    debouncedText,
-                    suggestions.data,
-                )
-                if (picked === undefined) {
-                    props.onTextSubmit(text)
-                    return
-                }
-                match(picked)
-                    .with({ type: "place" }, ({ place }) => {
-                        setText(place.label)
-                        props.onPlaceSelect(place)
-                    })
-                    .with({ type: "event" }, ({ event }) => {
-                        props.onEventSelect({ eventId: event.eventId, date: event.date })
-                    })
-                    .with({ type: "venue" }, ({ venue }) => {
-                        props.onVenueSelect(venue.venueId)
-                    })
-                    .exhaustive()
+                void submit()
             }}
         >
             <SearchField

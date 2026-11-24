@@ -27,7 +27,8 @@ interface SearchFieldProps {
     value: string
     onValueChange: (value: string) => void
     placeholder?: string
-    onSubmitEditing?: () => void
+    // Receives the text of the field: the change of the last letters can reach the parent after it
+    onSubmitEditing?: (text: string) => void
     onFocus?: () => void
     onBlur?: () => void
     className?: string
@@ -53,7 +54,9 @@ const SearchField = (props: SearchFieldProps) => {
                         accessibilityHint={props.placeholder}
                         value={props.value}
                         onChangeText={props.onValueChange}
-                        onSubmitEditing={props.onSubmitEditing}
+                        onSubmitEditing={event => {
+                            props.onSubmitEditing?.(event.nativeEvent.text)
+                        }}
                         onFocus={() => {
                             setFocused(true)
                             props.onFocus?.()

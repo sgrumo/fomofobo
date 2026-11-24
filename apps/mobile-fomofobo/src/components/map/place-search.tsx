@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import {
     isEmptySuggestions,
     MIN_SUGGESTION_TEXT,
@@ -100,8 +100,14 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
     const online = useOnline()
     const [text, setText] = useState(props.initialText)
     const [open, setOpen] = useState(false)
+    const queryClient = useQueryClient()
     const [debouncedText] = useDebounced(text.trim(), identity, SUGGESTION_DELAY_MS)
 
+    const suggestionsOptionsOf = (q: string) =>
+        api.searchPlacesQuery({
+            params: {},
+            query: { q, lat: props.center.latitude, lng: props.center.longitude },
+        })
     const showsSuggestions = open && debouncedText.length >= MIN_SUGGESTION_TEXT
     const {
         data: suggestions,
@@ -109,18 +115,43 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
         isFetching: suggestionsFetching,
         isSuccess: suggestionsLoaded,
     } = useQuery({
-        ...api.searchPlacesQuery({
-            params: {},
-            query: {
-                q: debouncedText,
-                lat: props.center.latitude,
-                lng: props.center.longitude,
-            },
-        }),
+        ...suggestionsOptionsOf(debouncedText),
         enabled: showsSuggestions && online,
         // The route allows 30 calls a minute per IP: a retry spends the budget of every phone behind it
         retry: false,
     })
+
+    // Enter often comes before the suggestions of the last letters, so the submit reads the
+    // suggestions of its own text, from the cache or from a new call, as a map search does
+    const submit = async (submittedText: string) => {
+        const submitted = submittedText.trim()
+        const submittedSuggestions =
+            online && submitted.length >= MIN_SUGGESTION_TEXT
+                ? await queryClient
+                      .query({ ...suggestionsOptionsOf(submitted), retry: false })
+                      .catch(() => undefined)
+                : undefined
+        const picked =
+            submittedSuggestions === undefined
+                ? undefined
+                : submittedSuggestionOf(submittedSuggestions)
+        if (picked === undefined) {
+            props.onTextSubmit(submittedText)
+            return
+        }
+        match(picked)
+            .with({ type: "place" }, ({ place }) => {
+                setText(place.label)
+                props.onPlaceSelect(place)
+            })
+            .with({ type: "event" }, ({ event }) => {
+                props.onEventSelect({ eventId: event.eventId, date: event.date })
+            })
+            .with({ type: "venue" }, ({ venue }) => {
+                props.onVenueSelect(venue.venueId)
+            })
+            .exhaustive()
+    }
 
     const places = suggestions?.places ?? []
     const events = suggestions?.events ?? []
@@ -157,28 +188,9 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                         props.onTextSubmit(value)
                     }
                 }}
-                onSubmitEditing={() => {
+                onSubmitEditing={submittedText => {
                     setOpen(false)
-                    const picked = submittedSuggestionOf(text, debouncedText, suggestions)
-                    if (picked === undefined) {
-                        props.onTextSubmit(text)
-                        return
-                    }
-                    match(picked)
-                        .with({ type: "place" }, ({ place }) => {
-                            setText(place.label)
-                            props.onPlaceSelect(place)
-                        })
-                        .with({ type: "event" }, ({ event }) => {
-                            props.onEventSelect({
-                                eventId: event.eventId,
-                                date: event.date,
-                            })
-                        })
-                        .with({ type: "venue" }, ({ venue }) => {
-                            props.onVenueSelect(venue.venueId)
-                        })
-                        .exhaustive()
+                    void submit(submittedText)
                 }}
             />
             {/* Drawn over the filters below the field, as the web dropdown */}

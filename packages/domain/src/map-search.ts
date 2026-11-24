@@ -43,20 +43,13 @@ export const textQueryOf = (text: string): MapQuery => {
 }
 
 /**
- * @description Returns the suggestion that a submitted text picks: the first one of the list, in
+ * @description Returns the suggestion that a submitted text picks: the first one of its list, in
  * the order the list shows them, else undefined for a text search
- * @param text Submitted text
- * @param suggestedText Text of the suggestions
- * @param suggestions Suggestions of the suggested text, undefined until they load
+ * @param suggestions Suggestions of the submitted text
  */
 export const submittedSuggestionOf = (
-    text: string,
-    suggestedText: string,
-    suggestions: SearchSuggestions | undefined,
+    suggestions: SearchSuggestions,
 ): SubmittedSuggestion | undefined => {
-    if (suggestions === undefined || text.trim() !== suggestedText) {
-        return undefined
-    }
     const venues = venueSuggestionGroupsOf(suggestions.venues)
     const place = suggestions.places.at(0)
     const event = suggestions.events.at(0)

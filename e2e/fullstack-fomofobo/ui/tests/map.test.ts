@@ -1029,6 +1029,23 @@ test.describe("map", () => {
         )
     })
 
+    test("moves to the first place on an Enter pressed before the suggestions show", async ({
+        page,
+    }) => {
+        const text = `Piazza ${crypto.randomUUID().slice(0, 8)}`
+        const searchField = page.getByLabel(t("shared", "Search.Label"))
+
+        await gotoPage(page, mapPath(buildArea()))
+        await searchField.fill(text)
+        await searchField.press("Enter")
+
+        await expect(page).toHaveURL(/place=/u)
+        // The search service lowercases the text that the geocoding mock echoes
+        await expect(searchField).toHaveValue(
+            `${text.toLowerCase()}, Imola (BO), Emilia-Romagna`,
+        )
+    })
+
     test("opens the first suggested event on Enter when no place matches the text", async ({
         page,
     }) => {

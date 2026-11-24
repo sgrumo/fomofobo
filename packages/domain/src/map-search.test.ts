@@ -61,7 +61,7 @@ describe("submittedSuggestionOf", () => {
 
     it("picks the first place, the first row of the list, even when an event or a venue matches", () => {
         expect(
-            submittedSuggestionOf(" Imola ", "Imola", {
+            submittedSuggestionOf({
                 places: [imola, bologna],
                 events: [jazzNight],
                 venues: [venue("Imola Jazz Club", "regular")],
@@ -71,7 +71,7 @@ describe("submittedSuggestionOf", () => {
 
     it("picks the first event when no place matches", () => {
         expect(
-            submittedSuggestionOf("Imola", "Imola", {
+            submittedSuggestionOf({
                 places: [],
                 events: [jazzNight],
                 venues: [venue("Imola Jazz Club", "regular")],
@@ -84,7 +84,7 @@ describe("submittedSuggestionOf", () => {
         const club = venue("Imola Jazz Club", "regular")
 
         expect(
-            submittedSuggestionOf("Imola", "Imola", {
+            submittedSuggestionOf({
                 places: [],
                 events: [],
                 venues: [rocca, club],
@@ -94,23 +94,12 @@ describe("submittedSuggestionOf", () => {
 
     it("keeps a text search with no suggestion", () => {
         expect(
-            submittedSuggestionOf("Imola", "Imola", {
+            submittedSuggestionOf({
                 places: [],
                 events: [],
                 venues: [],
             }),
         ).toBeUndefined()
-    })
-
-    it("keeps a text search while the suggestions belong to another text", () => {
-        expect(
-            submittedSuggestionOf("Imola", "Imo", {
-                places: [imola],
-                events: [],
-                venues: [],
-            }),
-        ).toBeUndefined()
-        expect(submittedSuggestionOf("Imola", "Imola", undefined)).toBeUndefined()
     })
 })
 
