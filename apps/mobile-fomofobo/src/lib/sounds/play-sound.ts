@@ -28,6 +28,8 @@ const soundPlayerOf = (source: AudioSource) => {
     const player = createAudioPlayer(source, { keepAudioSessionActive: true })
     player.addListener("playbackStatusUpdate", status => {
         if (status.didJustFinish) {
+            // Android keeps a finished player set to play, and a seek alone would play it again
+            player.pause()
             void player.seekTo(0)
         }
     })

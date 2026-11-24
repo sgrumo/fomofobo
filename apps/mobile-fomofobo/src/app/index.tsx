@@ -191,19 +191,26 @@ const MapScreen = () => {
     // An event opened from the list shows over it, and the list comes back once it closes
     const savedOpen = query.saved === true && !previewOpen
 
-    // The Android back button leaves the detail for the preview, and closes the saved list
+    // The Android back button leaves the detail for the preview, then closes the preview, and
+    // closes the saved list
     useEffect(() => {
-        if (!detailOpen && !savedOpen) {
+        if (!previewOpen && !savedOpen) {
             return undefined
         }
         const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-            setQuery(detailOpen ? { detail: undefined } : { saved: undefined })
+            if (detailOpen) {
+                setQuery({ detail: undefined })
+            } else if (previewOpen) {
+                setQuery(CLEARED_SELECTION)
+            } else {
+                setQuery({ saved: undefined })
+            }
             return true
         })
         return () => {
             subscription.remove()
         }
-    }, [detailOpen, savedOpen, setQuery])
+    }, [detailOpen, previewOpen, savedOpen, setQuery])
     const venueFromResults = results?.permanentVenues.find(
         venue => venue.id === selectedVenueId,
     )

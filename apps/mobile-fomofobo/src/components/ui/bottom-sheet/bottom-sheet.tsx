@@ -7,9 +7,10 @@ import type {
     BottomSheetBackdropProps,
     BottomSheetBackgroundProps,
 } from "@gorhom/bottom-sheet"
+import { useEffect, useState } from "react"
 import type { ReactNode, RefObject } from "react"
 import { useTranslation } from "react-i18next"
-import { View } from "react-native"
+import { BackHandler, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { IconButton } from "@/components/ui/icon-button/icon-button"
@@ -56,11 +57,32 @@ interface BottomSheetProps {
 const BottomSheet = ({ ref, ...props }: BottomSheetProps) => {
     const { t } = useTranslation("ui")
     const insets = useSafeAreaInsets()
+    const [open, setOpen] = useState(false)
+
+    // The Android back button closes the sheet before the screen under it, whose handler came first
+    useEffect(() => {
+        if (!open) {
+            return undefined
+        }
+        const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+            ref.current?.dismiss()
+            return true
+        })
+        return () => {
+            subscription.remove()
+        }
+    }, [open, ref])
 
     return (
         <BottomSheetModal
             ref={ref}
-            onDismiss={props.onDismiss}
+            onChange={index => {
+                setOpen(index >= 0)
+            }}
+            onDismiss={() => {
+                setOpen(false)
+                props.onDismiss?.()
+            }}
             enableDynamicSizing={true}
             enablePanDownToClose={true}
             detached={true}
