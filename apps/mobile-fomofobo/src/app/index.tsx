@@ -371,6 +371,12 @@ const MapScreen = () => {
                             onTextSubmit={text => {
                                 setQuery(textQueryOf(text))
                             }}
+                            // A new search leaves the open preview or detail
+                            onFocus={() => {
+                                if (previewOpen) {
+                                    setQuery(CLEARED_SELECTION)
+                                }
+                            }}
                         />
                     </View>
                     <View className="h-11 justify-center">

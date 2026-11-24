@@ -72,6 +72,8 @@ While the visitor shows permanent venues, every cinema and museum inside the sea
 
 A tap on a pin opens a preview of the occurrence. The preview shows status, venue, categories, price and times, with the elapsed time when live and a link to the event detail. Above the times, it shows the start date, or today for an event that starts today. The pin of a venue with more results opens the preview of its result, which pages through every result of the pin. On a phone, a tap on another pin moves the open preview to that pin, and a swipe up on the preview opens the detail.
 
+In the native app, a press on the search field closes the open preview or detail. The preview cuts a long title at three lines, as tall as its photo, so the preview never grows over its pin.
+
 The map stays inside Italy, and it never turns or tilts, because it draws no compass to undo a turn. A right click on the web map opens no browser menu.
 
 ### Search and filters

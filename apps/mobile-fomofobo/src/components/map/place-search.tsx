@@ -92,6 +92,7 @@ interface PlaceSearchProps {
     onEventSelect: (ref: OccurrenceRef) => void
     onVenueSelect: (venueId: string) => void
     onTextSubmit: (text: string) => void
+    onFocus: () => void
 }
 
 export const PlaceSearch = (props: PlaceSearchProps) => {
@@ -144,6 +145,7 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                 value={text}
                 onFocus={() => {
                     setOpen(true)
+                    props.onFocus()
                 }}
                 onBlur={() => {
                     setOpen(false)

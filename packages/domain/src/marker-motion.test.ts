@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest"
 import { buildEventClusters, shownFeaturesOf } from "./event-clusters"
 import {
     enterMoveOf,
+    isSameMarkerSet,
     leaveMoveOf,
     markerTransitions,
+    movedBoundsOf,
     pixelOffset,
     leavingEmphasisOf,
     resultIdOf,
@@ -222,5 +224,59 @@ describe("pixelOffset", () => {
                 16,
             ).y,
         ).toBeCloseTo(2 * offset.y)
+    })
+})
+
+describe("movedBoundsOf", () => {
+    const bounds: [number, number, number, number] = [11.3, 44.45, 11.4, 44.55]
+
+    it("keeps the bounds of a move that keeps the center and the zoom", () => {
+        const [west, south, east, north] = movedBoundsOf(
+            bounds,
+            12,
+            { latitude: 44.5, longitude: 11.35 },
+            12,
+        )
+
+        expect(west).toBeCloseTo(11.3)
+        expect(south).toBeCloseTo(44.45)
+        expect(east).toBeCloseTo(11.4)
+        expect(north).toBeCloseTo(44.55)
+    })
+
+    it("halves the span at each zoom level, around the new center", () => {
+        const center = { latitude: 44.48, longitude: 11.33 }
+        const [west, south, east, north] = movedBoundsOf(bounds, 12, center, 13)
+
+        expect(east - west).toBeCloseTo(0.05)
+        expect((west + east) / 2).toBeCloseTo(center.longitude)
+        expect(south).toBeLessThan(center.latitude)
+        expect(north).toBeGreaterThan(center.latitude)
+        expect(north - south).toBeCloseTo(0.05, 2)
+    })
+})
+
+describe("isSameMarkerSet", () => {
+    const marker = (key: string): ShownMarker => ({
+        key,
+        coordinates: { latitude: 44.3533, longitude: 11.7147 },
+        leaves: [0],
+        feature: {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [11.7147, 44.3533] },
+            properties: { index: 0, kind: "live", moreCount: 0 },
+        },
+    })
+
+    it("matches the same markers in any order", () => {
+        expect(
+            isSameMarkerSet([marker("a"), marker("b")], [marker("b"), marker("a")]),
+        ).toBe(true)
+    })
+
+    it("tells apart a set with a marker more, less or different", () => {
+        expect(isSameMarkerSet([marker("a")], [marker("a"), marker("b")])).toBe(false)
+        expect(isSameMarkerSet([marker("a"), marker("b")], [marker("a")])).toBe(false)
+        expect(isSameMarkerSet([marker("a")], [marker("b")])).toBe(false)
     })
 })

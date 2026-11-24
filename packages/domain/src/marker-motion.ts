@@ -210,6 +210,72 @@ const worldPixelOf = (point: GeoPoint, zoom: number): PixelOffset => {
 }
 
 /**
+ * @description Returns the point of the Web Mercator world at a point in px at a zoom
+ * @param pixel Point in px of the world
+ * @param zoom Zoom level, fractional
+ */
+const geoPointOf = (pixel: PixelOffset, zoom: number): GeoPoint => {
+    const size = WORLD_SIZE * 2 ** zoom
+    return {
+        latitude:
+            (Math.atan(Math.sinh(Math.PI * (1 - (2 * pixel.y) / size))) * 180) / Math.PI,
+        longitude: (pixel.x / size) * 360 - 180,
+    }
+}
+
+/**
+ * @description Returns the west, south, east and north edges that the map shows once a camera move ends, from the edges it shows now
+ * @param bounds West, south, east and north edges shown now
+ * @param zoom Zoom level shown now, fractional
+ * @param center Center the move ends on
+ * @param targetZoom Zoom level the move ends on, fractional
+ */
+export const movedBoundsOf = (
+    bounds: readonly [number, number, number, number],
+    zoom: number,
+    center: GeoPoint,
+    targetZoom: number,
+): [number, number, number, number] => {
+    const [west, south, east, north] = bounds
+    // The screen keeps its size in px at every zoom
+    const topLeft = worldPixelOf({ latitude: north, longitude: west }, zoom)
+    const bottomRight = worldPixelOf({ latitude: south, longitude: east }, zoom)
+    const halfWidth = (bottomRight.x - topLeft.x) / 2
+    const halfHeight = (bottomRight.y - topLeft.y) / 2
+    const middle = worldPixelOf(center, targetZoom)
+    const southWest = geoPointOf(
+        { x: middle.x - halfWidth, y: middle.y + halfHeight },
+        targetZoom,
+    )
+    const northEast = geoPointOf(
+        { x: middle.x + halfWidth, y: middle.y - halfHeight },
+        targetZoom,
+    )
+    return [
+        southWest.longitude,
+        southWest.latitude,
+        northEast.longitude,
+        northEast.latitude,
+    ]
+}
+
+/**
+ * @description True when two marker sets hold the same markers, in any order
+ * @param first Markers of one set
+ * @param second Markers of the other set
+ */
+export const isSameMarkerSet = (
+    first: readonly ShownMarker[],
+    second: readonly ShownMarker[],
+): boolean => {
+    const firstKeys = new Set(first.map(marker => marker.key))
+    return (
+        first.length === second.length &&
+        second.every(marker => firstKeys.has(marker.key))
+    )
+}
+
+/**
  * @description Returns the screen offset from one point to another at a zoom
  * @param from Point the offset starts at
  * @param to Point the offset ends at

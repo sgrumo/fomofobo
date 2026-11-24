@@ -19,7 +19,9 @@ import type { LocateRequest } from "domain/map-center"
 import { mapStyle } from "domain/map-style"
 import {
     enterMoveOf,
+    isSameMarkerSet,
     leaveMoveOf,
+    movedBoundsOf,
     MARKER_MOTION_MS,
     leavingEmphasisOf,
     NO_MARKER_TRANSITIONS,
@@ -59,8 +61,12 @@ const PIN_OFFSET: [number, number] = [0, PIN_DISC_RADIUS_PX]
 const INITIAL_ZOOM = 13
 const MAP_IMAGES = { "dot-dither": dotDitherPattern }
 
-// The map reports a press on a marker as a press of its own, right after the marker
-const MARKER_PRESS_ECHO_MS = 250
+// After a press on a marker, iOS reports a press of the map up to 800 ms late, and can report the
+// camera move that the press starts as a move of the visitor
+const MARKER_PRESS_ECHO_MS = 1000
+
+// A camera move that keeps the zoom can end it a few ten-thousandths under the whole level
+const ZOOM_DRIFT = 0.001
 
 interface Viewport {
     bbox: [number, number, number, number]
@@ -94,7 +100,7 @@ interface MarkerScene extends ResultSource {
  */
 const viewportOf = (view: Pick<ViewState, "bounds" | "zoom">): Viewport => ({
     bbox: view.bounds,
-    zoom: Math.floor(view.zoom),
+    zoom: Math.floor(view.zoom + ZOOM_DRIFT),
     exactZoom: view.zoom,
 })
 
@@ -211,29 +217,41 @@ export const EventMap = (props: EventMapProps) => {
             !sameResults ||
             scene.selectedIndex !== selectedIndex)
     ) {
-        setScene({
-            viewport,
-            clusterZoom,
-            occurrences: props.occurrences,
-            permanentVenues: props.permanentVenues,
-            markers,
-            transitions: sceneTransitionsOf(
-                scene,
-                sameResults,
-                { clusterZoom, selectedIndex },
-                markers,
-            ),
-            leavingFrom:
-                scene === undefined || sameResults
-                    ? props
-                    : {
-                          occurrences: scene.occurrences,
-                          permanentVenues: scene.permanentVenues,
-                      },
-            selectedIndex,
-            leavingDimmed: scene?.selectedIndex !== undefined,
-            generation: (scene?.generation ?? 0) + 1,
-        })
+        // The end of a camera move that the scene foresaw brings the same markers, and keeps the
+        // moves that play
+        const sameMarkers =
+            scene !== undefined &&
+            sameResults &&
+            scene.selectedIndex === selectedIndex &&
+            scene.clusterZoom === clusterZoom &&
+            isSameMarkerSet(scene.markers, markers)
+        setScene(
+            sameMarkers
+                ? { ...scene, viewport, markers, generation: scene.generation + 1 }
+                : {
+                      viewport,
+                      clusterZoom,
+                      occurrences: props.occurrences,
+                      permanentVenues: props.permanentVenues,
+                      markers,
+                      transitions: sceneTransitionsOf(
+                          scene,
+                          sameResults,
+                          { clusterZoom, selectedIndex },
+                          markers,
+                      ),
+                      leavingFrom:
+                          scene === undefined || sameResults
+                              ? props
+                              : {
+                                    occurrences: scene.occurrences,
+                                    permanentVenues: scene.permanentVenues,
+                                },
+                      selectedIndex,
+                      leavingDimmed: scene?.selectedIndex !== undefined,
+                      generation: (scene?.generation ?? 0) + 1,
+                  },
+        )
     }
     const generation = scene?.generation
     const transitions = scene?.transitions ?? NO_MARKER_TRANSITIONS
@@ -315,6 +333,9 @@ export const EventMap = (props: EventMapProps) => {
         }
     }
 
+    const isMarkerPressEcho = () =>
+        Date.now() - markerPressedAtRef.current <= MARKER_PRESS_ECHO_MS
+
     const selectIndex = (index: number) => {
         const occurrence = props.occurrences.at(index)
         if (occurrence !== undefined) {
@@ -366,6 +387,24 @@ export const EventMap = (props: EventMapProps) => {
                 }
                 props.onClusterZoom()
                 cameraRef.current?.easeTo({ center: lngLat, zoom })
+                // iOS shows a new marker a few frames after it mounts, so the split markers
+                // mount as the zoom starts, and show when it ends. They render on the next frame,
+                // since the camera starts only after the render that follows the press
+                if (viewport !== undefined) {
+                    const target = {
+                        bbox: movedBoundsOf(
+                            viewport.bbox,
+                            viewport.exactZoom,
+                            coordinates,
+                            zoom,
+                        ),
+                        zoom: Math.floor(zoom),
+                        exactZoom: zoom,
+                    }
+                    requestAnimationFrame(() => {
+                        setViewport(target)
+                    })
+                }
             }
             return (
                 <MapMarker
@@ -471,7 +510,7 @@ export const EventMap = (props: EventMapProps) => {
                 touchRotate={false}
                 touchPitch={false}
                 onPress={() => {
-                    if (Date.now() - markerPressedAtRef.current > MARKER_PRESS_ECHO_MS) {
+                    if (!isMarkerPressEcho()) {
                         props.onPress()
                     }
                 }}
@@ -479,7 +518,7 @@ export const EventMap = (props: EventMapProps) => {
                     void readViewport()
                 }}
                 onRegionWillChange={event => {
-                    if (event.nativeEvent.userInteraction) {
+                    if (event.nativeEvent.userInteraction && !isMarkerPressEcho()) {
                         props.onUserMoveStart()
                     }
                 }}

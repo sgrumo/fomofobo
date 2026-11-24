@@ -70,8 +70,9 @@ const BottomSheetPanel = (props: BottomSheetPanelProps) => {
 
     return (
         <>
-            {/* Outside the sheet and under it, so a press beside the tab reaches the screen behind */}
-            {props.tab !== undefined && (
+            {/* Outside the sheet and under it, so a press beside the tab reaches the screen behind.
+                A closed sheet rests at the bottom edge, where the tab would still peek out */}
+            {props.open && props.tab !== undefined && (
                 <Animated.View
                     pointerEvents="box-none"
                     style={[bottomSheetTabLayerStyle, tabRowStyle]}

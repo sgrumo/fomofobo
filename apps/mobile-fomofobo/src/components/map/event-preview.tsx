@@ -26,6 +26,9 @@ import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 
 const OPEN_ICON_SIZE = 20
 
+// Three lines of `pixel-xl` fit the 96 pt photo, so a long title never grows the preview over its pin
+const TITLE_MAX_LINES = 3
+
 interface PreviewPaging {
     index: number
     total: number
@@ -149,7 +152,11 @@ const OccurrenceBody = (props: OccurrenceBodyProps) => {
                     className="h-24 w-24 rounded-sm"
                 />
                 <View className="min-w-0 flex-1 gap-1">
-                    <Text variant="pixel-xl" accessibilityRole="header">
+                    <Text
+                        variant="pixel-xl"
+                        accessibilityRole="header"
+                        numberOfLines={TITLE_MAX_LINES}
+                    >
                         {occurrence.title}
                     </Text>
                     {occurrence.venue.isBlocked ? (
@@ -236,7 +243,11 @@ const VenueBody = (props: VenueBodyProps) => {
                     />
                 )}
                 <View className="min-w-0 flex-1 gap-1">
-                    <Text variant="pixel-xl" accessibilityRole="header">
+                    <Text
+                        variant="pixel-xl"
+                        accessibilityRole="header"
+                        numberOfLines={TITLE_MAX_LINES}
+                    >
                         {venue.name}
                     </Text>
                     <Text variant="body-md" className="text-fg-muted">
