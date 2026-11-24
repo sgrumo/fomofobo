@@ -19,10 +19,7 @@ export const OAUTH_PATHS = {
 
 const redirectBodySchema = z.object({ redirect: z.literal(true), url: z.string() })
 
-const publicClientSchema = z.object({
-    client_name: z.string().optional(),
-    client_uri: z.string().optional(),
-})
+const publicClientSchema = z.object({ client_name: z.string().optional() })
 
 export type OauthPublicClient = z.infer<typeof publicClientSchema>
 
@@ -89,7 +86,7 @@ export const answerOauthConsent = async (
     await postOauthStep(OAUTH_PATHS.consent, { accept, oauth_query: oauthQuery })
 
 /**
- * @description Fetches the public name and site of the client that asks for the access
+ * @description Fetches the public name of the client that asks for the access
  * @param clientId Client id of the authorization query
  * @throws When the endpoint answers an error status
  */

@@ -75,4 +75,22 @@ describe("GET /api/auth/oauth2/authorize", () => {
 
         expectRawStatus(res, 400)
     })
+
+    it("refuses a client metadata document outside claude.ai before it fetches it", async () => {
+        const client = {
+            clientId: "https://client.e2e.test/oauth/metadata",
+            redirectUri: "https://client.e2e.test/callback",
+        }
+
+        const res = await authorize(
+            buildAuthorizeQuery(client, await buildPkce(), crypto.randomUUID()),
+        )
+
+        expectRawStatus(res, 400)
+        expect(res.data).toMatchObject({
+            error: "invalid_client",
+            error_description:
+                "client_id URL is not permitted by the server's fetch policy",
+        })
+    })
 })

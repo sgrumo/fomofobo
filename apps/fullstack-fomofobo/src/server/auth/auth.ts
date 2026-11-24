@@ -29,6 +29,11 @@ import {
 import { routes } from "@/framework/routes/routes"
 
 import { mcpResourceUrl } from "../mcp/mcp-resource"
+import {
+    CIMD_METADATA_PROFILE,
+    MCP_ACCESS_TOKEN_SECONDS,
+    isAllowedClientMetadataUrl,
+} from "./oauth-policy"
 
 export interface AuthSettings {
     baseUrl: string
@@ -147,6 +152,7 @@ export const buildAuth = (db: DbInstanceFromSchema, settings: AuthSettings) => {
                 resource: mcpResourceUrl(settings.baseUrl),
                 loginPage: OAUTH_LOGIN_PATH,
                 consentPage: OAUTH_CONSENT_PATH,
+                accessTokenExpiresIn: MCP_ACCESS_TOKEN_SECONDS,
                 allowDynamicClientRegistration: settings.clientRegistrationEnabled,
                 allowUnauthenticatedClientRegistration:
                     settings.clientRegistrationEnabled,
@@ -172,7 +178,11 @@ export const buildAuth = (db: DbInstanceFromSchema, settings: AuthSettings) => {
                     oauthClientAssertion: { modelName: "authOauthClientAssertions" },
                 },
             }),
-            cimd({ fetchClientMetadataResource, metadataProfile: "mcp-2026-07-28" }),
+            cimd({
+                fetchClientMetadataResource,
+                metadataProfile: CIMD_METADATA_PROFILE,
+                isMetadataDocumentUrlAllowed: isAllowedClientMetadataUrl,
+            }),
             // Last plugin: it writes the cookies the other plugins set
             nextCookies(),
         ],

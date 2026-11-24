@@ -9,12 +9,13 @@ import type { RouteClientComponentProps } from "@/framework/routes/routes"
 import { answerOauthConsent, fetchOauthPublicClient } from "@/lib/auth/oauth"
 
 /**
- * @description Fetches the client that the signed authorization query of the page URL names
+ * @description Fetches the client that the signed authorization query of the page URL names, with its id
  */
-const fetchClientOfPage = async () =>
-    await fetchOauthPublicClient(
-        new URLSearchParams(globalThis.location.search).get("client_id") ?? "",
-    )
+const fetchClientOfPage = async () => {
+    const clientId =
+        new URLSearchParams(globalThis.location.search).get("client_id") ?? ""
+    return { clientId, details: await fetchOauthPublicClient(clientId) }
+}
 
 /**
  * @description Sends the answer with the signed authorization query of the page URL
@@ -24,11 +25,11 @@ const answerFromPage = async (accept: boolean) =>
     await answerOauthConsent(accept, globalThis.location.search.slice(1))
 
 /**
- * @description Returns the host of the client site, or `undefined` when it is no URL
- * @param uri Site the client declares
+ * @description Returns the host of a client id, or `undefined` when the id is no URL
+ * @param clientId Client id of the authorization query
  */
-const hostOf = (uri: string | undefined): string | undefined =>
-    uri === undefined ? undefined : URL.parse(uri)?.host
+const hostOf = (clientId: string | undefined): string | undefined =>
+    clientId === undefined ? undefined : URL.parse(clientId)?.host
 
 export const OauthConsentView = (
     _props: RouteClientComponentProps<"backofficeOauthConsent">,
@@ -50,7 +51,7 @@ export const OauthConsentView = (
     const busy = answer.isPending || answer.data?.kind === "redirect"
     const failed =
         client.isError || (answer.data !== undefined && answer.data.kind !== "redirect")
-    const site = hostOf(client.data?.client_uri)
+    const site = hostOf(client.data?.clientId)
 
     return (
         <main className="bg-surface text-fg flex min-h-dvh items-center justify-center p-4">
@@ -60,7 +61,7 @@ export const OauthConsentView = (
                     <p>
                         {t("Backoffice.OauthConsent.Request", {
                             client:
-                                client.data.client_name ??
+                                client.data.details.client_name ??
                                 t("Backoffice.OauthConsent.UnknownClient"),
                         })}
                     </p>
