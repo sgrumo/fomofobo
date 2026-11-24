@@ -1,6 +1,7 @@
 import { format, isAfter, isBefore, parseISO } from "date-fns"
 import { partition } from "es-toolkit"
-import type { CategoryIcon } from "models"
+import { dayPartSchema } from "models"
+import type { CategoryIcon, DayPart } from "models"
 import { match } from "ts-pattern"
 
 import type { MapPointKind } from "./event-clusters"
@@ -57,6 +58,26 @@ export const rangeQueryOf = (from: Date, to: Date): DateQuery => ({
     to: format(to, "yyyy-MM-dd"),
 })
 
+export const DAY_PARTS = dayPartSchema.options
+
+/**
+ * @description Returns the map query change of a tap on a day part chip, which adds the part
+ * to the pressed ones or takes it away, in the order of the day
+ * @param selected Day parts pressed before the tap
+ * @param part Day part of the chip
+ * @param pressed True when the tap presses the chip
+ */
+export const dayPartQueryOf = (
+    selected: readonly DayPart[] | undefined,
+    part: DayPart,
+    pressed: boolean,
+): MapQuery => {
+    const next = DAY_PARTS.filter(candidate =>
+        candidate === part ? pressed : (selected ?? []).includes(candidate),
+    )
+    return { dayParts: next.length === 0 ? undefined : next }
+}
+
 /**
  * @description Returns the map query change of a tap on the free chip
  * @param free True when the tap presses the chip
@@ -66,13 +87,17 @@ export const freeQueryOf = (free: boolean): MapQuery => ({
 })
 
 /**
- * @description True when the map query holds a category, a date filter or the free filter
+ * @description True when the map query holds a category, a date filter, a day part or the free
+ * filter
  * @param query Map query
  */
 export const hasActiveFilters = (
-    query: Pick<MapQuery, "categories" | "date" | "free">,
+    query: Pick<MapQuery, "categories" | "date" | "dayParts" | "free">,
 ): boolean =>
-    query.categories !== undefined || query.date !== undefined || query.free === true
+    query.categories !== undefined ||
+    query.date !== undefined ||
+    query.dayParts !== undefined ||
+    query.free === true
 
 export const KIND_FILTERS: readonly MapPointKind[] = [
     "live",

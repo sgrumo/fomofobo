@@ -16,6 +16,9 @@ export const dateFilterKindSchema = z.enum([
 ])
 export type DateFilterKind = z.infer<typeof dateFilterKindSchema>
 
+export const dayPartSchema = z.enum(["morning", "afternoon", "evening"])
+export type DayPart = z.infer<typeof dayPartSchema>
+
 /**
  * @remarks Stays flat, because it parses from a URL query string: `from` and `to` count
  * only when `date` is `range`
@@ -33,6 +36,10 @@ export const publicSearchQuerySchema = z
         // PLACEHOLDER(OP-09): past dates
         from: localDateSchema.optional(),
         to: localDateSchema.optional(),
+        dayParts: queryArraySchema(
+            dayPartSchema,
+            dayPartSchema.options.length,
+        ).optional(),
     })
     .refine(
         query =>

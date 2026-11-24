@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest"
 import {
     categoryChipOrderOf,
     categoryQueryOf,
+    dayPartQueryOf,
     earliestRangeDayOf,
     freeQueryOf,
     hasActiveFilters,
@@ -76,6 +77,26 @@ describe("quickDateQueryOf", () => {
     })
 })
 
+describe("dayPartQueryOf", () => {
+    it("adds the part on a press, in the order of the day", () => {
+        expect(dayPartQueryOf(undefined, "evening", true)).toStrictEqual({
+            dayParts: ["evening"],
+        })
+        expect(dayPartQueryOf(["evening"], "morning", true)).toStrictEqual({
+            dayParts: ["morning", "evening"],
+        })
+    })
+
+    it("takes the part away on a release, and clears the key with none left", () => {
+        expect(dayPartQueryOf(["morning", "evening"], "morning", false)).toStrictEqual({
+            dayParts: ["evening"],
+        })
+        expect(dayPartQueryOf(["afternoon"], "afternoon", false)).toStrictEqual({
+            dayParts: undefined,
+        })
+    })
+})
+
 describe("rangeQueryOf", () => {
     it("writes the local days of the range", () => {
         expect(
@@ -96,9 +117,10 @@ describe("hasActiveFilters", () => {
         expect(hasActiveFilters({ free: false })).toBe(false)
     })
 
-    it("is true with a category, a date filter or the free filter", () => {
+    it("is true with a category, a date filter, a day part or the free filter", () => {
         expect(hasActiveFilters({ categories: [crypto.randomUUID()] })).toBe(true)
         expect(hasActiveFilters({ date: "tomorrow" })).toBe(true)
+        expect(hasActiveFilters({ dayParts: ["evening"] })).toBe(true)
         expect(hasActiveFilters({ free: true })).toBe(true)
     })
 })

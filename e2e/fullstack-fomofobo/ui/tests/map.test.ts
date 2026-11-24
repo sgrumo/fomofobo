@@ -813,6 +813,52 @@ test.describe("map", () => {
         await expect(todayPin).toBeHidden()
     })
 
+    test("keeps the evening results alone under the evening chip", async ({ page }) => {
+        const center = buildArea()
+        const category = await seedCategory()
+        const afternoon = await seedPublicEvent(
+            {
+                venue: await seedVenue(
+                    offsetPoint(center, { latitude: 0.005, longitude: 0 }),
+                ),
+                category,
+            },
+            { startsAt: "2026-10-24T14:00", endsAt: "2026-10-24T16:00" },
+        )
+        const evening = await seedPublicEvent(
+            {
+                venue: await seedVenue(
+                    offsetPoint(center, { latitude: -0.005, longitude: 0 }),
+                ),
+                category,
+            },
+            { startsAt: "2026-10-24T20:00", endsAt: "2026-10-24T22:00" },
+        )
+        const afternoonPin = page.getByRole("button", {
+            name: t("shared", "Map.Pin", {
+                title: afternoon.title,
+                status: t("shared", "Status.upcoming"),
+                time: "14:00",
+            }),
+        })
+        const eveningPin = page.getByRole("button", {
+            name: t("shared", "Map.Pin", {
+                title: evening.title,
+                status: t("shared", "Status.upcoming"),
+                time: "20:00",
+            }),
+        })
+
+        await gotoPage(page, mapPath(center))
+        await expect(afternoonPin).toBeVisible({ timeout: MAP_TIMEOUT_MS })
+
+        await clickIconButton(page, t("shared", "Filters.Label"))
+        await pressChip(page, t("shared", "Filters.DayPart.evening"))
+
+        await expect(eveningPin).toBeVisible()
+        await expect(afternoonPin).toBeHidden()
+    })
+
     test("keeps the results of a custom range picked in the calendar of its chip, which a second press of the chip closes, and shows every result again once cleared", async ({
         page,
     }) => {

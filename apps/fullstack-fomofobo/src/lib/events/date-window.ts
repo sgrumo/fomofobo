@@ -1,7 +1,15 @@
 import { tz } from "@date-fns/tz"
-import { addDays, getDay, parseISO, startOfDay } from "date-fns"
+import {
+    addDays,
+    differenceInCalendarDays,
+    getDay,
+    parseISO,
+    setHours,
+    startOfDay,
+} from "date-fns"
 import { DEFAULT_WINDOW_DAYS } from "domain/platform"
-import type { PublicSearchQuery } from "models"
+import { dayPartSchema } from "models"
+import type { DayPart, PublicSearchQuery } from "models"
 import { match } from "ts-pattern"
 
 /**
@@ -51,4 +59,52 @@ export const dateWindow = (
         .exhaustive()
 
     return { from: new Date(bounds.from), to: new Date(bounds.to) }
+}
+
+/**
+ * @remarks Lets the evening run to 06:00 of the next day, so a night out counts for its evening
+ */
+export const DAY_PART_HOURS: Record<DayPart, { start: number; end: number }> = {
+    morning: { start: 6, end: 12 },
+    afternoon: { start: 12, end: 18 },
+    evening: { start: 18, end: 30 },
+}
+
+/**
+ * @description Returns the windows of the day parts on each day of a date window, in order,
+ * with the windows that touch merged into one
+ * @param window Date window, from a midnight of the zone
+ * @param dayParts Day parts kept
+ * @param timeZone IANA zone of the wall clock
+ */
+export const dayPartWindows = (
+    window: DateWindow,
+    dayParts: readonly DayPart[],
+    timeZone: string,
+): DateWindow[] => {
+    const zone = { in: tz(timeZone) }
+    const parts = dayPartSchema.options.filter(part => dayParts.includes(part))
+    const hourOf = (day: Date, hours: number): Date =>
+        new Date(setHours(addDays(day, Math.floor(hours / 24), zone), hours % 24, zone))
+    const days = Array.from(
+        { length: differenceInCalendarDays(window.to, window.from, zone) },
+        (_, offset) => addDays(window.from, offset, zone),
+    )
+
+    return days
+        .flatMap(day =>
+            parts.map(part => ({
+                from: hourOf(day, DAY_PART_HOURS[part].start),
+                to: hourOf(day, DAY_PART_HOURS[part].end),
+            })),
+        )
+        .reduce<DateWindow[]>((merged, next) => {
+            const last = merged.at(-1)
+            if (last !== undefined && last.to.getTime() >= next.from.getTime()) {
+                last.to = next.to
+            } else {
+                merged.push(next)
+            }
+            return merged
+        }, [])
 }

@@ -1,4 +1,4 @@
-import type { SQL } from "drizzle-orm"
+import type { SQL, SQLWrapper } from "drizzle-orm"
 import {
     and,
     count,
@@ -45,6 +45,28 @@ import { toLimitOffset } from "../utils/pagination"
 
 const EARTH_RADIUS_METERS = 6_371_000
 
+interface InstantWindow {
+    from: Date
+    to: Date
+}
+
+/**
+ * @description Builds the condition that an occurrence overlaps one of the windows, undefined
+ * with no windows to match
+ * @param windows Windows the occurrence overlaps
+ * @param startsAt Start column of the occurrence
+ * @param endsAt End column of the occurrence
+ */
+const overlapsAnyWindow = (
+    windows: readonly InstantWindow[] | undefined,
+    startsAt: SQLWrapper,
+    endsAt: SQLWrapper,
+): SQL | undefined =>
+    windows === undefined
+        ? undefined
+        : // One JSON parameter for every window, so a long range stays under the parameter cap
+          sql`exists (select 1 from json_each(${JSON.stringify(windows.map(window => [window.from.getTime(), window.to.getTime()]))}) as day_part where ${endsAt} > json_extract(day_part.value, '$[0]') and ${startsAt} < json_extract(day_part.value, '$[1]'))`
+
 export interface PublicSearchBox {
     minLatitude: number
     maxLatitude: number
@@ -59,7 +81,8 @@ export interface PublicSearchCircle {
 }
 
 export interface PublicOccurrenceSearch {
-    window: { from: Date; to: Date }
+    window: InstantWindow
+    dayPartWindows?: readonly InstantWindow[]
     box: PublicSearchBox
     q?: string
     categoryIds?: string[]
@@ -262,9 +285,20 @@ export class PublicOccurrencesStorage {
             insideBox(search.box),
             search.q === undefined ? undefined : likeContains(events.title, search.q),
             search.free === true ? eq(events.isFree, true) : undefined,
+            overlapsAnyWindow(
+                search.dayPartWindows,
+                eventOccurrences.startsAt,
+                eventOccurrences.endsAt,
+            ),
         )
+        const innerDayPartFilter =
+            overlapsAnyWindow(
+                search.dayPartWindows,
+                sql`inner_occurrence.starts_at`,
+                sql`inner_occurrence.ends_at`,
+            ) ?? sql`1`
         const firstInWindow = search.onePerEvent
-            ? sql`${eventOccurrences.startsAt} = (select min(inner_occurrence.starts_at) from ${eventOccurrences} as inner_occurrence where inner_occurrence.event_id = ${eventOccurrences.eventId} and inner_occurrence.ends_at > ${search.window.from.getTime()} and inner_occurrence.starts_at < ${search.window.to.getTime()})`
+            ? sql`${eventOccurrences.startsAt} = (select min(inner_occurrence.starts_at) from ${eventOccurrences} as inner_occurrence where inner_occurrence.event_id = ${eventOccurrences.eventId} and inner_occurrence.ends_at > ${search.window.from.getTime()} and inner_occurrence.starts_at < ${search.window.to.getTime()} and ${innerDayPartFilter})`
             : undefined
         const permanentVenueFilter = and(
             // A permanent venue has no price, so the free filter keeps events alone.

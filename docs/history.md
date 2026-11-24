@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-24 · The date filter gains day parts
+
+### Changed
+
+Morning, afternoon and evening chips narrow the results to a part of each day of the date window, on the web and in the native app. The evening runs to 06:00 of the next day.
+
+### Why
+
+A client request. A visitor plans by the part of the day as well as by the day.
+
+### Check next time
+
+Agree early whether the date filter needs hours as well as days, and where the night ends.
+
 ## 2026-11-24 · The native app asks which maps app to use
 
 ### Changed

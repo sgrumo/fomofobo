@@ -21,6 +21,7 @@ import { match } from "ts-pattern"
 
 import { CategoryChips } from "@/components/map/category-chips"
 import { DateChips } from "@/components/map/date-chips"
+import { DayPartChips } from "@/components/map/day-part-chips"
 import { EntityDetailSheet } from "@/components/map/entity-detail-sheet"
 import { EventMap } from "@/components/map/event-map"
 import { EventPreview } from "@/components/map/event-preview"
@@ -114,6 +115,7 @@ const MapScreen = () => {
         date: query.date ?? "default",
         from: query.from,
         to: query.to,
+        dayParts: query.dayParts,
     }
     const searchOptions = api.searchOccurrencesQuery({ params: {}, query: searchQuery })
     const {
@@ -412,6 +414,7 @@ const MapScreen = () => {
                             />
                             <View className="h-0.5 bg-line" />
                             <DateChips query={query} now={now} onChange={setQuery} />
+                            <DayPartChips selected={query.dayParts} onChange={setQuery} />
                         </View>
                     </PixelPanel>
                 )}

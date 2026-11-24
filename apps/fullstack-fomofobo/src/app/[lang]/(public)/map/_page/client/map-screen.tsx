@@ -69,6 +69,7 @@ import { playSound } from "@/lib/sounds/play-sound"
 
 import { CategoryChips } from "./category-chips"
 import { DateChips } from "./date-chips"
+import { DayPartChips } from "./day-part-chips"
 import { KindChips } from "./kind-chips"
 import { MapCredit } from "./map-credit"
 import { PlaceSearch } from "./place-search"
@@ -179,6 +180,7 @@ export const MapScreen = (props: MapScreenProps) => {
                 date: query.date ?? "default",
                 from: query.from,
                 to: query.to,
+                dayParts: query.dayParts,
             },
         }),
         enabled: searchReady,
@@ -599,6 +601,12 @@ export const MapScreen = (props: MapScreenProps) => {
                 route={props.route}
                 query={query}
                 now={now}
+                onChange={applyFilter}
+                className="flex-wrap justify-center"
+            />
+            <DayPartChips
+                route={props.route}
+                selected={query.dayParts}
                 onChange={applyFilter}
                 className="flex-wrap justify-center"
             />

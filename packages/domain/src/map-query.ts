@@ -1,4 +1,9 @@
-import { dateFilterKindSchema, localDateSchema, MAX_SEARCH_CATEGORIES } from "models"
+import {
+    dateFilterKindSchema,
+    dayPartSchema,
+    localDateSchema,
+    MAX_SEARCH_CATEGORIES,
+} from "models"
 import { z } from "zod"
 
 /**
@@ -31,6 +36,13 @@ export const mapQuerySchema = z.object({
     date: dateFilterKindSchema.optional().catch(undefined),
     from: localDateSchema.optional().catch(undefined),
     to: localDateSchema.optional().catch(undefined),
+    dayParts: z
+        .codec(z.string(), z.array(z.string()).pipe(z.array(dayPartSchema).min(1)), {
+            decode: value => value.split(","),
+            encode: parts => parts.join(","),
+        })
+        .optional()
+        .catch(undefined),
     showLive: z.stringbool().optional().catch(undefined),
     showUpcoming: z.stringbool().optional().catch(undefined),
     showPermanent: z.stringbool().optional().catch(undefined),

@@ -134,7 +134,13 @@
         "RangeTitle": "Scegli le date",
         "RangeStart": "Tocca il primo giorno",
         "RangeEnd": "Tocca l'ultimo giorno",
-        "Clear": "Cancella"
+        "Clear": "Cancella",
+        "DayParts": "Fasce orarie",
+        "DayPart": {
+            "morning": "Mattina",
+            "afternoon": "Pomeriggio",
+            "evening": "Sera"
+        }
     },
     "Preview": {
         "Title": "Evento",

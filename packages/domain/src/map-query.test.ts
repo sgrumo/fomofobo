@@ -44,6 +44,15 @@ describe("mapQuerySchema", () => {
         })
     })
 
+    it("decodes the pressed day parts of a comma list, and drops a malformed list", () => {
+        expect(mapQuerySchema.parse({ dayParts: "morning,evening" })).toStrictEqual({
+            dayParts: ["morning", "evening"],
+        })
+        expect(mapQuerySchema.parse({ dayParts: "morning,night" })).toStrictEqual({
+            dayParts: undefined,
+        })
+    })
+
     it("encodes back to the strings it decodes", () => {
         const encoded = z.encode(mapQuerySchema, { lat: 44.353, lng: 11.715, free: true })
 

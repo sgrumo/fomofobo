@@ -72,7 +72,13 @@
         "Range": "Date…",
         "RangeTitle": "Scegli le date",
         "Apply": "Applica",
-        "Clear": "Cancella"
+        "Clear": "Cancella",
+        "DayParts": "Fasce orarie",
+        "DayPart": {
+            "morning": "Mattina",
+            "afternoon": "Pomeriggio",
+            "evening": "Sera"
+        }
     },
     "Status": {
         "live": "In corso",

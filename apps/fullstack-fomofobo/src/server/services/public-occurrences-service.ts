@@ -20,7 +20,11 @@ import type {
     StoredPermanentVenue,
 } from "storage"
 
-import { dateWindow, NIGHT_START_GRACE_MS } from "@/lib/events/date-window"
+import {
+    dateWindow,
+    dayPartWindows,
+    NIGHT_START_GRACE_MS,
+} from "@/lib/events/date-window"
 import { MAX_PERMANENT_VENUE_RESULTS, MAX_SEARCH_RESULTS } from "@/lib/platform/platform"
 
 import { eventTag, PUBLIC_TAG } from "../cache"
@@ -76,7 +80,7 @@ export class PublicOccurrencesService {
 
     /**
      * @description Fetches the visible occurrences of the box and the date window, live first, the permanent venues of the box, and the counts per category
-     * @param query Box, text, categories and date filter
+     * @param query Box, text, categories, date filter and day parts
      * @param now Instant that sets today, the status order and the occurrences ended too long ago
      */
     public async search(
@@ -93,14 +97,25 @@ export class PublicOccurrencesService {
         }
 
         const window = dateWindow(query, now, PLATFORM_TIME_ZONE)
+        const partWindows =
+            query.dayParts === undefined
+                ? undefined
+                : dayPartWindows(window, query.dayParts, PLATFORM_TIME_ZONE)
         const endedVisibleSince = await this.settings.endedVisibleSince(now)
         const result = await this.occurrencesStorage.search({
             window: {
                 from: new Date(
                     Math.max(window.from.getTime(), endedVisibleSince.getTime()),
                 ),
-                to: new Date(window.to.getTime() + NIGHT_START_GRACE_MS),
+                // The evening of the last day runs past the grace of the window
+                to: new Date(
+                    Math.max(
+                        window.to.getTime() + NIGHT_START_GRACE_MS,
+                        partWindows?.at(-1)?.to.getTime() ?? 0,
+                    ),
+                ),
             },
+            dayPartWindows: partWindows,
             box: {
                 minLatitude: query.south,
                 maxLatitude: query.north,

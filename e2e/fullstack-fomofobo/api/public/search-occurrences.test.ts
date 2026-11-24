@@ -427,6 +427,61 @@ describe("GET /api/public/occurrences", () => {
         ).toStrictEqual(new Set([party.id, late.id]))
     })
 
+    it("keeps the occurrences that run in a chosen day part, the evening to 06:00 of the next day, and counts them", async () => {
+        const { headers } = await signInAs("organizer")
+        const { categoryId, venue, venueId } = await seedEventReferences()
+        const [morning, afternoon, night] = await Promise.all([
+            seedEvent(
+                headers,
+                { venueId, categoryId },
+                { startsAt: "2026-10-25T09:00", endsAt: "2026-10-25T11:00" },
+            ),
+            seedEvent(
+                headers,
+                { venueId, categoryId },
+                { startsAt: "2026-10-25T15:00", endsAt: "2026-10-25T17:00" },
+            ),
+            seedEvent(
+                headers,
+                { venueId, categoryId },
+                { startsAt: "2026-10-26T03:00", endsAt: "2026-10-26T05:00" },
+            ),
+            seedEvent(
+                headers,
+                { venueId, categoryId },
+                { startsAt: "2026-10-25T04:00", endsAt: "2026-10-25T05:30" },
+            ),
+        ])
+
+        const evening = await searchOccurrences({
+            headers: { "x-test-now": SATURDAY_NOON },
+            queryParams: {
+                ...boxAround(venue.coordinates),
+                date: "tomorrow",
+                dayParts: ["evening"],
+            },
+        })
+        const daytime = await searchOccurrences({
+            headers: { "x-test-now": SATURDAY_NOON },
+            queryParams: {
+                ...boxAround(venue.coordinates),
+                date: "tomorrow",
+                dayParts: ["morning", "afternoon"],
+            },
+        })
+
+        expectStatus(evening, 200)
+        expectStatus(daytime, 200)
+        expect([
+            evening.data.occurrences.map(occurrence => occurrence.eventId),
+            evening.data.categoryCounts,
+        ]).toStrictEqual([[night.id], [{ categoryId, count: 1 }]])
+        expect([
+            daytime.data.occurrences.map(occurrence => occurrence.eventId),
+            daytime.data.categoryCounts,
+        ]).toStrictEqual([[morning.id, afternoon.id], [{ categoryId, count: 2 }]])
+    })
+
     it("hides an occurrence ended today once an Admin saved zero retention days", async () => {
         const { headers } = await signInAs("organizer")
         const admin = await signInAs("admin")
