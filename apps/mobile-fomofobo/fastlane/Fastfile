@@ -280,8 +280,11 @@ def apply_manual_signing(bundle_id, profile_name)
 end
 
 # Takes the id rather than resolving it: this runs from an `ensure`, where a raise would
-# replace the failure that sent the lane here.
+# replace the failure that sent the lane here. A project that is gone, cleared by a prebuild
+# that ran during the build, has no signing to restore.
 def restore_automatic_signing(bundle_id)
+  return unless File.exist?(XCODEPROJ)
+
   update_code_signing_settings(
     path: XCODEPROJ,
     use_automatic_signing: true,

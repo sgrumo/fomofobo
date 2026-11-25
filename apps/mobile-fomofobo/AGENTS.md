@@ -101,6 +101,7 @@ lane, never the app on first launch.
 
 - The app imports `appEnvValues` from `config/target.ts`, so that file **MUST NOT** import a Node module
 - Metro and Babel configs **MUST** stay `.cjs` - neither tool supports TS configs
+- **NEVER** name a script `pre<name>` or `post<name>`: pnpm runs it around `<name>`. A `prebuild` script runs `expo prebuild` on every `pnpm -r build`, the checklist included, and clears `ios/` and `android/` under a running native build. `native` runs `expo prebuild`
 - **NEVER** add `react-native-reanimated/plugin` to babel - Reanimated v4 includes it internally
 
 ## i18n
@@ -116,7 +117,7 @@ lane, never the app on first launch.
 - Keys are PascalCase. A key for a list value uses the value: ``t(`Fruits.${value}`)``
 - Keep the value in state, not the label. Get the label with `t()` at render
 - The root `ErrorBoundary` in `src/app/_layout.tsx` holds the only copy in code, for an error before the i18n init completes. Keep it the same as `shared:AppError`
-- After you add a language to `languageKeys` of the `i18n` package, run `prebuild:clean`. iOS reads the app languages from the `expo-localization` plugin in `app.config.ts`
+- After you add a language to `languageKeys` of the `i18n` package, run `native:clean`. iOS reads the app languages from the `expo-localization` plugin in `app.config.ts`
 - **NEVER** declare an Android per-app language (`supportedLocales.android`). It adds a language setting to the system settings of the app
 
 ## TanStack Query
