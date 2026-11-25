@@ -13,7 +13,7 @@ import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persi
 import { QueryClient } from "@tanstack/react-query"
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client"
 import type { PersistQueryClientProviderProps } from "@tanstack/react-query-persist-client"
-import { nativeApplicationVersion } from "expo-application"
+import { nativeApplicationVersion, nativeBuildVersion } from "expo-application"
 import type { ErrorBoundaryProps } from "expo-router"
 import { Stack } from "expo-router"
 import { hideAsync, preventAutoHideAsync } from "expo-splash-screen"
@@ -48,14 +48,15 @@ const queryClient = new QueryClient({
     defaultOptions: { queries: { gcTime: PERSISTED_CACHE_MAX_AGE_MS } },
 })
 
-// A new app version drops the persisted cache, since its response shapes can differ.
+// A new build drops the persisted cache, since its response shapes can differ. TestFlight builds
+// share one version, so the build number joins it.
 const persistOptions: PersistQueryClientProviderProps["persistOptions"] = {
     persister: createAsyncStoragePersister({
         storage: AsyncStorage,
         key: QUERY_CACHE_STORAGE_KEY,
     }),
     maxAge: PERSISTED_CACHE_MAX_AGE_MS,
-    buster: nativeApplicationVersion ?? "",
+    buster: `${nativeApplicationVersion ?? ""}+${nativeBuildVersion ?? ""}`,
     dehydrateOptions: {
         shouldDehydrateQuery: query => isPersistedQuery(query, Date.now()),
     },
