@@ -6,6 +6,7 @@ import { occurrenceStatus } from "domain/occurrence-status"
 import { venuePhotoToneOf } from "domain/photo-tone"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { venueShareTextOf } from "domain/share-summary"
+import { venueUsefulLinksOf } from "domain/useful-links"
 import { historyDatesOf, VENUE_HISTORY_PAGE_SIZE } from "domain/venue-history"
 import type {
     OccurrenceRef,
@@ -24,9 +25,6 @@ import {
     PixelIconBack,
     PixelIconClose,
     PixelIconDirections,
-    PixelIconFacebook,
-    PixelIconInstagram,
-    PixelIconLink,
 } from "ui-components/pixel-icons"
 import { Spinner } from "ui-components/spinner"
 
@@ -35,6 +33,7 @@ import { detailActionClassName } from "@/components/client/detail-action-bar/det
 import { DirectionsLink } from "@/components/client/directions-link/directions-link"
 import { ShareMenu } from "@/components/client/share-menu/share-menu"
 import { TonedImage } from "@/components/client/toned-image/toned-image"
+import { UsefulLinks } from "@/components/client/useful-links/useful-links"
 import { api } from "@/lib/api/client-api"
 import { useClosingText } from "@/lib/hooks/use-closing-text"
 
@@ -91,23 +90,9 @@ export const VenueDetail = (props: VenueDetailProps) => {
 
     const permanent = venue.kind !== "regular"
     // The programme link of a permanent venue leads to its website
-    const links = [
-        {
-            url: permanent ? null : venue.links.websiteUrl,
-            label: t("Venue.Website"),
-            icon: <PixelIconLink />,
-        },
-        {
-            url: venue.links.instagramUrl,
-            label: t("Detail.Instagram"),
-            icon: <PixelIconInstagram />,
-        },
-        {
-            url: venue.links.facebookUrl,
-            label: t("Detail.Facebook"),
-            icon: <PixelIconFacebook />,
-        },
-    ]
+    const links = venueUsefulLinksOf(
+        permanent ? { ...venue.links, websiteUrl: null } : venue.links,
+    )
 
     return (
         <article ref={articleRef} className="flex flex-col gap-5">
@@ -141,31 +126,16 @@ export const VenueDetail = (props: VenueDetailProps) => {
                     <p className="tp-body-lg">{venue.description}</p>
                 )}
             </div>
-            <div className="flex flex-wrap gap-3 empty:hidden">
-                {permanent ? undefined : (
-                    <DirectionsLink
-                        coordinates={venue.coordinates}
-                        className={`${linkClassName} bg-surface-inverse text-fg-inverse`}
-                    >
-                        <PixelIconDirections />
-                        {t("Detail.Directions")}
-                    </DirectionsLink>
-                )}
-                {links.map(link =>
-                    link.url === null ? undefined : (
-                        <a
-                            key={link.label}
-                            href={link.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className={`${linkClassName} bg-social text-fg`}
-                        >
-                            {link.icon}
-                            {link.label}
-                        </a>
-                    ),
-                )}
-            </div>
+            {permanent ? undefined : (
+                <DirectionsLink
+                    coordinates={venue.coordinates}
+                    className={`${linkClassName} bg-surface-inverse text-fg-inverse self-start`}
+                >
+                    <PixelIconDirections />
+                    {t("Detail.Directions")}
+                </DirectionsLink>
+            )}
+            <UsefulLinks links={links} />
             <section aria-label={t("Venue.Upcoming")} className="flex flex-col gap-3">
                 <h2 className="tp-pixel-md uppercase">{t("Venue.Upcoming")}</h2>
                 {venue.upcoming.length === 0 ? (

@@ -4,7 +4,7 @@ import { eventExternalLinksSchema, eventPhotoSchema, eventSchema } from "./event
 import { MAX_LOOKUP_REFS } from "./lib/limits"
 import { instantSchema, localDateSchema } from "./lib/local-time"
 import { queryArraySchema } from "./lib/query-array"
-import { venueSchema } from "./venues"
+import { venueLinksSchema, venueSchema } from "./venues"
 
 export const occurrenceStatusSchema = z.enum(["upcoming", "live", "ended"])
 export type OccurrenceStatus = z.infer<typeof occurrenceStatusSchema>
@@ -35,13 +35,15 @@ export const occurrenceSummarySchema = occurrenceRefSchema.extend({
 export type OccurrenceSummary = z.infer<typeof occurrenceSummarySchema>
 
 export const occurrenceDetailSchema = occurrenceSummarySchema.extend({
-    venue: venueSchema.pick({
-        id: true,
-        name: true,
-        address: true,
-        coordinates: true,
-        isBlocked: true,
-    }),
+    venue: venueSchema
+        .pick({ id: true, name: true, address: true, coordinates: true, isBlocked: true })
+        .extend({
+            links: venueLinksSchema.default({
+                websiteUrl: null,
+                instagramUrl: null,
+                facebookUrl: null,
+            }),
+        }),
     photos: z.array(eventPhotoSchema),
     coverNaturalUrl: z.url().nullable().default(null),
     externalLinks: eventExternalLinksSchema,

@@ -1488,6 +1488,20 @@ test.describe("detail over the map", () => {
         page,
     }) => {
         const venue = await seedVenue(buildArea())
+        const venueLinks = {
+            websiteUrl: `https://www.venue-${crypto.randomUUID()}.it`,
+            instagramUrl: "https://www.instagram.com/venue",
+            facebookUrl: "https://www.facebook.com/venue",
+        }
+        const admin = await signInAs("admin")
+        expectStatus(
+            await updateVenue({
+                headers: admin.headers,
+                pathParams: { id: venue.id },
+                body: { links: venueLinks },
+            }),
+            200,
+        )
         const reducedLabel = `Under 18 ${crypto.randomUUID().slice(0, 8)}`
         const membershipName = `Tessera ${crypto.randomUUID()}`
         const event = await seedPublicEvent(
@@ -1527,9 +1541,21 @@ test.describe("detail over the map", () => {
         await expect(prices).toContainText(reducedLabel)
         await expect(prices).toContainText(membershipName)
         await expect(prices).toContainText(t("shared", "Price.MinimumAge", { age: 16 }))
+        // The Instagram link of the event takes the place of the venue one
+        const usefulLinks = detail.getByRole("region", {
+            name: t("shared", "Detail.UsefulLinks"),
+        })
         await expect(
-            detail.getByRole("link", { name: t("shared", "Detail.Instagram") }),
+            usefulLinks.getByRole("link", { name: t("shared", "Detail.Links.website") }),
+        ).toHaveAttribute("href", venueLinks.websiteUrl)
+        await expect(
+            usefulLinks.getByRole("link", {
+                name: t("shared", "Detail.Links.instagram"),
+            }),
         ).toHaveAttribute("href", "https://www.instagram.com/fomofobo")
+        await expect(
+            usefulLinks.getByRole("link", { name: t("shared", "Detail.Links.facebook") }),
+        ).toHaveAttribute("href", venueLinks.facebookUrl)
         await expect(
             detail.getByRole("link", { name: t("shared", "Detail.Directions") }),
         ).toHaveAttribute(
@@ -1809,7 +1835,7 @@ test.describe("detail over the map", () => {
         await expect(detail.getByText(venue.address)).toBeVisible()
         await expect(detail.getByText(description)).toBeVisible()
         await expect(
-            detail.getByRole("link", { name: t("shared", "Venue.Website") }),
+            detail.getByRole("link", { name: t("shared", "Detail.Links.website") }),
         ).toHaveAttribute("href", websiteUrl)
         await expect(
             detail.getByRole("link", { name: t("shared", "Detail.Directions") }),

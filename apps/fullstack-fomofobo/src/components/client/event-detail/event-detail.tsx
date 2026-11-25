@@ -8,18 +8,14 @@ import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { priceDetailRows } from "domain/price-details"
 import { formatEuroCents } from "domain/price-summary"
 import { occurrenceShareTextOf } from "domain/share-summary"
+import { eventUsefulLinksOf } from "domain/useful-links"
 import type { OccurrenceDetail, PriceScheme } from "models"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
 import { match } from "ts-pattern"
 import { Badge } from "ui-components/badge"
 import { IconButton } from "ui-components/icon-button"
-import {
-    PixelIconClose,
-    PixelIconDirections,
-    PixelIconFacebook,
-    PixelIconInstagram,
-} from "ui-components/pixel-icons"
+import { PixelIconClose, PixelIconDirections } from "ui-components/pixel-icons"
 import { StatGrid } from "ui-components/stat-grid"
 import { Timeline } from "ui-components/timeline"
 
@@ -29,6 +25,7 @@ import { DirectionsLink } from "@/components/client/directions-link/directions-l
 import { PhotoGallery } from "@/components/client/photo-gallery/photo-gallery"
 import { SaveToggle } from "@/components/client/save-toggle/save-toggle"
 import { ShareMenu } from "@/components/client/share-menu/share-menu"
+import { UsefulLinks } from "@/components/client/useful-links/useful-links"
 import { usePriceSummary } from "@/lib/hooks/use-price-summary"
 
 interface EventDetailProps {
@@ -145,6 +142,12 @@ export const EventDetail = (props: EventDetailProps) => {
                 )}
                 <p className="tp-body-md text-fg-muted">{occurrence.venue.address}</p>
             </section>
+            <UsefulLinks
+                links={eventUsefulLinksOf(
+                    occurrence.externalLinks,
+                    occurrence.venue.links,
+                )}
+            />
             <DetailActionBar label={t("Detail.Actions")}>
                 <DirectionsLink
                     coordinates={occurrence.venue.coordinates}
@@ -153,28 +156,6 @@ export const EventDetail = (props: EventDetailProps) => {
                     <PixelIconDirections />
                     {t("Detail.Directions")}
                 </DirectionsLink>
-                {occurrence.externalLinks.instagramUrl === null ? undefined : (
-                    <a
-                        href={occurrence.externalLinks.instagramUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={`${detailActionClassName} bg-social text-fg`}
-                    >
-                        <PixelIconInstagram />
-                        {t("Detail.Instagram")}
-                    </a>
-                )}
-                {occurrence.externalLinks.facebookUrl === null ? undefined : (
-                    <a
-                        href={occurrence.externalLinks.facebookUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={`${detailActionClassName} bg-social text-fg`}
-                    >
-                        <PixelIconFacebook />
-                        {t("Detail.Facebook")}
-                    </a>
-                )}
             </DetailActionBar>
         </article>
     )

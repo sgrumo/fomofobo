@@ -48,6 +48,7 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
                 address: venue.address,
                 coordinates: venue.coordinates,
                 isBlocked: false,
+                links: venue.links,
             },
             categoryIds: [categoryId],
             primaryCategoryId: categoryId,
@@ -265,10 +266,55 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
         expectApiError(expired, 404, { code: "OccurrenceNotFound" })
     })
 
-    it("keeps the occurrence of a blocked venue and flags the venue", async () => {
+    it("answers the links of the venue beside the links of the event", async () => {
         const { headers } = await signInAs("organizer")
         const admin = await signInAs("admin")
         const { categoryId, venueId } = await seedEventReferences()
+        const links = {
+            websiteUrl: `https://www.venue-${crypto.randomUUID()}.it`,
+            instagramUrl: "https://www.instagram.com/venue",
+            facebookUrl: "https://www.facebook.com/venue",
+        }
+        expectStatus(
+            await updateVenue({
+                headers: admin.headers,
+                pathParams: { id: venueId },
+                body: { links },
+            }),
+            200,
+        )
+        const event = await seedEvent(headers, { venueId, categoryId })
+
+        const res = await getOccurrence({
+            headers: { "x-test-now": SATURDAY_NOON },
+            pathParams: { eventId: event.id, date: "2026-10-24" },
+        })
+
+        expectStatus(res, 200)
+        expect(res.data).toMatchObject({
+            venue: { id: venueId, links },
+            externalLinks: event.externalLinks,
+        })
+    })
+
+    it("keeps the occurrence of a blocked venue and flags the venue, with no venue links", async () => {
+        const { headers } = await signInAs("organizer")
+        const admin = await signInAs("admin")
+        const { categoryId, venueId } = await seedEventReferences()
+        expectStatus(
+            await updateVenue({
+                headers: admin.headers,
+                pathParams: { id: venueId },
+                body: {
+                    links: {
+                        websiteUrl: "https://www.blocked-venue.it",
+                        instagramUrl: null,
+                        facebookUrl: null,
+                    },
+                },
+            }),
+            200,
+        )
         const event = await seedEvent(headers, { venueId, categoryId })
         expectStatus(
             await blockVenue({
@@ -285,7 +331,11 @@ describe("GET /api/public/occurrences/{eventId}/{date}", () => {
         })
 
         expectStatus(res, 200)
-        expect(res.data.venue).toMatchObject({ id: venueId, isBlocked: true })
+        expect(res.data.venue).toMatchObject({
+            id: venueId,
+            isBlocked: true,
+            links: { websiteUrl: null, instagramUrl: null, facebookUrl: null },
+        })
     })
 
     it("answers 404 on the next request once an Admin blocks the event", async () => {

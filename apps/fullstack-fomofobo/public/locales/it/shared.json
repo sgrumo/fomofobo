@@ -184,8 +184,12 @@
             "Notes": "Note"
         },
         "Venue": "Luogo",
-        "Instagram": "Instagram",
-        "Facebook": "Facebook",
+        "UsefulLinks": "Link utili",
+        "Links": {
+            "website": "Sito",
+            "instagram": "Instagram",
+            "facebook": "Facebook"
+        },
         "ShareOn": {
             "whatsapp": "Condividi su WhatsApp",
             "telegram": "Condividi su Telegram",
@@ -212,7 +216,6 @@
         "AlwaysOpen": "Nessun giorno di chiusura",
         "ClosedOn": "Chiuso {{days}}",
         "Cover": "Foto di {{name}}",
-        "Website": "Sito web",
         "Upcoming": "Prossimi eventi",
         "NoUpcoming": "Nessun evento in programma.",
         "History": "Eventi precedenti",

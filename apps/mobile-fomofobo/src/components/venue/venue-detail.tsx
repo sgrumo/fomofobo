@@ -1,7 +1,7 @@
 import { venueDetailUrlOf } from "domain/detail-urls"
 import { venuePhotoToneOf } from "domain/photo-tone"
-import type { PixelIconName } from "domain/pixel-icons"
 import { venueShareTextOf } from "domain/share-summary"
+import { venueUsefulLinksOf } from "domain/useful-links"
 import type { OccurrenceRef, PublicVenue } from "models"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
@@ -9,6 +9,7 @@ import { Linking, View } from "react-native"
 
 import { DirectionsButton } from "@/components/links/directions-button"
 import { ShareMenu } from "@/components/links/share-menu"
+import { UsefulLinks } from "@/components/links/useful-links"
 import { Badge } from "@/components/ui/badge/badge"
 import { Button } from "@/components/ui/button/button"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
@@ -18,33 +19,6 @@ import { VenueHistory } from "@/components/venue/venue-history"
 import { VenueUpcoming } from "@/components/venue/venue-upcoming"
 import { env } from "@/lib/env"
 import { useClosingText } from "@/lib/hooks/use-closing-text"
-
-interface VenueLinkButtonProps {
-    url: string
-    label: string
-    icon: PixelIconName
-}
-
-const VenueLinkButton = (props: VenueLinkButtonProps) => (
-    <Button
-        variant="accent"
-        size="sm"
-        icon={props.icon}
-        accessibilityRole="link"
-        accessibilityLabel={props.label}
-        onPress={() => {
-            void Linking.openURL(props.url)
-        }}
-    >
-        <Text>{props.label}</Text>
-    </Button>
-)
-
-interface VenueLink {
-    url: string | null
-    label: string
-    icon: PixelIconName
-}
 
 interface VenueDetailProps {
     venue: PublicVenue
@@ -59,25 +33,9 @@ export const VenueDetail = (props: VenueDetailProps) => {
     const permanent = venue.kind !== "regular"
     const closingText = useClosingText()(venue)
     // The programme link of a permanent venue leads to its website
-    const links = (
-        [
-            {
-                url: permanent ? null : venue.links.websiteUrl,
-                label: t("Venue.Website"),
-                icon: "link",
-            },
-            {
-                url: venue.links.instagramUrl,
-                label: t("Detail.Instagram"),
-                icon: "instagram",
-            },
-            {
-                url: venue.links.facebookUrl,
-                label: t("Detail.Facebook"),
-                icon: "facebook",
-            },
-        ] satisfies VenueLink[]
-    ).flatMap(link => (link.url === null ? [] : [{ ...link, url: link.url }]))
+    const links = venueUsefulLinksOf(
+        permanent ? { ...venue.links, websiteUrl: null } : venue.links,
+    )
 
     return (
         <>
@@ -126,19 +84,13 @@ export const VenueDetail = (props: VenueDetailProps) => {
                     <Text variant="body-lg">{venue.description}</Text>
                 )}
             </View>
-            {(!permanent || links.length > 0) && (
-                <View className="flex-row flex-wrap gap-3">
-                    {!permanent && <DirectionsButton coordinates={venue.coordinates} />}
-                    {links.map(link => (
-                        <VenueLinkButton
-                            key={link.icon}
-                            url={link.url}
-                            label={link.label}
-                            icon={link.icon}
-                        />
-                    ))}
-                </View>
+            {!permanent && (
+                <DirectionsButton
+                    coordinates={venue.coordinates}
+                    className="self-start"
+                />
             )}
+            <UsefulLinks links={links} />
             <VenueUpcoming upcoming={venue.upcoming} onOpenEvent={props.onOpenEvent} />
             {!permanent && <VenueHistory venueId={venue.id} />}
         </>

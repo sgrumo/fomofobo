@@ -5,19 +5,20 @@ import { occurrenceProgress } from "domain/occurrence-progress"
 import { occurrenceStatus } from "domain/occurrence-status"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
 import { occurrenceShareTextOf } from "domain/share-summary"
+import { eventUsefulLinksOf } from "domain/useful-links"
 import type { OccurrenceDetail } from "models"
 import { useLanguage } from "react-i18n/hooks"
 import { useTranslation } from "react-i18next"
-import { Linking, View } from "react-native"
+import { View } from "react-native"
 import { match } from "ts-pattern"
 
 import { PhotoGallery } from "@/components/event/photo-gallery"
 import { PriceDetails } from "@/components/event/price-details"
 import { DirectionsButton } from "@/components/links/directions-button"
 import { ShareMenu } from "@/components/links/share-menu"
+import { UsefulLinks } from "@/components/links/useful-links"
 import { SaveToggle } from "@/components/saves/save-toggle"
 import { Badge } from "@/components/ui/badge/badge"
-import { Button } from "@/components/ui/button/button"
 import { IconButton } from "@/components/ui/icon-button/icon-button"
 import { StatGrid } from "@/components/ui/stat-grid/stat-grid"
 import { Text } from "@/components/ui/text/text"
@@ -157,6 +158,12 @@ export const EventDetail = (props: EventDetailProps) => {
                     {occurrence.venue.address}
                 </Text>
             </View>
+            <UsefulLinks
+                links={eventUsefulLinksOf(
+                    occurrence.externalLinks,
+                    occurrence.venue.links,
+                )}
+            />
         </>
     )
 }
@@ -167,7 +174,6 @@ interface EventDetailActionsProps {
 
 export const EventDetailActions = (props: EventDetailActionsProps) => {
     const { t } = useTranslation("shared")
-    const { instagramUrl, facebookUrl } = props.occurrence.externalLinks
 
     return (
         <View
@@ -178,36 +184,6 @@ export const EventDetailActions = (props: EventDetailActionsProps) => {
                 coordinates={props.occurrence.venue.coordinates}
                 className="grow"
             />
-            {instagramUrl !== null && (
-                <Button
-                    variant="accent"
-                    size="sm"
-                    icon="instagram"
-                    accessibilityRole="link"
-                    accessibilityLabel={t("Detail.Instagram")}
-                    className="grow"
-                    onPress={() => {
-                        void Linking.openURL(instagramUrl)
-                    }}
-                >
-                    <Text>{t("Detail.Instagram")}</Text>
-                </Button>
-            )}
-            {facebookUrl !== null && (
-                <Button
-                    variant="accent"
-                    size="sm"
-                    icon="facebook"
-                    accessibilityRole="link"
-                    accessibilityLabel={t("Detail.Facebook")}
-                    className="grow"
-                    onPress={() => {
-                        void Linking.openURL(facebookUrl)
-                    }}
-                >
-                    <Text>{t("Detail.Facebook")}</Text>
-                </Button>
-            )}
         </View>
     )
 }

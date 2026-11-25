@@ -24,6 +24,7 @@ import type {
     SearchSuggestions,
     VenueHistoryItem,
     VenueHistoryQuery,
+    VenueLinks,
 } from "models"
 import type { StrictOmit } from "shared/types"
 
@@ -128,6 +129,7 @@ export type StoredPermanentVenue = StrictOmit<PermanentVenueSummary, "coverPhoto
 
 export interface StoredOccurrenceDetail extends StoredOccurrenceSummary {
     venueAddress: string
+    venueLinks: VenueLinks
     photos: StoredEventPhoto[]
     naturalFallback: {
         venueCoverOriginalObjectKey: string | null
@@ -431,6 +433,9 @@ export class PublicOccurrencesStorage {
                 .select({
                     ...summaryColumns,
                     venueAddress: venues.address,
+                    venueWebsiteUrl: venues.websiteUrl,
+                    venueInstagramUrl: venues.instagramUrl,
+                    venueFacebookUrl: venues.facebookUrl,
                     venueCoverOriginalObjectKey: venues.coverOriginalObjectKey,
                     categoryImageOriginalObjectKey: sql<
                         string | null
@@ -455,6 +460,11 @@ export class PublicOccurrencesStorage {
             ? {
                   ...toSummary(row),
                   venueAddress: row.venueAddress,
+                  venueLinks: {
+                      websiteUrl: row.venueWebsiteUrl,
+                      instagramUrl: row.venueInstagramUrl,
+                      facebookUrl: row.venueFacebookUrl,
+                  },
                   photos: photoRows.map(photo => ({
                       id: photo.id,
                       objectKey: photo.objectKey,

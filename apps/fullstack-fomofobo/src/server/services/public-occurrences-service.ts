@@ -154,7 +154,18 @@ export class PublicOccurrencesService {
                     ? null
                     : {
                           ...this.baseSummaryOf(stored),
-                          venue: { ...stored.venue, address: stored.venueAddress },
+                          venue: {
+                              ...stored.venue,
+                              address: stored.venueAddress,
+                              // A blocked venue loses its public links with its detail
+                              links: stored.venue.isBlocked
+                                  ? {
+                                        websiteUrl: null,
+                                        instagramUrl: null,
+                                        facebookUrl: null,
+                                    }
+                                  : stored.venueLinks,
+                          },
                           photos: stored.photos.map(photo => ({
                               id: photo.id,
                               url: photoUrl(this.photosPublicBaseUrl, photo.objectKey),
@@ -166,7 +177,7 @@ export class PublicOccurrencesService {
                           capacity: stored.capacity,
                       }
             },
-            ["occurrence-detail-v4", ref.eventId, ref.date],
+            ["occurrence-detail-v5", ref.eventId, ref.date],
             { tags: [PUBLIC_TAG, eventTag(ref.eventId)] },
         )()
         const endedVisibleSince = await this.settings.endedVisibleSince(now)
