@@ -2,7 +2,13 @@ import "server-only"
 import type { McpServer } from "@modelcontextprotocol/server"
 import { BackofficeEventsRoutes, BackofficeVenuesRoutes } from "api-routes"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
-import { eventUpsertSchema, venueCreationSchema } from "models"
+import {
+    eventUpsertSchema,
+    venueCreationSchema,
+    venueLinksSchema,
+    venueSchema,
+    venueUpdateSchema,
+} from "models"
 import type { Event } from "models"
 import { z } from "zod"
 
@@ -55,6 +61,28 @@ const eventFieldsInput = z.object({
         ),
 })
 
+const venueShape = venueSchema.shape
+
+const venueChangesInput = z
+    .object({
+        name: venueShape.name.describe("Name of the venue, at most 120 characters"),
+        address: venueShape.address.describe(
+            "Address from a search_places result, sent together with its coordinates",
+        ),
+        coordinates: venueShape.coordinates.describe(
+            "Coordinates of the same search_places result as the address",
+        ),
+        description: venueShape.description.describe(
+            "Short description, at most 500 characters, or null to remove it",
+        ),
+        links: venueLinksSchema
+            .partial()
+            .describe(
+                "Website, Instagram and Facebook URLs of the venue. Each link left out keeps its value, null removes it",
+            ),
+    })
+    .partial()
+
 const savedEventSchema = z.object({
     event: BackofficeEventsRoutes.create.responses[201].content["application/json"]
         .schema,
@@ -62,6 +90,8 @@ const savedEventSchema = z.object({
 })
 const createdVenueSchema =
     BackofficeVenuesRoutes.create.responses[201].content["application/json"].schema
+const updatedVenueSchema =
+    BackofficeVenuesRoutes.update.responses[200].content["application/json"].schema
 
 const write = { readOnlyHint: false, destructiveHint: true, openWorldHint: false }
 
@@ -146,5 +176,30 @@ export const registerWriteTools = (
             runTool("create_venue", createdVenueSchema, () =>
                 services.venues.create(input, call.account),
             ),
+    )
+
+    server.registerTool(
+        "update_venue",
+        {
+            title: "Update venue",
+            description: `Changes some fields of a venue and publishes the change at once, on the venue and on every event held there. Every field left out keeps its value. Find the venue with search_venues first. ${CONFIRMATION_RULE}`,
+            inputSchema: z.object({
+                venueId: z.uuid().describe("Id of the venue, from search_venues"),
+                changes: venueChangesInput.describe("The fields that change, alone"),
+            }),
+            annotations: write,
+        },
+        ({ venueId, changes }) =>
+            runTool("update_venue", updatedVenueSchema, async () => {
+                const current = await services.venues.getById(venueId)
+                const update = parseToolInput(venueUpdateSchema, {
+                    ...changes,
+                    links:
+                        changes.links === undefined
+                            ? undefined
+                            : { ...current.links, ...changes.links },
+                })
+                return await services.venues.update(venueId, update, call.account)
+            }),
     )
 }

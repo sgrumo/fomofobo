@@ -42,6 +42,7 @@ describe("MCP tools/list", () => {
             { name: "search_places", readOnly: true, destructive: undefined },
             { name: "search_venues", readOnly: true, destructive: undefined },
             { name: "update_event", readOnly: false, destructive: true },
+            { name: "update_venue", readOnly: false, destructive: true },
         ])
     })
 })

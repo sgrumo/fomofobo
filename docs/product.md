@@ -138,7 +138,7 @@ Organizers see, create, edit and delete only their own events, and the event of 
 
 A deleted event leaves the app and the backoffice, and its photos leave the public bucket.
 
-An Admin, and no Organizer, can also add and change events and create venues from a claude.ai chat, from a flyer, a photo or a text. The chat sends no photo, so the Admin adds the photos in the backoffice, from the link that Claude gives after each write. Claude shows a summary before each write, and claude.ai asks the Admin to approve each write until the Admin picks Always allow.
+An Admin, and no Organizer, can also add and change events, create venues, and change the name, address, description and links of a venue from a claude.ai chat, from a flyer, a photo or a text. The chat sends no photo, so the Admin adds the photos in the backoffice, from the link that Claude gives after each write. Claude shows a summary before each write, and claude.ai asks the Admin to approve each write until the Admin picks Always allow.
 
 Any account can also write events and venues from Claude Code, photos included. In both channels Claude acts as that account, so the roles and the rules of the backoffice apply unchanged.
 

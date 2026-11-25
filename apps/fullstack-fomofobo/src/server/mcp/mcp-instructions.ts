@@ -18,6 +18,8 @@ To add an event from a flyer, a photo, a link or a text:
 
 To change an event: find it with list_events, read it with get_event, show what changes, wait for a clear yes, then call update_event with the changed fields alone.
 
+To change a venue, such as its links: find it with search_venues, show what changes, wait for a clear yes, then call update_venue with the changed fields alone. For a new address, take the address and its coordinates from search_places.
+
 If a tool answers an error, explain it in plain words and fix the field. If the fix changes a fact that the user approved, ask again.
 
 Photos: the chat cannot send a photo to Zonzo, so every event starts with no photo. Tell the user to add the photos on the backofficeUrl page, and do not ask for them in the chat.`
