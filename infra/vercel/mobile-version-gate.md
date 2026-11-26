@@ -28,7 +28,9 @@ With nothing set, the gate sleeps and every request gets `ok`. An absent `*_RELE
 
 A version must be full `semver`: `1.4.0` is valid and `1.4` is not. A wrong value stops the boot of the API. A build with no `APP_VERSION`, such as a local build, reports `1.0.0`.
 
-`IOS_STORE_URL` needs the numeric App Store id from App Store Connect: `https://apps.apple.com/app/id<number>`. The bundle identifier does not work. `ANDROID_STORE_URL` is `market://details?id=it.quinck.fomofobo`.
+`IOS_STORE_URL` needs the numeric App Store id from App Store Connect: `https://apps.apple.com/app/id<number>`. The bundle identifier does not work. `ANDROID_STORE_URL` is `https://play.google.com/store/apps/details?id=it.quinck.zonzo`: Android opens it in the Play Store app, and the landing page shows it to desktop browsers too, which cannot open `market://`.
+
+The landing page and the download prompt of the map read the same two `*_STORE_URL` variables: an unset value hides the store row of its platform.
 
 Set `*_MIN_VERSION` only for a change that breaks an old build. An additive change of the API needs nothing here.
 
