@@ -295,9 +295,15 @@ export const MapScreen = (props: MapScreenProps) => {
             { history: "replace" },
         )
     }
-    // A drag of the map or a zoom into a cluster closes the preview, not the detail over it
+    // A drag of the map closes the preview, not the detail over it
     const closeBarePreview = () => {
         if (previewOpen && !detailOpen) {
+            closePreview()
+        }
+    }
+    // A zoom into a cluster closes the preview and the detail over it
+    const closeOpenPreview = () => {
+        if (previewOpen) {
             closePreview()
         }
     }
@@ -642,7 +648,7 @@ export const MapScreen = (props: MapScreenProps) => {
                     setCreditOpen(false)
                 }}
                 onDragStart={closeBarePreview}
-                onClusterZoom={closeBarePreview}
+                onClusterZoom={closeOpenPreview}
                 onViewportChange={bbox => {
                     setSearchArea(area =>
                         nextSearchArea(bbox, center, area, results?.truncated === true),
