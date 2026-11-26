@@ -380,11 +380,12 @@
     }
 }
 
-/* Phone: one screen, the parts spread over the height, the card a short bar that opens over the points */
+/* Phone: one screen, the parts spread over the height, the card and its menu of one height */
 @media (max-width: 820px) {
     .landing {
-        --landing-face-height: 0px;
-        --landing-menu-height: 196px;
+        --landing-logo-size: min(34vw, 14dvh);
+        --landing-face-height: 148px;
+        --landing-menu-height: 148px;
         --landing-shadow: 6px;
 
         height: 100%;
@@ -401,13 +402,13 @@
     }
 
     .landing-logo {
-        width: min(46vw, 19dvh);
-        height: min(46vw, 19dvh);
+        width: var(--landing-logo-size);
+        height: var(--landing-logo-size);
     }
 
     .landing-wordmark {
-        margin-top: calc(min(46vw, 19dvh) * -0.09);
-        font-size: clamp(44px, 8.5dvh, 66px);
+        margin-top: calc(var(--landing-logo-size) * -0.09);
+        font-size: clamp(40px, 7dvh, 56px);
         line-height: 1;
     }
 
@@ -433,18 +434,9 @@
     }
 
     .landing-card-face {
-        height: 60px;
-        align-items: center;
-        padding: 0 20px;
-        font-size: 20px;
-        line-height: 20px;
-    }
-
-    .landing-back {
-        position: absolute;
-        top: 0;
-        right: var(--landing-shadow);
-        left: 0;
+        padding: 20px;
+        font-size: 22px;
+        line-height: 22px;
     }
 
     .landing-back-bar {
@@ -506,7 +498,7 @@
 }
 
 /* A short phone screen keeps the titles of the points and drops their text */
-@media (max-width: 820px) and (max-height: 740px) {
+@media (max-width: 820px) and (max-height: 820px) {
     .landing-point-body {
         display: none;
     }
