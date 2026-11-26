@@ -158,7 +158,7 @@ const buildApi = (): OpenAPIHono => {
     const mcpEndpoint = buildMcpEndpoint({
         auth,
         authAccounts,
-        services: { categories, events, organizers, places, venues },
+        services: { categories, events, organizers, places, settings, venues },
         resource: mcpResource,
     })
     app.all(MCP_PATH, c => mcpEndpoint(c.req.raw))

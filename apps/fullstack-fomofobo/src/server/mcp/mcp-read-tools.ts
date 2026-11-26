@@ -3,6 +3,7 @@ import type { McpServer } from "@modelcontextprotocol/server"
 import {
     BackofficeEventsRoutes,
     BackofficeOrganizersRoutes,
+    BackofficeSettingsRoutes,
     BackofficeVenuesRoutes,
     PublicRoutes,
 } from "api-routes"
@@ -25,6 +26,8 @@ const eventPageSchema =
     BackofficeEventsRoutes.list.responses[200].content["application/json"].schema
 const eventSchema =
     BackofficeEventsRoutes.getById.responses[200].content["application/json"].schema
+const settingsSchema =
+    BackofficeSettingsRoutes.get.responses[200].content["application/json"].schema
 
 const readOnly = { readOnlyHint: true, openWorldHint: false }
 
@@ -149,6 +152,17 @@ export const registerReadTools = (
                     call.account,
                 ),
             ),
+    )
+
+    server.registerTool(
+        "get_settings",
+        {
+            title: "Get settings",
+            description:
+                "Reads the platform settings: the days an ended event stays on the public map, and the count of saves from which the public app shows the count of an event.",
+            annotations: readOnly,
+        },
+        () => runTool("get_settings", settingsSchema, () => services.settings.get()),
     )
 
     server.registerTool(

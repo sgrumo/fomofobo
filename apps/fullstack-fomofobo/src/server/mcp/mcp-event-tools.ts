@@ -1,14 +1,8 @@
 import "server-only"
 import type { McpServer } from "@modelcontextprotocol/server"
-import { BackofficeEventsRoutes, BackofficeVenuesRoutes } from "api-routes"
+import { BackofficeEventsRoutes } from "api-routes"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
-import {
-    eventUpsertSchema,
-    venueCreationSchema,
-    venueLinksSchema,
-    venueSchema,
-    venueUpdateSchema,
-} from "models"
+import { eventBlockSchema, eventUpsertSchema } from "models"
 import type { Event } from "models"
 import { z } from "zod"
 
@@ -17,6 +11,12 @@ import { routes } from "@/framework/routes/routes"
 import type { McpCall, McpServices } from "./mcp-server"
 import { parseToolInput, toEventUpsert } from "./mcp-tool-input"
 import { runTool } from "./mcp-tool-result"
+import {
+    BLOCK_RULE,
+    CONFIRMATION_RULE,
+    DELETE_RULE,
+    WRITE_ANNOTATIONS,
+} from "./mcp-write-rules"
 
 const eventShape = eventUpsertSchema.shape
 
@@ -61,50 +61,32 @@ const eventFieldsInput = z.object({
         ),
 })
 
-const venueShape = venueSchema.shape
-
-const venueChangesInput = z
-    .object({
-        name: venueShape.name.describe("Name of the venue, at most 120 characters"),
-        address: venueShape.address.describe(
-            "Address from a search_places result, sent together with its coordinates",
+const eventChangesInput = eventFieldsInput
+    .extend({
+        photoKeys: eventShape.photoKeys.describe(
+            "Keys of the photos of the event, from get_event, in their new order: the first is the cover. Leave a key out to remove that photo. A key that get_event does not list fails",
         ),
-        coordinates: venueShape.coordinates.describe(
-            "Coordinates of the same search_places result as the address",
-        ),
-        description: venueShape.description.describe(
-            "Short description, at most 500 characters, or null to remove it",
-        ),
-        links: venueLinksSchema
-            .partial()
-            .describe(
-                "Website, Instagram and Facebook URLs of the venue. Each link left out keeps its value, null removes it",
-            ),
     })
     .partial()
+
+const eventIdInput = z.uuid().describe("Id of the event, from list_events")
 
 const savedEventSchema = z.object({
     event: BackofficeEventsRoutes.create.responses[201].content["application/json"]
         .schema,
     backofficeUrl: z.url(),
 })
-const createdVenueSchema =
-    BackofficeVenuesRoutes.create.responses[201].content["application/json"].schema
-const updatedVenueSchema =
-    BackofficeVenuesRoutes.update.responses[200].content["application/json"].schema
-
-const write = { readOnlyHint: false, destructiveHint: true, openWorldHint: false }
-
-const CONFIRMATION_RULE =
-    "Before you call it, show the user every field you will send, in plain words with names in place of ids, and wait for a clear yes. Never invent a value that the source does not give: ask."
+const eventSchema =
+    BackofficeEventsRoutes.block.responses[200].content["application/json"].schema
+const deletedEventSchema = z.object({ deletedEventId: z.uuid() })
 
 /**
- * @description Registers the tools that write events and venues on the server
+ * @description Registers the tools that write events on the server
  * @param server MCP server of the request
  * @param services Services that the routers of the backoffice call
  * @param call Account and origin of the request
  */
-export const registerWriteTools = (
+export const registerEventTools = (
     server: McpServer,
     services: McpServices,
     call: McpCall,
@@ -123,7 +105,7 @@ export const registerWriteTools = (
             title: "Create event",
             description: `Creates an event with no photo and publishes it at once on the public map. ${CONFIRMATION_RULE} Check with list_events that the event does not exist yet. The answer holds backofficeUrl: give it to the user, who adds the photos there.`,
             inputSchema: eventFieldsInput,
-            annotations: write,
+            annotations: WRITE_ANNOTATIONS,
         },
         input =>
             runTool("create_event", savedEventSchema, async () =>
@@ -142,14 +124,12 @@ export const registerWriteTools = (
             title: "Update event",
             description: `Changes some fields of an event and publishes the change at once. Every field left out keeps its value, the photos included. ${CONFIRMATION_RULE}`,
             inputSchema: z.object({
-                eventId: z.uuid().describe("Id of the event"),
-                changes: eventFieldsInput
-                    .partial()
-                    .describe(
-                        "The fields that change, alone. Each one replaces the whole field, an object field included",
-                    ),
+                eventId: eventIdInput,
+                changes: eventChangesInput.describe(
+                    "The fields that change, alone. Each one replaces the whole field, an object field included",
+                ),
             }),
-            annotations: write,
+            annotations: WRITE_ANNOTATIONS,
         },
         ({ eventId, changes }) =>
             runTool("update_event", savedEventSchema, async () => {
@@ -165,41 +145,58 @@ export const registerWriteTools = (
     )
 
     server.registerTool(
-        "create_venue",
+        "delete_event",
         {
-            title: "Create venue",
-            description: `Creates a venue. Call it only when search_venues finds no match and the user agreed to a new venue. Take the address and the coordinates from a search_places result. ${CONFIRMATION_RULE}`,
-            inputSchema: venueCreationSchema,
-            annotations: write,
+            title: "Delete event",
+            description: `Deletes an event with every date and photo: it leaves the map, the saved lists of the visitors and the backoffice. Read it with get_event first. ${DELETE_RULE} To hide an event and keep it, use block_event.`,
+            inputSchema: z.object({ eventId: eventIdInput }),
+            annotations: WRITE_ANNOTATIONS,
         },
-        input =>
-            runTool("create_venue", createdVenueSchema, () =>
-                services.venues.create(input, call.account),
+        ({ eventId }) =>
+            runTool("delete_event", deletedEventSchema, async () => {
+                await services.events.delete(eventId, call.account)
+                return { deletedEventId: eventId }
+            }),
+    )
+
+    server.registerTool(
+        "block_event",
+        {
+            title: "Block event",
+            description: `Hides an event from the public map and keeps it in the backoffice, with a reason that the backoffice shows. An edit of the event keeps the block. ${BLOCK_RULE}`,
+            inputSchema: z.object({
+                eventId: eventIdInput,
+                reason: eventBlockSchema.shape.reason.describe(
+                    "Why the event is blocked, at most 280 characters",
+                ),
+            }),
+            annotations: WRITE_ANNOTATIONS,
+        },
+        ({ eventId, reason }) =>
+            runTool("block_event", eventSchema, () =>
+                services.events.setBlocked(
+                    eventId,
+                    { isBlocked: true, blockReason: reason },
+                    call.account,
+                ),
             ),
     )
 
     server.registerTool(
-        "update_venue",
+        "unblock_event",
         {
-            title: "Update venue",
-            description: `Changes some fields of a venue and publishes the change at once, on the venue and on every event held there. Every field left out keeps its value. Find the venue with search_venues first. ${CONFIRMATION_RULE}`,
-            inputSchema: z.object({
-                venueId: z.uuid().describe("Id of the venue, from search_venues"),
-                changes: venueChangesInput.describe("The fields that change, alone"),
-            }),
-            annotations: write,
+            title: "Unblock event",
+            description: `Shows a blocked event on the public map again, unless its organizer is blocked. ${CONFIRMATION_RULE}`,
+            inputSchema: z.object({ eventId: eventIdInput }),
+            annotations: WRITE_ANNOTATIONS,
         },
-        ({ venueId, changes }) =>
-            runTool("update_venue", updatedVenueSchema, async () => {
-                const current = await services.venues.getById(venueId)
-                const update = parseToolInput(venueUpdateSchema, {
-                    ...changes,
-                    links:
-                        changes.links === undefined
-                            ? undefined
-                            : { ...current.links, ...changes.links },
-                })
-                return await services.venues.update(venueId, update, call.account)
-            }),
+        ({ eventId }) =>
+            runTool("unblock_event", eventSchema, () =>
+                services.events.setBlocked(
+                    eventId,
+                    { isBlocked: false, blockReason: null },
+                    call.account,
+                ),
+            ),
     )
 }

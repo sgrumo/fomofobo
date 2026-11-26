@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 
 import { signInAs } from "../auth/utils"
 import { createVenue, getVenue, updateVenue } from "../backoffice-venues/api"
-import { buildVenueCreation } from "../backoffice-venues/utils"
+import { buildVenueCreation, uploadVenueCover } from "../backoffice-venues/utils"
 import { authorizeAdmin } from "../oauth/utils"
 import { callTool } from "./api"
 
@@ -49,6 +49,30 @@ describe("MCP update_venue", () => {
                 facebookUrl: "https://www.facebook.com/venue",
             },
         })
+        expect(result).toStrictEqual({ isError: false, value: read.data })
+    })
+
+    it("removes the cover photo", async () => {
+        const { headers } = await signInAs("admin")
+        const created = await createVenue({ headers, body: buildVenueCreation() })
+        expectStatus(created, 201)
+        const cover = await uploadVenueCover(headers, created.data.id)
+        const withCover = await updateVenue({
+            headers,
+            pathParams: { id: created.data.id },
+            body: { coverPhotoKey: cover.key },
+        })
+        expectStatus(withCover, 200)
+        const { tokens } = await authorizeAdmin()
+
+        const result = await callTool(tokens.access_token, "update_venue", {
+            venueId: created.data.id,
+            changes: { removeCoverPhoto: true },
+        })
+
+        const read = await getVenue({ headers, pathParams: { id: created.data.id } })
+        expectStatus(read, 200)
+        expect(read.data).toStrictEqual({ ...withCover.data, coverPhotoUrl: null })
         expect(result).toStrictEqual({ isError: false, value: read.data })
     })
 

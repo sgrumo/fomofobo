@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-26 · The claude.ai chat covers every Admin write
+
+### Changed
+
+The chat of an Admin now does every write of the backoffice except uploads and passwords: deletes, blocks, venue owners and kinds, categories, organizers and settings. Before, it added and changed events and venues alone.
+
+### Why
+
+A decision. The Admin manages the whole catalogue from the chat, with no backoffice form.
+
+### Check next time
+
+Agree early which writes a chat channel covers, and keep passwords and uploads out of it.
+
 ## 2026-11-24 · The date filter gains day parts
 
 ### Changed

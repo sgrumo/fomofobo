@@ -1,6 +1,6 @@
 # Connettore Zonzo per claude.ai
 
-Questa guida spiega come un Owner collega Zonzo a claude.ai e come un Admin aggiunge un evento da una chat.
+Questa guida spiega come un Owner collega Zonzo a claude.ai e come un Admin aggiunge un evento e gestisce il resto del backoffice da una chat.
 
 ## Cosa serve
 
@@ -38,7 +38,24 @@ Hai finito quando l'evento si apre nel backoffice con le sue foto.
 
 Per cambiare un evento, chiedilo a Claude in una chat con Zonzo attivo. Claude mostra cosa cambia e aspetta un sì.
 
+## Gestire il resto
+
+In una chat con Zonzo attivo, Claude fa anche il resto del lavoro del backoffice. Chiedi in parole semplici, per esempio "blocca il luogo X perché è chiuso".
+
+- Eventi: eliminarli, bloccarli con un motivo e sbloccarli, togliere o riordinare le foto.
+- Luoghi: cambiare i dati e i link, togliere la copertina, assegnarli a un organizzatore, renderli cinema, musei o teatri, bloccarli e sbloccarli.
+- Categorie: crearle, cambiare nome e icona, togliere l'immagine, eliminarle.
+- Organizzatori: crearli, bloccarli e sbloccarli.
+- Impostazioni: i giorni in cui un evento finito resta sulla mappa e la soglia degli interessati.
+
+Un luogo o un organizzatore non si elimina: si blocca. Una categoria si elimina solo quando nessun evento e nessun luogo la usa.
+
+Hai finito quando Claude conferma la modifica e la vedi nel backoffice.
+
 ## Cosa sapere
+
+- Un'eliminazione non si può annullare. Claude dice cosa elimina e aspetta un sì: leggi bene prima di rispondere.
+- Claude non chiede e non scrive mai una password. Un organizzatore creato dalla chat non può accedere finché non imposti la sua prima password nella pagina Organizzatori del backoffice, dal link che ti dà Claude.
 
 - Un evento è pubblico sulla mappa appena Claude lo salva.
 - Le foto non passano dalla chat. Un'immagine incollata serve a Claude solo per leggere i dati dell'evento.

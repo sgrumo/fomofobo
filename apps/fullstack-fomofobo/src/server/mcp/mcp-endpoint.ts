@@ -39,7 +39,14 @@ export const buildMcpEndpoint = (
                 { keepAliveMs: 0 },
             )
             try {
-                return await handler.fetch(request)
+                const response = await handler.fetch(request)
+                // The tool runs while the SSE body streams: read it whole, so the cache expiries of its write land inside the request
+                const body = await response.arrayBuffer()
+                return new Response(body, {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: response.headers,
+                })
             } finally {
                 await handler.close()
             }

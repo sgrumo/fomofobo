@@ -3,13 +3,15 @@ import { McpServer } from "@modelcontextprotocol/server"
 import type { Account } from "models"
 
 import type { Container } from "../container"
+import { registerAdminTools } from "./mcp-admin-tools"
+import { registerEventTools } from "./mcp-event-tools"
 import { MCP_INSTRUCTIONS } from "./mcp-instructions"
 import { registerReadTools } from "./mcp-read-tools"
-import { registerWriteTools } from "./mcp-write-tools"
+import { registerVenueTools } from "./mcp-venue-tools"
 
 export type McpServices = Pick<
     Container,
-    "categories" | "events" | "organizers" | "places" | "venues"
+    "categories" | "events" | "organizers" | "places" | "settings" | "venues"
 >
 
 export interface McpCall {
@@ -30,6 +32,8 @@ export const buildMcpServer = (services: McpServices, call: McpCall): McpServer 
         { instructions: MCP_INSTRUCTIONS },
     )
     registerReadTools(server, services, call)
-    registerWriteTools(server, services, call)
+    registerEventTools(server, services, call)
+    registerVenueTools(server, services, call)
+    registerAdminTools(server, services, call)
     return server
 }
