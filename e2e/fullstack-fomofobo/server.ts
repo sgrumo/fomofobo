@@ -28,6 +28,19 @@ export const VERSION_GATE_ENV = {
 }
 
 /**
+ * @remarks Lists two apps of each platform, as the dev environment does: the tester id and the
+ * store id
+ */
+export const APP_LINKS_ENV = {
+    IOS_APP_IDS: "ABCDE12345.it.example.app.dev,ABCDE12345.it.example.app",
+    ANDROID_PACKAGES: "it.example.app.dev,it.example.app",
+    ANDROID_CERT_FINGERPRINTS: [
+        Array.from({ length: 32 }, () => "0A").join(":"),
+        Array.from({ length: 32 }, () => "B1").join(":"),
+    ].join(","),
+}
+
+/**
  * @description Builds the production bundle of the app with `next build`, on an empty data cache
  */
 export const buildApp = () => {
@@ -74,6 +87,7 @@ export const appServer = (options: {
         GEOAPIFY_BASE_URL: options.geocodingBaseUrl,
         GEOAPIFY_API_KEY: "e2e-geoapify-key",
         ...VERSION_GATE_ENV,
+        ...APP_LINKS_ENV,
     },
     // The app answers here in every environment; the Swagger route does not.
     healthUrl: `http://127.0.0.1:${options.port}/api/health`,

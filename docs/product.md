@@ -88,7 +88,7 @@ The event and venue details open over the map, with no page of their own. On a w
 
 The event detail offers directions to the venue and a save action. Its useful links are the website, Instagram and Facebook links of the venue, and an Instagram or Facebook link of the event takes the place of the venue link of the same platform. The event of a blocked venue shows only its own links. The detail shows the price summary, the capacity and the count of interested visitors, and lists every price, the membership card, the minimum age and the notes when the scheme holds more than one price line. On the web, directions open Apple Maps on iOS and iPadOS, and Google Maps elsewhere. The native app asks which maps app to use: Apple Maps, Google Maps or Waze on iOS, Google Maps or Waze on Android. On iOS it offers Google Maps and Waze only when the phone has them, and it opens the one maps app with no question when only Apple Maps is there.
 
-A share action on the detail shares it on WhatsApp, Telegram and Facebook with its title, date, time and venue, or copies the link. A shared link shows a card with the title, the cover, and the description of the event or else its date, time and venue.
+A share action on the detail shares it on WhatsApp, Telegram and Facebook with its title, date, time and venue, or copies the link. A shared link shows a card with the title, the cover, and the description of the event or else its date, time and venue. On a phone with the native app, a shared link opens the detail in the app, and the web map otherwise.
 
 ### Venue detail
 

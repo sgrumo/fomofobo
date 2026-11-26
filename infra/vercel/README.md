@@ -33,6 +33,21 @@ claude.ai identifies itself with a Client ID Metadata Document, which the app fe
 
 `GET /api/client-compatibility` tells each build of the mobile app to go on, to update, or to wait for maintenance. Before a breaking change of the API, follow `mobile-version-gate.md`.
 
+## App links
+
+A shared link of the map, `/<lang>/map?...`, opens the native app when the phone has it, and the web map when it does not. The phone checks two documents of the origin first, and the app serves both from `env/<env>.env`:
+
+| Document                                  | Variables                                                         |
+| ----------------------------------------- | ----------------------------------------------------------------- |
+| `/.well-known/apple-app-site-association` | `IOS_APP_IDS`: `<team id>.<bundle id>` of each iOS app            |
+| `/.well-known/assetlinks.json`            | `ANDROID_PACKAGES`, and `ANDROID_CERT_FINGERPRINTS` of their keys |
+
+Each list is comma-separated. List every app id that shares links of the environment: `dev` serves the tester builds, which carry the `.dev` id, and the TestFlight and Play internal builds, which carry the store id on the dev backend.
+
+`ANDROID_CERT_FINGERPRINTS` holds the SHA-256 fingerprint of each key that signs an installed build: the app signing key of Google Play, from Play Console > Test and release > App integrity, and the upload key, which signs the App Distribution builds. Unset, the document holds no statement and Android opens the links in the browser.
+
+Apple reads the document through its CDN, which caches it for up to a day. Check a change with `curl https://app-site-association.cdn-apple.com/a/v1/<host>`.
+
 ## Plan limits
 
 - Vercel Hobby is for non-commercial use only. Ads, paid listings or a paying client break its terms. See the [Hobby plan](https://vercel.com/docs/plans/hobby).

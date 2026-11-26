@@ -50,6 +50,41 @@ const authSecretSchema = z
     .min(32, { error: "must hold at least 32 random characters" })
 
 /**
+ * @description Returns a schema reading a comma-separated list, each item checked by the rule
+ * @param item Rule of one item
+ */
+const commaListSchema = (item: z.ZodString) =>
+    z
+        .string()
+        .transform(value =>
+            value
+                .split(",")
+                .map(entry => entry.trim())
+                .filter(entry => entry !== ""),
+        )
+        .pipe(z.array(item))
+
+/** Team id and bundle id of an iOS app, for example `ABCDE12345.com.example.app`. */
+const iosAppIdsSchema = commaListSchema(
+    z.string().regex(/^[A-Z0-9]{10}\.[A-Za-z0-9.-]+$/u, {
+        error: "must list <team id>.<bundle id> values, separated by commas",
+    }),
+)
+
+const androidPackagesSchema = commaListSchema(
+    z.string().regex(/^[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+$/iu, {
+        error: "must list Android package names, separated by commas",
+    }),
+)
+
+/** SHA-256 fingerprints of the certificates that sign the Android apps, as `keytool` prints them. */
+const androidCertFingerprintsSchema = commaListSchema(
+    z.string().regex(/^(?:[0-9A-F]{2}:){31}[0-9A-F]{2}$/u, {
+        error: "must list SHA-256 fingerprints in the AB:CD:... form, separated by commas",
+    }),
+)
+
+/**
  * @description Builds one schema block per deployment shape, with every field in every
  * block
  * @remarks Repeats every field on purpose, and uses `.nonempty()` everywhere because
@@ -88,6 +123,9 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         ANDROID_CURRENT_VERSION: optionalEnv(semverSchema),
         ANDROID_RELEASE_LIVE: optionalEnv(z.stringbool()),
         ANDROID_STORE_URL: optionalEnv(z.string().nonempty()),
+        IOS_APP_IDS: optionalEnv(iosAppIdsSchema),
+        ANDROID_PACKAGES: optionalEnv(androidPackagesSchema),
+        ANDROID_CERT_FINGERPRINTS: optionalEnv(androidCertFingerprintsSchema),
     }),
     z.object({
         APP_ENV: appEnv.extract(["preview", "vercel"]),
@@ -111,6 +149,9 @@ const envVariants = z.discriminatedUnion("APP_ENV", [
         ANDROID_CURRENT_VERSION: optionalEnv(semverSchema),
         ANDROID_RELEASE_LIVE: optionalEnv(z.stringbool()),
         ANDROID_STORE_URL: optionalEnv(z.string().nonempty()),
+        IOS_APP_IDS: optionalEnv(iosAppIdsSchema),
+        ANDROID_PACKAGES: optionalEnv(androidPackagesSchema),
+        ANDROID_CERT_FINGERPRINTS: optionalEnv(androidCertFingerprintsSchema),
     }),
 ])
 export type Env = z.infer<typeof envVariants>

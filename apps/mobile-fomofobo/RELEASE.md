@@ -44,6 +44,9 @@ The values go in `.env`. A `*_PATH` value is the absolute path of the file. `.en
 4. Write `APPLE_TEAM_ID` from [developer.apple.com/account](https://developer.apple.com/account), under Membership details.
 5. Under Certificates, Identifiers & Profiles, register the identifiers `it.quinck.zonzo` and `it.quinck.zonzo.dev`. Match creates no App ID.
 6. In App Store Connect, create the app record of `it.quinck.zonzo`. The dev id needs no record.
+7. Under Identifiers, turn on Associated Domains for both identifiers. A shared link of the map opens the app through it, and the build claims the host of `API_URL`.
+
+If you turn on a capability after match stored the profiles, the stored profiles lack it, and the archive fails on a missing entitlement. Delete the two profiles under Profiles in the portal, then run `bundle exec fastlane ios certificates`. The portal list holds no certificate, so this delete revokes none.
 
 The first `certificates` run creates the distribution certificate, and that needs the Admin role. After it, you can replace the key with one of the App Manager role.
 

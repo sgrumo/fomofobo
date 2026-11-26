@@ -165,6 +165,51 @@ describe("parseEnv", () => {
         ).toThrow("ANDROID_MIN_VERSION")
     })
 
+    it("should split the app link lists on commas, around blanks", () => {
+        const fingerprint = Array.from({ length: 32 }, () => "0F").join(":")
+        const env = parseEnv(
+            {
+                ...vercelEnv,
+                IOS_APP_IDS: "ABCDE12345.it.example.app, ABCDE12345.it.example.app.dev",
+                ANDROID_PACKAGES: "it.example.app,",
+                ANDROID_CERT_FINGERPRINTS: fingerprint,
+            },
+            true,
+        )
+
+        expect([
+            env.IOS_APP_IDS,
+            env.ANDROID_PACKAGES,
+            env.ANDROID_CERT_FINGERPRINTS,
+        ]).toStrictEqual([
+            ["ABCDE12345.it.example.app", "ABCDE12345.it.example.app.dev"],
+            ["it.example.app"],
+            [fingerprint],
+        ])
+    })
+
+    it("should leave every app link list unset by default", () => {
+        const env = parseEnv(vercelEnv, true)
+
+        expect([
+            env.IOS_APP_IDS,
+            env.ANDROID_PACKAGES,
+            env.ANDROID_CERT_FINGERPRINTS,
+        ]).toStrictEqual([undefined, undefined, undefined])
+    })
+
+    it("should reject an iOS app id without its team id", () => {
+        expect(() =>
+            parseEnv({ ...vercelEnv, IOS_APP_IDS: "it.example.app" }, true),
+        ).toThrow("IOS_APP_IDS")
+    })
+
+    it("should reject a fingerprint that is not a colon-separated SHA-256", () => {
+        expect(() =>
+            parseEnv({ ...vercelEnv, ANDROID_CERT_FINGERPRINTS: "0f0f0f" }, true),
+        ).toThrow("ANDROID_CERT_FINGERPRINTS")
+    })
+
     it("should reject an S3 endpoint without a scheme", () => {
         expect(() =>
             parseEnv(
