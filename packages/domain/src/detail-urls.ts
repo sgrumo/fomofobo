@@ -1,6 +1,7 @@
 import type { OccurrenceRef } from "models"
 import { z } from "zod"
 
+import { mapPathOf } from "./app-links"
 import { mapQuerySchema } from "./map-query"
 import type { MapQuery } from "./map-query"
 
@@ -11,7 +12,7 @@ import type { MapQuery } from "./map-query"
  * @param query Keys of the map query
  */
 const mapUrlOf = (baseUrl: string, language: string, query: MapQuery): string => {
-    const url = new URL(`/${language}/map`, baseUrl)
+    const url = new URL(mapPathOf(language), baseUrl)
     url.search = new URLSearchParams(z.encode(mapQuerySchema, query)).toString()
     return url.href
 }

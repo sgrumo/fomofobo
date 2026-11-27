@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs"
 import path from "node:path"
 
+import { appLinkPathsOf } from "domain/app-links"
 import type { ExpoConfig } from "expo/config"
 import { languageKeys } from "i18n/i18n"
 
@@ -24,6 +25,12 @@ const buildNumber = env.APP_BUILD_NUMBER ?? 1
 // build on one phone.
 const baseAppId = "it.quinck.zonzo"
 const appId = `${baseAppId}${target.appIdSuffix}`
+
+// A shared link points at the origin the app calls, so the app opens the map links of that
+// origin. The phone checks the claim against the origin over HTTPS alone.
+const apiUrl = URL.canParse(env.API_URL) ? new URL(env.API_URL) : undefined
+const appLinkHost = apiUrl?.protocol === "https:" ? apiUrl.host : undefined
+const appLinkPaths = appLinkPathsOf(languageKeys)
 
 /**
  * @description Returns the config path when the file is present, undefined otherwise
@@ -73,6 +80,8 @@ const config: ExpoConfig = {
         bundleIdentifier: appId,
         buildNumber: String(buildNumber),
         googleServicesFile: googleServicesFile("GoogleService-Info.plist"),
+        associatedDomains:
+            appLinkHost === undefined ? undefined : [`applinks:${appLinkHost}`],
         infoPlist: {
             CFBundleAllowMixedLocalizations: true,
             // HTTPS alone, so App Store Connect asks no export compliance question per build
@@ -85,6 +94,21 @@ const config: ExpoConfig = {
         package: appId,
         versionCode: buildNumber,
         googleServicesFile: googleServicesFile("google-services.json"),
+        intentFilters:
+            appLinkHost === undefined
+                ? undefined
+                : [
+                      {
+                          action: "VIEW",
+                          autoVerify: true,
+                          data: appLinkPaths.map(appLinkPath => ({
+                              scheme: "https",
+                              host: appLinkHost,
+                              path: appLinkPath,
+                          })),
+                          category: ["BROWSABLE", "DEFAULT"],
+                      },
+                  ],
         adaptiveIcon: {
             foregroundImage: "./assets/adaptive-icon.png",
             backgroundColor: THEME_COLORS["map-ground"],

@@ -184,6 +184,10 @@ export const routes = {
 
 export const routeHandlers = {
     api: createRouteHandler({ segments: ["api", "[[...route]]"] }),
+    appleAppSiteAssociation: createRouteHandler({
+        segments: [".well-known", "apple-app-site-association"],
+    }),
+    assetLinks: createRouteHandler({ segments: [".well-known", "assetlinks.json"] }),
     authLogout: createRouteHandler({ segments: ["auth", "logout"] }),
     oauthAuthorizationServerMetadata: createRouteHandler({
         segments: [".well-known", "oauth-authorization-server", "[[...issuer]]"],

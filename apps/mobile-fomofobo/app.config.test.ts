@@ -121,6 +121,35 @@ describe("app.config", () => {
         expect(dev.scheme).toBe("zonzodev")
     })
 
+    // A shared link points at the web origin of API_URL. The TestFlight build pairs the store
+    // id with the dev backend, so the claim follows API_URL, not the environment.
+    it("opens the map links of the HTTPS origin of API_URL, on both platforms", async () => {
+        const released = await loadConfigFor("prod")
+        expect(released.ios?.associatedDomains).toStrictEqual([
+            "applinks:api.example.com",
+        ])
+        expect(released.android?.intentFilters).toStrictEqual([
+            {
+                action: "VIEW",
+                autoVerify: true,
+                data: languageKeys.map(language => ({
+                    scheme: "https",
+                    host: "api.example.com",
+                    path: `/${language}/map`,
+                })),
+                category: ["BROWSABLE", "DEFAULT"],
+            },
+        ])
+    })
+
+    it("opens no link of a plain HTTP origin, such as the local server", async () => {
+        vi.stubEnv("APP_ENV", "local")
+        vi.stubEnv("API_URL", "http://localhost:3000")
+        const local = await loadConfig()
+        expect(local.ios?.associatedDomains).toBeUndefined()
+        expect(local.android?.intentFilters).toBeUndefined()
+    })
+
     it("takes the release version from APP_VERSION", async () => {
         vi.stubEnv("APP_VERSION", "1.2.0")
         const released = await loadConfig()

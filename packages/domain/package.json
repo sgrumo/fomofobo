@@ -4,6 +4,7 @@
     "private": true,
     "type": "module",
     "exports": {
+        "./app-links": "./src/app-links.ts",
         "./bounding-box": "./src/bounding-box.ts",
         "./detail-urls": "./src/detail-urls.ts",
         "./directions-url": "./src/directions-url.ts",
