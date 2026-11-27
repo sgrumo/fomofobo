@@ -30,6 +30,7 @@ interface PlaceSearchProps extends RouteClientComponentProps<"map"> {
     onEventSelect: (ref: OccurrenceRef) => void
     onVenueSelect: (venueId: string) => void
     onTextSubmit: (text: string) => void
+    onFocus: () => void
 }
 
 export const PlaceSearch = (props: PlaceSearchProps) => {
@@ -131,6 +132,7 @@ export const PlaceSearch = (props: PlaceSearchProps) => {
                 loading={searching}
                 onFocus={() => {
                     setOpen(true)
+                    props.onFocus()
                 }}
                 onBlur={closeWhenFocusLeaves}
                 onKeyDown={event => {

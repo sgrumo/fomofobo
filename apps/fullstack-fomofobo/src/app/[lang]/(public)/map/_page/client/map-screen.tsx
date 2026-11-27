@@ -279,9 +279,16 @@ export const MapScreen = (props: MapScreenProps) => {
             { history: opening ? "push" : "replace" },
         )
     }
+    // Query of the entry that a close pops, so a second close in the same press, such as the
+    // outside press of a sheet, waits for the pop in place of replacing that entry
+    const poppedQueryRef = useRef<typeof query>(undefined)
     const closePreview = () => {
+        if (poppedQueryRef.current === query) {
+            return
+        }
         if (previewPushedRef.current) {
             previewPushedRef.current = false
+            poppedQueryRef.current = query
             globalThis.history.go(detailPushed ? -2 : -1)
             return
         }
@@ -301,7 +308,7 @@ export const MapScreen = (props: MapScreenProps) => {
             closePreview()
         }
     }
-    // A zoom into a cluster closes the preview and the detail over it
+    // A zoom into a cluster or a new search closes the preview and the detail over it
     const closeOpenPreview = () => {
         if (previewOpen) {
             closePreview()
@@ -682,6 +689,8 @@ export const MapScreen = (props: MapScreenProps) => {
                             onTextSubmit={text => {
                                 setQuery(textQueryOf(text))
                             }}
+                            // A new search leaves the open preview or detail
+                            onFocus={closeOpenPreview}
                         />
                     </div>
                     <div className="relative">

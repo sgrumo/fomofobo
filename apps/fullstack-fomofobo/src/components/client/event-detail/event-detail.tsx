@@ -118,7 +118,9 @@ export const EventDetail = (props: EventDetailProps) => {
             <div className="flex flex-col gap-2">
                 <h1 className="tp-pixel-2xl uppercase">{occurrence.title}</h1>
                 {occurrence.description === null ? undefined : (
-                    <p className="tp-body-lg text-fg-muted">{occurrence.description}</p>
+                    <p className="tp-body-lg text-fg-muted whitespace-pre-line">
+                        {occurrence.description}
+                    </p>
                 )}
             </div>
             <StatGrid items={facts} />

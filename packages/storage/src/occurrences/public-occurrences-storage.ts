@@ -5,6 +5,7 @@ import {
     desc,
     eq,
     exists,
+    getTableColumns,
     gt,
     inArray,
     isNull,
@@ -115,16 +116,25 @@ export interface StoredOccurrenceSummary {
     priceScheme: PriceScheme
 }
 
+interface StoredVenueCategoryFallback {
+    imageObjectKey: string | null
+    icon: CategoryIcon
+}
+
 export type StoredPublicVenue = StrictOmit<
     PublicVenue,
     "coverPhotoUrl" | "coverNaturalUrl" | "upcoming"
 > & {
     coverObjectKey: string | null
     coverOriginalObjectKey: string | null
+    categoryFallback:
+        | (StoredVenueCategoryFallback & { imageOriginalObjectKey: string | null })
+        | null
 }
 
 export type StoredPermanentVenue = StrictOmit<PermanentVenueSummary, "coverPhotoUrl"> & {
     coverObjectKey: string | null
+    categoryFallback: StoredVenueCategoryFallback
 }
 
 export interface StoredOccurrenceDetail extends StoredOccurrenceSummary {
@@ -174,6 +184,16 @@ const insideCircle = (circle: PublicSearchCircle): SQL | undefined =>
     )
 
 const primaryCategoryOfEvent = sql<string>`(select ${eventCategories.categoryId} from ${eventCategories} where ${eventCategories.eventId} = ${events.id} and ${eventCategories.isPrimary} = 1)`
+
+const venueCategoryColumns = {
+    categoryImageObjectKey: sql<
+        string | null
+    >`(select ${categories.imageObjectKey} from ${categories} where ${categories.id} = ${venues.categoryId})`,
+    categoryImageOriginalObjectKey: sql<
+        string | null
+    >`(select ${categories.imageOriginalObjectKey} from ${categories} where ${categories.id} = ${venues.categoryId})`,
+    categoryIcon: sql<CategoryIcon | null>`(select ${categories.icon} from ${categories} where ${categories.id} = ${venues.categoryId})`,
+}
 
 const summaryColumns = {
     eventId: eventOccurrences.eventId,
@@ -371,7 +391,7 @@ export class PublicOccurrencesStorage {
                 )
                 .limit(search.limit + 1),
             this.db
-                .select()
+                .select({ ...getTableColumns(venues), ...venueCategoryColumns })
                 .from(venues)
                 .where(
                     and(
@@ -396,7 +416,8 @@ export class PublicOccurrencesStorage {
                 .flatMap(row =>
                     row.kind === "regular" ||
                     row.programmeUrl === null ||
-                    row.categoryId === null
+                    row.categoryId === null ||
+                    row.categoryIcon === null
                         ? []
                         : [
                               {
@@ -412,6 +433,10 @@ export class PublicOccurrencesStorage {
                                   programmeUrl: row.programmeUrl,
                                   categoryId: row.categoryId,
                                   closingDays: row.closingDays,
+                                  categoryFallback: {
+                                      imageObjectKey: row.categoryImageObjectKey,
+                                      icon: row.categoryIcon,
+                                  },
                               },
                           ],
                 ),
@@ -551,7 +576,7 @@ export class PublicOccurrencesStorage {
      */
     public async findPublicVenue(id: string): Promise<StoredPublicVenue | null> {
         const [row] = await this.db
-            .select()
+            .select({ ...getTableColumns(venues), ...venueCategoryColumns })
             .from(venues)
             .where(and(eq(venues.id, id), sql`${venues.isBlocked} = 0`))
         return row
@@ -571,6 +596,15 @@ export class PublicOccurrencesStorage {
                   kind: row.kind,
                   programmeUrl: row.programmeUrl,
                   closingDays: row.closingDays,
+                  categoryFallback:
+                      row.categoryIcon === null
+                          ? null
+                          : {
+                                imageObjectKey: row.categoryImageObjectKey,
+                                imageOriginalObjectKey:
+                                    row.categoryImageOriginalObjectKey,
+                                icon: row.categoryIcon,
+                            },
               }
             : null
     }

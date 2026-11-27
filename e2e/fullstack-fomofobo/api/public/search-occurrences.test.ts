@@ -152,7 +152,7 @@ describe("GET /api/public/occurrences", () => {
                     name: near.name,
                     address: near.address,
                     coordinates: near.coordinates,
-                    coverPhotoUrl: null,
+                    coverPhotoUrl: expect.stringMatching(/\/fallbacks\/[a-z]+\.png$/u),
                     kind: "cinema",
                     programmeUrl: near.programmeUrl,
                     categoryId,

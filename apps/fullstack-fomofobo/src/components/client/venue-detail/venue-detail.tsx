@@ -123,7 +123,7 @@ export const VenueDetail = (props: VenueDetailProps) => {
                     <p className="tp-pixel-sm uppercase">{closingText}</p>
                 )}
                 {venue.description === null ? undefined : (
-                    <p className="tp-body-lg">{venue.description}</p>
+                    <p className="tp-body-lg whitespace-pre-line">{venue.description}</p>
                 )}
             </div>
             {permanent ? undefined : (

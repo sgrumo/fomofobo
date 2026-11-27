@@ -2,6 +2,7 @@ import "server-only"
 import { localDateOf } from "domain/local-format"
 import { PLATFORM_TIME_ZONE } from "domain/platform"
 import type {
+    CategoryIcon,
     OccurrenceDetail,
     OccurrenceLookupQuery,
     OccurrenceRef,
@@ -262,14 +263,29 @@ export class PublicOccurrencesService {
      * @param venue Stored permanent venue
      */
     private toPermanentVenue(venue: StoredPermanentVenue): PermanentVenueSummary {
-        const { coverObjectKey, ...rest } = venue
+        const { coverObjectKey, categoryFallback, ...rest } = venue
         return {
             ...rest,
-            coverPhotoUrl:
-                coverObjectKey === null
-                    ? null
-                    : photoUrl(this.photosPublicBaseUrl, coverObjectKey),
+            coverPhotoUrl: this.venueCoverUrlOf(coverObjectKey, categoryFallback),
         }
+    }
+
+    /**
+     * @description Returns the URL of the cover of a venue: its own cover, else the image of its category, else the generated image of the category icon, `null` with no cover and no category
+     * @param coverObjectKey Key of the cover of the venue
+     * @param categoryFallback Image key and icon of the category of the venue, `null` for a venue with no category
+     */
+    public venueCoverUrlOf(
+        coverObjectKey: string | null,
+        categoryFallback: { imageObjectKey: string | null; icon: CategoryIcon } | null,
+    ): string | null {
+        const key = coverObjectKey ?? categoryFallback?.imageObjectKey ?? null
+        if (key !== null) {
+            return photoUrl(this.photosPublicBaseUrl, key)
+        }
+        return categoryFallback === null
+            ? null
+            : `${this.fallbackImagesBaseUrl}${categoryFallback.icon}.png`
     }
 
     /**

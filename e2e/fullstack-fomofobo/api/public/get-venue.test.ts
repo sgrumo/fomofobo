@@ -2,14 +2,30 @@ import { expectApiError, expectStatus } from "e2e-kit/assertions"
 import { describe, expect, it } from "vitest"
 
 import { signInAs } from "../auth/utils"
+import { createCategory, updateCategory } from "../backoffice-categories/api"
+import {
+    buildCategoryCreation,
+    uploadCategoryImage,
+} from "../backoffice-categories/utils"
 import { blockEvent } from "../backoffice-events/api"
 import {
     buildWeeklyRecurrence,
     seedEvent,
     seedEventReferences,
 } from "../backoffice-events/utils"
-import { blockVenue, setVenueKind } from "../backoffice-venues/api"
-import { buildCinemaKind } from "../backoffice-venues/utils"
+import {
+    blockVenue,
+    createVenue,
+    setVenueKind,
+    updateVenue,
+} from "../backoffice-venues/api"
+import {
+    buildCinemaKind,
+    buildVenueCreation,
+    seedCinema,
+    seedPermanentVenue,
+    uploadVenueCover,
+} from "../backoffice-venues/utils"
 import { getPublicVenue } from "./api"
 import { SATURDAY_NOON } from "./utils"
 
@@ -123,6 +139,58 @@ describe("GET /api/public/venues/{venueId}", () => {
             "regular",
             "cinema",
             cinema.programmeUrl,
+        ])
+    })
+
+    it("covers a permanent venue with no cover by the category image, else the icon image", async () => {
+        const admin = await signInAs("admin")
+        const [theatre, art, regular] = await Promise.all([
+            createCategory({
+                headers: admin.headers,
+                body: { ...buildCategoryCreation(), icon: "theatre" },
+            }),
+            createCategory({
+                headers: admin.headers,
+                body: { ...buildCategoryCreation(), icon: "art" },
+            }),
+            createVenue({ headers: admin.headers, body: buildVenueCreation() }),
+        ])
+        expectStatus(theatre, 201)
+        expectStatus(art, 201)
+        expectStatus(regular, 201)
+        const image = await uploadCategoryImage(art.data.id)
+        const withImage = await updateCategory({
+            headers: admin.headers,
+            pathParams: { id: art.data.id },
+            body: { imageKey: image.key },
+        })
+        expectStatus(withImage, 200)
+        const [covered, imaged, bare] = await Promise.all([
+            seedCinema(art.data.id),
+            seedCinema(art.data.id),
+            seedPermanentVenue(theatre.data.id, "theatre"),
+        ])
+        const cover = await uploadVenueCover(admin.headers, covered.id)
+        const withCover = await updateVenue({
+            headers: admin.headers,
+            pathParams: { id: covered.id },
+            body: { coverPhotoKey: cover.key },
+        })
+        expectStatus(withCover, 200)
+
+        const covers = await Promise.all(
+            [covered.id, imaged.id, bare.id, regular.data.id].map(async venueId => {
+                const res = await getPublicVenue({ pathParams: { venueId } })
+                expectStatus(res, 200)
+                return res.data.coverPhotoUrl
+            }),
+        )
+
+        expect(covers).toStrictEqual([
+            withCover.data.coverPhotoUrl,
+            withImage.data.imageUrl,
+            expect.stringMatching(/\/fallbacks\/theatre\.png$/u),
+            null,
         ])
     })
 

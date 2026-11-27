@@ -404,13 +404,14 @@ test.describe("map", () => {
         await expect(pinOf(paid.title)).toBeVisible({ timeout: MAP_TIMEOUT_MS })
     })
 
-    test("shows a cinema under any date filter once its kind chip is pressed, and opens its detail with the programme and the directions at its bottom and no past events", async ({
+    test("shows a cinema under any date filter once its kind chip is pressed, and opens its detail with the icon image of its category, the programme and the directions at its bottom and no past events", async ({
         page,
     }) => {
         const center = buildArea()
+        const category = await seedCategory()
         const cinema = await seedPublicCinema(
             offsetPoint(center, { latitude: 0.005, longitude: 0 }),
-            await seedCategory(),
+            category,
         )
 
         await gotoPage(page, `${mapPath(center)}&date=tomorrow`)
@@ -442,6 +443,11 @@ test.describe("map", () => {
             .filter({ has: page.getByRole("heading", { level: 1, name: cinema.name }) })
         await expect(detail).toBeVisible()
         await expect(page).toHaveURL(/detail=true/u)
+        await expect(
+            detail.getByRole("img", {
+                name: t("shared", "Venue.Cover", { name: cinema.name }),
+            }),
+        ).toHaveAttribute("src", new RegExp(`/fallbacks/${category.icon}\\.png$`, "u"))
         await expect(
             detail.getByText(t("shared", "VenueKind.cinema"), { exact: true }),
         ).toBeVisible()
@@ -1288,7 +1294,7 @@ test.describe("map", () => {
         await expect(pin).toBeFocused()
     })
 
-    test("hides the map buttons under the preview of a wide screen, and closes it on a click on the map or on its pin, a filter, a drag of the map, and Escape with the focus outside it", async ({
+    test("hides the map buttons under the preview of a wide screen, and closes it on a click on the map or on its pin, a press on the search field, a filter, a drag of the map, and Escape with the focus outside it", async ({
         page,
     }) => {
         const center = buildArea()
@@ -1335,7 +1341,14 @@ test.describe("map", () => {
 
         await pin.click()
         await expect(preview).toBeVisible()
-        await page.getByLabel(t("shared", "Search.Label")).focus()
+        await page.getByLabel(t("shared", "Search.Label")).click()
+
+        await expect(preview).toBeHidden()
+        await expect(page).not.toHaveURL(/event=/u)
+
+        await pin.click()
+        await expect(preview).toBeVisible()
+        await page.getByRole("button", { name: t("shared", "Filters.Label") }).focus()
         await page.keyboard.press("Escape")
 
         await expect(preview).toBeHidden()
