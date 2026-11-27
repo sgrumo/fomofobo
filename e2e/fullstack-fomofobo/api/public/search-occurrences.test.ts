@@ -51,7 +51,7 @@ describe("GET /api/public/occurrences", () => {
 
         expectStatus(res, 200)
         expect(res.data).toStrictEqual({
-            window: { from: "2026-10-23T22:00:00.000Z", to: "2026-10-30T23:00:00.000Z" },
+            window: { from: "2026-10-23T22:00:00.000Z", to: "2026-11-22T23:00:00.000Z" },
             occurrences: [
                 {
                     eventId: saturday.id,

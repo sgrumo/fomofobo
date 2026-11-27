@@ -7,7 +7,7 @@ export const PLATFORM_TIME_ZONE = "Europe/Rome"
 export const SEARCH_RADIUS_METERS = 5000
 
 // PLACEHOLDER(OP-01)
-export const DEFAULT_WINDOW_DAYS = 7
+export const DEFAULT_WINDOW_DAYS = 30
 
 // PLACEHOLDER(OP-02)
 export const DEFAULT_CITY: { label: string; center: GeoPoint } = {

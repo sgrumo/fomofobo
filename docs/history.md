@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-27 · The default date window grows to a month
+
+### Changed
+
+With no date filter, the map shows the events of the next 30 days in place of the next 7, on the web and in the native app.
+
+### Why
+
+A decision. A week left more than half of the upcoming events off the map.
+
+### Check next time
+
+Agree early how far ahead the default view of the events reaches.
+
 ## 2026-11-26 · The claude.ai chat covers every Admin write
 
 ### Changed

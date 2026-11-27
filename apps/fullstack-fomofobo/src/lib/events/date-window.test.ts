@@ -10,7 +10,7 @@ describe("dateWindow", () => {
     it("spans today and the following days by default", () => {
         expect(dateWindow({ date: "default" }, FRIDAY_NOON, ROME)).toStrictEqual({
             from: new Date("2026-10-22T22:00:00Z"),
-            to: new Date("2026-10-29T23:00:00Z"),
+            to: new Date("2026-11-21T23:00:00Z"),
         })
     })
 
