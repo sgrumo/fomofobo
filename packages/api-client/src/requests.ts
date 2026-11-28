@@ -147,6 +147,9 @@ export const createApi = (options: ApiClientOptions) => {
 
     const saveOccurrence = responselessMutationEndpoint(PublicRoutes.saveOccurrence)
     const unsaveOccurrence = responselessMutationEndpoint(PublicRoutes.unsaveOccurrence)
+    const checkInActiveDevice = responselessMutationEndpoint(
+        PublicRoutes.checkInActiveDevice,
+    )
 
     const searchPlaces = bodylessQueryEndpoint(PublicRoutes.searchPlaces, 200)
     const searchPlacesQuery = (
@@ -433,6 +436,7 @@ export const createApi = (options: ApiClientOptions) => {
         getOccurrenceQuery,
         saveOccurrence,
         unsaveOccurrence,
+        checkInActiveDevice,
         getPublicVenue,
         getPublicVenueQuery,
         listVenueHistory,

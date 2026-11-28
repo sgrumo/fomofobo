@@ -104,6 +104,10 @@ Each save and unsave also reaches the server under a random id of the device, wh
 
 Each IP sends 60 save changes every 10 minutes at most. Past that limit, the change waits on the device for a later send.
 
+### Active devices
+
+Once a day, on a visit to the public site or a launch or return of the native app, the device sends the same random id with its platform (iOS, Android or web) and the version of the app. The server keeps one row for each device and local date of Rome, so the counts name no one. An Admin reads the distinct devices of each platform today, in the last 7 days and in the last 30 days, and the devices of each day, through the backoffice API. Each IP sends 300 check-ins every 10 minutes at most, because phones on mobile data share addresses. A native build counts from the first version that sends the check-in.
+
 ### Installation and offline use
 
 The app installs on the home screen and opens full-screen on the map. Browsers with an install prompt get an install button on the saved list, and iOS gets the steps of the share sheet.

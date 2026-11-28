@@ -10,7 +10,12 @@ import {
     uniqueIndex,
 } from "drizzle-orm/sqlite-core"
 import type { Recurrence, ReducedPrice, VenueClosingDays } from "models"
-import { accountRoleValues, categoryIconValues, venueKindValues } from "models"
+import {
+    accountRoleValues,
+    activeDevicePlatformValues,
+    categoryIconValues,
+    venueKindValues,
+} from "models"
 
 /**
  * @description Builds the quoted SQL list of enum values for a CHECK constraint
@@ -510,4 +515,22 @@ export const occurrenceSaves = sqliteTable(
         createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
     },
     table => [primaryKey({ columns: [table.eventId, table.localDate, table.deviceId] })],
+)
+
+export const activeDeviceDays = sqliteTable(
+    "active_device_days",
+    {
+        deviceId: text("device_id").notNull(),
+        localDate: text("local_date").notNull(),
+        platform: text("platform", { enum: activeDevicePlatformValues }).notNull(),
+        appVersion: text("app_version"),
+    },
+    table => [
+        primaryKey({ columns: [table.deviceId, table.localDate] }),
+        index("active_device_days_date_idx").on(table.localDate),
+        check(
+            "active_device_days_platform_check",
+            sql`${table.platform} in (${sqlValueList(activeDevicePlatformValues)})`,
+        ),
+    ],
 )

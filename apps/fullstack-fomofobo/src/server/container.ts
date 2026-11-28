@@ -4,6 +4,7 @@ import { memoize } from "es-toolkit"
 import type { DbInstanceFromSchema } from "storage"
 import {
     AccountsStorage,
+    ActiveDevicesStorage,
     buildDbInstance,
     CategoriesStorage,
     EventsStorage,
@@ -21,6 +22,7 @@ import { resolveAppConfig } from "./config/app-config"
 import { parseEnv } from "./config/env"
 import { GeoapifyProvider } from "./geocoding/geoapify-provider"
 import { mcpResourceUrl } from "./mcp/mcp-resource"
+import { ActiveDevicesService } from "./services/active-devices-service"
 import { AuthAccountsService } from "./services/auth-accounts-service"
 import { CategoriesService } from "./services/categories-service"
 import { ClientCompatibilityService } from "./services/client-compatibility-service"
@@ -35,6 +37,7 @@ import { SettingsService } from "./services/settings-service"
 import { VenuesService } from "./services/venues-service"
 
 export interface Container {
+    activeDevices: ActiveDevicesService
     appConfig: AppConfig
     db: DbInstanceFromSchema
     auth: Auth
@@ -153,6 +156,10 @@ const buildContainer = (): Container => {
             occurrencesStorage,
         ),
         saves: new PublicSavesService(savesStorage, rateLimitsStorage, occurrences),
+        activeDevices: new ActiveDevicesService(
+            new ActiveDevicesStorage(db),
+            rateLimitsStorage,
+        ),
         settings,
     }
 }

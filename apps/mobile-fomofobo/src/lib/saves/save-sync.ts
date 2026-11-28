@@ -9,6 +9,7 @@ import type { SaveChange } from "models"
 import type { DeviceStorageKey, deviceStorageSchema } from "@/lib/storage/storage-keys"
 
 import { ApiResponseError } from "../api/api-response-error"
+import { deviceIdOf } from "../device/device-id"
 
 interface SaveSyncOptions {
     storage: WebStorage<DeviceStorageKey, typeof deviceStorageSchema>
@@ -23,15 +24,7 @@ interface SaveSyncOptions {
 export const createSaveSync = (options: SaveSyncOptions) => {
     const storage = options.storage
 
-    const deviceId = (): string => {
-        const stored = storage.getItem("device-id")
-        if (stored !== null) {
-            return stored
-        }
-        const created = options.randomId()
-        storage.setItem("device-id", created)
-        return created
-    }
+    const deviceId = (): string => deviceIdOf(storage, options.randomId)
 
     const sendSaveChange = async (change: SaveChange): Promise<boolean> => {
         try {

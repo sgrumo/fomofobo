@@ -12,6 +12,7 @@ const SECTIONS = [
     "Location",
     "PlaceSearch",
     "Saves",
+    "ActiveDevices",
     "IpAddress",
     "DeviceStorage",
     "Providers",

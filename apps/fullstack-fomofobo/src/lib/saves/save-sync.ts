@@ -7,20 +7,8 @@ import type { SaveChange } from "models"
 
 import { api } from "@/lib/api/client-api"
 import { ApiTransportError } from "@/lib/api/transport-error"
+import { deviceId } from "@/lib/device/device-id"
 import { localStorage } from "@/lib/storage/local-storage"
-
-/**
- * @description Returns the id of this device, created and persisted on the first call
- */
-const deviceId = (): string => {
-    const stored = localStorage.getItem("device-id")
-    if (stored !== null) {
-        return stored
-    }
-    const created = crypto.randomUUID()
-    localStorage.setItem("device-id", created)
-    return created
-}
 
 /**
  * @description Sends one change, and returns true when it leaves the queue

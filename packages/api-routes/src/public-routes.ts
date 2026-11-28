@@ -1,5 +1,6 @@
 import { createRoute, z } from "@hono/zod-openapi"
 import {
+    activeDeviceCheckInSchema,
     categorySchema,
     localDateSchema,
     occurrenceDetailSchema,
@@ -243,5 +244,29 @@ export const PublicRoutes = {
         },
         tags: ["Public"],
         summary: "Unsave occurrence",
+    }),
+
+    checkInActiveDevice: createRoute({
+        method: "post",
+        path: "/api/public/active-devices",
+        request: {
+            body: {
+                required: true,
+                content: {
+                    "application/json": {
+                        schema: activeDeviceCheckInSchema.openapi("ActiveDeviceCheckIn"),
+                    },
+                },
+            },
+        },
+        responses: {
+            204: { description: "Use of the day counted" },
+            400: badRequestResponse,
+            429: tooManyRequestsResponse,
+        },
+        tags: ["Public"],
+        summary: "Check in active device",
+        description:
+            "Counts the use of the app by an anonymous device id on the local date of the platform. A second check-in on the same date counts once.",
     }),
 }

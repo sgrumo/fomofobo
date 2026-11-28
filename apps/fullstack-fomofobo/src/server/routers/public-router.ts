@@ -5,6 +5,7 @@ import { HttpStatus } from "models"
 
 import type { ClockEnv } from "../clock"
 import { toApplicationError } from "../errors"
+import type { ActiveDevicesService } from "../services/active-devices-service"
 import type { CategoriesService } from "../services/categories-service"
 import type { PlacesService } from "../services/places-service"
 import type { PublicOccurrencesService } from "../services/public-occurrences-service"
@@ -13,9 +14,10 @@ import type { PublicVenuesService } from "../services/public-venues-service"
 
 /**
  * @description Builds the router of the public app reads, open to every visitor
- * @param services Category reads, occurrence and venue reads, place suggestions, and anonymous saves
+ * @param services Category reads, occurrence and venue reads, place suggestions, anonymous saves, and active device check-ins
  */
 export const buildPublicRouter = (services: {
+    activeDevices: ActiveDevicesService
     categories: CategoriesService
     occurrences: PublicOccurrencesService
     places: PlacesService
@@ -132,6 +134,19 @@ export const buildPublicRouter = (services: {
             return c.body(null, HttpStatus.NoContent)
         } catch (error) {
             throw toApplicationError(error, "Error unsaving the occurrence")
+        }
+    })
+
+    router.openapi(PublicRoutes.checkInActiveDevice, async c => {
+        try {
+            await services.activeDevices.checkIn(
+                c.req.valid("json"),
+                c.req.header("x-forwarded-for"),
+                c.var.now,
+            )
+            return c.body(null, HttpStatus.NoContent)
+        } catch (error) {
+            throw toApplicationError(error, "Error checking in the device")
         }
     })
 

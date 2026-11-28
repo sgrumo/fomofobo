@@ -726,7 +726,7 @@
     },
     "Privacy": {
         "Title": "Informativa sulla privacy",
-        "Updated": "Ultimo aggiornamento: 5 novembre 2026",
+        "Updated": "Ultimo aggiornamento: 28 novembre 2026",
         "Intro": "Questa informativa spiega quali dati trattano il sito e l'app per iOS e Android quando cerchi eventi sulla mappa, e quali dati trattiamo per gli organizzatori che pubblicano dal backoffice.",
         "Sections": {
             "Controller": {
@@ -735,7 +735,7 @@
             },
             "NotCollected": {
                 "Title": "Cosa non raccogliamo",
-                "Body": "Per usare la mappa non serve un account. Non mostriamo pubblicità, non seguiamo le tue attività su app e siti di altri e non usiamo strumenti di statistica o di profilazione."
+                "Body": "Per usare la mappa non serve un account. Non mostriamo pubblicità, non seguiamo le tue attività su app e siti di altri e non usiamo strumenti di statistica o di profilazione di terze parti. Contiamo da soli, in forma anonima, quanti dispositivi usano Zonzo ogni giorno."
             },
             "Location": {
                 "Title": "Posizione",
@@ -749,9 +749,13 @@
                 "Title": "Eventi salvati",
                 "Body": "La lista degli eventi salvati resta sul tuo dispositivo. Quando salvi o togli un evento, l'app invia al server un identificativo casuale creato sul dispositivo, insieme all'evento e alla data, per contare le persone interessate. L'identificativo non contiene il tuo nome, la tua email né altri dati che ti identifichino. Il salvataggio resta sul server finché lo togli o finché l'evento viene eliminato."
             },
+            "ActiveDevices": {
+                "Title": "Dispositivi attivi",
+                "Body": "Una volta al giorno, quando apri il sito o l'app, il dispositivo invia al server lo stesso identificativo casuale degli eventi salvati, il tipo di dispositivo (iOS, Android o web) e la versione dell'app. Il server salva l'identificativo con la data, il tipo e la versione, per contare quanti dispositivi usano Zonzo ogni giorno, ogni settimana e ogni mese. Non salva la tua posizione, le ricerche né l'indirizzo IP insieme a questi dati."
+            },
             "IpAddress": {
                 "Title": "Indirizzo IP e sicurezza",
-                "Body": "Il server usa l'indirizzo IP di ogni richiesta per limitare gli abusi: al massimo 60 salvataggi ogni 10 minuti e 30 ricerche di luoghi al minuto. Per contarle salva l'indirizzo con un contatore e l'ora di inizio del conteggio. Il fornitore di hosting registra le richieste nei suoi log tecnici."
+                "Body": "Il server usa l'indirizzo IP di ogni richiesta per limitare gli abusi: al massimo 60 salvataggi ogni 10 minuti, 300 conteggi dei dispositivi attivi ogni 10 minuti e 30 ricerche di luoghi al minuto. Per contarle salva l'indirizzo con un contatore e l'ora di inizio del conteggio. Il fornitore di hosting registra le richieste nei suoi log tecnici."
             },
             "DeviceStorage": {
                 "Title": "Dati sul dispositivo e cookie",

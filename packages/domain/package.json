@@ -4,6 +4,7 @@
     "private": true,
     "type": "module",
     "exports": {
+        "./active-device": "./src/active-device.ts",
         "./app-links": "./src/app-links.ts",
         "./bounding-box": "./src/bounding-box.ts",
         "./detail-urls": "./src/detail-urls.ts",

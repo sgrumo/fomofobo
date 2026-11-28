@@ -32,6 +32,7 @@ import { Text } from "@/components/ui/text/text"
 import { ToastHost } from "@/components/ui/toast/toast-host"
 import { VersionGate } from "@/components/version-gate/version-gate"
 import { isPersistedQuery, PERSISTED_CACHE_MAX_AGE_MS } from "@/lib/api/persisted-queries"
+import { startActiveDeviceCheckIn } from "@/lib/device/active-device-check-in"
 import { nativeI18n } from "@/lib/i18n/native-i18n"
 import { perfMeasured, startPerf } from "@/lib/perf/perf-env"
 import { startDeviceSaveSync } from "@/lib/saves/device-save-sync"
@@ -64,10 +65,16 @@ const persistOptions: PersistQueryClientProviderProps["persistOptions"] = {
 
 // One stable promise for `use()`. A rejected one is dropped, so a retry starts a new init.
 // The device storage reads from memory, so it loads before the first screen.
-// Its own lazy promise starts the save sync once, even when the i18n init is retried.
-const deviceStorageReady = lazyAsync(() =>
-    hydrateDeviceStorage().then(startDeviceSaveSync),
-)
+/**
+ * @description Starts the save sync and the daily check-in, which read the device storage
+ */
+const startDeviceSync = (): void => {
+    startDeviceSaveSync()
+    startActiveDeviceCheckIn()
+}
+
+// Its own lazy promise starts the save sync and the check-in once, even when the i18n init is retried.
+const deviceStorageReady = lazyAsync(() => hydrateDeviceStorage().then(startDeviceSync))
 
 // On success the splash radar hides the native splash once the GIF paints its first frame, so no
 // frame of the screen behind shows between them. A failed init hides it for the error screen.

@@ -1,3 +1,4 @@
+export * from "./backoffice-active-devices-routes"
 export * from "./backoffice-categories-routes"
 export * from "./backoffice-events-routes"
 export * from "./backoffice-organizers-routes"

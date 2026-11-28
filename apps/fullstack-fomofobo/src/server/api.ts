@@ -19,6 +19,7 @@ import type { AppErrorCode } from "./errors"
 import { handleRouteNotFound } from "./errors"
 import { buildMcpEndpoint } from "./mcp/mcp-endpoint"
 import { MCP_PATH } from "./mcp/mcp-resource"
+import { buildBackofficeActiveDevicesRouter } from "./routers/backoffice-active-devices-router"
 import { buildBackofficeCategoriesRouter } from "./routers/backoffice-categories-router"
 import { buildBackofficeEventsRouter } from "./routers/backoffice-events-router"
 import { buildBackofficeOrganizersRouter } from "./routers/backoffice-organizers-router"
@@ -92,6 +93,7 @@ export const mapErrorStatus = (err: ApplicationError<AppErrorCode>): HttpStatus 
  */
 const buildApi = (): OpenAPIHono => {
     const {
+        activeDevices,
         appConfig,
         auth,
         authAccounts,
@@ -145,6 +147,7 @@ const buildApi = (): OpenAPIHono => {
     app.route(
         "/",
         buildPublicRouter({
+            activeDevices,
             categories,
             occurrences,
             places,
@@ -170,6 +173,7 @@ const buildApi = (): OpenAPIHono => {
     app.route("/", buildBackofficeOrganizersRouter(organizers))
     app.route("/", buildBackofficeEventsRouter(events, photos))
     app.route("/", buildBackofficeSettingsRouter(settings))
+    app.route("/", buildBackofficeActiveDevicesRouter(activeDevices))
 
     if (appConfig.testRoutesEnabled) {
         app.post(`${apiBasePath}/test/reset-database`, async c => {

@@ -6,6 +6,7 @@ export const deviceStorageSchema = {
     "saved-events": savedEventsStorageSchema,
     "save-sync": saveSyncStorageSchema,
     "device-id": z.uuid().nullable(),
+    "active-device-checked-in": z.iso.date().nullable(),
     "sounds-muted": z.boolean(),
 }
 export type DeviceStorageKey = keyof typeof deviceStorageSchema
@@ -16,6 +17,7 @@ export const deviceStorageDefaults: {
     "saved-events": { version: 1, events: [] },
     "save-sync": { version: 1, queuedStoredSaves: false, pending: [] },
     "device-id": null,
+    "active-device-checked-in": null,
     "sounds-muted": false,
 }
 
