@@ -52,6 +52,8 @@ import { playSound } from "@/lib/sounds/play-sound"
 const TOAST_DURATION_MS = 5000
 
 const CLOCK_TICK_MS = 60_000
+// A search answer stays fresh this long, so a return to the app or to an area reads no new one
+const SEARCH_FRESH_MS = 60_000
 
 const CONTROLS_BOTTOM_OFFSET = 8
 
@@ -122,7 +124,7 @@ const MapScreen = () => {
         data: searchAnswer,
         isFetching: searchFetching,
         error: searchError,
-    } = useQuery({ ...searchOptions, enabled: searchReady })
+    } = useQuery({ ...searchOptions, enabled: searchReady, staleTime: SEARCH_FRESH_MS })
     // With no answer, offline or failed, the last search of the same filters stands in, whatever its box
     const search =
         searchAnswer ??

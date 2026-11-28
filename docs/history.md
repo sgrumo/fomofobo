@@ -3,6 +3,20 @@ standard: draft
 title: fomofobo
 ---
 
+## 2026-11-28 · Map search reads nearly used up the database quota
+
+### Changed
+
+The map search reads fewer rows, and each server instance keeps a search answer for a minute on a box grown to a grid. The native app keeps a search answer fresh for a minute.
+
+### Why
+
+A technical problem. From midday of 2026-11-27, traffic on the map search read about 25M rows an hour, against a free quota of 500M a month that blocks reads past it.
+
+### Check next time
+
+Estimate the rows that the busiest query reads per call and the calls per active user, against the database quota, before a launch.
+
 ## 2026-11-27 · The default date window grows to a month
 
 ### Changed

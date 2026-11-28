@@ -26,12 +26,18 @@ import {
     dayPartWindows,
     NIGHT_START_GRACE_MS,
 } from "@/lib/events/date-window"
+import { snapToSearchGrid } from "@/lib/events/search-grid"
 import { MAX_PERMANENT_VENUE_RESULTS, MAX_SEARCH_RESULTS } from "@/lib/platform/platform"
 
 import { eventTag, PUBLIC_TAG } from "../cache"
 import { appError } from "../errors"
+import { MemoryCache } from "../memory-cache"
 import { photoUrl } from "./photos-service"
 import type { SettingsService } from "./settings-service"
+
+// A map search answer stays this long in the memory of an instance, and its minute is part of the key
+const SEARCH_CACHE_TTL_MS = 60_000
+const SEARCH_CACHE_MAX_ENTRIES = 1000
 
 /**
  * @description Returns the count of saves the public app shows: the count at the threshold or above, else `null`
@@ -65,6 +71,10 @@ export class PublicOccurrencesService {
     private readonly settings: SettingsService
     private readonly photosPublicBaseUrl: string
     private readonly fallbackImagesBaseUrl: string
+    private readonly searches = new MemoryCache<PublicSearchResponse>(
+        SEARCH_CACHE_TTL_MS,
+        SEARCH_CACHE_MAX_ENTRIES,
+    )
     public constructor(
         occurrencesStorage: PublicOccurrencesStorage,
         savesStorage: SavesStorage,
@@ -80,9 +90,10 @@ export class PublicOccurrencesService {
     }
 
     /**
-     * @description Fetches the visible occurrences of the box and the date window, live first, the permanent venues of the box, and the counts per category
+     * @description Fetches the visible occurrences of the box and the date window, live first, the permanent venues of the box, and the counts per category, from the memory of the instance for a minute
      * @param query Box, text, categories, date filter and day parts
      * @param now Instant that sets today, the status order and the occurrences ended too long ago
+     * @remarks Searches the box grown to the search grid, so the answer can hold results just outside the box
      */
     public async search(
         query: PublicSearchQuery,
@@ -97,6 +108,32 @@ export class PublicOccurrencesService {
             throw appError("PastDateRange", "The date range starts before today")
         }
 
+        const edges = snapToSearchGrid(query)
+        const key = JSON.stringify([
+            edges,
+            query.q,
+            query.categoryIds,
+            query.free,
+            query.date,
+            query.from,
+            query.to,
+            query.dayParts,
+            Math.floor(now.getTime() / SEARCH_CACHE_TTL_MS),
+        ])
+        return await this.searches.getOrLoad(key, Date.now(), () =>
+            this.searchUncached({ ...query, ...edges }, now),
+        )
+    }
+
+    /**
+     * @description Fetches the visible occurrences of the box and the date window, live first, the permanent venues of the box, and the counts per category, from the database
+     * @param query Box, text, categories, date filter and day parts
+     * @param now Instant that sets today, the status order and the occurrences ended too long ago
+     */
+    private async searchUncached(
+        query: PublicSearchQuery,
+        now: Date,
+    ): Promise<PublicSearchResponse> {
         const window = dateWindow(query, now, PLATFORM_TIME_ZONE)
         const partWindows =
             query.dayParts === undefined

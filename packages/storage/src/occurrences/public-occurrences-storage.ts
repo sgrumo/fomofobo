@@ -299,29 +299,22 @@ export class PublicOccurrencesStorage {
         truncated: boolean
     }> {
         const now = search.now.getTime()
-        const baseFilter = and(
-            visibleEvent,
+        const occurrenceFilter = and(
             // PLACEHOLDER(OP-08): overlap with the window
             gt(eventOccurrences.endsAt, search.window.from),
             lt(eventOccurrences.startsAt, search.window.to),
-            insideBox(search.box),
-            search.q === undefined ? undefined : likeContains(events.title, search.q),
-            search.free === true ? eq(events.isFree, true) : undefined,
             overlapsAnyWindow(
                 search.dayPartWindows,
                 eventOccurrences.startsAt,
                 eventOccurrences.endsAt,
             ),
         )
-        const innerDayPartFilter =
-            overlapsAnyWindow(
-                search.dayPartWindows,
-                sql`inner_occurrence.starts_at`,
-                sql`inner_occurrence.ends_at`,
-            ) ?? sql`1`
-        const firstInWindow = search.onePerEvent
-            ? sql`${eventOccurrences.startsAt} = (select min(inner_occurrence.starts_at) from ${eventOccurrences} as inner_occurrence where inner_occurrence.event_id = ${eventOccurrences.eventId} and inner_occurrence.ends_at > ${search.window.from.getTime()} and inner_occurrence.starts_at < ${search.window.to.getTime()} and ${innerDayPartFilter})`
-            : undefined
+        const eventFilter = and(
+            visibleEvent,
+            insideBox(search.box),
+            search.q === undefined ? undefined : likeContains(events.title, search.q),
+            search.free === true ? eq(events.isFree, true) : undefined,
+        )
         const permanentVenueFilter = and(
             // A permanent venue has no price, so the free filter keeps events alone.
             search.free === true ? sql`0` : undefined,
@@ -358,20 +351,35 @@ export class PublicOccurrencesStorage {
                           .where(inArray(eventCategories.categoryId, search.categoryIds)),
                   )
 
+        // Starts from the venues of the box, so a search reads the events of its area alone
         const categoryUses = unionAll(
             this.db
-                .selectDistinct({
+                .select({
                     categoryId: sql<string>`${eventCategories.categoryId}`.as(
                         "category_id",
                     ),
                     itemId: sql<string>`${events.id}`.as("item_id"),
                 })
-                .from(eventOccurrences)
-                .innerJoin(events, eq(events.id, eventOccurrences.eventId))
-                .innerJoin(venues, eq(venues.id, events.venueId))
+                .from(venues)
+                .innerJoin(events, eq(events.venueId, venues.id))
                 .innerJoin(accounts, eq(accounts.id, events.organizerId))
                 .innerJoin(eventCategories, eq(eventCategories.eventId, events.id))
-                .where(baseFilter),
+                .where(
+                    and(
+                        eventFilter,
+                        exists(
+                            this.db
+                                .select({ one: sql`1` })
+                                .from(eventOccurrences)
+                                .where(
+                                    and(
+                                        eq(eventOccurrences.eventId, events.id),
+                                        occurrenceFilter,
+                                    ),
+                                ),
+                        ),
+                    ),
+                ),
             this.db
                 .select({
                     categoryId: sql<string>`${venues.categoryId}`.as("category_id"),
@@ -383,7 +391,19 @@ export class PublicOccurrencesStorage {
 
         const [rows, permanentRows, counts] = await this.db.batch([
             selectSummaryRows(this.db)
-                .where(and(baseFilter, firstInWindow, categoryFilter))
+                .where(and(eventFilter, occurrenceFilter, categoryFilter))
+                // The bare columns of a group take the row of its min(), so each event keeps
+                // its first occurrence in the window
+                .groupBy(
+                    ...(search.onePerEvent
+                        ? [eventOccurrences.eventId]
+                        : [eventOccurrences.eventId, eventOccurrences.localDate]),
+                )
+                .having(
+                    search.onePerEvent
+                        ? sql`${eventOccurrences.startsAt} = min(${eventOccurrences.startsAt})`
+                        : undefined,
+                )
                 .orderBy(
                     sql`case when ${eventOccurrences.endsAt} <= ${now} then 2 when ${eventOccurrences.startsAt} <= ${now} then 0 else 1 end`,
                     eventOccurrences.startsAt,

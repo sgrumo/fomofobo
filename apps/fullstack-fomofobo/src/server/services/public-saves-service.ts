@@ -3,6 +3,7 @@ import type { OccurrenceRef } from "models"
 import type { RateLimitsStorage, SavesStorage } from "storage"
 
 import { appError } from "../errors"
+import { clearMemoryCaches } from "../memory-cache"
 import type { PublicOccurrencesService } from "./public-occurrences-service"
 import { rateLimitClientOf } from "./rate-limit-client"
 
@@ -43,6 +44,8 @@ export class PublicSavesService {
             deviceId,
             now,
         )
+        // A search answer carries the count of interested visitors
+        clearMemoryCaches()
     }
 
     /**
@@ -60,6 +63,7 @@ export class PublicSavesService {
     ): Promise<void> {
         await this.assertUnderLimit(forwardedFor, now)
         await this.savesStorage.remove(ref, deviceId)
+        clearMemoryCaches()
     }
 
     /**
